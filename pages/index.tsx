@@ -71,7 +71,7 @@ const index: React.FC<IndexProps> = ({ images, services }) => {
 
 export default index;
 
-export const getServerSideProps = () => {
+export const getStaticProps = () => {
   const captions = [
     "Hondenhotel",
     "Groepstrainingen",
