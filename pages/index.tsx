@@ -1,4 +1,4 @@
-import { Body, Title2, Caption } from "../components/Typography/Typography";
+import { Body, Title2 } from "../components/Typography/Typography";
 import Image from "../components/Image";
 import { nanoid } from "nanoid";
 import { ImageProps } from "../components/Image";
@@ -79,6 +79,8 @@ export const getServerSideProps = () => {
     "Contact",
   ];
 
+  const links = ["/hotel", "/trainingen", "/trainingen", "/contact"];
+
   const images = new Array<ImageProps>(12)
     .fill({ id: "" })
     .map((_) => ({ key: nanoid(5) }));
@@ -90,11 +92,13 @@ export const getServerSideProps = () => {
       image: "https://loremflickr.com/200/200/dog",
       text: "",
       alt: "",
+      link: "",
     })
     .map((_, index) => ({
       ..._,
       caption: captions[index],
       text: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem maiores ipsa, numquam molestias, provident similique, delectus voluptatem vero quaerat distinctio tempora necessitatibus et labore ab nostrum dignissimos in aliquam. Inventore.",
+      link: links[index],
     }));
 
   return {
