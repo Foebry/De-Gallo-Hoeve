@@ -14,3 +14,30 @@ body {
 * {
   box-sizing: border-box;
 }
+
+.formInput:before {
+  display: block;
+  position: absolute;
+  height: 1px;
+  content: "";
+  border-bottom: 2px solid #40909b;
+  bottom: 0;
+  left: 40%;
+  width: 0;
+}
+.formInput:after {
+  display: block;
+  position: absolute;
+  height: 1px;
+  content: "";
+  border-bottom: 2px solid #40909b;
+  bottom: 0;
+  right: 60%;
+  width: 0;
+}
+
+.inputActive:before,
+.inputActive:after {
+  width: 40%;
+  transition: all 0.5s ease;
+}

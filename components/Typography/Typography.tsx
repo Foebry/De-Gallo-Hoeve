@@ -2,6 +2,7 @@ import React, { ReactNode } from "react";
 
 export interface Props {
   children: ReactNode;
+  to?: string;
 }
 
 export const Title1: React.FC<Props> = ({ children }) => {
@@ -36,13 +37,25 @@ export const Body: React.FC<Props> = ({ children }) => {
   return <p className="text-black-200 text-base mb-2">{children}</p>;
 };
 
-export const Link: React.FC<Props> = ({ children }) => {
-  return <a className="text-center text-5xl mt-12 mb-20">{children}</a>;
+export const Link: React.FC<Props> = ({ children, to }) => {
+  return (
+    <a href={to} className="text-center text-gray-300 underline">
+      {children}
+    </a>
+  );
 };
 
 export const FootNote: React.FC<Props> = ({ children }) => {
   return (
     <p className="text-center text-black-200 absolute block w-full bottom-2.5">
+      {children}
+    </p>
+  );
+};
+
+export const FormError: React.FC<Props> = ({ children }) => {
+  return (
+    <p className="absolute left-1 -bottom-3.5 text-red-500 text-xs">
       {children}
     </p>
   );
