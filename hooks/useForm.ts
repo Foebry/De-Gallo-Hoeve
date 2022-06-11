@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { LoginInterface } from "../components/form/Form";
-import {LoginErrorsType, LoginRulesType} from "../pages/login";
+import { FormInterface } from "../types/formTypes";
+import {registerRulesInterface} from "../types/formTypes/registerTypes"
 
-type useFormProps = LoginInterface;
-type rulesType = LoginRulesType;
+type useFormProps = FormInterface;
+type rulesType = registerRulesInterface;
 
 const useForm = (initialValues: useFormProps, rules?: rulesType) => {
 	const [values, setValues] = useState(initialValues);
-	const [formErrors, setFormErrors] = useState({} as LoginErrorsType);
+	const [formErrors, setFormErrors] = useState<FormInterface>({});
 
 	const validateRule = (key: string, value: string, keyRule: Array<any>) => {
 		if( keyRule[0] === "required"){
@@ -18,7 +18,7 @@ const useForm = (initialValues: useFormProps, rules?: rulesType) => {
 		}
 		else if( keyRule[0] === "minLength"){
 			if( value.length < keyRule[1] ) {
-				setFormErrors((formErrors) => ({...formErrors, [key]: `Value too short, ${key} should be at least ${keyRule[1]} characters long.`}));
+				setFormErrors({...formErrors, [key]: `Value too short, ${key} should be at least ${keyRule[1]} characters long.`});
 				return false;
 			}
 		}

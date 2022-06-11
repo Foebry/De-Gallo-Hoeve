@@ -1,46 +1,13 @@
 import React from "react";
-import { FootNote, Link, Title2 } from "../components/Typography/Typography";
-import { LoginInterface } from "../components/form/Form";
+import { FootNote, Link } from "../components/Typography/Typography";
+import { loginRules, loginValues } from "../types/formTypes/loginTypes";
 import Form from "../components/form/Form";
 import FormInput from "../components/form/FormInput";
 import useForm from "../hooks/useForm";
 import { REGISTER } from "../types/linkTypes";
 
-export type LoginRulesType = {
-  email: {
-    required: boolean;
-    pattern: string;
-  };
-  password: {
-    required: boolean;
-    minLength: Number;
-  };
-};
-export type LoginErrorsType = {
-  email?: string;
-  password?: string;
-};
-
 const Login = () => {
-  const initialValues: LoginInterface = {
-    email: "",
-    password: "",
-  };
-  const loginRules: LoginRulesType = {
-    email: {
-      required: true,
-      pattern: "",
-    },
-    password: {
-      required: true,
-      minLength: 8,
-    },
-  };
-
-  const { onSubmit, onChange, values, formErrors } = useForm(
-    initialValues,
-    loginRules
-  );
+  const { onSubmit, onChange, values, formErrors } = useForm(loginValues);
 
   const handleSubmit = () => {
     console.log("ok");
@@ -57,7 +24,7 @@ const Login = () => {
         name="email"
         id="email"
         type="text"
-        value={values.email}
+        value={values.email ?? ""}
         onChange={onChange}
         error={formErrors.email ?? ""}
       />
@@ -66,7 +33,7 @@ const Login = () => {
         name="password"
         id="password"
         type="password"
-        value={values.password}
+        value={values.password ?? ""}
         onChange={onChange}
         error={formErrors.password ?? ""}
       />
