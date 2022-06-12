@@ -58,7 +58,7 @@ const index: React.FC<IndexProps> = ({ images, services }) => {
           ))}
         </div>
       </section>
-      <section className="bg-grey-400 px-5 py-5">
+      <section className="bg-grey-900 px-5 py-5">
         <div className="flex flex-grow flex-shrink flex-wrap gap-2.5 justify-center">
           {images.map(({ id }) => (
             <Image key={id} />

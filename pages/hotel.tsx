@@ -4,7 +4,7 @@ import { Body, Link, Title2 } from "../components/Typography/Typography";
 
 const hotel = () => {
   return (
-    <section className="bg-grey-400 px-5 py-5">
+    <section className="bg-grey-900 px-5 py-5">
       <div className="max-w-8xl flex items-center py-24 mx-auto gap-12">
         <div className="min-w-fit shadow-md">
           <img
