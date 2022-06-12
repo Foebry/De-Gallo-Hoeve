@@ -21,7 +21,7 @@ const step3: React.FC<FormStepProps> = ({
           extra="w-1/6"
           value={values.arts_postcode ?? ""}
           onChange={onChange}
-          error={formErrors.arts_postcode}
+          error={formErrors.arts_postcode ?? ""}
         />
         <FormInput
           label="naam"
@@ -30,7 +30,7 @@ const step3: React.FC<FormStepProps> = ({
           extra="w-1/2"
           value={values.arts_name ?? ""}
           onChange={onChange}
-          error={formErrors.arts_name}
+          error={formErrors.arts_name ?? ""}
         />
       </FormRow>
       {action && (
