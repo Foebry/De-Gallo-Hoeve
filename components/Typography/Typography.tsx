@@ -34,7 +34,7 @@ export const Caption: React.FC<Props> = ({ children }) => {
 };
 
 export const Body: React.FC<Props> = ({ children }) => {
-  return <p className="text-black-200 text-base mb-2">{children}</p>;
+  return <p className="text-black-100 text-base mb-2">{children}</p>;
 };
 
 export const Link: React.FC<Props> = ({ children, to }) => {
@@ -51,6 +51,14 @@ export const Link: React.FC<Props> = ({ children, to }) => {
 export const FootNote: React.FC<Props> = ({ children }) => {
   return (
     <p className="text-center text-black-200 absolute block w-full bottom-2.5">
+      {children}
+    </p>
+  );
+};
+
+export const FormError: React.FC<Props> = ({ children }) => {
+  return (
+    <p className="absolute left-1 -bottom-3.5 text-red-500 text-xs">
       {children}
     </p>
   );

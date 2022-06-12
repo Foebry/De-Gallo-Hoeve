@@ -6,7 +6,7 @@ const Header = () => {
   const router = useRouter();
   return (
     <header className="relative">
-      <h1 className="absolute right-13p top-25p text-5vmax text-grey-100">
+      <h1 className="absolute right-13p top-25p text-5vmax text-gray-100">
         De Gallo-hoeve
       </h1>
       <button
@@ -17,7 +17,7 @@ const Header = () => {
           Login
         </Link>
       </button>
-      <div className="banner__imgholder">
+      <div>
         <img
           className="block w-full aspect-6x object-fill"
           src="https://loremflickr.com/1400/320/dog"
