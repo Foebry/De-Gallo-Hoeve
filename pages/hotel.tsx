@@ -17,7 +17,7 @@ const hotel = () => {
           <Title2>Reserveren</Title2>
           <Body>
             Reserveren van een plekje gebeurt uitsluitend op afspraak en na{" "}
-            <Link>registratie</Link>.
+            <Link to="register">registratie</Link>.
           </Body>
           <Body>
             Onze reserveringsprocedure is zeer gebruiksvriendelijk, waarbij u

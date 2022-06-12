@@ -79,7 +79,7 @@ export const getStaticProps = () => {
     "Contact",
   ];
 
-  const links = ["/hotel", "/trainingen", "/trainingen", "/contact"];
+  const links = ["/hotel", "/training", "/training", "/contact"];
 
   const images = new Array<ImageProps>(12)
     .fill({ id: "" })
