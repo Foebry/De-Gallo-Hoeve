@@ -1,16 +1,27 @@
 import React from "react";
 import Link from "next/link";
-import { INDEX, HOTEL, TRAINING, CONTACT } from "../types/linkTypes";
+import {
+  INDEX,
+  HOTEL,
+  TRAINING,
+  CONTACT,
+  LOGIN,
+  REGISTER,
+} from "../types/linkTypes";
 
 export const Nav = () => {
   return (
-    <div className="hidden md:flex justify-between h-16 rounded-l-4xl items-center  max-w-8xl my-10 mx-auto w-98p bg-grey-500">
+    <div className="relative hidden md:flex justify-between h-16 rounded-l-4xl items-center  max-w-8xl my-10 mx-auto w-98p bg-grey-500">
       <div className="w-24">
         <img
           className="block w-full rounded-full aspect-square object-contain rotate-y-180 bg-grey-100"
           src="../images/logo-r.png"
           alt=""
         />
+      </div>
+      <div className="absolute left-40 flex gap-10 text-lg uppercase pr-5 text-gray-100">
+        <Link href={LOGIN}>Login</Link>
+        <Link href={REGISTER}>Registreer</Link>
       </div>
       <nav className="flex gap-10 text-lg uppercase pr-5 text-gray-100">
         <Link href={INDEX}>Home</Link>

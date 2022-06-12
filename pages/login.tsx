@@ -1,10 +1,12 @@
 import React from "react";
-import { FootNote, Link } from "../components/Typography/Typography";
+import { Body, FootNote, Link } from "../components/Typography/Typography";
 import Form from "../components/form/Form";
 import FormInput from "../components/form/FormInput";
 import useForm from "../hooks/useForm";
 import { REGISTER } from "../types/linkTypes";
 import { FormValues } from "../types/formTypes/formTypes";
+import Button from "../components/buttons/Button";
+import FormRow from "../components/form/FormRow";
 
 const Login = () => {
   const { onSubmit, onChange, values, formErrors } = useForm(FormValues);
@@ -16,7 +18,6 @@ const Login = () => {
   return (
     <Form
       title="Welkom bij de Gallo-hoeve"
-      action="login"
       onSubmit={(e: any) => onSubmit(e, handleSubmit)}
     >
       <FormInput
@@ -37,12 +38,15 @@ const Login = () => {
         onChange={onChange}
         error={formErrors.password ?? ""}
       />
-      <FootNote>
-        Nog geen account?{"	"}
-        <span>
-          <Link to={REGISTER}>registreer</Link>
-        </span>
-      </FootNote>
+      <FormRow>
+        <Body>
+          Nog geen account?{"	"}
+          <span>
+            <Link to={REGISTER}>registreer</Link>
+          </span>
+        </Body>
+        <Button label="login" />
+      </FormRow>
     </Form>
   );
 };
