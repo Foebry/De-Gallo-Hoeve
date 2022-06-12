@@ -22,7 +22,7 @@ body {
   content: "";
   border-bottom: 2px solid #40909b;
   bottom: 0;
-  left: 40%;
+  left: 50%;
   width: 0;
 }
 header h1 {
@@ -35,12 +35,12 @@ header h1 {
   content: "";
   border-bottom: 2px solid #40909b;
   bottom: 0;
-  right: 60%;
+  right: 50%;
   width: 0;
 }
 
 .inputActive:before,
 .inputActive:after {
-  width: 40%;
+  width: 50%;
   transition: all 0.5s ease;
 }

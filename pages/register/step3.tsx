@@ -9,30 +9,40 @@ const step3: React.FC<FormStepProps> = ({
   onChange,
   formErrors,
   setActiveTab,
+  action,
 }) => {
   return (
     <>
       <FormRow>
         <FormInput
           label="postcode"
-          name="postcode"
+          name="arts_postcode"
           id="postcode"
-          type="text"
-          value={values.dierenarts?.postcode ?? ""}
+          extra="w-1/6"
+          value={values.arts_postcode ?? ""}
           onChange={onChange}
-          error={formErrors.dierenarts?.postcode}
+          error={formErrors.arts_postcode}
         />
         <FormInput
           label="naam"
-          name="naam"
+          name="arts_name"
           id="naam"
-          type="text"
-          value={values.dierenarts?.naam ?? ""}
+          extra="w-1/2"
+          value={values.arts_name ?? ""}
           onChange={onChange}
-          error={formErrors.dierenarts?.naam}
+          error={formErrors.arts_name}
         />
       </FormRow>
-      <Button label="Volgende" onClick={() => setActiveTab(4)} />
+      {action && (
+        <Button
+          label="Volgende"
+          type="form"
+          onClick={() => {
+            console.log(values);
+            setActiveTab(4);
+          }}
+        />
+      )}
     </>
   );
 };

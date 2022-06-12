@@ -5,7 +5,7 @@ interface FormRowProps {
 }
 
 const FormRow: React.FC<FormRowProps> = ({ children }) => {
-  return <div className="flex gap-7">{children}</div>;
+  return <div className="flex justify-between">{children}</div>;
 };
 
 export default FormRow;

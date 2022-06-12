@@ -1,5 +1,4 @@
-import { RegisterHondValuesInterface, dierenartsInterface } from "./formTypes/registerTypes"
-
+import { RegisterHondInterface } from "./formTypes/registerTypes"
 export interface FormInterface {
     email?: string,
     password?: string,
@@ -11,7 +10,9 @@ export interface FormInterface {
     gemeente?: string,
     postcode?: string,
     telefoon?: string,
-    honden?: RegisterHondValuesInterface[],
-    dierenarts?: dierenartsInterface
+    honden?: RegisterHondInterface[],
+    arts_postcode: string,
+    arts_name: string,
+    arts_id: string
 }
 

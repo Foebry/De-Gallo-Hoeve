@@ -1,6 +1,9 @@
 import React, { Dispatch, SetStateAction } from "react";
 import { FormInterface } from "../../types/formTypes";
-import { RegisterPersonalValuesInterface } from "../../types/formTypes/registerTypes";
+import {
+  RegisterHondInterface,
+  RegisterPersonalValuesInterface,
+} from "../../types/formTypes/registerTypes";
 
 export type FormTabType = 1 | 2 | 3 | 4;
 
@@ -11,9 +14,11 @@ export interface FormTabsProps {
 
 export interface FormStepProps {
   values: FormInterface;
-  onChange: (e: any) => void;
+  onChange?: Dispatch<SetStateAction<RegisterHondInterface[]>>;
   formErrors: FormInterface;
   setActiveTab: Dispatch<SetStateAction<FormTabType>>;
+  handleHondInput?: Dispatch<SetStateAction<RegisterHondInterface[]>>;
+  action?: string;
 }
 
 const FormTabs: React.FC<FormTabsProps> = ({ activeTab, setActiveTab }) => {

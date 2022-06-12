@@ -12,7 +12,7 @@ import Step3 from "./register/step3";
 import Step4 from "./register/step4";
 
 const Register = () => {
-  const { onChange, onSubmit, formErrors, values } = useForm(
+  const { onChange, onSubmit, formErrors, values, handleHondInput } = useForm(
     registerValues,
     registerRules
   );
@@ -40,13 +40,15 @@ const Register = () => {
           onChange={onChange}
           formErrors={formErrors}
           setActiveTab={setActiveTab}
+          action="Volgende"
         />
       ) : activeTab === 2 ? (
         <Step2
           values={values}
-          onChange={onChange}
+          onChange={handleHondInput}
           formErrors={formErrors}
           setActiveTab={setActiveTab}
+          action="Volgende"
         />
       ) : activeTab === 3 ? (
         <Step3
@@ -54,6 +56,7 @@ const Register = () => {
           onChange={onChange}
           formErrors={formErrors}
           setActiveTab={setActiveTab}
+          action="Volgende"
         />
       ) : (
         <Step4
@@ -61,6 +64,7 @@ const Register = () => {
           onChange={onChange}
           formErrors={formErrors}
           setActiveTab={setActiveTab}
+          action="Registreer"
         />
       )}
     </Form>

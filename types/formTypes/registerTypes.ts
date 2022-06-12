@@ -12,7 +12,8 @@ export interface RegisterPersonalValuesInterface {
 
 export type geslachtType = "" | "Reu" | "Teef";
 
-export interface RegisterHondValuesInterface {
+export interface RegisterHondInterface {
+    id: string,
     name: string,
     dob: string,
     ras: string,
@@ -20,12 +21,6 @@ export interface RegisterHondValuesInterface {
     chipNumber: string,
     gecastreerd?: boolean | "",
     gesteriliseerd?: boolean | "",
-}
-
-export interface dierenartsInterface {
-    postcode: string,
-    naam?: string,
-    id?: string
 }
 
 export interface RegisterInterface {
@@ -38,8 +33,10 @@ export interface RegisterInterface {
     gemeente: string,
     postcode: string,
     telefoon: string,
-    honden: RegisterHondValuesInterface[],
-    dierenarts: dierenartsInterface
+    honden: RegisterHondInterface[],
+    arts_postcode: string,
+    arts_id: string,
+    arts_name: string
 }
 
 export const registerValues: RegisterInterface = {
@@ -52,22 +49,10 @@ export const registerValues: RegisterInterface = {
     gemeente: "",
     postcode: "",
     telefoon: "",
-    honden: [
-        {
-            name: "",
-            dob: "",
-            ras: "",
-            geslacht: "",
-            chipNumber: "",
-            gecastreerd: "",
-            gesteriliseerd: "",
-        }
-    ],
-    dierenarts: {
-        postcode: "",
-        naam: "",
-        id: ""
-    }
+    honden: [],
+    arts_postcode: "",
+    arts_id: "",
+    arts_name: "",
 }
 
 export interface registerRulesInterface {

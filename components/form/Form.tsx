@@ -22,7 +22,7 @@ const Form: React.FC<FormProps> = ({
   setActiveTab,
 }) => {
   return (
-    <div className="w-1/2 h-50vh bg-grey-300 border-grey-900 border-solid border shadow-sm rounded-2xl mx-auto my-32 relative">
+    <div className="w-1/2 min-h-50vh bg-grey-300 border-grey-900 border-solid border shadow-sm rounded-2xl mx-auto my-32 relative">
       {title && <Title3>{title}</Title3>}
       {formTabs && (
         <FormTabs activeTab={activeTab} setActiveTab={setActiveTab} />

@@ -7,22 +7,26 @@ export interface FormInputProps {
   label: string;
   name: string;
   id: string;
-  type: string;
+  type?: string;
   placeholder?: string;
   value: string;
-  onChange: (e: any) => void;
+  extra?: string;
+  onChange?: (e: any) => void;
   error?: string;
+  dataid?: string;
 }
 
 const FormInput: React.FC<FormInputProps> = ({
   label,
   name,
   id,
-  type,
+  type = "text",
   placeholder,
   value,
   onChange,
   error,
+  extra,
+  dataid = "",
 }) => {
   const labelRef = useRef<HTMLLabelElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -32,7 +36,7 @@ const FormInput: React.FC<FormInputProps> = ({
 
   return (
     <div
-      className="ml-1/3 mb-5 relative formInput"
+      className={`mb-5 relative ${extra} formInput`}
       ref={inputRef}
       onFocus={() => setHasFocus(true)}
       onBlur={() => setHasFocus(false)}
@@ -45,7 +49,7 @@ const FormInput: React.FC<FormInputProps> = ({
         {label}
       </label>
       <input
-        className="w-4/5 text-xl outline-none border-b-[1px] border-b-gray-100 py-1 px-2.5 text-green-100 bg-grey-300"
+        className="block w-full text-xl outline-none border-b-[1px] border-b-gray-100 py-1 px-2.5 text-green-100 bg-grey-300"
         type={type}
         id={id}
         name={name}
@@ -53,6 +57,7 @@ const FormInput: React.FC<FormInputProps> = ({
         onChange={onChange}
         value={value}
         autoComplete="off"
+        data-id={`${dataid}`}
       />
       <FormError>{error}</FormError>
     </div>
