@@ -59,11 +59,11 @@ const index: React.FC<IndexProps> = ({ images, services }) => {
         </div>
       </section>
       <section className="bg-grey-400 px-5 py-5">
-        <ul className="flex flex-grow flex-shrink flex-wrap gap-2.5 justify-center">
+        <div className="flex flex-grow flex-shrink flex-wrap gap-2.5 justify-center">
           {images.map(({ id }) => (
             <Image key={id} />
           ))}
-        </ul>
+        </div>
       </section>
     </>
   );
@@ -83,12 +83,12 @@ export const getStaticProps = () => {
 
   const images = new Array<ImageProps>(12)
     .fill({ id: "" })
-    .map((_) => ({ key: nanoid(5) }));
+    .map((_) => ({ id: nanoid(5) }));
 
   const services = new Array<ServiceProps>(4)
     .fill({
       caption: "",
-      id: nanoid(5),
+      id: "",
       image: "https://loremflickr.com/200/200/dog",
       text: "",
       alt: "",
@@ -96,6 +96,7 @@ export const getStaticProps = () => {
     })
     .map((_, index) => ({
       ..._,
+      id: nanoid(5),
       caption: captions[index],
       text: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem maiores ipsa, numquam molestias, provident similique, delectus voluptatem vero quaerat distinctio tempora necessitatibus et labore ab nostrum dignissimos in aliquam. Inventore.",
       link: links[index],
