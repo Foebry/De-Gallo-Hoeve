@@ -17,34 +17,34 @@ const Step1: React.FC<FormStepProps> = ({
         label="naam"
         name="name"
         id="name"
-        value={values.name ?? ""}
+        value={values?.name ?? ""}
         onChange={onChange}
-        error={formErrors.name ?? ""}
+        error={formErrors?.name ?? ""}
       />
       <FormInput
         label="voornaam"
         name="firstName"
         id="voornaam"
-        value={values.firstName ?? ""}
+        value={values?.firstName ?? ""}
         onChange={onChange}
-        error={formErrors.firstName ?? ""}
+        error={formErrors?.firstName ?? ""}
       />
       <FormInput
         label="email"
         name="email"
         id="email"
-        value={values.email ?? ""}
+        value={values?.email ?? ""}
         onChange={onChange}
-        error={formErrors.email ?? ""}
+        error={formErrors?.email ?? ""}
       />
       <FormRow>
         <FormInput
           label="straat"
           name="straat"
           id="straat"
-          value={values.straat ?? ""}
+          value={values?.straat ?? ""}
           onChange={onChange}
-          error={formErrors.straat ?? ""}
+          error={formErrors?.straat ?? ""}
           extra="w-1/2"
         />
         <FormInput
@@ -52,18 +52,18 @@ const Step1: React.FC<FormStepProps> = ({
           name="nummer"
           id="nummer"
           extra="w-1/6"
-          value={values.nummer ?? ""}
+          value={values?.nummer ?? ""}
           onChange={onChange}
-          error={formErrors.nummer ?? ""}
+          error={formErrors?.nummer ?? ""}
         />
         <FormInput
           label="bus"
           name="bus"
           id="bus"
           extra="w-1/6"
-          value={values.bus ?? ""}
+          value={values?.bus ?? ""}
           onChange={onChange}
-          error={formErrors.bus ?? ""}
+          error={formErrors?.bus ?? ""}
         />
       </FormRow>
       <FormRow>
@@ -72,18 +72,18 @@ const Step1: React.FC<FormStepProps> = ({
           name="gemeente"
           id="gemeente"
           extra="w-1/2"
-          value={values.gemeente ?? ""}
+          value={values?.gemeente ?? ""}
           onChange={onChange}
-          error={formErrors.gemeente ?? ""}
+          error={formErrors?.gemeente ?? ""}
         />
         <FormInput
           label="postcode"
           name="postcode"
           id="postcode"
           extra="w-1/6"
-          value={values.postcode ?? ""}
+          value={values?.postcode ?? ""}
           onChange={onChange}
-          error={formErrors.postcode ?? ""}
+          error={formErrors?.postcode ?? ""}
         />
       </FormRow>
       <FormInput
@@ -91,9 +91,9 @@ const Step1: React.FC<FormStepProps> = ({
         name="telefoon"
         id="telefoon"
         extra="w-1/2"
-        value={values.telefoon ?? ""}
+        value={values?.telefoon ?? ""}
         onChange={onChange}
-        error={formErrors.telefoon ?? ""}
+        error={formErrors?.telefoon ?? ""}
       />
       {action && (
         <Button label="Volgende" onClick={() => setActiveTab(2)} type="form" />

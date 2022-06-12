@@ -18,9 +18,9 @@ const step2: React.FC<FormStepProps> = ({
         label="naam"
         name="name"
         id="name"
-        value={values.honden?.[0]?.name ?? ""}
+        value={values?.honden?.[0]?.name ?? ""}
         onChange={onChange}
-        error={formErrors.honden?.[0].name ?? ""}
+        error={formErrors?.honden?.[0].name ?? ""}
         dataid={"0"}
       />
       <FormRow>
@@ -30,9 +30,9 @@ const step2: React.FC<FormStepProps> = ({
           id="geboortedatum"
           type="datetime"
           extra="w-1-3"
-          value={values.honden?.[0]?.dob ?? ""}
+          value={values?.honden?.[0]?.dob ?? ""}
           onChange={onChange}
-          error={formErrors.honden?.[0].dob ?? ""}
+          error={formErrors?.honden?.[0].dob ?? ""}
           dataid={"0"}
         />
         <FormInput
@@ -40,9 +40,9 @@ const step2: React.FC<FormStepProps> = ({
           name="ras"
           id="ras"
           extra="w-1/3"
-          value={values.honden?.[0]?.ras ?? ""}
+          value={values?.honden?.[0]?.ras ?? ""}
           onChange={onChange}
-          error={formErrors.honden?.[0].ras ?? ""}
+          error={formErrors?.honden?.[0].ras ?? ""}
           dataid={"0"}
         />
       </FormRow>
@@ -52,39 +52,39 @@ const step2: React.FC<FormStepProps> = ({
           name="geslacht"
           id="geslacht"
           extra="w-1/6"
-          value={values.honden?.[0]?.geslacht ?? ""}
+          value={values?.honden?.[0]?.geslacht ?? ""}
           onChange={onChange}
-          error={formErrors.honden?.[0].geslacht ?? ""}
+          error={formErrors?.honden?.[0].geslacht ?? ""}
           dataid={"0"}
         />
-        {["Reu", "Teef"].includes(values.honden?.[0]?.geslacht ?? "") && (
+        {["Reu", "Teef"].includes(values?.honden?.[0]?.geslacht ?? "") && (
           <FormInput
             label={`${
-              values.honden?.[0]?.geslacht === "Reu"
+              values?.honden?.[0]?.geslacht === "Reu"
                 ? "gecastreerd"
                 : "stereliseerd"
             }`}
             name={`${
-              values.honden?.[0]?.geslacht === "Reu"
+              values?.honden?.[0]?.geslacht === "Reu"
                 ? "gecastreerd"
                 : "gesteriliseerd"
             }`}
             id={`${
-              values.honden?.[0]?.geslacht === "Reu"
+              values?.honden?.[0]?.geslacht === "Reu"
                 ? "gecastreerd"
                 : "gestereliseerd"
             }`}
             extra="w-1/6"
             value={`${
-              values.honden?.[0]?.geslacht === "Reu"
-                ? values.honden?.[0]?.gecastreerd
-                : values.honden?.[0]?.gesteriliseerd
+              values?.honden?.[0]?.geslacht === "Reu"
+                ? values?.honden?.[0]?.gecastreerd
+                : values?.honden?.[0]?.gesteriliseerd
             }`}
             onChange={onChange}
             error={`${
-              values.honden?.[0]?.geslacht === "Reu"
-                ? formErrors.honden?.[0].gecastreerd
-                : formErrors.honden?.[0].gesteriliseerd
+              values?.honden?.[0]?.geslacht === "Reu"
+                ? formErrors?.honden?.[0].gecastreerd
+                : formErrors?.honden?.[0].gesteriliseerd
             }`}
             dataid={"0"}
           />
@@ -94,9 +94,9 @@ const step2: React.FC<FormStepProps> = ({
           name="chipNumber"
           id="chipNr"
           extra="w-1/6"
-          value={values.honden?.[0]?.chipNumber ?? ""}
+          value={values?.honden?.[0]?.chipNumber ?? ""}
           onChange={onChange}
-          error={formErrors.honden?.[0].chipNumber ?? ""}
+          error={formErrors?.honden?.[0].chipNumber ?? ""}
           dataid={"0"}
         />
       </FormRow>
