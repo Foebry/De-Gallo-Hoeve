@@ -1,4 +1,5 @@
 import React from "react";
+import { SubmitButton } from "../../components/buttons/Button";
 import { FormStepProps } from "../../components/form/FormTabs";
 
 const Step4: React.FC<FormStepProps> = ({ values, onChange, formErrors }) => {
@@ -189,9 +190,7 @@ const Step4: React.FC<FormStepProps> = ({ values, onChange, formErrors }) => {
         <label htmlFor="verify">Deze gegevens zijn juist</label>
         <input type="checkbox" />
       </div>
-      <div className="forminput">
-        <input type="submit" value="registreer" />
-      </div>
+      <SubmitButton label="Registreer" />
     </>
   );
 };

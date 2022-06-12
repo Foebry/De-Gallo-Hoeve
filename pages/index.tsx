@@ -12,11 +12,11 @@ interface IndexProps {
 const index: React.FC<IndexProps> = ({ images, services }) => {
   return (
     <>
-      <section className="bg-grey-400 px-5 py-5">
+      <section className="bg-grey-900 px-5 py-5">
         <div className="max-w-8xl flex items-center py-24 mx-auto gap-12">
-          <div className="min-w-fit shadow-md">
+          <div className="min-w-fit shadow-md shadow-shadow-500">
             <img
-              className="block aspect-3/4 h-auto w-full rounded border-2 border-grey-100"
+              className="block aspect-3/4 h-auto w-full rounded border-2 border-gray-100"
               src="../images/intro.jpg"
               alt="hond duitse herder gallo-hoeve"
             />

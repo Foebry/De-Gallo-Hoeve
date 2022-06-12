@@ -38,14 +38,14 @@ const FormInput: React.FC<FormInputProps> = ({
       onBlur={() => setHasFocus(false)}
     >
       <label
-        className="absolute pl-2.5 bottom-1 text-right text-grey-100 mr-5 capitalize pointer-events-none"
+        className="absolute pl-2.5 bottom-1 text-right text-gray-100 mr-5 capitalize pointer-events-none"
         htmlFor={id}
         ref={labelRef}
       >
         {label}
       </label>
       <input
-        className="w-4/5 text-xl outline-none border-b-[1px] border-b-grey-100 py-1 px-2.5 text-gray-200 bg-grey-300"
+        className="w-4/5 text-xl outline-none border-b-[1px] border-b-gray-100 py-1 px-2.5 text-green-100 bg-grey-300"
         type={type}
         id={id}
         name={name}

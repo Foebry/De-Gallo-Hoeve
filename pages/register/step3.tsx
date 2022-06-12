@@ -1,4 +1,5 @@
 import React from "react";
+import Button from "../../components/buttons/Button";
 import FormInput from "../../components/form/FormInput";
 import FormRow from "../../components/form/FormRow";
 import { FormStepProps } from "../../components/form/FormTabs";
@@ -31,7 +32,7 @@ const step3: React.FC<FormStepProps> = ({
           error={formErrors.dierenarts?.naam}
         />
       </FormRow>
-      <input type="submit" value="Volgende" onClick={() => setActiveTab(4)} />
+      <Button label="Volgende" onClick={() => setActiveTab(4)} />
     </>
   );
 };

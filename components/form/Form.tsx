@@ -1,5 +1,5 @@
 import React, { Dispatch, ReactNode, SetStateAction } from "react";
-import { Title2 } from "../Typography/Typography";
+import { Title3 } from "../Typography/Typography";
 import FormTabs, { FormTabType } from "./FormTabs";
 
 export interface FormProps {
@@ -22,15 +22,12 @@ const Form: React.FC<FormProps> = ({
   setActiveTab,
 }) => {
   return (
-    <div className="w-1/2 h-50vh bg-grey-300 border-grey-200 shadow-sm rounded-2xl mx-auto my-32 relative">
-      {title && <Title2>{title}</Title2>}
+    <div className="w-1/2 h-50vh bg-grey-300 border-grey-900 border-solid border shadow-sm rounded-2xl mx-auto my-32 relative">
+      {title && <Title3>{title}</Title3>}
       {formTabs && (
         <FormTabs activeTab={activeTab} setActiveTab={setActiveTab} />
       )}
-      <form
-        className="absolute w-1/2 h-1/2 top-1/4 left-1/4 pt-7p"
-        onSubmit={onSubmit}
-      >
+      <form className="w-1/2 pt-7 mx-auto" onSubmit={onSubmit}>
         {children}
         {action && (
           <input

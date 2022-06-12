@@ -7,12 +7,12 @@ export const Nav = () => {
     <div className="hidden md:flex justify-between h-16 rounded-l-4xl items-center  max-w-8xl my-10 mx-auto w-98p bg-grey-500">
       <div className="w-24">
         <img
-          className="block w-full rounded-full aspect-square object-contain rotate-y-180 bg-grey-300"
+          className="block w-full rounded-full aspect-square object-contain rotate-y-180 bg-grey-100"
           src="../images/logo-r.png"
           alt=""
         />
       </div>
-      <nav className="flex gap-10 text-lg uppercase pr-5 text-grey-100">
+      <nav className="flex gap-10 text-lg uppercase pr-5 text-gray-100">
         <Link href={INDEX}>Home</Link>
         <Link href={HOTEL}>Hotel</Link>
         <Link href={TRAINING}>Trainingen</Link>

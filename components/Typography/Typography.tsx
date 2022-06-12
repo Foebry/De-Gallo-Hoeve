@@ -34,12 +34,12 @@ export const Caption: React.FC<Props> = ({ children }) => {
 };
 
 export const Body: React.FC<Props> = ({ children }) => {
-  return <p className="text-black-200 text-base mb-2">{children}</p>;
+  return <p className="text-black-100 text-base mb-2">{children}</p>;
 };
 
 export const Link: React.FC<Props> = ({ children, to }) => {
   return (
-    <a href={to} className="text-center text-gray-300 underline">
+    <a href={to} className="text-center text-green-500 underline">
       {children}
     </a>
   );

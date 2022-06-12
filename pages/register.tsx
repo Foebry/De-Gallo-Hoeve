@@ -21,7 +21,15 @@ const Register = () => {
   return (
     <Form
       onSubmit={onSubmit}
-      title="Persoonlijke gegevens"
+      title={
+        activeTab === 1
+          ? "Persoonlijke gegevens"
+          : activeTab === 2
+          ? "Gegevens viervoeters"
+          : activeTab === 3
+          ? "Gegevens dierenarts"
+          : "Verifieer uw gegevens aub"
+      }
       formTabs={true}
       activeTab={activeTab}
       setActiveTab={setActiveTab}

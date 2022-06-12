@@ -1,4 +1,5 @@
 import React from "react";
+import Button from "../../components/buttons/Button";
 import FormInput from "../../components/form/FormInput";
 import FormRow from "../../components/form/FormRow";
 import { FormStepProps } from "../../components/form/FormTabs";
@@ -89,7 +90,7 @@ const step2: React.FC<FormStepProps> = ({
           }`}
         />
       </FormRow>
-      <input type="submit" value="Volgende" onClick={() => setActiveTab(3)} />
+      <Button label="Volgende" onClick={() => setActiveTab(3)} />
       <input type="submit" value="Ik heb nog een hond" />
     </>
   );
