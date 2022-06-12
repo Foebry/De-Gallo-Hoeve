@@ -60,7 +60,7 @@ const trainingen = () => {
               nostrum ullam placeat harum error et corrupti ex, mollitia est
               temporibus! Minima consequatur sunt voluptatem accusantium quasi?
             </Body>
-            <p>Groepslessen gaan door op zondag.</p>
+            <Body>Groepslessen gaan door op zondag.</Body>
             <Button label="Ik schrijf me in" />
           </div>
         </div>
