@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction } from "react";
-import { FormInterface } from "../../types/formTypes";
+import { FormInterface } from "../../types/formTypes/formTypes";
 import {
   RegisterHondInterface,
   RegisterPersonalValuesInterface,
@@ -14,7 +14,7 @@ export interface FormTabsProps {
 
 export interface FormStepProps {
   values: FormInterface;
-  onChange?: Dispatch<SetStateAction<RegisterHondInterface[]>>;
+  onChange: Dispatch<SetStateAction<RegisterHondInterface[]>>;
   formErrors: FormInterface;
   setActiveTab: Dispatch<SetStateAction<FormTabType>>;
   handleHondInput?: Dispatch<SetStateAction<RegisterHondInterface[]>>;

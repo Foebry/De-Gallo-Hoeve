@@ -1,53 +1,18 @@
 import { useState } from "react";
-import { FormInterface } from "../types/formTypes";
-import {RegisterHondInterface, RegisterInterface, registerRulesInterface} from "../types/formTypes/registerTypes"
+import {  FormInterface } from "../types/formTypes/formTypes";
+import {RegisterHondInterface, registerRulesInterface} from "../types/formTypes/registerTypes"
 import {newHond} from "../helpers/form/registerHelpers";
 
 type useFormProps = FormInterface;
 type rulesType = registerRulesInterface;
 
 const useForm = (initialValues: useFormProps, rules?: rulesType) => {
-	const [values, setValues] = useState(initialValues);
-	const [formErrors, setFormErrors] = useState<FormInterface>({});
-
-	const validateRule = (key: string, value: string, keyRule: Array<any>) => {
-		if( keyRule[0] === "required"){
-			if( value === "") {
-				setFormErrors({...formErrors, [key]: "This field is required"});
-				return false;
-			}
-		}
-		else if( keyRule[0] === "minLength"){
-			if( value.length < keyRule[1] ) {
-				setFormErrors({...formErrors, [key]: `Value too short, ${key} should be at least ${keyRule[1]} characters long.`});
-				return false;
-			}
-		}
-	}
-
-	const checkValidationRules = () => {
-		let validInputs = true;
-		if( rules === undefined ) return;
-		else{
-			Object.entries(values).forEach(keyValue => {
-				const key = keyValue[0];
-				const value = keyValue[1];
-				const keyRules = rules[key as keyof typeof rules];
-
-				for (let keyRule of Object.entries(keyRules)) {
-					if( validateRule(key, value, keyRule) === false ) {
-						validInputs = false;
-						break;
-					}
-				}
-			})
-		}
-		return validInputs;
-	}
+	const [values, setValues] = useState<useFormProps>(initialValues);
+	const [formErrors, setFormErrors] = useState<FormInterface>({} as FormInterface);
 
   const onSubmit = (e:any, func?: () => void ) => {
 		e.preventDefault();
-		if ( !checkValidationRules() ) return;
+		// if ( !validateInputs(values, rules, setFormErrors, formErrors) ) return;
 		func?.();
 	};
 

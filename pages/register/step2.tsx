@@ -67,7 +67,7 @@ const step2: React.FC<FormStepProps> = ({
             name={`${
               values.honden?.[0]?.geslacht === "Reu"
                 ? "gecastreerd"
-                : "gestereliseerd"
+                : "gesteriliseerd"
             }`}
             id={`${
               values.honden?.[0]?.geslacht === "Reu"

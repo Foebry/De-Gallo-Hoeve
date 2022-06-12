@@ -1,4 +1,6 @@
-export interface LoginInterface {
+import { BasicFormInterface } from "./formTypes"
+
+export interface LoginInterface extends BasicFormInterface {
     email: string,
     password: string
 }

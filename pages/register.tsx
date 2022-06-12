@@ -17,10 +17,14 @@ const Register = () => {
     registerRules
   );
   const [activeTab, setActiveTab] = useState<FormTabType>(1);
-
+  const handleSubmit = (e: any) => {
+    onSubmit(e, () => {
+      console.log("ok");
+    });
+  };
   return (
     <Form
-      onSubmit={onSubmit}
+      onSubmit={handleSubmit}
       title={
         activeTab === 1
           ? "Persoonlijke gegevens"

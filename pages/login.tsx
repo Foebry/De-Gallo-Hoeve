@@ -1,13 +1,13 @@
 import React from "react";
 import { FootNote, Link } from "../components/Typography/Typography";
-import { loginRules, loginValues } from "../types/formTypes/loginTypes";
 import Form from "../components/form/Form";
 import FormInput from "../components/form/FormInput";
 import useForm from "../hooks/useForm";
 import { REGISTER } from "../types/linkTypes";
+import { FormValues } from "../types/formTypes/formTypes";
 
 const Login = () => {
-  const { onSubmit, onChange, values, formErrors } = useForm(loginValues);
+  const { onSubmit, onChange, values, formErrors } = useForm(FormValues);
 
   const handleSubmit = () => {
     console.log("ok");

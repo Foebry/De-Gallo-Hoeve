@@ -28,7 +28,7 @@ const Step4: React.FC<FormStepProps> = ({
         <Details summary="Gegevens viervoeters">
           <Step2
             values={values}
-            onChange={handleHondInput}
+            onChange={handleHondInput ?? onChange}
             formErrors={formErrors}
             setActiveTab={setActiveTab}
           />
@@ -42,9 +42,7 @@ const Step4: React.FC<FormStepProps> = ({
           />
         </Details>
       </div>
-      <FormRow>
-        <SubmitButton label="Registreer" />
-      </FormRow>
+      <SubmitButton label="Registreer" />
     </>
   );
 };
