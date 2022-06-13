@@ -25,19 +25,22 @@ class Inschrijving
     private $datum;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\ManyToOne(targetEntity=Training::class, inversedBy="inschrijvings")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $training_id;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Klant::class, inversedBy="inschrijvings")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $klant_id;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\ManyToOne(targetEntity=Hond::class, inversedBy="inschrijvings")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $hond_id;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $training_id;
 
     public function getId(): ?int
     {
@@ -56,38 +59,38 @@ class Inschrijving
         return $this;
     }
 
-    public function getKlantId(): ?int
+    public function getTrainingId(): ?Training
+    {
+        return $this->training_id;
+    }
+
+    public function setTrainingId(?Training $training_id): self
+    {
+        $this->training_id = $training_id;
+
+        return $this;
+    }
+
+    public function getKlantId(): ?Klant
     {
         return $this->klant_id;
     }
 
-    public function setKlantId(int $klant_id): self
+    public function setKlantId(?Klant $klant_id): self
     {
         $this->klant_id = $klant_id;
 
         return $this;
     }
 
-    public function getHondId(): ?int
+    public function getHondId(): ?Hond
     {
         return $this->hond_id;
     }
 
-    public function setHondId(int $hond_id): self
+    public function setHondId(?Hond $hond_id): self
     {
         $this->hond_id = $hond_id;
-
-        return $this;
-    }
-
-    public function getTrainingId(): ?int
-    {
-        return $this->training_id;
-    }
-
-    public function setTrainingId(int $training_id): self
-    {
-        $this->training_id = $training_id;
 
         return $this;
     }

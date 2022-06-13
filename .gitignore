@@ -1,5 +1,6 @@
 *.scss
 *.css.map
+.env
 
 ###> symfony/framework-bundle ###
 /.env.local

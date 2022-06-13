@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\TrainingRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -33,6 +35,16 @@ class Training
      * @ORM\Column(type="float")
      */
     private $prijs;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Inschrijving::class, mappedBy="training_id")
+     */
+    private $inschrijvings;
+
+    public function __construct()
+    {
+        $this->inschrijvings = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -71,6 +83,36 @@ class Training
     public function setPrijs(float $prijs): self
     {
         $this->prijs = $prijs;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Inschrijving>
+     */
+    public function getInschrijvings(): Collection
+    {
+        return $this->inschrijvings;
+    }
+
+    public function addInschrijving(Inschrijving $inschrijving): self
+    {
+        if (!$this->inschrijvings->contains($inschrijving)) {
+            $this->inschrijvings[] = $inschrijving;
+            $inschrijving->setTrainingId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInschrijving(Inschrijving $inschrijving): self
+    {
+        if ($this->inschrijvings->removeElement($inschrijving)) {
+            // set the owning side to null (unless already changed)
+            if ($inschrijving->getTrainingId() === $this) {
+                $inschrijving->setTrainingId(null);
+            }
+        }
 
         return $this;
     }

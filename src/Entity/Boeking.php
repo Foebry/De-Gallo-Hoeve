@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\BoekingRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -30,14 +32,25 @@ class Boeking
     private $einddatum;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string", length=255)
+     */
+    private $referentie;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Klant::class, inversedBy="boekings")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $klant_id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\OneToMany(targetEntity=BoekingDetail::class, mappedBy="boeking_id")
      */
-    private $referentie;
+    private $boekingDetails;
+
+    public function __construct()
+    {
+        $this->boekingDetails = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -68,18 +81,6 @@ class Boeking
         return $this;
     }
 
-    public function getKlantId(): ?int
-    {
-        return $this->klant_id;
-    }
-
-    public function setKlantId(int $klant_id): self
-    {
-        $this->klant_id = $klant_id;
-
-        return $this;
-    }
-
     public function getReferentie(): ?string
     {
         return $this->referentie;
@@ -88,6 +89,48 @@ class Boeking
     public function setReferentie(string $referentie): self
     {
         $this->referentie = $referentie;
+
+        return $this;
+    }
+
+    public function getKlantId(): ?Klant
+    {
+        return $this->klant_id;
+    }
+
+    public function setKlantId(?Klant $klant_id): self
+    {
+        $this->klant_id = $klant_id;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BoekingDetail>
+     */
+    public function getBoekingDetails(): Collection
+    {
+        return $this->boekingDetails;
+    }
+
+    public function addBoekingDetail(BoekingDetail $boekingDetail): self
+    {
+        if (!$this->boekingDetails->contains($boekingDetail)) {
+            $this->boekingDetails[] = $boekingDetail;
+            $boekingDetail->setBoekingId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBoekingDetail(BoekingDetail $boekingDetail): self
+    {
+        if ($this->boekingDetails->removeElement($boekingDetail)) {
+            // set the owning side to null (unless already changed)
+            if ($boekingDetail->getBoekingId() === $this) {
+                $boekingDetail->setBoekingId(null);
+            }
+        }
 
         return $this;
     }

@@ -20,21 +20,6 @@ class BoekingDetail
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $hond_id;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $boeking_id;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $kennel_id;
-
-    /**
      * @ORM\Column(type="boolean")
      */
     private $medicatie;
@@ -59,45 +44,27 @@ class BoekingDetail
      */
     private $extra;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Boeking::class, inversedBy="boekingDetails")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $boeking_id;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Hond::class, inversedBy="boekingDetails")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $hond_id;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Kennel::class, inversedBy="boekingDetails")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $kennel_id;
+
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getHondId(): ?int
-    {
-        return $this->hond_id;
-    }
-
-    public function setHondId(int $hond_id): self
-    {
-        $this->hond_id = $hond_id;
-
-        return $this;
-    }
-
-    public function getBoekingId(): ?int
-    {
-        return $this->boeking_id;
-    }
-
-    public function setBoekingId(int $boeking_id): self
-    {
-        $this->boeking_id = $boeking_id;
-
-        return $this;
-    }
-
-    public function getKennelId(): ?int
-    {
-        return $this->kennel_id;
-    }
-
-    public function setKennelId(int $kennel_id): self
-    {
-        $this->kennel_id = $kennel_id;
-
-        return $this;
     }
 
     public function isMedicatie(): ?bool
@@ -156,6 +123,42 @@ class BoekingDetail
     public function setExtra(?string $extra): self
     {
         $this->extra = $extra;
+
+        return $this;
+    }
+
+    public function getBoekingId(): ?Boeking
+    {
+        return $this->boeking_id;
+    }
+
+    public function setBoekingId(?Boeking $boeking_id): self
+    {
+        $this->boeking_id = $boeking_id;
+
+        return $this;
+    }
+
+    public function getHondId(): ?Hond
+    {
+        return $this->hond_id;
+    }
+
+    public function setHondId(?Hond $hond_id): self
+    {
+        $this->hond_id = $hond_id;
+
+        return $this;
+    }
+
+    public function getKennelId(): ?Kennel
+    {
+        return $this->kennel_id;
+    }
+
+    public function setKennelId(?Kennel $kennel_id): self
+    {
+        $this->kennel_id = $kennel_id;
 
         return $this;
     }
