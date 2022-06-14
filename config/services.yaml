@@ -22,3 +22,15 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\Services\DbManager:
+        bind:
+            $db_url: "%env(DBMANAGER_URL)%"
+            $db_user: "%env(DBMANAGER_USER)%"
+            $db_pwd: "%env(DBMANAGER_PWD)%"
+    
+    App\Services\Logger:
+        bind:
+            $infofile: "%env(INFOFILE)%"
+            $dbfile: "%env(DBFILE)%"
+            $errorfile: "%env(ERRORFILE)%"

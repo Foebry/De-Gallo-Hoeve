@@ -2,16 +2,24 @@
 
 namespace App\Controller;
 
+use App\Services\DbManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 
 class TrainingController extends AbstractController {
 
+    private $dbm;
+
+    function __construct( DbManager $dbm )
+    {
+        $this->dbm = $dbm;
+    }
+
     /**
-     * @Route("/api/training/{id}", name="specifieke_training")
+     * @Route("/api/trainings", name="get_trainings")
      */
-    function getTraining(int $id): Response {
-        return new Response("data for specific training");
+    function getTrainings(int $id): Response {
+        return new Response;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
+use App\Entity\AbstractClass;
 use App\Repository\KlantRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -10,9 +12,10 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
+ * @ApiResource()
  * @ORM\Entity(repositoryClass=KlantRepository::class)
  */
-class Klant implements UserInterface, PasswordAuthenticatedUserInterface
+class Klant extends AbstractClass implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Id

@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ApiResource()
  * @ORM\Entity(repositoryClass=RasRepository::class)
  */
-class Ras
+class Ras extends AbstractClass
 {
     /**
      * @ORM\Id

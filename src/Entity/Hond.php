@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ApiResource()
  * @ORM\Entity(repositoryClass=HondRepository::class)
  */
-class Hond
+class Hond extends AbstractClass
 {
     /**
      * @ORM\Id
