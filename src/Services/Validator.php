@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Services\DbManager;
 use Error;
 use DateTime;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class Validator {
@@ -44,14 +45,15 @@ class Validator {
             if ( in_array( $column, $payloadKeys ) && $payloadArray[$column] === "" ) unset( $payloadArray[$column] );
 
             $missingData = ( !$columnCanBeNull && !in_array( $column, $payloadKeys ) && $method === "POST" );
-
-            if( $unique && $this->violatesUniqueRestraint( $method, $table, $column, $payloadArray[$column] ) ) $this->responseHandler->badRequest( [$column => "Is reeds in gebruik"] );
+            $requiresDefaultValue = ( !in_array( $column, $payloadKeys ) && !$missingData && $method === "POST" );
 
             if( $missingData ) $this->responseHandler->badRequest( [$column => "Mag niet leeg zijn"] );
-            if( !in_array( $column, $payloadKeys ) && !$missingData && $method === "POST" ){
-                $validatedPayload[$column] = $this->setDefaultValue( $column );
+            if( $requiresDefaultValue ){
+                $validatedPayload[$column] = $this->getDefaultValue( $column );
                 continue;
             }
+
+            if( $unique && $this->violatesUniqueRestraint( $method, $table, $column, $payloadArray[$column] ) ) $this->responseHandler->badRequest( [$column => "Is reeds in gebruik"] );
 
             $validatedValue = null;
 
@@ -83,7 +85,7 @@ class Validator {
 
         $date = new DateTime($value);
 
-        return $time ? $date->format("Y-m-d H") : $date->format("Y-m-d");
+        return $time ? $date->format("Y-m-d H:00:00") : $date->format("Y-m-d");
     }
 
 
@@ -136,6 +138,7 @@ class Validator {
             "honds" => "hond",
             "hond" => "hond",
             "inschrijvings" => "inschrijving",
+            "register" => "klant",
         ];
 
         $temp = explode( "api/", $uri )[1];
@@ -150,25 +153,32 @@ class Validator {
     function violatesUniqueRestraint( $method, $table, $column, $value, $id=null ) {
 
         $data = null;
-
-        $vars = ["table" => $table, "column" => $column, "value" => $value, "id" => $id];
-        if( $method === "POST" ) $data = $this->dbm->query( "select id from :table where :column = :value" , $vars );
-        elseif( $method === "PATCH" ) $data = $this->dbm->query( "select id from :table where :column = :value and not id = :id", $vars);
+        if( $method === "POST" ) $data = $this->dbm->query( 
+            "select id from $table where $column = :value" , ["value" => $value] 
+        );
+        elseif( $method === "PATCH" ) $data = $this->dbm->query( 
+            "select id from $table where $column = :value and not id = :id", ["value" => $value, "id" => $id]
+        );
 
         return count( $data ) > 0;
 
     }
 
-    function setDefaultValue( string $column ) {
+    function getDefaultValue( string $column ) {
 
-        $now = new DateTime();
-
-        $defaultValues = [
-            "referentie" => $now->format("m-siHdy"),
-            "loops" => "1111-11-11"
-        ];
-
-        return $defaultValues[$column];
+        switch( $column ){
+            case "referentie": 
+                $now = new DateTime();
+                return $now->format("m-siHdy");
+            case "loops": 
+                return "1111-11-11";
+            case "roles":
+                return "[]";
+            case "verified":
+                return 0;
+            default:
+                return "";
+        }
     }
 
     /**
@@ -188,5 +198,14 @@ class Validator {
             $ids[] = $row[$key];
         }
         return true;
+    }
+
+    function isFutureDate( string $date ){
+        
+        $now = new DateTime();
+        $now = new DateTime( $now->format( "Y-m-d" ) );
+        $date = new DateTime( $date );
+
+        if( $now > $date ) $this->responseHandler->badRequest( ["message" => "Gelieve een toekomstige datum te kiezen" ] );
     }
 }

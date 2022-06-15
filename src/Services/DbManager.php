@@ -50,7 +50,7 @@ use PDOException;
         $stmt = $conn->prepare( $query );
         $this->logger->db( $query, $vars );
         $stmt->execute( $vars );
-        $result = $lastInsertTable ? true : $stmt->fetchAll( PDO::FETCH_ASSOC );
+        $result = $lastInsertTable ? true : ($stmt->rowCount() > 0 ? $stmt->fetchAll( PDO::FETCH_ASSOC ) : []);
       }
       catch(PDOException $e) {
         $this->logger->error( $e->getMessage() );

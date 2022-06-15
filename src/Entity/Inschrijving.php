@@ -10,37 +10,37 @@ use Doctrine\ORM\Mapping as ORM;
  * @ApiResource()
  * @ORM\Entity(repositoryClass=InschrijvingRepository::class)
  */
-class Inschrijving
+class Inschrijving extends AbstractClass
 {
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="datetime")
      */
-    private $datum;
+    protected $datum;
 
     /**
      * @ORM\ManyToOne(targetEntity=Training::class, inversedBy="inschrijvings")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $training_id;
+    protected $training_id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Klant::class, inversedBy="inschrijvings")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $klant_id;
+    protected $klant_id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Hond::class, inversedBy="inschrijvings")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $hond_id;
+    protected $hond_id;
 
     public function getId(): ?int
     {

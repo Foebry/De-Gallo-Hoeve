@@ -121,7 +121,7 @@ class EntityLoader {
         foreach( $data as $entity => $id ){
             $function = $functionMappings[$entity];
             // exit(print(json_encode(["function" => $function])));
-            $entities[$entity] = $this->$function($id);
+            $entities[] = $this->$function($id);
         }
         return $entities;
     }

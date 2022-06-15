@@ -43,10 +43,10 @@ use Symfony\Component\HttpFoundation\Response;
             $data = $this->checkBoekingPayload();
             $details = $this->checkDetailsPayload( $payload );
 
-            $boeking_id = $this->loader->getDbm()->generateInsertStatmentAndGetInsertId( $table, $data );
+            $data["id"] = $this->loader->getDbm()->generateInsertStatmentAndGetInsertId( $table, $data );
             
-            foreach( $details as $detailData ){
-                $detailData["boeking_id"] = $boeking_id;
+            foreach( $details as &$detailData ){
+                $detailData["boeking_id"] = $data["id"];
                 $this->loader->getDbm()->generateInsertStatmentAndGetInsertId( "boeking_detail", $detailData );
             }
 
@@ -59,8 +59,8 @@ use Symfony\Component\HttpFoundation\Response;
 
             $boekingData = $this->validator->validatePayload();
 
-            $start = $boekingData["startdatum"];
-            $eind = $boekingData["einddatum"];
+            $start = new DateTime( $boekingData["startdatum"] );
+            $eind = new DateTime( $boekingData["einddatum"] );
             $now = new DateTime();
 
             if( $now > $start ) $this->responseHandler->badRequest( ["startdatum" => "Gelieve een datum in de toekomst te kiezen"]);
@@ -76,16 +76,16 @@ use Symfony\Component\HttpFoundation\Response;
             $controllerFunction = function( $id ) {
                 return $this->loader->getHondById( $id );
             };
-            //controleren of hond niet meerdere malen voorkomt
-            if( !$this->validator->controleerUniekeEntiteiten( $payload["details"], "hond_id", $controllerFunction ) ){
-                $this->responseHandler->badRequest( ["message"=>"Een hond kan maar 1 maal geboekt worden."] );
-            }
 
             foreach( $payload["details"] as $data ){
 
                 $boekingDetails[] = $this->validator->validatePayload("boeking_detail", $data);
             }
+            //controleren of hond niet meerdere malen voorkomt
+            if( !$this->validator->controleerUniekeEntiteiten( $payload["details"], "hond_id", $controllerFunction ) ){
+                $this->responseHandler->badRequest( ["message"=>"Een hond kan maar 1 maal geboekt worden."] );
+            }
 
-            return [];
+            return $boekingDetails;
         }
     }

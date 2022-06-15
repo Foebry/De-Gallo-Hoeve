@@ -18,7 +18,7 @@ class LoginController extends AbstractController {
     }
 
     /**
-     * @Route("/login", name="login", methods={"POST"})
+     * @Route("/api/login", name="login", methods={"POST"})
      * @return Response
      */
     function login(): Response {
