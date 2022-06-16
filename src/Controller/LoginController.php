@@ -30,7 +30,7 @@ class LoginController extends AbstractController {
 
         return !$user ? null : $this->json([
             "id"=>$user->getId(),
-            "name"=>$user->getVnaam()
+            "naam"=>$user->getVnaam()
         ]);
     }
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import {  FormInterface } from "../types/formTypes/formTypes";
 import {RegisterHondInterface, registerRulesInterface} from "../types/formTypes/registerTypes"
 import {newHond} from "../helpers/form/registerHelpers";
@@ -10,32 +10,26 @@ const useForm = (initialValues: useFormProps, rules?: rulesType) => {
 	const [values, setValues] = useState<useFormProps>(initialValues);
 	const [formErrors, setFormErrors] = useState<FormInterface>({} as FormInterface);
 
-  const onSubmit = (e:any, func?: () => void ) => {
-		e.preventDefault();
-		// if ( !validateInputs(values, rules, setFormErrors, formErrors) ) return;
-		func?.();
-	};
-
-  const onChange = (e: any) => {
-		const name = e.target.name;
-		const value = e.target.value;
+  const onChange = (e: React.FormEvent<HTMLInputElement>) => {
+		const name = e.currentTarget.name;
+		const value = e.currentTarget.value;
+		
 		setValues({...values, [name]: value});
-
-		const key = e.target.name;
-		delete formErrors[key as keyof typeof formErrors];
+		
+		delete formErrors[name as keyof typeof formErrors];
 
 		setFormErrors({...formErrors});
 	};
 	
-	const handleHondInput = (e: any) => {
-		const dataid = e.target.dataset.id;
-		const name = e.target.name;
-		const value = e.target.value;
+	const handleHondInput = (e: React.FormEvent<HTMLInputElement>) => {
+		const dataid = e.currentTarget.dataset.id;
+		const name = e.currentTarget.name;
+		const value = e.currentTarget.value;
 		const hond = values.honden?.filter(({ id }) => id === dataid)[0];
 		let dogs = [] as RegisterHondInterface[];
 
 		if (!hond) {
-			dogs = [{ ...newHond(dataid), [name]: value }];
+			dogs = [{ ...newHond(dataid ?? ""), [name]: value }];
 		} else {
 			const dog = { ...hond, [name]: value };
 			if (values.honden){
@@ -45,7 +39,11 @@ const useForm = (initialValues: useFormProps, rules?: rulesType) => {
 		setValues({ ...values, honden: [...dogs] });
 	};
 
-  return { onSubmit, onChange, values, formErrors, handleHondInput };
+	const handleChangeSelect = (e: React.FormEvent<HTMLSelectElement>) => {
+
+	}
+
+  return { onChange, values, formErrors, handleHondInput, handleChangeSelect };
 };
 
 export default useForm;

@@ -1,24 +1,16 @@
 import React, { Dispatch, SetStateAction } from "react";
-import { FormInterface } from "../../types/formTypes/formTypes";
-import {
-  RegisterHondInterface,
-  RegisterPersonalValuesInterface,
-} from "../../types/formTypes/registerTypes";
+import { Control, FieldValues } from "react-hook-form";
 
 export type FormTabType = 1 | 2 | 3 | 4;
 
-export interface FormTabsProps {
+interface FormTabsProps {
   activeTab?: FormTabType;
   setActiveTab?: Dispatch<SetStateAction<FormTabType>>;
 }
 
-export interface FormStepProps {
-  values: FormInterface;
-  onChange: Dispatch<SetStateAction<RegisterHondInterface[]>>;
-  formErrors: FormInterface;
-  setActiveTab: Dispatch<SetStateAction<FormTabType>>;
-  handleHondInput?: Dispatch<SetStateAction<RegisterHondInterface[]>>;
-  action?: string;
+export interface RegisterStepProps {
+  control: Control<FieldValues, any>;
+  setActiveTab: React.Dispatch<React.SetStateAction<FormTabType>>;
 }
 
 const FormTabs: React.FC<FormTabsProps> = ({ activeTab, setActiveTab }) => {

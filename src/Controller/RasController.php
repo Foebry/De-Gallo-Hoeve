@@ -22,7 +22,7 @@ class RasController extends AbstractController {
      */
     function getAllRassen(): Response {
         
-        $data = $this->dbm->query( "slect id, naam from ras" );
+        $data = $this->dbm->query( "select id, naam from ras" );
         return $this->json( $data );
     }
 }

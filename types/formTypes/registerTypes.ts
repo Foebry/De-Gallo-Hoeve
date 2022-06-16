@@ -14,9 +14,9 @@ export type geslachtType = "" | "Reu" | "Teef";
 
 export interface RegisterHondInterface {
     id: string,
-    name: string,
-    dob: string,
-    ras: string,
+    naam: string,
+    geboortedatum: string,
+    ras_id: string,
     geslacht: geslachtType,
     chipNumber: string,
     gecastreerd?: boolean | "",

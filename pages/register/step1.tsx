@@ -1,103 +1,164 @@
 import React from "react";
 import FormInput from "../../components/form/FormInput";
 import FormRow from "../../components/form/FormRow";
-import { FormStepProps } from "../../components/form/FormTabs";
 import Button from "../../components/buttons/Button";
+import { Controller } from "react-hook-form";
+import { FootNote } from "../../components/Typography/Typography";
 
-const Step1: React.FC<FormStepProps> = ({
-  values,
-  onChange,
-  formErrors,
+const Step1 = ({
+  control,
   setActiveTab,
-  action,
+}: {
+  control: any;
+  setActiveTab: (e: any) => void;
 }) => {
   return (
     <>
-      <FormInput
-        label="naam"
-        name="name"
-        id="name"
-        value={values?.name ?? ""}
-        onChange={onChange}
-        error={formErrors?.name ?? ""}
+      <Controller
+        name="lnaam"
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <FormInput
+            label="naam"
+            name="lnaam"
+            id="lnaam"
+            value={value}
+            onChange={onChange}
+            onBlur={onBlur}
+          />
+        )}
       />
-      <FormInput
-        label="voornaam"
-        name="firstName"
-        id="voornaam"
-        value={values?.firstName ?? ""}
-        onChange={onChange}
-        error={formErrors?.firstName ?? ""}
+      {<FootNote>errors.lnaam</FootNote>}
+      <Controller
+        name="vnaam"
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <FormInput
+            label="voornaam"
+            name="vnaam"
+            id="vnaam"
+            value={value}
+            onChange={onChange}
+            onBlur={onBlur}
+          />
+        )}
       />
-      <FormInput
-        label="email"
+      {<FootNote>errors.vnaam</FootNote>}
+      <Controller
         name="email"
-        id="email"
-        value={values?.email ?? ""}
-        onChange={onChange}
-        error={formErrors?.email ?? ""}
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <FormInput
+            label="email"
+            name="email"
+            id="email"
+            value={value}
+            onChange={onChange}
+            onBlur={onBlur}
+          />
+        )}
       />
+      {<FootNote>errors.email</FootNote>}
       <FormRow>
-        <FormInput
-          label="straat"
+        <Controller
           name="straat"
-          id="straat"
-          value={values?.straat ?? ""}
-          onChange={onChange}
-          error={formErrors?.straat ?? ""}
-          extra="w-1/2"
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <FormInput
+              label="straat"
+              name="straat"
+              id="straat"
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+            />
+          )}
         />
-        <FormInput
-          label="nr"
-          name="nummer"
-          id="nummer"
-          extra="w-1/6"
-          value={values?.nummer ?? ""}
-          onChange={onChange}
-          error={formErrors?.nummer ?? ""}
+        {<FootNote>errors.straat</FootNote>}
+        <Controller
+          name="nr"
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <FormInput
+              label="nr"
+              name="nr"
+              id="nr"
+              extra="w-1/6"
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+            />
+          )}
         />
-        <FormInput
-          label="bus"
+        {<FootNote>errors.nr</FootNote>}
+        <Controller
           name="bus"
-          id="bus"
-          extra="w-1/6"
-          value={values?.bus ?? ""}
-          onChange={onChange}
-          error={formErrors?.bus ?? ""}
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <FormInput
+              label="bus"
+              name="bus"
+              id="bus"
+              extra="w-1/6"
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+            />
+          )}
         />
+        {<FootNote>errors.bus</FootNote>}
       </FormRow>
       <FormRow>
-        <FormInput
-          label="gemeente"
+        <Controller
           name="gemeente"
-          id="gemeente"
-          extra="w-1/2"
-          value={values?.gemeente ?? ""}
-          onChange={onChange}
-          error={formErrors?.gemeente ?? ""}
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <FormInput
+              label="gemeente"
+              name="gemeente"
+              id="gemeente"
+              extra="w-1/2"
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+            />
+          )}
         />
-        <FormInput
-          label="postcode"
+        {<FootNote>errors.gemeente</FootNote>}
+        <Controller
           name="postcode"
-          id="postcode"
-          extra="w-1/6"
-          value={values?.postcode ?? ""}
-          onChange={onChange}
-          error={formErrors?.postcode ?? ""}
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <FormInput
+              label="postcode"
+              name="postcode"
+              id="postcode"
+              extra="w-1/6"
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+            />
+          )}
         />
+        {<FootNote>errors.postcode</FootNote>}
       </FormRow>
-      <FormInput
-        label="telefoon"
+      <Controller
         name="telefoon"
-        id="telefoon"
-        extra="w-1/2"
-        value={values?.telefoon ?? ""}
-        onChange={onChange}
-        error={formErrors?.telefoon ?? ""}
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <FormInput
+            label="telefoon"
+            name="telefoon"
+            id="telefoon"
+            extra="w-1/2"
+            value={value}
+            onChange={onChange}
+            onBlur={onBlur}
+          />
+        )}
       />
-      {action && (
-        <Button label="Volgende" onClick={() => setActiveTab(2)} type="form" />
-      )}
+      {<FootNote>errors.telefoon</FootNote>}
+      <Button type="form" label="volgende" onClick={() => setActiveTab(2)} />
     </>
   );
 };

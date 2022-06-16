@@ -43,11 +43,13 @@ class Validator {
             if( $metadata["key"] === "PRI" ) continue;
             if( !in_array( $column, $payloadKeys ) && $method === "PATCH" ) continue;
             if ( in_array( $column, $payloadKeys ) && $payloadArray[$column] === "" ) unset( $payloadArray[$column] );
+            $payloadKeys = array_keys( $payloadArray );
 
             $missingData = ( !$columnCanBeNull && !in_array( $column, $payloadKeys ) && $method === "POST" );
             $requiresDefaultValue = ( !in_array( $column, $payloadKeys ) && !$missingData && $method === "POST" );
 
             if( $missingData ) $this->responseHandler->badRequest( [$column => "Mag niet leeg zijn"] );
+            
             if( $requiresDefaultValue ){
                 $validatedPayload[$column] = $this->getDefaultValue( $column );
                 continue;

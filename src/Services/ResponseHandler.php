@@ -2,13 +2,14 @@
 
 namespace App\Services;
 
-    class ResponseHandler {
+    class ResponseHandler{
 
         /**
          * Geef response terug wanneer payload niet volledig is
          */
-        function badRequest( array $data = [] ): void{
+        function badRequest( array $data = [] ) {
             print( json_encode( array_merge( ["code"=>400, "message"=>"Bad Request"], $data ) ) );
+            header("Access-Control-Allow-Origin:*");
             header("HTTP/1.1 400");
             exit();
         }

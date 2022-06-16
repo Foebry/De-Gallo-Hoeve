@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   INDEX,
@@ -8,8 +8,12 @@ import {
   LOGIN,
   REGISTER,
 } from "../types/linkTypes";
+import { Title3 } from "./Typography/Typography";
+import getFromLocalStorage from "../hooks/localStorage";
 
 export const Nav = () => {
+  const userName = getFromLocalStorage("naam");
+
   return (
     <div className="relative hidden md:flex justify-between h-16 rounded-l-4xl items-center  max-w-8xl my-10 mx-auto w-98p bg-grey-500">
       <div className="w-24">
@@ -20,8 +24,19 @@ export const Nav = () => {
         />
       </div>
       <div className="absolute left-40 flex gap-10 text-lg uppercase pr-5 text-gray-100">
-        <Link href={LOGIN}>Login</Link>
-        <Link href={REGISTER}>Registreer</Link>
+        {!userName ? (
+          <>
+            <Link href={LOGIN}>Login</Link>
+            <Link href={REGISTER}>Registreer</Link>
+          </>
+        ) : (
+          <Title3>
+            Welkom{" "}
+            <span className="hover:cursor-pointer text-gray-900">
+              {userName}
+            </span>
+          </Title3>
+        )}
       </div>
       <nav className="flex gap-10 text-lg uppercase pr-5 text-gray-100">
         <Link href={INDEX}>Home</Link>

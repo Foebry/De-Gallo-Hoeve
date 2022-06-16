@@ -12,6 +12,7 @@ export interface FormInputProps {
   value: string;
   extra?: string;
   onChange?: (e: any) => void;
+  onBlur?: (e: any) => void;
   error?: string;
   dataid?: string;
 }
