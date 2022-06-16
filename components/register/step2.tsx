@@ -86,7 +86,7 @@ const step2: React.FC<Props> = ({
                 )}
               />
               <Controller
-                name={`honden.${index}.ras_id`}
+                name={`honden.${index}.ras_id_id`}
                 control={control}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Select

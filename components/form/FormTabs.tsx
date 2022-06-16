@@ -40,14 +40,6 @@ const FormTabs: React.FC<FormTabsProps> = ({ activeTab, setActiveTab }) => {
       >
         Stap3
       </span>
-      <span
-        className={`bg-grey-100 py-5 px-10 rounded-md border border-solid border-grey-700 border-b-0 hover:cursor-pointer ${
-          activeTab === 4 ? "color-gray-500 bg-grey-700 border-grey-800" : ""
-        }`}
-        onClick={() => setActiveTab?.(4)}
-      >
-        Bevestiging
-      </span>
     </div>
   );
 };

@@ -1,8 +1,11 @@
+import { useRouter } from "next/router";
 import React from "react";
 import Button from "../components/buttons/Button";
 import { Body, Link, Title2 } from "../components/Typography/Typography";
+import { RESERVATIE } from "../types/linkTypes";
 
 const hotel = () => {
+  const router = useRouter();
   return (
     <section className="bg-grey-900 px-5 py-5">
       <div className="max-w-8xl flex items-center py-24 mx-auto gap-12">
@@ -26,7 +29,10 @@ const hotel = () => {
             voor ontvangst ontsmet en gekuist zijn. Dit is dan ook wettelijk
             verplicht.
           </Body>
-          <Button label="Reserveer een plekje" />
+          <Button
+            label="Reserveer een plekje"
+            onClick={() => router.push(RESERVATIE)}
+          />
           <Title2>Verblijven</Title2>
           <Body>
             Elk verblijf heeft een binnen en buitenkennel met afmetingen van 4
@@ -58,3 +64,6 @@ const hotel = () => {
 };
 
 export default hotel;
+function useRedirect() {
+  throw new Error("Function not implemented.");
+}

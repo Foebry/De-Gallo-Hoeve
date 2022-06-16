@@ -7,6 +7,7 @@ use App\Repository\RasRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource()
@@ -17,7 +18,8 @@ class Ras extends AbstractClass
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
+     * @ORM\Column(name="id")
+     * @groups({"honds: read"})
      */
     private $id;
 

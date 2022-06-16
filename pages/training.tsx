@@ -1,8 +1,11 @@
+import { useRouter } from "next/router";
 import React from "react";
 import Button from "../components/buttons/Button";
 import { Body, Title2 } from "../components/Typography/Typography";
+import { INSCHRIJVING } from "../types/linkTypes";
 
 const trainingen = () => {
+  const router = useRouter();
   return (
     <>
       <section className="bg-grey-900 px-5 py-5">
@@ -61,7 +64,10 @@ const trainingen = () => {
               temporibus! Minima consequatur sunt voluptatem accusantium quasi?
             </Body>
             <Body>Groepslessen gaan door op zondag.</Body>
-            <Button label="Ik schrijf me in" />
+            <Button
+              label="Ik schrijf me in"
+              onClick={() => router.push(INSCHRIJVING)}
+            />
           </div>
         </div>
       </section>
@@ -116,7 +122,10 @@ const trainingen = () => {
               Vraag een privétraining aan voor woensdag, vrijdag of zaterdag.
               Voor een privéles vragen we een bijdrage van €23.90
             </Body>
-            <Button label="Aanvragen" />
+            <Button
+              label="Aanvragen"
+              onClick={() => router.push(INSCHRIJVING)}
+            />
           </div>
           <div className="min-w-fit shadow-md">
             <img

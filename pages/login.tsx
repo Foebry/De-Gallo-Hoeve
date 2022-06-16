@@ -1,58 +1,61 @@
 import React from "react";
-import { Body, FootNote, Link } from "../components/Typography/Typography";
+import { Body, Link } from "../components/Typography/Typography";
 import Form from "../components/form/Form";
 import FormInput from "../components/form/FormInput";
-import useForm from "../hooks/useForm";
 import { REGISTER, INDEX } from "../types/linkTypes";
-import { FormValues } from "../types/formTypes/formTypes";
 import { SubmitButton } from "../components/buttons/Button";
 import FormRow from "../components/form/FormRow";
-import axios from "axios";
 import { useRouter } from "next/router";
+import { useForm, Controller } from "react-hook-form";
+import useMutation from "../hooks/useMutation";
+import { LOGINAPI } from "../types/apiTypes";
+import { useInitializeLocalStorage } from "../hooks/localStorage";
 
-const Login = () => {
+const Login: React.FC<{}> = () => {
   const router = useRouter();
 
-  const { onChange, values, formErrors } = useForm(FormValues);
+  const { control, handleSubmit } = useForm();
 
-  const handleSubmit = async (e: SubmitEvent) => {
-    e.preventDefault();
-    try {
-      const { data } = await axios("http://localhost:8000/api/login", {
-        method: "POST",
-        data: values,
-      });
-      // if (data.error) console.log(error);
-      if (data) {
-        localStorage.setItem("naam", data.naam);
-        localStorage.setItem("id", data.id);
-        router.push(INDEX);
-      }
-    } catch (error) {
-      console.log(error);
+  const onSubmit = async (values: any) => {
+    const { data, error } = await useMutation(LOGINAPI, values);
+    if (error) console.log(error);
+    if (data) {
+      useInitializeLocalStorage(data);
+      router.push(INDEX);
     }
   };
 
   return (
     <section className="bg-grey-700 px-5 py-5">
-      <Form title="Welkom bij de Gallo-hoeve" onSubmit={handleSubmit}>
-        <FormInput
-          label="emailadress"
+      <Form title="Welkom bij de Gallo-hoeve" onSubmit={handleSubmit(onSubmit)}>
+        <Controller
           name="email"
-          id="email"
-          type="text"
-          value={values.email ?? ""}
-          onChange={onChange}
-          error={formErrors.email ?? ""}
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <FormInput
+              label="email"
+              name="email"
+              id="email"
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+            />
+          )}
         />
-        <FormInput
-          label="password"
+        <Controller
           name="password"
-          id="password"
-          type="password"
-          value={values.password ?? ""}
-          onChange={onChange}
-          error={formErrors.password ?? ""}
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <FormInput
+              label="password"
+              name="password"
+              id="password"
+              type="password"
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+            />
+          )}
         />
         <FormRow>
           <Body>

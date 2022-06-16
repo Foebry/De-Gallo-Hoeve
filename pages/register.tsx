@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Form from "../components/form/Form";
 import { FormTabType } from "../components/form/FormTabs";
 import axios from "axios";
@@ -9,6 +9,9 @@ import Step1 from "../components/register/step1";
 import Step2, { optionInterface } from "../components/register/step2";
 import Step3 from "../components/register/step3";
 import { OptionsOrGroups } from "react-select";
+import useApi from "../hooks/useApi";
+import { RASSEN, REGISTERAPI } from "../types/apiTypes";
+import useMutation, { structureHondenPayload } from "../hooks/useMutation";
 
 interface RegisterProps {
   rassen: OptionsOrGroups<any, optionInterface>[];
@@ -22,16 +25,12 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
   const [activeTab, setActiveTab] = useState<FormTabType>(1);
 
   const onSubmit = async (values: any) => {
-    try {
-      await axios("http://localhost:8000/api/register", {
-        method: "POST",
-        data: { ...values, password: "password" },
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-        },
-      });
-      router.push(LOGIN);
-    } catch (error) {}
+    const payload = structureHondenPayload(values);
+    console.log(payload);
+
+    const { data, error } = await useMutation(REGISTERAPI, payload);
+    if (data) router.push(LOGIN);
+    if (error) console.log(error);
   };
 
   return (
@@ -73,14 +72,7 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
 export default Register;
 
 export const getStaticProps = async () => {
-  let rassen = [];
-  try {
-    const { data } = await axios("http://localhost:8000/api/ras");
-    rassen = data.map(({ id, naam }: { id: Number; naam: string }) => ({
-      value: id,
-      label: naam,
-    }));
-  } catch (error) {}
+  const { data: rassen } = await useApi(RASSEN);
 
   return {
     props: {

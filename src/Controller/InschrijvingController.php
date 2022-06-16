@@ -42,7 +42,7 @@ class InschrijvingController extends AbstractController {
         // $table = $validator->getTableFromRequestUri();
 
         $loader->checkPayloadForKeys( $payload, ["klant_id", "hond_id", "training_id"] );
-        [$klant, $hond, $training] = $loader->getEntities(["klant"=>$payload["klant_id"], "hond"=>$payload["hond_id"], "training"=>$payload["training_id"]]);
+        $loader->getEntities(["klant"=>$payload["klant_id"], "hond"=>$payload["hond_id"], "training"=>$payload["training_id"]]);
 
         $data = $validator->validatePayload();
         $validator->isFutureDate( $data["datum"] );
