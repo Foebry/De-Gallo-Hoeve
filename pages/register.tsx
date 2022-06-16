@@ -64,8 +64,6 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
           />
         ) : activeTab === 3 ? (
           <Step3 control={control} setActiveTab={setActiveTab} />
-        ) : activeTab === 4 ? (
-          <></>
         ) : null}
       </Form>
     </section>

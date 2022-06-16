@@ -3,15 +3,9 @@ import FormInput from "../../components/form/FormInput";
 import FormRow from "../../components/form/FormRow";
 import Button from "../../components/buttons/Button";
 import { Controller } from "react-hook-form";
-import { FootNote } from "../../components/Typography/Typography";
+import { RegisterStepProps } from "../../components/form/FormTabs";
 
-const Step1 = ({
-  control,
-  setActiveTab,
-}: {
-  control: any;
-  setActiveTab: (e: any) => void;
-}) => {
+const Step1: React.FC<RegisterStepProps> = ({ control, setActiveTab }) => {
   return (
     <>
       <Controller
@@ -28,7 +22,6 @@ const Step1 = ({
           />
         )}
       />
-      {<FootNote>errors.lnaam</FootNote>}
       <Controller
         name="vnaam"
         control={control}
@@ -43,7 +36,6 @@ const Step1 = ({
           />
         )}
       />
-      {<FootNote>errors.vnaam</FootNote>}
       <Controller
         name="email"
         control={control}
@@ -58,7 +50,6 @@ const Step1 = ({
           />
         )}
       />
-      {<FootNote>errors.email</FootNote>}
       <FormRow>
         <Controller
           name="straat"
@@ -74,7 +65,6 @@ const Step1 = ({
             />
           )}
         />
-        {<FootNote>errors.straat</FootNote>}
         <Controller
           name="nr"
           control={control}
@@ -90,7 +80,6 @@ const Step1 = ({
             />
           )}
         />
-        {<FootNote>errors.nr</FootNote>}
         <Controller
           name="bus"
           control={control}
@@ -106,7 +95,6 @@ const Step1 = ({
             />
           )}
         />
-        {<FootNote>errors.bus</FootNote>}
       </FormRow>
       <FormRow>
         <Controller
@@ -124,7 +112,6 @@ const Step1 = ({
             />
           )}
         />
-        {<FootNote>errors.gemeente</FootNote>}
         <Controller
           name="postcode"
           control={control}
@@ -140,7 +127,6 @@ const Step1 = ({
             />
           )}
         />
-        {<FootNote>errors.postcode</FootNote>}
       </FormRow>
       <Controller
         name="telefoon"
@@ -157,7 +143,6 @@ const Step1 = ({
           />
         )}
       />
-      {<FootNote>errors.telefoon</FootNote>}
       <Button type="form" label="volgende" onClick={() => setActiveTab(2)} />
     </>
   );
