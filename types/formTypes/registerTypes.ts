@@ -1,4 +1,4 @@
-import { optionInterface } from "../../pages/register/step2";
+import { optionInterface } from "../../components/register/step2";
 
 export interface RegisterPersonalValuesInterface {
     name: string,
