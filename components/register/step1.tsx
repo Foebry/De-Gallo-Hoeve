@@ -1,9 +1,9 @@
 import React from "react";
-import FormInput from "../../components/form/FormInput";
-import FormRow from "../../components/form/FormRow";
-import Button from "../../components/buttons/Button";
+import FormInput from "../form/FormInput";
+import FormRow from "../form/FormRow";
+import Button from "../buttons/Button";
 import { Controller } from "react-hook-form";
-import { RegisterStepProps } from "../../components/form/FormTabs";
+import { RegisterStepProps } from "../form/FormTabs";
 
 const Step1: React.FC<RegisterStepProps> = ({ control, setActiveTab }) => {
   return (

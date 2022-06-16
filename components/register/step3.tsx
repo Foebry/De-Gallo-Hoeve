@@ -1,10 +1,9 @@
 import React from "react";
-import { SubmitButton } from "../../components/buttons/Button";
-import FormInput from "../../components/form/FormInput";
-import FormRow from "../../components/form/FormRow";
+import { SubmitButton } from "../buttons/Button";
+import FormInput from "../form/FormInput";
+import FormRow from "../form/FormRow";
 import { Controller } from "react-hook-form";
-import { FootNote } from "../../components/Typography/Typography";
-import { RegisterStepProps } from "../../components/form/FormTabs";
+import { RegisterStepProps } from "../form/FormTabs";
 
 const step3: React.FC<RegisterStepProps> = ({ control }) => {
   return (

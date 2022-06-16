@@ -1,7 +1,7 @@
 import React from "react";
-import Button from "../../components/buttons/Button";
-import FormInput from "../../components/form/FormInput";
-import FormRow from "../../components/form/FormRow";
+import Button from "../buttons/Button";
+import FormInput from "../form/FormInput";
+import FormRow from "../form/FormRow";
 import Select, { OptionsOrGroups } from "react-select";
 import {
   Controller,
@@ -9,8 +9,8 @@ import {
   UseFieldArrayAppend,
   UseFieldArrayRemove,
 } from "react-hook-form";
-import Details from "../../components/Details";
-import { RegisterStepProps } from "../../components/form/FormTabs";
+import Details from "../Details";
+import { RegisterStepProps } from "../form/FormTabs";
 
 export interface optionInterface {
   options: [{ value: any; label: string }];

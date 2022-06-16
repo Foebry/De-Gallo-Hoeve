@@ -5,9 +5,9 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import { LOGIN } from "../types/linkTypes";
 import { useFieldArray, useForm } from "react-hook-form";
-import Step1 from "./register/step1";
-import Step2, { optionInterface } from "./register/step2";
-import Step3 from "./register/step3";
+import Step1 from "../components/register/step1";
+import Step2, { optionInterface } from "../components/register/step2";
+import Step3 from "../components/register/step3";
 import { OptionsOrGroups } from "react-select";
 
 interface RegisterProps {
