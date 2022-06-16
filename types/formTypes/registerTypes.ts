@@ -1,3 +1,5 @@
+import { optionInterface } from "../../pages/register/step2";
+
 export interface RegisterPersonalValuesInterface {
     name: string,
     firstName: string,
@@ -16,7 +18,7 @@ export interface RegisterHondInterface {
     id: string,
     naam: string,
     geboortedatum: string,
-    ras_id: string,
+    ras_id: optionInterface,
     geslacht: geslachtType,
     chipNumber: string,
     gecastreerd?: boolean | "",
@@ -124,76 +126,4 @@ export interface registerRulesInterface {
             required: boolean
         }
     }
-}
-
-export const registerRules: registerRulesInterface = {
-    name: {
-        required: true
-    },
-    firstName: {
-        required: true
-    },
-    email: {
-        required: true,
-        pattern: ""
-    },
-    straat: {
-        required: true,
-    },
-    nummer: {
-        required: true
-    },
-    bus: {
-        required: true
-    },
-    gemeente: {
-        required: true
-    },
-    postcode: {
-        required: true
-    },
-    telefoon: {
-        required: true
-    },
-    honden: [
-        {
-            name: {
-                required: true,
-            },
-            dob: {
-                required: true,
-                type: "DateTime"
-            },
-            ras: {
-                required: true
-            },
-            geslacht: {
-                required: true,
-                value: ["Reu", "Teef"]
-            },
-            chipNumber: {
-                required: true
-            },
-            gecastreerd: {
-                required: false,
-                value: [true, false]
-            },
-            gesteriliseerd: {
-                required: false,
-                value: [true, false]
-            },
-        }
-    ],
-    dierenarts: {
-        postcode: {
-            required: true
-        },
-        naam: {
-            required: false
-        },
-        id: {
-            required: false
-        }
-    }
-
 }
