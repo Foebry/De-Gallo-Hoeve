@@ -30,8 +30,8 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
     console.log(payload);
 
     const { data, error } = await register(REGISTERAPI, payload);
-    if (data) router.push(LOGIN);
     if (error) console.log(error);
+    else router.push(LOGIN);
   };
 
   return (

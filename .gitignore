@@ -1,6 +1,10 @@
 .env
 *.log
 .idea
+deploy.php
+composer_deploy.json
+composer_latest_install
+.htaccess_deploy
 
 ###> symfony/framework-bundle ###
 /.env.local

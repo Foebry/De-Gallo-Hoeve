@@ -3,16 +3,20 @@ import axios from "axios";
 const useMutation = () => {
 
     const executerFunc = async(endpoint: string, payload: any) => {
-        const route = "http://localhost:8000/api"+endpoint;
+        // const route = "http://localhost:8000/api/"+endpoint;
+        const route = "https://www.wdev2.be/fs_sander/eindwerk/api/"+endpoint;
         try {
             const {data} = await axios(route, {
                 method: "POST",
-                data: payload
+                data: payload,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                }
             });
             return {data, error: undefined};
         }
         catch(error) {
-            return {data: undefined, error}
+            return {undefined, error}
         }
     }
     return executerFunc;
