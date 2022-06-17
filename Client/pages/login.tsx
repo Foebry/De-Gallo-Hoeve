@@ -1,5 +1,5 @@
 import React from "react";
-import { Body, Link } from "../components/Typography/Typography";
+import { Body, Link } from "../Typography/Typography";
 import Form from "../components/form/Form";
 import FormInput from "../components/form/FormInput";
 import { REGISTER, INDEX } from "../types/linkTypes";

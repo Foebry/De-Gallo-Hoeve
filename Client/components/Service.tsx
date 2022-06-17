@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import React from "react";
-import { Caption } from "./Typography/Typography";
-import { Body } from "./Typography/Typography";
+import { Caption } from "../Typography/Typography";
+import { Body } from "../Typography/Typography";
 
 export interface ServiceProps {
   id: string;

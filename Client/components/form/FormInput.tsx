@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useRef } from "react";
 import useFormInputEffect from "../../hooks/layout/useFormInputEffect";
-import { FormError } from "../Typography/Typography";
+import { FormError } from "../../Typography/Typography";
 
 export interface FormInputProps {
   label: string;

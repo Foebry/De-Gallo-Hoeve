@@ -146,7 +146,6 @@ const step2: React.FC<Props> = ({
         type="form"
         label="volgende"
         onClick={() => {
-          console.log(fields);
           setActiveTab(3);
         }}
       />

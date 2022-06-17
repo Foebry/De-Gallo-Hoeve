@@ -1,4 +1,4 @@
-import { Title1, Title2, Title3, FootNote } from "./Typography/Typography";
+import { Title1, Title2, Title3, FootNote } from "../Typography/Typography";
 
 const Footer = () => {
   return (

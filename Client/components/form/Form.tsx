@@ -1,5 +1,5 @@
 import React, { Dispatch, ReactNode, SetStateAction } from "react";
-import { Title3 } from "../Typography/Typography";
+import { Title3 } from "../../Typography/Typography";
 import FormTabs, { FormTabType } from "./FormTabs";
 
 export interface FormProps {

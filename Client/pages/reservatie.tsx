@@ -1,5 +1,5 @@
 import React from "react";
-import { Title1 } from "../components/Typography/Typography";
+import { Title1 } from "../Typography/Typography";
 
 const reservatie = () => {
   return <Title1>Reservatie pagina</Title1>;

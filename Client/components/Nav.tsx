@@ -8,7 +8,7 @@ import {
   LOGIN,
   REGISTER,
 } from "../types/linkTypes";
-import { Title3 } from "./Typography/Typography";
+import { Title3 } from "../Typography/Typography";
 
 export const Nav = () => {
   const [userName, setUserName] = useState<string | null>();
@@ -24,7 +24,7 @@ export const Nav = () => {
       <div className="w-24">
         <img
           className="block w-full rounded-full aspect-square object-contain rotate-y-180 bg-grey-100"
-          src="../images/logo-r.png"
+          src={`${process.env.NEXT_PUBLIC_IMAGES}/logo-r.png`}
           alt=""
         />
       </div>

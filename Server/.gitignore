@@ -1,5 +1,4 @@
 .env
-.next
 *.log
 .idea
 deploy.php

@@ -1,4 +1,4 @@
-import { Body, Title2 } from "../components/Typography/Typography";
+import { Body, Title2 } from "../Typography/Typography";
 import Image from "../components/Image";
 import { nanoid } from "nanoid";
 import { ImageProps } from "../components/Image";
@@ -17,7 +17,7 @@ const index: React.FC<IndexProps> = ({ images, services }) => {
           <div className="min-w-fit shadow-md shadow-shadow-500">
             <img
               className="block aspect-3/4 h-auto w-full rounded border-2 border-gray-100"
-              src="../images/intro.jpg"
+              src={`${process.env.NEXT_PUBLIC_IMAGES}/intro.jpg`}
               alt="hond duitse herder gallo-hoeve"
             />
           </div>
