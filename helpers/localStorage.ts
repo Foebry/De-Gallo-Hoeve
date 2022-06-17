@@ -9,7 +9,7 @@ const getFromLocalStorage = (key: string) => {
     return value;
 }
 
-export const useInitializeLocalStorage = (data: any) => {
+export const initializeLocalStorage = (data: any) => {
     localStorage.setItem("naam", data.naam);
     localStorage.setItem("id", data.id);
 }

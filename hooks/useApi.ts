@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const useApi = async (endpoint: string) => {
+const getData = async (endpoint: string) => {
     const route = "http://localhost:8000/api"+endpoint;
     try{
         const {data} = await axios(route);
@@ -11,4 +11,4 @@ const useApi = async (endpoint: string) => {
     }
 }
 
-export default useApi;
+export default getData;

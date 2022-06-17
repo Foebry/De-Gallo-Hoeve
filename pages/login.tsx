@@ -9,18 +9,19 @@ import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
 import useMutation from "../hooks/useMutation";
 import { LOGINAPI } from "../types/apiTypes";
-import { useInitializeLocalStorage } from "../hooks/localStorage";
+import { initializeLocalStorage } from "../helpers/localStorage";
 
 const Login: React.FC<{}> = () => {
   const router = useRouter();
+  const login = useMutation();
 
   const { control, handleSubmit } = useForm();
 
   const onSubmit = async (values: any) => {
-    const { data, error } = await useMutation(LOGINAPI, values);
+    const { data, error } = await login(LOGINAPI, values);
     if (error) console.log(error);
     if (data) {
-      useInitializeLocalStorage(data);
+      initializeLocalStorage(data);
       router.push(INDEX);
     }
   };

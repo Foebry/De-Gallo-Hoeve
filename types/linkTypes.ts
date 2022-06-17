@@ -6,7 +6,7 @@ const linkTypes = {
   LOGIN: "/login",
   REGISTER: "/register",
   RESERVATIE: "/reservatie",
-  INSCHRIJVING: "/inschrijving"
+  INSCHRIJVING: "/inschrijving",
   
 }
 

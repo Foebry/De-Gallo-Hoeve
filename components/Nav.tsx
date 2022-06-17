@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   INDEX,
@@ -12,9 +12,12 @@ import { Title3 } from "./Typography/Typography";
 
 export const Nav = () => {
   const [userName, setUserName] = useState<string | null>();
-  setTimeout(() => {
-    setUserName(localStorage.getItem("naam"));
-  }, 1000);
+
+  useEffect(() => {
+    setInterval(() => {
+      setUserName(localStorage.getItem("naam"));
+    }, 1000);
+  }, []);
 
   return (
     <div className="relative hidden md:flex justify-between h-16 rounded-l-4xl items-center  max-w-8xl my-10 mx-auto w-98p bg-grey-500">

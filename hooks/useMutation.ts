@@ -1,17 +1,21 @@
 import axios from "axios";
 
-const useMutation = async (endpoint: string, payload: any) => {
-    const route = "http://localhost:8000/api"+endpoint;
-    try{
-        const {data} = await axios(route, {
-            method: "POST",
-            data: payload
-        });
-        return {data, error: undefined}
+const useMutation = () => {
+
+    const executerFunc = async(endpoint: string, payload: any) => {
+        const route = "http://localhost:8000/api"+endpoint;
+        try {
+            const {data} = await axios(route, {
+                method: "POST",
+                data: payload
+            });
+            return {data, error: undefined};
+        }
+        catch(error) {
+            return {data: undefined, error}
+        }
     }
-    catch(error: any){
-        return {data: undefined, error}
-    }
+    return executerFunc;
 }
 
 export const structureHondenPayload = (payload: any) => {

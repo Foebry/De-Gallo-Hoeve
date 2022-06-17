@@ -9,7 +9,7 @@ import Step1 from "../components/register/step1";
 import Step2, { optionInterface } from "../components/register/step2";
 import Step3 from "../components/register/step3";
 import { OptionsOrGroups } from "react-select";
-import useApi from "../hooks/useApi";
+import getData from "../hooks/useApi";
 import { RASSEN, REGISTERAPI } from "../types/apiTypes";
 import useMutation, { structureHondenPayload } from "../hooks/useMutation";
 
@@ -19,6 +19,7 @@ interface RegisterProps {
 
 const Register: React.FC<RegisterProps> = ({ rassen }) => {
   const router = useRouter();
+  const register = useMutation();
   const { control, handleSubmit } = useForm();
   const { fields, append, remove } = useFieldArray({ control, name: "honden" });
 
@@ -28,7 +29,7 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
     const payload = structureHondenPayload(values);
     console.log(payload);
 
-    const { data, error } = await useMutation(REGISTERAPI, payload);
+    const { data, error } = await register(REGISTERAPI, payload);
     if (data) router.push(LOGIN);
     if (error) console.log(error);
   };
@@ -72,7 +73,7 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
 export default Register;
 
 export const getStaticProps = async () => {
-  const { data: rassen } = await useApi(RASSEN);
+  const { data: rassen } = await getData(RASSEN);
 
   return {
     props: {

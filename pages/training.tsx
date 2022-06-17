@@ -4,7 +4,9 @@ import Button from "../components/buttons/Button";
 import { Body, Title2 } from "../components/Typography/Typography";
 import { INSCHRIJVING } from "../types/linkTypes";
 
-const trainingen = () => {
+interface TrainingProps {}
+
+const Trainingen: React.FC<TrainingProps> = () => {
   const router = useRouter();
   return (
     <>
@@ -66,7 +68,9 @@ const trainingen = () => {
             <Body>Groepslessen gaan door op zondag.</Body>
             <Button
               label="Ik schrijf me in"
-              onClick={() => router.push(INSCHRIJVING)}
+              onClick={() =>
+                router.push(`${INSCHRIJVING}?type=group`, INSCHRIJVING)
+              }
             />
           </div>
         </div>
@@ -124,7 +128,9 @@ const trainingen = () => {
             </Body>
             <Button
               label="Aanvragen"
-              onClick={() => router.push(INSCHRIJVING)}
+              onClick={() =>
+                router.push(`${INSCHRIJVING}?type=prive`, INSCHRIJVING)
+              }
             />
           </div>
           <div className="min-w-fit shadow-md">
@@ -140,4 +146,4 @@ const trainingen = () => {
   );
 };
 
-export default trainingen;
+export default Trainingen;

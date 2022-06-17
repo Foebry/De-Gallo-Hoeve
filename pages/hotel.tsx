@@ -4,7 +4,9 @@ import Button from "../components/buttons/Button";
 import { Body, Link, Title2 } from "../components/Typography/Typography";
 import { RESERVATIE } from "../types/linkTypes";
 
-const hotel = () => {
+interface HotelProps {}
+
+const Hotel: React.FC<HotelProps> = ({}) => {
   const router = useRouter();
   return (
     <section className="bg-grey-900 px-5 py-5">
@@ -63,7 +65,4 @@ const hotel = () => {
   );
 };
 
-export default hotel;
-function useRedirect() {
-  throw new Error("Function not implemented.");
-}
+export default Hotel;
