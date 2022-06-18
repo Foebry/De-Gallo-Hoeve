@@ -9,48 +9,49 @@ use App\Services\EntityLoader;
 use App\Services\Validator;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Klant;
-use App\Services\ResponseHandler;
+use App\Entity\Hond;
+use App\Services\CustomHelper;
 
     class RegistrationController extends AbstractController {
 
-        private $emailVerifier;
         private $validator;
-        private $responseHandler;
 
-        public function __construct( Validator $validator, ResponseHandler $responseHandler ){
-
+        public function __construct( Validator $validator )
+        {
             $this->validator = $validator;
-            $this->responseHandler = $responseHandler;
-
         }
 
         /**
          * @Route("/api/register", name="register", methods={"POST"})
          */
-        public function register( Request $request, EntityLoader $loader, EntityManagerInterface $entityManager ){
+        public function register( Request $request, EntityLoader $loader, CustomHelper $helper, EntityManagerInterface $em ){
 
-            $table = $this->validator->getTableFromRequestUri();
             $payload = json_decode( $request->getContent(), true );
 
             $loader->checkPayloadForKeys( $payload, ["honden"] );
 
             $data = $this->validator->validatePayload();
-            $data["password"] = password_hash( $data["password"], 1 );
             // $arts = $this->checkArtsPayload();
             $payload["honden"] = $this->checkPayloadHonden( $payload["honden"] );
 
-            $klant_id = $loader->getDbm()->generateInsertStatmentAndGetInsertId( $table, $data );
+            /** @var Klant $klant */
+            $klant = $helper->create(Klant::class, $data, $loader);
+            $em->persist( $klant );
+            
             // $loader->getDbm()->generateInsertStatmentAndGetInsertId("arts", $arts);
 
             foreach( $payload["honden"] as &$hondData ){
                 
-                $hondData["klant_id"] = $klant_id;
-                $hondData["id"] = $loader->getDbm()->generateInsertStatmentAndGetInsertId( "hond", $hondData );
-                $data["honden"][] = $hondData;
+                $hondData["Klant"] = $klant;
+                $hond = $helper->create(Hond::class, $hondData, $loader);
+                $klant->addHonden( $hond );
+                
+                $em->persist($hond);
                 
             }
+            $em->flush();
 
-            return $this->json( $data, 201 );
+            return $this->json( ["message"=>"Bedankt voor uw registratie!"], 201 );
         }
 
         function checkPayloadHonden( array $hondenArray ) {

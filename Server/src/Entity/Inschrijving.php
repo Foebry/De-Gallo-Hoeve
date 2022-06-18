@@ -5,42 +5,44 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\InschrijvingRepository;
 use Doctrine\ORM\Mapping as ORM;
+use DateTime;
+use App\Services\EntityLoader;
 
 /**
  * @ApiResource()
  * @ORM\Entity(repositoryClass=InschrijvingRepository::class)
  */
-class Inschrijving extends AbstractClass
+class Inschrijving extends AbstractEntity
 {
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    protected $id;
+    private $id;
 
     /**
      * @ORM\Column(type="datetime")
      */
-    protected $datum;
+    private $datum;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Training::class, inversedBy="inschrijvings")
+     * @ORM\ManyToOne(targetEntity=Hond::class, inversedBy="inschrijvingen")
      * @ORM\JoinColumn(nullable=false)
      */
-    protected $training_id;
+    private $hond;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Klant::class, inversedBy="inschrijvings")
+     * @ORM\ManyToOne(targetEntity=Training::class, inversedBy="inschrijvingen")
      * @ORM\JoinColumn(nullable=false)
      */
-    protected $klant_id;
+    private $training;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Hond::class, inversedBy="inschrijvings")
+     * @ORM\ManyToOne(targetEntity=Klant::class, inversedBy="inschrijvingen")
      * @ORM\JoinColumn(nullable=false)
      */
-    protected $hond_id;
+    private $klant;
 
     public function getId(): ?int
     {
@@ -59,38 +61,48 @@ class Inschrijving extends AbstractClass
         return $this;
     }
 
-    public function getTrainingId(): ?Training
+    public function getHond(): ?Hond
     {
-        return $this->training_id;
+        return $this->hond;
     }
 
-    public function setTrainingId(?Training $training_id): self
+    public function setHond(?Hond $hond): self
     {
-        $this->training_id = $training_id;
+        $this->hond = $hond;
 
         return $this;
     }
 
-    public function getKlantId(): ?Klant
+    public function getTraining(): ?Training
     {
-        return $this->klant_id;
+        return $this->training;
     }
 
-    public function setKlantId(?Klant $klant_id): self
+    public function setTraining(?Training $training): self
     {
-        $this->klant_id = $klant_id;
+        $this->training = $training;
 
         return $this;
     }
 
-    public function getHondId(): ?Hond
+    public function getKlant(): ?Klant
     {
-        return $this->hond_id;
+        return $this->klant;
     }
 
-    public function setHondId(?Hond $hond_id): self
+    public function setKlant(?Klant $klant): self
     {
-        $this->hond_id = $hond_id;
+        $this->klant = $klant;
+
+        return $this;
+    }
+
+    public function initialize( array $data, EntityLoader $loader ): Inschrijving {
+        
+        $this->setDatum( new DateTime($data["datum"]) );
+        $this->setHond( $loader->getHondById($data["hond_id"]) );
+        $this->setKlant( $loader->getKlantBy( ["id" => $data["klant_id"]] ) );
+        $this->setTraining( $loader->getTrainingById($data["training_id"]) );
 
         return $this;
     }

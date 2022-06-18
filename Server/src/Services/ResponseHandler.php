@@ -23,6 +23,12 @@ namespace App\Services;
             exit();
         }
 
+        function unprocessableEntity( array $data = [] ): void{
+            print( json_encode( array_merge( ["code"=>422, "message"=>"Not Found"], $data ) ) );
+            header("HTTP/1.1 422");
+            exit();
+        }
+
         /**
          * Geef Response terug wanneer database error.
          */

@@ -1,8 +1,10 @@
 import axios from "axios";
 
 const getData = async (endpoint: string) => {
-    // const route = "http://localhost:8000/api/"+endpoint;
-    const route = "https://www.wdev2.be/fs_sander/eindwerk/api/"+endpoint;
+    const environment = process.env.NODE_ENV;
+    const api = environment === "production" ? process.env.NEXT_PUBLIC_PROD_API : process.env.NEXT_PUBLIC_DEV_API;
+
+    const route = `${api+endpoint}`
     try{
         const {data} = await axios(route);
         return {data, error: undefined};

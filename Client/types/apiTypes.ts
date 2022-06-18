@@ -1,5 +1,5 @@
 const ApiTypes = {
-    RASSEN: "rassen",
+    RASSEN: "ras",
     REGISTERAPI: "register",
     LOGINAPI: "login",
 }

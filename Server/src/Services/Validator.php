@@ -50,10 +50,7 @@ class Validator {
 
             if( $missingData ) $this->responseHandler->badRequest( [$column => "Mag niet leeg zijn"] );
             
-            if( $requiresDefaultValue ){
-                $validatedPayload[$column] = $this->getDefaultValue( $column );
-                continue;
-            }
+            if( $requiresDefaultValue ) continue;
 
             if( $unique && $this->violatesUniqueRestraint( $method, $table, $column, $payloadArray[$column] ) ) $this->responseHandler->badRequest( [$column => "Is reeds in gebruik"] );
 

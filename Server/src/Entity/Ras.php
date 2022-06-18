@@ -7,19 +7,17 @@ use App\Repository\RasRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource()
  * @ORM\Entity(repositoryClass=RasRepository::class)
  */
-class Ras extends AbstractClass
+class Ras
 {
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
-     * @ORM\Column(name="id")
-     * @groups({"honds: read"})
+     * @ORM\Column(type="integer")
      */
     private $id;
 
@@ -34,13 +32,13 @@ class Ras extends AbstractClass
     private $soort;
 
     /**
-     * @ORM\OneToMany(targetEntity=Hond::class, mappedBy="ras_id")
+     * @ORM\OneToMany(targetEntity=Hond::class, mappedBy="ras", orphanRemoval=true)
      */
-    private $honds;
+    private $honden;
 
     public function __construct()
     {
-        $this->honds = new ArrayCollection();
+        $this->honden = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -72,30 +70,38 @@ class Ras extends AbstractClass
         return $this;
     }
 
+    public function initialize( array $data ): Ras {
+        
+        $this->setNaam($data["naam"]);
+        $this->setSoort($data["soort"]);
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Hond>
      */
-    public function getHonds(): Collection
+    public function getHonden(): Collection
     {
-        return $this->honds;
+        return $this->honden;
     }
 
-    public function addHond(Hond $hond): self
+    public function addHonden(Hond $honden): self
     {
-        if (!$this->honds->contains($hond)) {
-            $this->honds[] = $hond;
-            $hond->setRasId($this);
+        if (!$this->honden->contains($honden)) {
+            $this->honden[] = $honden;
+            $honden->setRas($this);
         }
 
         return $this;
     }
 
-    public function removeHond(Hond $hond): self
+    public function removeHonden(Hond $honden): self
     {
-        if ($this->honds->removeElement($hond)) {
+        if ($this->honden->removeElement($honden)) {
             // set the owning side to null (unless already changed)
-            if ($hond->getRasId() === $this) {
-                $hond->setRasId(null);
+            if ($honden->getRas() === $this) {
+                $honden->setRas(null);
             }
         }
 

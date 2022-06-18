@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ApiResource()
  * @ORM\Entity(repositoryClass=TrainingRepository::class)
  */
-class Training extends AbstractClass
+class Training
 {
     /**
      * @ORM\Id
@@ -37,13 +37,13 @@ class Training extends AbstractClass
     private $prijs;
 
     /**
-     * @ORM\OneToMany(targetEntity=Inschrijving::class, mappedBy="training_id")
+     * @ORM\OneToMany(targetEntity=Inschrijving::class, mappedBy="training", orphanRemoval=true)
      */
-    private $inschrijvings;
+    private $inschrijvingen;
 
     public function __construct()
     {
-        $this->inschrijvings = new ArrayCollection();
+        $this->inschrijvingen = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -87,30 +87,39 @@ class Training extends AbstractClass
         return $this;
     }
 
+    public function initialize( array $data ): Training {
+        
+        $this->setNaam($data["naam"]);
+        $this->setOmschrijving($data["omschrijving"]);
+        $this->setPrijs($data["prijs"]);
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Inschrijving>
      */
-    public function getInschrijvings(): Collection
+    public function getInschrijvingen(): Collection
     {
-        return $this->inschrijvings;
+        return $this->inschrijvingen;
     }
 
-    public function addInschrijving(Inschrijving $inschrijving): self
+    public function addInschrijvingen(Inschrijving $inschrijvingen): self
     {
-        if (!$this->inschrijvings->contains($inschrijving)) {
-            $this->inschrijvings[] = $inschrijving;
-            $inschrijving->setTrainingId($this);
+        if (!$this->inschrijvingen->contains($inschrijvingen)) {
+            $this->inschrijvingen[] = $inschrijvingen;
+            $inschrijvingen->setTraining($this);
         }
 
         return $this;
     }
 
-    public function removeInschrijving(Inschrijving $inschrijving): self
+    public function removeInschrijvingen(Inschrijving $inschrijvingen): self
     {
-        if ($this->inschrijvings->removeElement($inschrijving)) {
+        if ($this->inschrijvingen->removeElement($inschrijvingen)) {
             // set the owning side to null (unless already changed)
-            if ($inschrijving->getTrainingId() === $this) {
-                $inschrijving->setTrainingId(null);
+            if ($inschrijvingen->getTraining() === $this) {
+                $inschrijvingen->setTraining(null);
             }
         }
 

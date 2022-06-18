@@ -2,10 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Boeking;
+use App\Entity\BoekingDetail;
+use App\Services\CustomHelper;
 use DateTime;
 use App\Services\Validator;
 use App\Services\EntityLoader;
 use App\Services\ResponseHandler;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Annotation\Route;
@@ -32,39 +36,56 @@ use Symfony\Component\HttpFoundation\Response;
          * @todo controleer of kennels vrij zijn gedurende de gevraagde periode.
          * @todo indien geen kennels aangeduidt, wijs zelf kennel toe.
          */
-        function postBoeking(): Response {
-
-            $table = $this->validator->getTableFromRequestUri();
+        function postBoeking(EntityManagerInterface $em, CustomHelper $helper): Response {
             $payload = json_decode( $this->request->getContent(), true );
 
             $this->loader->checkPayloadForKeys( $payload, ["klant_id", "details"], [ "details" => ["message"=>"Gelieve minstens 1 hond aan te duiden"]]);
-            $this->loader->getKlantById( $payload["klant_id"] );
+            if(count($payload["details"]) === 0) $this->responseHandler->badRequest(["message" => "Gelieve minstens 1 hond aan te duiden"]);
+
+            /** @var Klant $klant */
+            $klant = $this->loader->getKlantBy( ["id", $payload["klant_id"]] );
 
             $data = $this->checkBoekingPayload();
-            $details = $this->checkDetailsPayload( $payload );
 
-            $data["id"] = $this->loader->getDbm()->generateInsertStatmentAndGetInsertId( $table, $data );
+            /** @var Boeking $boeking */
+            $boeking = $helper->create( Boeking::class, $data, $this->loader );
+            $klant->addBoekingen($boeking);
             
-            foreach( $details as &$detailData ){
-                $detailData["boeking_id"] = $data["id"];
-                $this->loader->getDbm()->generateInsertStatmentAndGetInsertId( "boeking_detail", $detailData );
+            $em->persist($boeking);
+            
+            $detailRows = $this->checkDetailsPayload( $payload );
+            
+            foreach( $detailRows as &$detailData ){
+
+                $hond = $this->loader->getHondById( $detailData["hond_id"]);
+
+                if( !$klant->isOwnerOf($hond) ) $this->responseHandler->unprocessableEntity(["message" => "Het lijkt dat deze hond niet bij jou hoort"]);
+
+                $detailData["Boeking"] = $boeking;
+                /** @var BoekingDetail $detail */
+                $detail = $helper->create(BoekingDetail::class, $detailData, $this->loader);
+                $hond->addBoeking($detail);
+                $boeking->addDetail($detail);
+
+                $em->persist($detail);
             }
+            $em->flush();
 
-            $data["details"] = $details;
+            $data["details"] = $detailRows;
 
-            return $this->json( $data, 201 );           
+            return $this->json( ["message" => "Uw boeking is goed ontvangen!"], 201 );           
         }
 
         function checkBoekingPayload(): array {
 
             $boekingData = $this->validator->validatePayload();
 
-            $start = new DateTime( $boekingData["startdatum"] );
-            $eind = new DateTime( $boekingData["einddatum"] );
+            $start = new DateTime( $boekingData["start"] );
+            $eind = new DateTime( $boekingData["eind"] );
             $now = new DateTime();
 
-            if( $now > $start ) $this->responseHandler->badRequest( ["startdatum" => "Gelieve een datum in de toekomst te kiezen"]);
-            if( $start >= $eind ) $this->responseHandler->badRequest( ["einddatum" => "Gelieve einddatum na begindatum te kiezen."]);
+            if( $now > $start ) $this->responseHandler->badRequest( ["start" => "Gelieve een datum in de toekomst te kiezen"]);
+            if( $start >= $eind ) $this->responseHandler->badRequest( ["eind" => "Gelieve einddatum na begindatum te kiezen."]);
             
             return $boekingData;
         }

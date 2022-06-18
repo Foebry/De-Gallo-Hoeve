@@ -22,21 +22,6 @@ class Kennel
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $breedte;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $lengte;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $hoogte;
-
-    /**
      * @ORM\Column(type="text")
      */
     private $omschrijving;
@@ -47,54 +32,18 @@ class Kennel
     private $prijs;
 
     /**
-     * @ORM\OneToMany(targetEntity=BoekingDetail::class, mappedBy="kennel_id")
+     * @ORM\OneToMany(targetEntity=BoekingDetail::class, mappedBy="kennel")
      */
-    private $boekingDetails;
+    private $boekings;
 
     public function __construct()
     {
-        $this->boekingDetails = new ArrayCollection();
+        $this->boekings = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getBreedte(): ?int
-    {
-        return $this->breedte;
-    }
-
-    public function setBreedte(int $breedte): self
-    {
-        $this->breedte = $breedte;
-
-        return $this;
-    }
-
-    public function getLengte(): ?int
-    {
-        return $this->lengte;
-    }
-
-    public function setLengte(int $lengte): self
-    {
-        $this->lengte = $lengte;
-
-        return $this;
-    }
-
-    public function getHoogte(): ?int
-    {
-        return $this->hoogte;
-    }
-
-    public function setHoogte(int $hoogte): self
-    {
-        $this->hoogte = $hoogte;
-
-        return $this;
     }
 
     public function getOmschrijving(): ?string
@@ -120,31 +69,38 @@ class Kennel
 
         return $this;
     }
+    public function initialize( array $data ): Kennel {
+        
+        $this->setOmschrijving($data["omschrijving"]);
+        $this->setPrijs($data["prijs"]);
+
+        return $this;
+    }
 
     /**
      * @return Collection<int, BoekingDetail>
      */
-    public function getBoekingDetails(): Collection
+    public function getBoekings(): Collection
     {
-        return $this->boekingDetails;
+        return $this->boekings;
     }
 
-    public function addBoekingDetail(BoekingDetail $boekingDetail): self
+    public function addBoeking(BoekingDetail $boeking): self
     {
-        if (!$this->boekingDetails->contains($boekingDetail)) {
-            $this->boekingDetails[] = $boekingDetail;
-            $boekingDetail->setKennelId($this);
+        if (!$this->boekings->contains($boeking)) {
+            $this->boekings[] = $boeking;
+            $boeking->setKennel($this);
         }
 
         return $this;
     }
 
-    public function removeBoekingDetail(BoekingDetail $boekingDetail): self
+    public function removeBoeking(BoekingDetail $boeking): self
     {
-        if ($this->boekingDetails->removeElement($boekingDetail)) {
+        if ($this->boekings->removeElement($boeking)) {
             // set the owning side to null (unless already changed)
-            if ($boekingDetail->getKennelId() === $this) {
-                $boekingDetail->setKennelId(null);
+            if ($boeking->getKennel() === $this) {
+                $boeking->setKennel(null);
             }
         }
 

@@ -7,13 +7,14 @@ use App\Repository\HondRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use DateTime;
+use App\Services\EntityLoader;
 
 /**
  * @ApiResource()
  * @ORM\Entity(repositoryClass=HondRepository::class)
  */
-class Hond extends AbstractClass
+class Hond extends AbstractEntity
 {
     /**
      * @ORM\Id
@@ -33,31 +34,36 @@ class Hond extends AbstractClass
     private $geboortedatum;
 
     /**
-     * @ORM\OneToMany(targetEntity=Inschrijving::class, mappedBy="hond_id")
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $inschrijvings;
+    private $chip_nr;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Ras::class, inversedBy="honds")
+     * @ORM\ManyToOne(targetEntity=Ras::class, inversedBy="honden")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $ras_id;
+    private $ras;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Klant::class, inversedBy="honds")
+     * @ORM\OneToMany(targetEntity=BoekingDetail::class, mappedBy="hond", orphanRemoval=true)
+     */
+    private $boekings;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Inschrijving::class, mappedBy="hond", orphanRemoval=true)
+     */
+    private $inschrijvingen;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Klant::class, inversedBy="honden")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $klant_id;
-
-    /**
-     * @ORM\OneToMany(targetEntity=BoekingDetail::class, mappedBy="hond_id")
-     */
-    private $boekingDetails;
+    private $klant;
 
     public function __construct()
     {
-        $this->inschrijvings = new ArrayCollection();
-        $this->boekingDetails = new ArrayCollection();
+        $this->boekings = new ArrayCollection();
+        $this->inschrijvingen = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -89,86 +95,113 @@ class Hond extends AbstractClass
         return $this;
     }
 
-    /**
-     * @return Collection<int, Inschrijving>
-     */
-    public function getInschrijvings(): Collection
+    public function getChipNr(): ?string
     {
-        return $this->inschrijvings;
+        return $this->chip_nr;
     }
 
-    public function addInschrijving(Inschrijving $inschrijving): self
+    public function setChipNr(?string $chip_nr): self
     {
-        if (!$this->inschrijvings->contains($inschrijving)) {
-            $this->inschrijvings[] = $inschrijving;
-            $inschrijving->setHondId($this);
-        }
+        $this->chip_nr = $chip_nr;
 
         return $this;
     }
 
-    public function removeInschrijving(Inschrijving $inschrijving): self
+    public function getRas(): ?Ras
     {
-        if ($this->inschrijvings->removeElement($inschrijving)) {
-            // set the owning side to null (unless already changed)
-            if ($inschrijving->getHondId() === $this) {
-                $inschrijving->setHondId(null);
-            }
-        }
+        return $this->ras;
+    }
+
+    public function setRas(?Ras $ras): self
+    {
+        $this->ras = $ras;
 
         return $this;
     }
 
-    public function getRasId(): ?Ras
-    {
-        return $this->ras_id;
-    }
-
-    public function setRasId(?Ras $ras_id): self
-    {
-        $this->ras_id = $ras_id;
-
-        return $this;
-    }
-
-    public function getKlantId(): ?Klant
-    {
-        return $this->klant_id;
-    }
-
-    public function setKlantId(?Klant $klant_id): self
-    {
-        $this->klant_id = $klant_id;
-
+    public function initialize( array $data, EntityLoader $loader ): Hond {
+        
+        // header("Access-Control-Allow-Origin: *");
+        // print(json_encode($data));
+        // exit();
+        
+        $this->setNaam($data["naam"]);
+        $this->setRas( $loader->getRasById( $data["ras_id"] ) );
+        $this->setGeboortedatum(new DateTime($data["geboortedatum"]));
+        $this->setChipNr($data["chip_nr"] ?? $loader->getHelper()->generateRandomString());
+        $this->setKlant( $data["Klant"] );
+        
         return $this;
     }
 
     /**
      * @return Collection<int, BoekingDetail>
      */
-    public function getBoekingDetails(): Collection
+    public function getBoekings(): Collection
     {
-        return $this->boekingDetails;
+        return $this->boekings;
     }
 
-    public function addBoekingDetail(BoekingDetail $boekingDetail): self
+    public function addBoeking(BoekingDetail $boeking): self
     {
-        if (!$this->boekingDetails->contains($boekingDetail)) {
-            $this->boekingDetails[] = $boekingDetail;
-            $boekingDetail->setHondId($this);
+        if (!$this->boekings->contains($boeking)) {
+            $this->boekings[] = $boeking;
+            $boeking->setHond($this);
         }
 
         return $this;
     }
 
-    public function removeBoekingDetail(BoekingDetail $boekingDetail): self
+    public function removeBoeking(BoekingDetail $boeking): self
     {
-        if ($this->boekingDetails->removeElement($boekingDetail)) {
+        if ($this->boekings->removeElement($boeking)) {
             // set the owning side to null (unless already changed)
-            if ($boekingDetail->getHondId() === $this) {
-                $boekingDetail->setHondId(null);
+            if ($boeking->getHond() === $this) {
+                $boeking->setHond(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Inschrijving>
+     */
+    public function getInschrijvingen(): Collection
+    {
+        return $this->inschrijvingen;
+    }
+
+    public function addInschrijvingen(Inschrijving $inschrijvingen): self
+    {
+        if (!$this->inschrijvingen->contains($inschrijvingen)) {
+            $this->inschrijvingen[] = $inschrijvingen;
+            $inschrijvingen->setHond($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInschrijvingen(Inschrijving $inschrijvingen): self
+    {
+        if ($this->inschrijvingen->removeElement($inschrijvingen)) {
+            // set the owning side to null (unless already changed)
+            if ($inschrijvingen->getHond() === $this) {
+                $inschrijvingen->setHond(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getKlant(): ?Klant
+    {
+        return $this->klant;
+    }
+
+    public function setKlant(?Klant $klant): self
+    {
+        $this->klant = $klant;
 
         return $this;
     }

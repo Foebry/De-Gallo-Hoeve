@@ -129,13 +129,13 @@ const Step1: React.FC<RegisterStepProps> = ({ control, setActiveTab }) => {
         />
       </FormRow>
       <Controller
-        name="telefoon"
+        name="gsm"
         control={control}
         render={({ field: { onChange, onBlur, value } }) => (
           <FormInput
             label="telefoon"
-            name="telefoon"
-            id="telefoon"
+            name="gsm"
+            id="gsm"
             extra="w-1/2"
             value={value}
             onChange={onChange}

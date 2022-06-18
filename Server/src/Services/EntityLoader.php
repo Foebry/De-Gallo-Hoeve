@@ -4,40 +4,54 @@ namespace App\Services;
 
 use App\Entity\Klant;
 use App\Entity\Hond;
+use App\Entity\Kennel;
 use App\Entity\Ras;
 use App\Entity\Training;
 use App\Services\DbManager;
 use App\Services\ResponseHandler;
+use Doctrine\ORM\EntityManagerInterface;
 
 class EntityLoader {
     
     private $dbm;
     private $responseHandler;
+    private $helper;
+    private $em;
 
-    public function __construct(DbManager $dbm, ResponseHandler $rh)
+    public function __construct(DbManager $dbm, ResponseHandler $rh, CustomHelper $helper, EntityManagerInterface $em )
     {
         $this->dbm = $dbm;
         $this->responseHandler = $rh;
+        $this->helper = $helper;
+        $this->em = $em;
     }
 
     function getDbm(): DbManager {
         return $this->dbm;
     }
 
+    function getResponseHandler(): ResponseHandler {
+        return $this->responseHandler;
+    }
+
+    function getHelper(): CustomHelper {
+        return $this->helper;
+    }
+
     /**
      * Zoek klant met id {id} als deze bestaat.
-     * @param int $id
+     * @param array $data
      * @return Klant
      */
-    public function getKlantById( int $id ): Klant {
+    public function getKlantBy( array $data ): Klant {
 
-        $query = "select * from klant where id = :id";
-        $data = $this->dbm->query( $query, ["id" => $id] );
+        $klantRepo = $this->em->getRepository(Klant::class);
+        $klant = $klantRepo->findOneBy([$data[0] => $data[1]]);
 
-        if($data === []) $this->responseHandler->NotFound(["message"=>"Geen klant met id $id"]);
-
-        $klant = new Klant();
-        $klant->initialize( $data );
+        if( !$klant ){
+            $this->dbm->logger->error( sprintf( "Geen klant met %s %s", $data[0], $data[1] ) );
+            $this->responseHandler->NotFound(["message"=>"Klant niet gevonden"]);
+        }
         
         return $klant;
     }
@@ -49,14 +63,13 @@ class EntityLoader {
      */
     public function getHondById( int $id ): Hond {
 
-        $query = "select * from hond where id = $id";
-        $vars = ["id" => $id];
-        $data = $this->dbm->query( $query, $vars );
+        $hondRepo = $this->em->getRepository(Hond::class);
+        $hond = $hondRepo->findOneBy(["id" => $id]);
 
-        if( $data === [] ) $this->responseHandler->NotFound(["message" => "Geen hond met id $id"]);
-
-        $hond = new Hond();
-        $hond->initialize( $data );
+        if( !$hond ) {
+            $this->dbm->logger->error( "Geen hond met id $id" );
+            $this->responseHandler->NotFound(["message" => "Hond niet gevonden"]);
+        }
 
         return $hond;
     }
@@ -68,30 +81,40 @@ class EntityLoader {
      */
     public function getRasById( int $id ): Ras{
 
-        $query = "select * from ras where id = :id";
-        $vars = ["id" => $id];
-        $data = $this->dbm->query( $query, $vars );
+        $rasRepo = $this->em->getRepository(Ras::class);
+        $ras = $rasRepo->findOneBy(["id"=>$id]);
 
-        if( $data === [] ) $this->responseHandler->badRequest(["message" => "Geen Ras met id $id"]);
-
-        $ras = new Ras();
-        $ras->initialize( $data );
+        if( !$ras ) {
+            $this->dbm->logger->error( "Geen Ras met id $id" );
+            $this->responseHandler->badRequest(["message" => "Ras niet gevonden"]);
+        }
 
         return $ras;
     }
 
     public function getTrainingById( int $id ): Training {
-        
-        $query = "select * from training where id = $id";
-        $vars = ["id" => $id];
-        $data = $this->dbm->query( $query, $vars );
 
-        if( $data === [] ) $this->responseHandler->badRequest( ["message" => "Geen training met id $id"] );
+        $trainingRepo = $this->em->getRepository(Training::class);
+        $training = $trainingRepo->findOneBy(["id"=>$id]);
 
-        $training = new Training();
-        $training->initialize( $data );
+        if( $training ) {
+            $this->dbm->logger->error( "Geen training met id $id" );
+            $this->responseHandler->badRequest( ["message" => "Training niet gevonden"] );
+        }
 
         return $training;
+    }
+
+    public function getKennelById( int $id ): Kennel{
+
+        $kennelRepo = $this->em->getRepository(Kennel::class);
+        $kennel = $kennelRepo->findOneBy(["id"=>$id]);
+
+        if( !$kennel ) {
+            $this->dbm->logger->error( "Geen kennel met id $id" );
+            $this->responseHandler->badRequest( ["message" => "Kennel niet gevonden"]);
+        }
+        return $kennel;
     }
 
     public function checkPayloadForKeys(array $payload, array $keys, array $defaultResponses = []): void {

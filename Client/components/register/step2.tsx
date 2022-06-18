@@ -86,7 +86,7 @@ const step2: React.FC<Props> = ({
                 )}
               />
               <Controller
-                name={`honden.${index}.ras_id_id`}
+                name={`honden.${index}.ras_id`}
                 control={control}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Select
@@ -109,13 +109,13 @@ const step2: React.FC<Props> = ({
                   )}
                 />
                 <Controller
-                  name={`honden.${index}.chipNr`}
+                  name={`honden.${index}.chip_nr`}
                   control={control}
                   render={({ field: { onChange, onBlur, value } }) => (
                     <FormInput
                       label="chipNr"
-                      name={`honden.${index}.chipNr`}
-                      id={`honden.${index}.chipNr`}
+                      name={`honden.${index}.chip_nr`}
+                      id={`honden.${index}.chip_nr`}
                       extra="w-1/6"
                       value={value}
                       onChange={onChange}

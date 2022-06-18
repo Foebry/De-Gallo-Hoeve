@@ -5,12 +5,14 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\BoekingDetailRepository;
 use Doctrine\ORM\Mapping as ORM;
+use DateTime;
+use App\Services\EntityLoader;
 
 /**
  * @ApiResource()
  * @ORM\Entity(repositoryClass=BoekingDetailRepository::class)
  */
-class BoekingDetail
+class BoekingDetail extends AbstractEntity
 {
     /**
      * @ORM\Id
@@ -18,11 +20,6 @@ class BoekingDetail
      * @ORM\Column(type="integer")
      */
     private $id;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $medicatie;
 
     /**
      * @ORM\Column(type="date", nullable=true)
@@ -40,43 +37,35 @@ class BoekingDetail
     private $sociaal;
 
     /**
+     * @ORM\Column(type="boolean")
+     */
+    private $medicatie;
+
+    /**
      * @ORM\Column(type="text", nullable=true)
      */
     private $extra;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Boeking::class, inversedBy="boekingDetails")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\ManyToOne(targetEntity=Kennel::class, inversedBy="boekings")
      */
-    private $boeking_id;
+    private $kennel;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Hond::class, inversedBy="boekingDetails")
+     * @ORM\ManyToOne(targetEntity=Boeking::class, inversedBy="details")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $hond_id;
+    private $boeking;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Kennel::class, inversedBy="boekingDetails")
+     * @ORM\ManyToOne(targetEntity=Hond::class, inversedBy="boekings")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $kennel_id;
+    public $hond;
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function isMedicatie(): ?bool
-    {
-        return $this->medicatie;
-    }
-
-    public function setMedicatie(bool $medicatie): self
-    {
-        $this->medicatie = $medicatie;
-
-        return $this;
     }
 
     public function getLoops(): ?\DateTimeInterface
@@ -115,6 +104,18 @@ class BoekingDetail
         return $this;
     }
 
+    public function isMedicatie(): ?bool
+    {
+        return $this->medicatie;
+    }
+
+    public function setMedicatie(bool $medicatie): self
+    {
+        $this->medicatie = $medicatie;
+
+        return $this;
+    }
+
     public function getExtra(): ?string
     {
         return $this->extra;
@@ -127,38 +128,52 @@ class BoekingDetail
         return $this;
     }
 
-    public function getBoekingId(): ?Boeking
-    {
-        return $this->boeking_id;
-    }
+    public function initialize( array $data, EntityLoader $loader ): BoekingDetail {
 
-    public function setBoekingId(?Boeking $boeking_id): self
-    {
-        $this->boeking_id = $boeking_id;
-
-        return $this;
-    }
-
-    public function getHondId(): ?Hond
-    {
-        return $this->hond_id;
-    }
-
-    public function setHondId(?Hond $hond_id): self
-    {
-        $this->hond_id = $hond_id;
+        $this->setBoeking($data["Boeking"]);
+        $this->setExtra($data["extra"] ?? "");
+        $this->setHond( $loader->getHondById( $data["hond_id"] ) );
+        $this->setKennel( $loader->getKennelById( $data["kennel_id"] ?? 1 ) );
+        $this->setLoops(new DateTime($data["loops"] ?? "1990-01-01") );
+        $this->setMedicatie($data["medicatie"]);
+        $this->setOntsnapping($data["ontsnapping"]);
+        $this->setSociaal($data["sociaal"]);
 
         return $this;
     }
 
-    public function getKennelId(): ?Kennel
+    public function getKennel(): ?Kennel
     {
-        return $this->kennel_id;
+        return $this->kennel;
     }
 
-    public function setKennelId(?Kennel $kennel_id): self
+    public function setKennel(?Kennel $kennel): self
     {
-        $this->kennel_id = $kennel_id;
+        $this->kennel = $kennel;
+
+        return $this;
+    }
+
+    public function getBoeking(): ?Boeking
+    {
+        return $this->boeking;
+    }
+
+    public function setBoeking(?Boeking $boeking): self
+    {
+        $this->boeking = $boeking;
+
+        return $this;
+    }
+
+    public function getHond(): ?Hond
+    {
+        return $this->hond;
+    }
+
+    public function setHond(?Hond $hond): self
+    {
+        $this->hond = $hond;
 
         return $this;
     }

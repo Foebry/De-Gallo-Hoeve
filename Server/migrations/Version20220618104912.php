@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20220613093228 extends AbstractMigration
+final class Version20220618104912 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,12 +20,14 @@ final class Version20220613093228 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE hond (id INT AUTO_INCREMENT NOT NULL, naam VARCHAR(255) NOT NULL, geboortedatum DATE NOT NULL, ras_id INT NOT NULL, klant_id INT NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('ALTER TABLE boeking CHANGE start start DATETIME NOT NULL, CHANGE referentie referentie VARCHAR(255) NOT NULL');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('DROP TABLE hond');
+        $this->addSql('ALTER TABLE boeking CHANGE start start DATE NOT NULL, CHANGE referentie referentie VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE hond CHANGE klant_id klant_id INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE klant CHANGE roles roles LONGTEXT DEFAULT NULL COMMENT \'(DC2Type:json)\'');
     }
 }

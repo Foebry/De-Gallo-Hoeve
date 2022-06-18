@@ -12,6 +12,7 @@ import { OptionsOrGroups } from "react-select";
 import getData from "../hooks/useApi";
 import { RASSEN, REGISTERAPI } from "../types/apiTypes";
 import useMutation, { structureHondenPayload } from "../hooks/useMutation";
+import internal from "stream";
 
 interface RegisterProps {
   rassen: OptionsOrGroups<any, optionInterface>[];
@@ -22,12 +23,14 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
   const register = useMutation();
   const { control, handleSubmit } = useForm();
   const { fields, append, remove } = useFieldArray({ control, name: "honden" });
-
   const [activeTab, setActiveTab] = useState<FormTabType>(1);
 
+  useEffect(() => {
+    console.log(rassen);
+  }, []);
+
   const onSubmit = async (values: any) => {
-    const payload = structureHondenPayload(values);
-    console.log(payload);
+    let payload = structureHondenPayload(values);
 
     const { data, error } = await register(REGISTERAPI, payload);
     if (error) console.log(error);
@@ -73,8 +76,11 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
 export default Register;
 
 export const getStaticProps = async () => {
-  const { data: rassen } = await getData(RASSEN);
-
+  const { data } = await getData(RASSEN);
+  const rassen = data.map((ras: { id: number; naam: string }) => ({
+    value: ras.id,
+    label: ras.naam,
+  }));
   return {
     props: {
       rassen,

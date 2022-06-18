@@ -2,8 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use App\Entity\AbstractClass;
 use App\Repository\KlantRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -12,10 +10,9 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * @ApiResource()
  * @ORM\Entity(repositoryClass=KlantRepository::class)
  */
-class Klant extends AbstractClass implements UserInterface, PasswordAuthenticatedUserInterface
+class Klant extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Id
@@ -51,9 +48,9 @@ class Klant extends AbstractClass implements UserInterface, PasswordAuthenticate
     private $lnaam;
 
     /**
-     * @ORM\Column(type="string", length=20)
+     * @ORM\Column(type="string", length=255)
      */
-    private $telefoon;
+    private $gsm;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -81,25 +78,25 @@ class Klant extends AbstractClass implements UserInterface, PasswordAuthenticate
     private $verified;
 
     /**
-     * @ORM\OneToMany(targetEntity=Inschrijving::class, mappedBy="klant_id")
+     * @ORM\OneToMany(targetEntity=Boeking::class, mappedBy="klant", orphanRemoval=true)
      */
-    private $inschrijvings;
+    private $boekingen;
 
     /**
-     * @ORM\OneToMany(targetEntity=Hond::class, mappedBy="klant_id")
+     * @ORM\OneToMany(targetEntity=Hond::class, mappedBy="klant", orphanRemoval=true)
      */
-    private $honds;
+    private $honden;
 
     /**
-     * @ORM\OneToMany(targetEntity=Boeking::class, mappedBy="klant_id")
+     * @ORM\OneToMany(targetEntity=Inschrijving::class, mappedBy="klant", orphanRemoval=true)
      */
-    private $boekings;
+    private $inschrijvingen;
 
     public function __construct()
     {
-        $this->inschrijvings = new ArrayCollection();
-        $this->honds = new ArrayCollection();
-        $this->boekings = new ArrayCollection();
+        $this->boekingen = new ArrayCollection();
+        $this->honden = new ArrayCollection();
+        $this->inschrijvingen = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -215,14 +212,14 @@ class Klant extends AbstractClass implements UserInterface, PasswordAuthenticate
         return $this;
     }
 
-    public function getTelefoon(): ?string
+    public function getGsm(): ?string
     {
-        return $this->telefoon;
+        return $this->gsm;
     }
 
-    public function setTelefoon(string $telefoon): self
+    public function setGsm(string $gsm): self
     {
-        $this->telefoon = $telefoon;
+        $this->gsm = $gsm;
 
         return $this;
     }
@@ -280,37 +277,63 @@ class Klant extends AbstractClass implements UserInterface, PasswordAuthenticate
         return $this->verified;
     }
 
-    public function setVerified(bool $verified): self
+    public function setVerified(?bool $verified): self
     {
         $this->verified = $verified;
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, Inschrijving>
-     */
-    public function getInschrijvings(): Collection
-    {
-        return $this->inschrijvings;
+    public function initialize( array $payload ): Klant {  
+        
+        $this->setEmail($payload["email"]);
+        $this->setGemeente($payload["gemeente"]);
+        $this->setGsm($payload["gsm"]);
+        $this->setLnaam($payload["lnaam"]);
+        $this->setNr($payload["nr"]);
+        $this->setPassword( password_hash($payload["password"], 1));
+        $this->setPostcode($payload["postcode"]);
+        $this->setStraat($payload["straat"]);
+        $this->setVerified(0);
+        $this->setVnaam($payload["vnaam"]);
+        $this->setRoles([]);
+
+        return $this;
     }
 
-    public function addInschrijving(Inschrijving $inschrijving): self
+    public function isOwnerOf( Hond $hond ): bool{
+
+        $honden = $this->getHonden();
+        foreach( $honden as $huisdier ){
+            if( $hond->getId() === $huisdier->getId() ) return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return Collection<int, Boeking>
+     */
+    public function getBoekingen(): Collection
     {
-        if (!$this->inschrijvings->contains($inschrijving)) {
-            $this->inschrijvings[] = $inschrijving;
-            $inschrijving->setKlantId($this);
+        return $this->boekingen;
+    }
+
+    public function addBoekingen(Boeking $boekingen): self
+    {
+        if (!$this->boekingen->contains($boekingen)) {
+            $this->boekingen[] = $boekingen;
+            $boekingen->setKlant($this);
         }
 
         return $this;
     }
 
-    public function removeInschrijving(Inschrijving $inschrijving): self
+    public function removeBoekingen(Boeking $boekingen): self
     {
-        if ($this->inschrijvings->removeElement($inschrijving)) {
+        if ($this->boekingen->removeElement($boekingen)) {
             // set the owning side to null (unless already changed)
-            if ($inschrijving->getKlantId() === $this) {
-                $inschrijving->setKlantId(null);
+            if ($boekingen->getKlant() === $this) {
+                $boekingen->setKlant(null);
             }
         }
 
@@ -320,27 +343,27 @@ class Klant extends AbstractClass implements UserInterface, PasswordAuthenticate
     /**
      * @return Collection<int, Hond>
      */
-    public function getHonds(): Collection
+    public function getHonden(): Collection
     {
-        return $this->honds;
+        return $this->honden;
     }
 
-    public function addHond(Hond $hond): self
+    public function addHonden(Hond $honden): self
     {
-        if (!$this->honds->contains($hond)) {
-            $this->honds[] = $hond;
-            $hond->setKlantId($this);
+        if (!$this->honden->contains($honden)) {
+            $this->honden[] = $honden;
+            $honden->setKlant($this);
         }
 
         return $this;
     }
 
-    public function removeHond(Hond $hond): self
+    public function removeHonden(Hond $honden): self
     {
-        if ($this->honds->removeElement($hond)) {
+        if ($this->honden->removeElement($honden)) {
             // set the owning side to null (unless already changed)
-            if ($hond->getKlantId() === $this) {
-                $hond->setKlantId(null);
+            if ($honden->getKlant() === $this) {
+                $honden->setKlant(null);
             }
         }
 
@@ -348,29 +371,29 @@ class Klant extends AbstractClass implements UserInterface, PasswordAuthenticate
     }
 
     /**
-     * @return Collection<int, Boeking>
+     * @return Collection<int, Inschrijving>
      */
-    public function getBoekings(): Collection
+    public function getInschrijvingen(): Collection
     {
-        return $this->boekings;
+        return $this->inschrijvingen;
     }
 
-    public function addBoeking(Boeking $boeking): self
+    public function addInschrijvingen(Inschrijving $inschrijvingen): self
     {
-        if (!$this->boekings->contains($boeking)) {
-            $this->boekings[] = $boeking;
-            $boeking->setKlantId($this);
+        if (!$this->inschrijvingen->contains($inschrijvingen)) {
+            $this->inschrijvingen[] = $inschrijvingen;
+            $inschrijvingen->setKlant($this);
         }
 
         return $this;
     }
 
-    public function removeBoeking(Boeking $boeking): self
+    public function removeInschrijvingen(Inschrijving $inschrijvingen): self
     {
-        if ($this->boekings->removeElement($boeking)) {
+        if ($this->inschrijvingen->removeElement($inschrijvingen)) {
             // set the owning side to null (unless already changed)
-            if ($boeking->getKlantId() === $this) {
-                $boeking->setKlantId(null);
+            if ($inschrijvingen->getKlant() === $this) {
+                $inschrijvingen->setKlant(null);
             }
         }
 
