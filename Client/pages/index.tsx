@@ -1,8 +1,13 @@
-import { Body, Title2 } from "../Typography/Typography";
+import { Body, Title2 } from "../components/Typography/Typography";
 import Image from "../components/Image";
 import { nanoid } from "nanoid";
 import { ImageProps } from "../components/Image";
 import Service, { ServiceProps } from "../components/Service";
+import {
+  SECTION_CONTENT,
+  SECTION_DARKER,
+  SECTION_LIGHTER,
+} from "../types/styleTypes";
 
 interface IndexProps {
   images: ImageProps[];
@@ -12,16 +17,16 @@ interface IndexProps {
 const index: React.FC<IndexProps> = ({ images, services }) => {
   return (
     <>
-      <section className="bg-grey-900 px-5 py-5">
-        <div className="max-w-8xl flex items-center py-24 mx-auto gap-12">
-          <div className="min-w-fit shadow-md shadow-shadow-500">
+      <section className={SECTION_DARKER}>
+        <div className={SECTION_CONTENT}>
+          <div className="w-95p xs:w-1/2 mx-auto shadow-md">
             <img
-              className="block aspect-3/4 h-auto w-full rounded border-2 border-gray-100"
+              className="w-full border-solid border-2 border-gray-100 rounded block aspect-3/4 h-auto"
               src={`${process.env.NEXT_PUBLIC_IMAGES}/intro.jpg`}
               alt="hond duitse herder gallo-hoeve"
             />
           </div>
-          <div>
+          <div className="block align-center gap-12 p24 mx-auto md:max-w-2/3">
             <Title2>Wie zijn we?</Title2>
             <Body>
               Lorem ipsum, dolor sit amet consectetur adipisicing elit.
@@ -50,15 +55,15 @@ const index: React.FC<IndexProps> = ({ images, services }) => {
           </div>
         </div>
       </section>
-      <section className="px-5 py-5">
+      <section className={SECTION_LIGHTER}>
         <Title2>Onze diensten</Title2>
-        <div className="flex gap-5 mx-auto justify-center flex-wrap mb-20">
+        <div className="max-w-8xl flex items-center gap-5 mx-auto justify-center flex-wrap sm:pb-25">
           {services.map(({ id, ...rest }) => (
             <Service key={id} id={id} {...rest} />
           ))}
         </div>
       </section>
-      <section className="bg-grey-900 px-5 py-5">
+      <section className={SECTION_DARKER}>
         <div className="flex flex-grow flex-shrink flex-wrap gap-2.5 justify-center">
           {images.map(({ id }) => (
             <Image key={id} />

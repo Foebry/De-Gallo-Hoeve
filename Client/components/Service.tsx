@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import React from "react";
-import { Caption } from "../Typography/Typography";
-import { Body } from "../Typography/Typography";
+import { Caption } from "./Typography/Typography";
+import { Body } from "./Typography/Typography";
 
 export interface ServiceProps {
   id: string;
@@ -21,7 +21,7 @@ const Service: React.FC<ServiceProps> = ({
 }) => {
   const router = useRouter();
   return (
-    <article className="basis-24 max-w-2xs min-h-xs min-w-2xs flex-grow flex-shrink">
+    <article className="block min-w-2xs min-h-xs max-w-2xs flex-grow flex-shrink basis-76 md:basis-38">
       <div
         className="shadow-sm w-full rounded-sm hover:cursor-pointer hover:shadow-none hover:ml-1"
         onClick={() => router.push(link)}

@@ -7,13 +7,15 @@ export interface Props {
 
 export const Title1: React.FC<Props> = ({ children }) => {
   return (
-    <h1 className="text-center text-black-200 text-7xl my-20">{children}</h1>
+    <h1 className="text-5xl text-center my-18 text-black-200 3xs:text-6xl xs:text-7xl">
+      {children}
+    </h1>
   );
 };
 
 export const Title2: React.FC<Props> = ({ children }) => {
   return (
-    <h2 className="text-center text-black-200 text-5xl mt-12 mb-20">
+    <h2 className="text-4xl text-black-200 3xs:text-5xl text-center mt-12 mx-auto mb-18">
       {children}
     </h2>
   );
@@ -21,7 +23,7 @@ export const Title2: React.FC<Props> = ({ children }) => {
 
 export const Title3: React.FC<Props> = ({ children }) => {
   return (
-    <h3 className="text-2xl text-black-200 text-center my-2">{children}</h3>
+    <h3 className="text-2xl text-center text-black-200 my-2.5">{children}</h3>
   );
 };
 

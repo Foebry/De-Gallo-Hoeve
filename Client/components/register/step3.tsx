@@ -4,7 +4,7 @@ import FormInput from "../form/FormInput";
 import FormRow from "../form/FormRow";
 import { Controller } from "react-hook-form";
 import { RegisterStepProps } from "../form/FormTabs";
-import { Title1, Title3 } from "../../Typography/Typography";
+import { Title1, Title3 } from "../Typography/Typography";
 
 const step3: React.FC<RegisterStepProps> = ({ control }) => {
   return (

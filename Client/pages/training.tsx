@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import React from "react";
 import Button from "../components/buttons/Button";
-import { Body, Title2 } from "../Typography/Typography";
+import { Body, Title2 } from "../components/Typography/Typography";
 import { INSCHRIJVING } from "../types/linkTypes";
 
 interface TrainingProps {}

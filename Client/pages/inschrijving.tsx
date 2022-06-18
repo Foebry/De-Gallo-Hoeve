@@ -1,6 +1,6 @@
 import { Router, useRouter } from "next/router";
 import React from "react";
-import { Title1 } from "../Typography/Typography";
+import { Title1 } from "../components/Typography/Typography";
 
 interface Props {
   type: string;

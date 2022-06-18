@@ -1,4 +1,4 @@
-import { Title1, Title2, Title3, FootNote } from "../Typography/Typography";
+import { Title1, Title2, Title3, FootNote } from "./Typography/Typography";
 
 const Footer = () => {
   return (
@@ -13,7 +13,7 @@ const Footer = () => {
         <a href="mailto:info@gallohoeve.be">info@gallohoeve.be</a>
       </Title3>
       <Title3>Openingsuren</Title3>
-      <ul className="w-76 mx-auto mt-18 mb-30">
+      <ul className="w-11/12 mt-18 mx-auto mb-30 3xs:w-76">
         <li className="flex justify-between my-2.5 mx-0">
           <p>Maandag</p>
           <p className="text-right">10:00 - 18:00</p>

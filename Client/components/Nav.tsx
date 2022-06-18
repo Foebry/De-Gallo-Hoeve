@@ -8,7 +8,7 @@ import {
   LOGIN,
   REGISTER,
 } from "../types/linkTypes";
-import { Title3 } from "../Typography/Typography";
+import { Title3 } from "./Typography/Typography";
 
 export const Nav = () => {
   const [userName, setUserName] = useState<string | null>();

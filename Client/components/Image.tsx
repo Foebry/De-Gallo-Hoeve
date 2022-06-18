@@ -6,7 +6,7 @@ export interface ImageProps {
 
 const Image = () => {
   return (
-    <article className="flex flex-grow flex-shrink basis-15p max-w-15p min-w-3xs shadow-2sm">
+    <article className="hidden first:block min-w-full max-w-1/2 basis-52 shadow-2sm 2xs:block 2xs:min-w-3xs xs:max-w-1/5 md:basis-15p lg:max-w-15p">
       <img
         className="block w-full h-auto aspect-square"
         src="https://loremflickr.com/200/200/dog"

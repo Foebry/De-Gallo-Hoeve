@@ -6,6 +6,14 @@ module.exports = {
     "./Typography/Typography.tsx",
   ],
   theme: {
+    screens: {
+      lg: "1280px",
+      md: "950px",
+      sm: "800px",
+      xs: "625px",
+      "2xs": "550px",
+      "3xs": "380px",
+    },
     extend: {
       colors: {
         black: {
@@ -87,10 +95,15 @@ module.exports = {
         "3/2": "3/2",
         "3/4": "3/4",
         "6x": "6/1",
+        "3x": "3/1",
       },
       maxWidth: {
         "2xs": "300px",
         "8xl": "88rem",
+        "1/5": "20%",
+        "2/5": "40%",
+        "1/2": "50%",
+        "2/3": "66%",
         "15p": "15%",
       },
       minWidth: {
@@ -117,15 +130,22 @@ module.exports = {
         "15p": "15%",
         "25p": "25%",
         "80p": "80%",
+        "90p": "90%",
+        "95p": "95%",
         "98p": "98%",
         full: "100%",
         18: "75px",
+        25: "100px",
         30: "125px",
+        38: "150px",
         76: "300px",
+        100: "400px",
         "50vh": "50vh",
+        none: "none",
       },
       fontSize: {
         "5vmax": "5vmax",
+        "8vmin": "8vmin",
       },
     },
   },
