@@ -48,7 +48,7 @@ const Step1: React.FC<Props> = ({
   );
   useEffect(() => {
     console.log(values());
-  }, [available]);
+  }, [values]);
 
   const selectHandler = (e: any) => {
     append({ hond_id: e.value, naam: e.label });

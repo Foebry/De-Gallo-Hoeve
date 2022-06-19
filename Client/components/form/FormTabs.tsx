@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import React, { Dispatch, SetStateAction } from "react";
 import { Control, FieldValues } from "react-hook-form";
 
@@ -23,6 +24,7 @@ const FormTabs: React.FC<FormTabsProps> = ({
         .fill(0)
         .map((_, index) => (
           <span
+            key={nanoid(5)}
             className={`bg-grey-100 py-5 px-10 rounded-md border border-solid border-grey-700 border-b-0 hover:cursor-pointer ${
               activeTab === index + 1
                 ? "color-gray-500 bg-grey-700 border-grey-800"
