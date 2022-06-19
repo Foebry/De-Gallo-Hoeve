@@ -11,6 +11,9 @@ const useMutation = () => {
             const {data} = await axios(route, {
                 method: "POST",
                 data: payload,
+                headers: {
+                    "Access-Control-Allow-Origin": "*"
+                }
             });
             return {data, error: undefined};
         }
@@ -33,13 +36,15 @@ export const structureHondenPayload = (payload: any) => {
 
 export const structureDetailsPayload = (payload: any) => {
     const details = payload?.details ?? [];
+    const start = payload["period"].from;
+    const eind = payload["period"].to;
     const newDetails = details.map((detail:any) => {
-        const medicatie = detail.medicatie.value;
-        const ontsnapping = detail.ontsnapping.value;
-        const sociaal = detail.sociaal.value;
+        const medicatie = detail.medicatie?.value;
+        const ontsnapping = detail.ontsnapping?.value;
+        const sociaal = detail.sociaal?.value;
         return {...detail, medicatie, ontsnapping, sociaal};
     })
-    return {...payload, details: newDetails};
+    return {start, eind, details: newDetails};
 }
 
 export default useMutation;

@@ -1,19 +1,17 @@
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import Form from "../components/form/Form";
 import Step1 from "../components/reservatie/Step1";
 import Step2 from "../components/reservatie/Step2";
+import getData from "../hooks/useApi";
 import useMutation, { structureDetailsPayload } from "../hooks/useMutation";
-import { RESERVATIEAPI } from "../types/apiTypes";
+import { KLANT_HONDEN, RESERVATIEAPI } from "../types/apiTypes";
 import { LOGIN } from "../types/linkTypes";
 
-interface ReservatieProps {
-  honden: any;
-  hondenOptions: any;
-}
+interface ReservatieProps {}
 
-const Reservatie: React.FC<ReservatieProps> = ({ honden, hondenOptions }) => {
+const Reservatie: React.FC<ReservatieProps> = () => {
   const router = useRouter();
   const makeReservation = useMutation();
   const { control, handleSubmit, getValues } = useForm();
@@ -22,21 +20,19 @@ const Reservatie: React.FC<ReservatieProps> = ({ honden, hondenOptions }) => {
     name: "details",
   });
   const [activeTab, setActiveTab] = useState<number>(1);
-  const [user, setUser] = useState<string | null>();
+  const [klantId, setKlantId] = useState<string | null>();
+  useEffect(() => {
+    const id = localStorage.getItem("id");
+    setKlantId(id);
+  }, []);
 
   const onSubmit = async (values: any) => {
-    values.klant_id = localStorage.getItem("id");
     values = structureDetailsPayload(values);
-    console.log(values);
+    values.klant_id = klantId;
     const { data, error } = await makeReservation(RESERVATIEAPI, values);
     if (error) console.log(error);
     else router.push(LOGIN);
   };
-
-  useEffect(() => {
-    const id = localStorage.getItem("id");
-    setUser(id);
-  }, []);
 
   return (
     <section className="bg-grey-700 px-5 py-5">
@@ -52,7 +48,7 @@ const Reservatie: React.FC<ReservatieProps> = ({ honden, hondenOptions }) => {
         }
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        tabCount={user ? 2 : null}
+        tabCount={klantId ? 2 : null}
       >
         {activeTab === 1 ? (
           <Step1
@@ -61,8 +57,6 @@ const Reservatie: React.FC<ReservatieProps> = ({ honden, hondenOptions }) => {
             fields={fields}
             append={append}
             remove={remove}
-            honden={honden}
-            options={hondenOptions}
             values={getValues}
           />
         ) : activeTab === 2 ? (
@@ -75,31 +69,19 @@ const Reservatie: React.FC<ReservatieProps> = ({ honden, hondenOptions }) => {
 
 export default Reservatie;
 
-export const getServerSideProps = async () => {
+export const getServerSideProps = async (ctx: any) => {
+  const klantId = ctx.query?.klant ?? 0;
+  const { data: honden } = await getData(KLANT_HONDEN, { klantId });
+  console.log("honden", honden);
+  const hondenOptions = honden.map((hond: any) => ({
+    value: hond.id,
+    label: hond.naam,
+  }));
+  console.log("options", hondenOptions);
   return {
     props: {
-      honden: [
-        {
-          naam: "Jacko",
-          id: 1,
-          geslacht: 1,
-        },
-        {
-          naam: "Jumbo",
-          id: 2,
-          geslacht: 0,
-        },
-      ],
-      hondenOptions: [
-        {
-          value: 1,
-          label: "Jacko",
-        },
-        {
-          value: 2,
-          label: "Jumbo",
-        },
-      ],
+      honden,
+      hondenOptions,
     },
   };
 };

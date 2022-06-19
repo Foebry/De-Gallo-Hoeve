@@ -13,14 +13,16 @@ use PDOException;
 		private $db_url;
 		private $db_user;
 		private $db_pwd;
+    private $schema;
 
-    public function __construct(Logger $logger, ResponseHandler $rh, $db_url, $db_user, $db_pwd) {
+    public function __construct(Logger $logger, ResponseHandler $rh, $db_url, $db_user, $db_pwd, string $schema) {
 			$this->logger = $logger;
       $this->responseHandler = $rh;
 			$this->db_url = $db_url;
 			$this->db_user = $db_user;
 			$this->db_pwd = $db_pwd;
       $this->connection = null;
+      $this->schema = $schema;
     }
 
     public function getConnection() {
@@ -91,8 +93,8 @@ use PDOException;
     public function getTableHeaders(string $table): array{
       $headers = [];
 
-      $query = "select * from information_schema.columns where table_name = :table_name and table_schema = 'eindwerk'";
-      $vars = ["table_name" => $table];
+      $query = "select * from information_schema.columns where table_name = :table_name and table_schema = :schema";
+      $vars = ["table_name" => $table, "schema" => $this->schema];
 
       $data = $this->query( $query, $vars );
 

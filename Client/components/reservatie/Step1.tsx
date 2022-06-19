@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   FieldValues,
   UseFieldArrayAppend,
@@ -8,6 +8,8 @@ import Button from "../buttons/Button";
 import Select, { OptionsOrGroups } from "react-select";
 import { FormStepProps } from "../form/FormTabs";
 import Hond from "../Hond";
+import { KLANT_HONDEN } from "../../types/apiTypes";
+import getData from "../../hooks/useApi";
 
 interface SelectionInterface {
   id: number;
@@ -26,8 +28,6 @@ interface Props extends FormStepProps {
   fields: Record<"id", string>[];
   append: UseFieldArrayAppend<FieldValues, "details">;
   remove: UseFieldArrayRemove;
-  honden: any;
-  options: any;
   values: any;
 }
 
@@ -37,21 +37,39 @@ const Step1: React.FC<Props> = ({
   fields,
   append,
   remove,
-  honden,
-  options,
   values,
 }) => {
-  const [available, setAvailable] =
-    useState<OptionsOrGroups<any, OptionInterface>>(options);
+  const [available, setAvailable] = useState<
+    OptionsOrGroups<any, OptionInterface>
+  >([]);
   const [selectedHonden, setSelectedHonden] = useState<SelectionInterface[]>(
     []
   );
+  const [klantId, setKlantId] = useState<string | null>();
+  const [honden, setHonden] = useState([]);
+
   useEffect(() => {
-    console.log(values());
-  }, [values]);
+    const id = localStorage.getItem("id");
+    setKlantId(id);
+    (async () => {
+      const { data } = await getData(KLANT_HONDEN, { klantId });
+      setHonden(data);
+    })();
+  }, []);
+
+  const options = useMemo(() => {
+    return honden.map(({ naam: label, id: value, avatar }: any) => ({
+      label,
+      value,
+      avatar,
+    }));
+  }, [honden]);
+  useEffect(() => {
+    setAvailable(options);
+  }, [options]);
 
   const selectHandler = (e: any) => {
-    append({ hond_id: e.value, naam: e.label });
+    append({ hond_id: e.value, naam: e.label, avatar: e.avatar });
     setSelectedHonden(() => [
       ...selectedHonden,
       { id: e.value, naam: e.label },
@@ -75,9 +93,6 @@ const Step1: React.FC<Props> = ({
     );
     remove(index);
   };
-  useEffect(() => {
-    console.log("values", values());
-  }, []);
 
   return (
     <>
@@ -100,6 +115,7 @@ const Step1: React.FC<Props> = ({
             control={control}
             remove={removeHandler}
             id={values().details[index].hond_id}
+            avatar={values().details[index].avatar}
           />
         ))}
       </div>

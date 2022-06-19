@@ -3,7 +3,7 @@ const ApiTypes = {
     REGISTERAPI: "register",
     LOGINAPI: "login",
     RESERVATIEAPI: "boekings",
-    MYHONDEN: "users/:userId/honden",
+    KLANT_HONDEN: "klanten/:klantId/honden",
 }
 
-export const  {RASSEN, REGISTERAPI, LOGINAPI, RESERVATIEAPI, MYHONDEN} = ApiTypes;
+export const  {RASSEN, REGISTERAPI, LOGINAPI, RESERVATIEAPI, KLANT_HONDEN} = ApiTypes;

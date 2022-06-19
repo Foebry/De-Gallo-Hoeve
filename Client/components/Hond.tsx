@@ -16,6 +16,7 @@ interface HondProps {
   control: Control<FieldValues, any>;
   remove: (index: number, id: number) => void;
   id: number;
+  avatar: string;
 }
 interface OptionInterface {
   value: boolean;
@@ -29,7 +30,7 @@ const options: OptionInterface[] = [
 
 const Hond: React.FC<HondProps> = ({
   naam,
-  image = "https://loremflickr.com/100/100/hond",
+  avatar = "https://loremflickr.com/100/100/hond",
   index,
   control,
   remove,
@@ -39,8 +40,12 @@ const Hond: React.FC<HondProps> = ({
   return (
     <div className="border-solid border-2 border-black-100 rounded p-2 my-2">
       <div className="flex gap-5 justify-between items-center">
-        <div className="imgholder">
-          <img src={image} alt="" />
+        <div className="w-25 aspect-square">
+          <img
+            src={avatar}
+            alt=""
+            className="w-full object-cover aspect-square"
+          />
         </div>
         <div>
           <Title3>{naam}</Title3>

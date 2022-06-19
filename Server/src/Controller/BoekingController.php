@@ -79,13 +79,12 @@ use Symfony\Component\HttpFoundation\Response;
         function checkBoekingPayload(): array {
 
             $boekingData = $this->validator->validatePayload();
-
             $start = new DateTime( $boekingData["start"] );
             $eind = new DateTime( $boekingData["eind"] );
             $now = new DateTime();
 
-            if( $now > $start ) $this->responseHandler->badRequest( ["start" => "Gelieve een datum in de toekomst te kiezen"]);
-            if( $start >= $eind ) $this->responseHandler->badRequest( ["eind" => "Gelieve einddatum na begindatum te kiezen."]);
+            if( $now > $start ) $this->responseHandler->badRequest( ["period" => "Gelieve een begindatum in de toekomst te kiezen"]);
+            if( $start >= $eind ) $this->responseHandler->badRequest( ["period" => "Gelieve einddatum na begindatum te kiezen."]);
             
             return $boekingData;
         }

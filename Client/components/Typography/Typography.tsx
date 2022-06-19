@@ -3,6 +3,7 @@ import React, { ReactNode } from "react";
 export interface Props {
   children: ReactNode;
   to?: string;
+  onClick?: () => void;
 }
 
 export const Title1: React.FC<Props> = ({ children }) => {

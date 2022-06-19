@@ -28,6 +28,7 @@ services:
             $db_url: "%env(DBMANAGER_URL)%"
             $db_user: "%env(DBMANAGER_USER)%"
             $db_pwd: "%env(DBMANAGER_PWD)%"
+            $schema: "%env(DB_SCHEMA)%"
     
     App\Services\Logger:
         bind:

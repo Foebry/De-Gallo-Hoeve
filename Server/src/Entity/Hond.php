@@ -60,6 +60,11 @@ class Hond extends AbstractEntity
      */
     private $klant;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $geslacht;
+
     public function __construct()
     {
         $this->boekings = new ArrayCollection();
@@ -202,6 +207,18 @@ class Hond extends AbstractEntity
     public function setKlant(?Klant $klant): self
     {
         $this->klant = $klant;
+
+        return $this;
+    }
+
+    public function isGeslacht(): ?bool
+    {
+        return $this->geslacht;
+    }
+
+    public function setGeslacht(bool $geslacht): self
+    {
+        $this->geslacht = $geslacht;
 
         return $this;
     }

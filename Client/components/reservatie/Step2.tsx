@@ -13,11 +13,7 @@ const Step2: React.FC<FormStepProps> = ({ control, setActiveTab }) => {
           name="period"
           control={control}
           render={({ field: { onChange, value } }) => (
-            <RangePicker
-              onChange={onChange}
-              disabledDays={["2022-06-19"]}
-              selectedDays={value}
-            />
+            <RangePicker onChange={onChange} selectedDays={value} />
           )}
         />
       </div>

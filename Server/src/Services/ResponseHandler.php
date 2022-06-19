@@ -19,6 +19,7 @@ namespace App\Services;
          */
         function NotFound(array $data = []): void{
             print( json_encode( array_merge( ["code"=>404, "message"=>"Not Found"], $data ) ) );
+            header("Access-Control-Allow-Origin: *");
             header("HTTP/1.1 404");
             exit();
         }
