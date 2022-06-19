@@ -10,13 +10,13 @@ import {
   UseFieldArrayRemove,
 } from "react-hook-form";
 import Details from "../Details";
-import { RegisterStepProps } from "../form/FormTabs";
+import { FormStepProps } from "../form/FormTabs";
 
 export interface optionInterface {
   options: [{ value: any; label: string }];
 }
 
-interface Props extends RegisterStepProps {
+interface Props extends FormStepProps {
   fields: Record<"id", string>[];
   append: UseFieldArrayAppend<FieldValues, "honden">;
   remove: UseFieldArrayRemove;
@@ -88,7 +88,7 @@ const step2: React.FC<Props> = ({
               <Controller
                 name={`honden.${index}.ras_id`}
                 control={control}
-                render={({ field: { onChange, onBlur, value } }) => (
+                render={({ field: { onChange, value } }) => (
                   <Select
                     options={options}
                     onChange={onChange}

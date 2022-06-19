@@ -11,9 +11,6 @@ const useMutation = () => {
             const {data} = await axios(route, {
                 method: "POST",
                 data: payload,
-                headers: {
-                    "Access-Control-Allow-Origin": "*",
-                }
             });
             return {data, error: undefined};
         }
@@ -25,7 +22,6 @@ const useMutation = () => {
 }
 
 export const structureHondenPayload = (payload: any) => {
-    console.log(payload);
     const honden = payload?.honden ?? [];
     const new_honden = honden.map((hond:any) => {
         const ras_id = hond.ras_id?.value;
@@ -33,6 +29,17 @@ export const structureHondenPayload = (payload: any) => {
         return {...hond, ras_id, geslacht};
     });
     return { ...payload, honden: new_honden }
+}
+
+export const structureDetailsPayload = (payload: any) => {
+    const details = payload?.details ?? [];
+    const newDetails = details.map((detail:any) => {
+        const medicatie = detail.medicatie.value;
+        const ontsnapping = detail.ontsnapping.value;
+        const sociaal = detail.sociaal.value;
+        return {...detail, medicatie, ontsnapping, sociaal};
+    })
+    return {...payload, details: newDetails};
 }
 
 export default useMutation;

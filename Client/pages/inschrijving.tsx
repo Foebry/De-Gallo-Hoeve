@@ -6,7 +6,7 @@ interface Props {
   type: string;
 }
 
-const inschrijving: React.FC<Props> = ({ type }) => {
+const Inschrijving: React.FC<Props> = ({ type }) => {
   return (
     <Title1>
       {type === "group" ? "GROEP" : type === "prive" ? "PRIVE" : ""}
@@ -14,7 +14,7 @@ const inschrijving: React.FC<Props> = ({ type }) => {
   );
 };
 
-export default inschrijving;
+export default Inschrijving;
 
 export const getServerSideProps = (context: any) => {
   return {

@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Form from "../components/form/Form";
-import { FormTabType } from "../components/form/FormTabs";
-import axios from "axios";
 import { useRouter } from "next/router";
 import { LOGIN } from "../types/linkTypes";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -12,7 +10,6 @@ import { OptionsOrGroups } from "react-select";
 import getData from "../hooks/useApi";
 import { RASSEN, REGISTERAPI } from "../types/apiTypes";
 import useMutation, { structureHondenPayload } from "../hooks/useMutation";
-import internal from "stream";
 
 interface RegisterProps {
   rassen: OptionsOrGroups<any, optionInterface>[];
@@ -23,11 +20,7 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
   const register = useMutation();
   const { control, handleSubmit } = useForm();
   const { fields, append, remove } = useFieldArray({ control, name: "honden" });
-  const [activeTab, setActiveTab] = useState<FormTabType>(1);
-
-  useEffect(() => {
-    console.log(rassen);
-  }, []);
+  const [activeTab, setActiveTab] = useState<number>(1);
 
   const onSubmit = async (values: any) => {
     let payload = structureHondenPayload(values);
@@ -50,9 +43,9 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
             ? "Gegevens dierenarts"
             : "Verifieer uw gegevens aub"
         }
-        formTabs={true}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        tabCount={3}
       >
         {activeTab === 1 ? (
           <Step1 control={control} setActiveTab={setActiveTab} />

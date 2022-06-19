@@ -14,7 +14,7 @@ interface IndexProps {
   services: ServiceProps[];
 }
 
-const index: React.FC<IndexProps> = ({ images, services }) => {
+const Index: React.FC<IndexProps> = ({ images, services }) => {
   return (
     <>
       <section className={SECTION_DARKER}>
@@ -74,7 +74,7 @@ const index: React.FC<IndexProps> = ({ images, services }) => {
   );
 };
 
-export default index;
+export default Index;
 
 export const getStaticProps = () => {
   const captions = [

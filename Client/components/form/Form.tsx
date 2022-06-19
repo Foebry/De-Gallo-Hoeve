@@ -1,15 +1,16 @@
 import React, { Dispatch, ReactNode, SetStateAction } from "react";
 import { Title3 } from "../Typography/Typography";
-import FormTabs, { FormTabType } from "./FormTabs";
+import FormTabs from "./FormTabs";
 
 export interface FormProps {
   onSubmit: (e: any) => void;
   action?: string;
   children: ReactNode;
   title?: string;
-  formTabs?: boolean;
-  activeTab?: FormTabType;
-  setActiveTab?: Dispatch<SetStateAction<FormTabType>>;
+  activeTab?: number;
+  setActiveTab?: Dispatch<SetStateAction<number>>;
+  tabCount?: number | null;
+  className?: string;
 }
 
 const Form: React.FC<FormProps> = ({
@@ -17,17 +18,24 @@ const Form: React.FC<FormProps> = ({
   onSubmit,
   action,
   children,
-  formTabs,
   activeTab,
   setActiveTab,
+  tabCount,
+  className,
 }) => {
   return (
-    <div className="w-1/2 min-h-50vh bg-grey-300 border-grey-900 border-solid border shadow-sm rounded-2xl mx-auto my-32 relative">
+    <div
+      className={` w-1/2 min-h-50vh bg-grey-300 border-grey-900 border-solid border shadow-sm rounded-2xl mx-auto my-32 relative`}
+    >
       {title && <Title3>{title}</Title3>}
-      {formTabs && (
-        <FormTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+      {tabCount && (
+        <FormTabs
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          tabCount={tabCount}
+        />
       )}
-      <form className="w-1/2 pt-7 mx-auto" onSubmit={onSubmit}>
+      <form className={`w-1/2 pt-7 mx-auto ${className}`} onSubmit={onSubmit}>
         {children}
         {action && (
           <input
