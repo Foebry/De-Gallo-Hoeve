@@ -82,10 +82,12 @@ export const getServerSideProps = async () => {
         {
           naam: "Jacko",
           id: 1,
+          geslacht: 1,
         },
         {
           naam: "Jumbo",
           id: 2,
+          geslacht: 0,
         },
       ],
       hondenOptions: [

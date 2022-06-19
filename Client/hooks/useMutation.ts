@@ -15,7 +15,7 @@ const useMutation = () => {
             return {data, error: undefined};
         }
         catch(error) {
-            return {undefined, error}
+            return {data:undefined, error}
         }
     }
     return executerFunc;

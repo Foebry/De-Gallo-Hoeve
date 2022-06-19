@@ -1,8 +1,7 @@
 import React from "react";
 import { Controller } from "react-hook-form";
-import { DatePicker, RangePicker } from "react-trip-date";
+import { RangePicker } from "react-trip-date";
 import Button, { SubmitButton } from "../buttons/Button";
-import FormInput from "../form/FormInput";
 import FormRow from "../form/FormRow";
 import { FormStepProps } from "../form/FormTabs";
 
@@ -11,9 +10,9 @@ const Step2: React.FC<FormStepProps> = ({ control, setActiveTab }) => {
     <>
       <div className="mb-30">
         <Controller
-          name="timeframe"
+          name="period"
           control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
+          render={({ field: { onChange, value } }) => (
             <RangePicker
               onChange={onChange}
               disabledDays={["2022-06-19"]}
