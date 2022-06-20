@@ -10,6 +10,8 @@ import { FormStepProps } from "../form/FormTabs";
 import Hond from "../Hond";
 import { KLANT_HONDEN } from "../../types/apiTypes";
 import getData from "../../hooks/useApi";
+import { Link, Title1, Title3 } from "../Typography/Typography";
+import { LOGIN } from "../../types/linkTypes";
 
 interface SelectionInterface {
   id: number;
@@ -98,32 +100,47 @@ const Step1: React.FC<Props> = ({
 
   return (
     <>
-      <div className="mb-20">
-        <Select
-          options={available}
-          onChange={selectHandler}
-          value={{
-            label: `${
-              available.length > 0 ? "Voeg een hond toe" : "geen honden meer"
-            }`,
-            value: undefined,
-          }}
-        />
-        {fields.map((el: any, index: number) => (
-          <Hond
-            key={el.id}
-            naam={values().details[index].naam}
-            index={index}
-            control={control}
-            remove={removeHandler}
-            id={values().details[index].hond_id}
-            avatar={values().details[index].avatar}
-            errors={errors}
-            setErrors={setErrors}
+      {klantId ? (
+        <>
+          <div className="mb-20">
+            <Select
+              options={available}
+              onChange={selectHandler}
+              value={{
+                label: `${
+                  available.length > 0
+                    ? "Voeg een hond toe"
+                    : "geen honden meer"
+                }`,
+                value: undefined,
+              }}
+            />
+            {fields.map((el: any, index: number) => (
+              <Hond
+                key={el.id}
+                naam={values().details[index].naam}
+                index={index}
+                control={control}
+                remove={removeHandler}
+                id={values().details[index].hond_id}
+                avatar={values().details[index].avatar}
+                errors={errors}
+                setErrors={setErrors}
+                boeking={true}
+              />
+            ))}
+          </div>
+          <Button
+            type="form"
+            label="volgende"
+            onClick={() => setActiveTab(2)}
           />
-        ))}
-      </div>
-      <Button type="form" label="volgende" onClick={() => setActiveTab(2)} />
+        </>
+      ) : (
+        <Title1>
+          Klik <Link to={LOGIN}>hier</Link> om in te loggen.
+        </Title1>
+      )}
     </>
   );
 };

@@ -13,6 +13,7 @@ export interface FormStepProps {
   setActiveTab: React.Dispatch<React.SetStateAction<number>>;
   errors?: any;
   setErrors?: any;
+  disabledDays?: string[];
 }
 
 const FormTabs: React.FC<FormTabsProps> = ({

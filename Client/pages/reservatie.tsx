@@ -4,6 +4,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 import Form from "../components/form/Form";
 import Step1 from "../components/reservatie/Step1";
 import Step2 from "../components/reservatie/Step2";
+import { Title3 } from "../components/Typography/Typography";
 import getData from "../hooks/useApi";
 import useMutation, {
   handleErrors,
@@ -64,7 +65,9 @@ const Reservatie: React.FC<ReservatieProps> = () => {
         className="md:w-10/12"
         onSubmit={handleSubmit(onSubmit)}
         title={
-          activeTab === 1
+          !klantId
+            ? "U bent niet ingelogd"
+            : activeTab === 1
             ? "Wie komt logeren?"
             : activeTab === 2
             ? "Wanneer komen zij logeren?"
@@ -86,7 +89,12 @@ const Reservatie: React.FC<ReservatieProps> = () => {
             setErrors={setFormErrors}
           />
         ) : activeTab === 2 ? (
-          <Step2 control={control} setActiveTab={setActiveTab} />
+          <Step2
+            control={control}
+            setActiveTab={setActiveTab}
+            errors={formErrors}
+            setErrors={setFormErrors}
+          />
         ) : null}
       </Form>
     </section>
@@ -95,19 +103,17 @@ const Reservatie: React.FC<ReservatieProps> = () => {
 
 export default Reservatie;
 
-export const getServerSideProps = async (ctx: any) => {
-  const klantId = ctx.query?.klant ?? 0;
-  const { data: honden } = await getData(KLANT_HONDEN, { klantId });
-  console.log("honden", honden);
-  const hondenOptions = honden.map((hond: any) => ({
-    value: hond.id,
-    label: hond.naam,
-  }));
-  console.log("options", hondenOptions);
-  return {
-    props: {
-      honden,
-      hondenOptions,
-    },
-  };
-};
+// export const getServerSideProps = async (ctx: any) => {
+//   const klantId = ctx.query?.klant ?? 0;
+//   const { data: honden } = await getData(KLANT_HONDEN, { klantId });
+//   const hondenOptions = honden.map((hond: any) => ({
+//     value: hond.id,
+//     label: hond.naam,
+//   }));
+//   return {
+//     props: {
+//       honden,
+//       hondenOptions,
+//     },
+//   };
+// };

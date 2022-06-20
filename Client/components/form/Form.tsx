@@ -6,7 +6,7 @@ export interface FormProps {
   onSubmit: (e: any) => void;
   action?: string;
   children: ReactNode;
-  title?: string;
+  title?: string | ReactNode;
   activeTab?: number;
   setActiveTab?: Dispatch<SetStateAction<number>>;
   tabCount?: number | null;

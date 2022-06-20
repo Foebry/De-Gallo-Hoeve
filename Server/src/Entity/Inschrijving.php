@@ -101,7 +101,7 @@ class Inschrijving extends AbstractEntity
         
         $this->setDatum( new DateTime($data["datum"]) );
         $this->setHond( $loader->getHondById($data["hond_id"]) );
-        $this->setKlant( $loader->getKlantBy( ["id" => $data["klant_id"]] ) );
+        $this->setKlant( $loader->getKlantBy( ["id", $data["klant_id"]] ) );
         $this->setTraining( $loader->getTrainingById($data["training_id"]) );
 
         return $this;

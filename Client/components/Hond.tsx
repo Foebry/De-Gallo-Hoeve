@@ -84,26 +84,28 @@ const Hond: React.FC<HondProps> = ({
       <div>
         {boeking && (
           <>
-            <div className="text-center">
-              <Body>Gelieve nog wat bijkomende informatie te verlenen</Body>
-            </div>
-            <FormRow>
+            <FormRow className="mt-5">
               <Controller
                 name={`details.${index}.medicatie`}
                 control={control}
                 render={({ field: { onChange, value } }) => (
                   <div className="relative">
-                    <Select
-                      options={options}
-                      onChange={(e) => {
-                        setErrors({
-                          ...errors,
-                          medicatie: undefined,
-                        });
-                        onChange(e);
-                      }}
-                      value={value ?? { label: "medicatie?", value: undefined }}
-                    />
+                    <div className="flex gap-3 items-center">
+                      <Body>medicatie</Body>
+                      <Select
+                        options={options}
+                        onChange={(e) => {
+                          setErrors({
+                            ...errors,
+                            medicatie: undefined,
+                          });
+                          onChange(e);
+                        }}
+                        value={
+                          value ?? { label: "medicatie?", value: undefined }
+                        }
+                      />
+                    </div>
                     <FormError>{errors.medicatie}</FormError>
                   </div>
                 )}
@@ -113,19 +115,22 @@ const Hond: React.FC<HondProps> = ({
                 control={control}
                 render={({ field: { onChange, value } }) => (
                   <div className="relative">
-                    <Select
-                      options={options}
-                      onChange={(e) => {
-                        setErrors({
-                          ...errors,
-                          ontsnapping: undefined,
-                        });
-                        onChange(e);
-                      }}
-                      value={
-                        value ?? { label: "ontsnapping?", value: undefined }
-                      }
-                    />
+                    <div className="flex gap-3 items-center">
+                      <Body>ontsnapt</Body>
+                      <Select
+                        options={options}
+                        onChange={(e) => {
+                          setErrors({
+                            ...errors,
+                            ontsnapping: undefined,
+                          });
+                          onChange(e);
+                        }}
+                        value={
+                          value ?? { label: "ontsnapping?", value: undefined }
+                        }
+                      />
+                    </div>
                     <FormError>{errors.ontsnapping}</FormError>
                   </div>
                 )}
@@ -135,17 +140,20 @@ const Hond: React.FC<HondProps> = ({
                 control={control}
                 render={({ field: { onChange, value } }) => (
                   <div className="relative">
-                    <Select
-                      options={options}
-                      onChange={(e) => {
-                        setErrors({
-                          ...errors,
-                          sociaal: undefined,
-                        });
-                        onChange(e);
-                      }}
-                      value={value ?? { label: "sociaal?", value: undefined }}
-                    />
+                    <div className="flex gap-3 items-center">
+                      <Body>sociaal</Body>
+                      <Select
+                        options={options}
+                        onChange={(e) => {
+                          setErrors({
+                            ...errors,
+                            sociaal: undefined,
+                          });
+                          onChange(e);
+                        }}
+                        value={value ?? { label: "sociaal?", value: undefined }}
+                      />
+                    </div>
                     <FormError>{errors.sociaal}</FormError>
                   </div>
                 )}

@@ -4,6 +4,7 @@ export interface Props {
   children: ReactNode;
   to?: string;
   onClick?: () => void;
+  className?: string;
 }
 
 export const Title1: React.FC<Props> = ({ children }) => {
@@ -36,8 +37,10 @@ export const Caption: React.FC<Props> = ({ children }) => {
   );
 };
 
-export const Body: React.FC<Props> = ({ children }) => {
-  return <p className="text-black-100 text-base mb-2">{children}</p>;
+export const Body: React.FC<Props> = ({ children, className }) => {
+  return (
+    <p className={`${className} text-black-100 text-base mb-2`}>{children}</p>
+  );
 };
 
 export const Link: React.FC<Props> = ({ children, to }) => {
@@ -59,9 +62,11 @@ export const FootNote: React.FC<Props> = ({ children }) => {
   );
 };
 
-export const FormError: React.FC<Props> = ({ children }) => {
+export const FormError: React.FC<Props> = ({ children, className }) => {
   return (
-    <p className="absolute left-1 -bottom-3.5 text-red-500 text-xs">
+    <p
+      className={`${className} absolute left-1 -bottom-3.5 text-red-600 text-xs`}
+    >
       {children}
     </p>
   );

@@ -100,8 +100,9 @@ class EntityLoader {
 
         $trainingRepo = $this->em->getRepository(Training::class);
         $training = $trainingRepo->findOneBy(["id"=>$id]);
+        
 
-        if( $training ) {
+        if( !$training ) {
             $this->dbm->logger->error( "Geen training met id $id" );
             $this->responseHandler->badRequest( ["message" => "Training niet gevonden"] );
         }

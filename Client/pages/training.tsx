@@ -152,13 +152,3 @@ const Trainingen: React.FC<TrainingProps> = () => {
 };
 
 export default Trainingen;
-
-export const getServerSideProps = async () => {
-  const honden = await getData(KLANT_HONDEN, { klantId: 1 });
-  console.log(honden);
-  return {
-    props: {
-      honden,
-    },
-  };
-};
