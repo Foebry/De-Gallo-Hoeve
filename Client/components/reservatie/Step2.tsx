@@ -1,8 +1,6 @@
 import React from "react";
 import { Controller } from "react-hook-form";
 import { RangePicker } from "react-trip-date";
-import getData from "../../hooks/useApi";
-import { INSCHRIJVINGENAPI } from "../../types/apiTypes";
 import Button, { SubmitButton } from "../buttons/Button";
 import FormRow from "../form/FormRow";
 import { FormStepProps } from "../form/FormTabs";

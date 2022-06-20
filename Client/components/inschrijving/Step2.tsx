@@ -1,6 +1,4 @@
 import React, { useEffect } from "react";
-import getData from "../../hooks/useApi";
-import { KLANT_HONDEN } from "../../types/apiTypes";
 import Button, { SubmitButton } from "../buttons/Button";
 import FormRow from "../form/FormRow";
 import { FormStepProps } from "../form/FormTabs";
@@ -17,13 +15,11 @@ const Step2: React.FC<Props> = ({
   setErrors,
   errors,
 }) => {
-  useEffect(() => {
-    console.log(honden);
-  }, []);
   return (
     <>
       {honden.map(({ naam, avatar, id }: any, index: number) => (
         <Hond
+          key={id}
           control={control}
           naam={naam}
           index={index}
