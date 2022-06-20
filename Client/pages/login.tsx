@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Body, Link } from "../components/Typography/Typography";
 import Form from "../components/form/Form";
 import FormInput from "../components/form/FormInput";
@@ -11,15 +11,20 @@ import useMutation from "../hooks/useMutation";
 import { LOGINAPI } from "../types/apiTypes";
 import { initializeLocalStorage } from "../helpers/localStorage";
 
+interface LoginErrorInterface {
+  email?: string;
+  password?: string;
+}
+
 const Login: React.FC<{}> = () => {
   const router = useRouter();
   const login = useMutation();
 
+  const [formErrors, setFormErrors] = useState<LoginErrorInterface>({});
   const { control, handleSubmit } = useForm();
 
   const onSubmit = async (values: any) => {
-    const { data, error } = await login(LOGINAPI, values);
-    if (error) console.log(error);
+    const { data } = await login(LOGINAPI, values, formErrors, setFormErrors);
     if (data) {
       initializeLocalStorage(data);
       router.push(INDEX);
@@ -28,7 +33,11 @@ const Login: React.FC<{}> = () => {
 
   return (
     <section className="bg-grey-700 px-5 py-5">
-      <Form title="Welkom bij de Gallo-hoeve" onSubmit={handleSubmit(onSubmit)}>
+      <Form
+        title="Welkom bij de Gallo-hoeve"
+        onSubmit={handleSubmit(onSubmit)}
+        className="mt-20"
+      >
         <Controller
           name="email"
           control={control}
@@ -40,6 +49,8 @@ const Login: React.FC<{}> = () => {
               value={value}
               onChange={onChange}
               onBlur={onBlur}
+              errors={formErrors}
+              setErrors={setFormErrors}
             />
           )}
         />
@@ -55,6 +66,8 @@ const Login: React.FC<{}> = () => {
               value={value}
               onChange={onChange}
               onBlur={onBlur}
+              errors={formErrors}
+              setErrors={setFormErrors}
             />
           )}
         />

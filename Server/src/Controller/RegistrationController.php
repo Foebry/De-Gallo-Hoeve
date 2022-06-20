@@ -31,14 +31,12 @@ use App\Services\CustomHelper;
             $loader->checkPayloadForKeys( $payload, ["honden"] );
 
             $data = $this->validator->validatePayload();
-            // $arts = $this->checkArtsPayload();
             $payload["honden"] = $this->checkPayloadHonden( $payload["honden"] );
 
             /** @var Klant $klant */
             $klant = $helper->create(Klant::class, $data, $loader);
             $em->persist( $klant );
             
-            // $loader->getDbm()->generateInsertStatmentAndGetInsertId("arts", $arts);
 
             foreach( $payload["honden"] as &$hondData ){
                 

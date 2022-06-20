@@ -11,6 +11,8 @@ interface FormTabsProps {
 export interface FormStepProps {
   control: Control<FieldValues, any>;
   setActiveTab: React.Dispatch<React.SetStateAction<number>>;
+  errors?: any;
+  setErrors?: any;
 }
 
 const FormTabs: React.FC<FormTabsProps> = ({

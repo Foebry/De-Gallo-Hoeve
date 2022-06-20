@@ -50,7 +50,11 @@ class EntityLoader {
 
         if( !$klant ){
             $this->dbm->logger->error( sprintf( "Geen klant met %s %s", $data[0], $data[1] ) );
-            $this->responseHandler->NotFound(["message"=>"Klant niet gevonden"]);
+            if( $data[0] === "email") {
+                if( $data[1] === "") $this->responseHandler->badRequest(["email" => "Ongeldig email adres"]);
+                $this->responseHandler->badRequest(["email" => "email niet gevonden."]);
+            }
+            $this->responseHandler->NotFound(["message" => "Klant niet gevonden"]);
         }
         
         return $klant;

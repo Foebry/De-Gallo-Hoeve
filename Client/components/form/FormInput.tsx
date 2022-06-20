@@ -11,10 +11,11 @@ export interface FormInputProps {
   placeholder?: string;
   value: string;
   extra?: string;
-  onChange?: (e: any) => void;
+  onChange: any;
   onBlur?: (e: any) => void;
-  error?: string;
+  errors?: any;
   dataid?: string;
+  setErrors?: any;
 }
 
 const FormInput: React.FC<FormInputProps> = ({
@@ -25,13 +26,15 @@ const FormInput: React.FC<FormInputProps> = ({
   placeholder,
   value,
   onChange,
-  error,
+  errors,
   extra,
   dataid = "",
+  setErrors,
 }) => {
   const labelRef = useRef<HTMLLabelElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [hasFocus, setHasFocus] = useState(false);
+  const fieldName = name;
 
   useFormInputEffect({ labelRef, inputRef, value, hasFocus });
 
@@ -55,12 +58,15 @@ const FormInput: React.FC<FormInputProps> = ({
         id={id}
         name={name}
         placeholder={placeholder}
-        onChange={onChange}
+        onChange={(e) => {
+          setErrors?.(() => ({ ...errors, [fieldName]: undefined }));
+          onChange(e);
+        }}
         value={value}
         autoComplete="off"
         data-id={`${dataid}`}
       />
-      <FormError>{error}</FormError>
+      <FormError>{errors?.[fieldName]}</FormError>
     </div>
   );
 };

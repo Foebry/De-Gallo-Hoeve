@@ -26,6 +26,7 @@ namespace App\Services;
 
         function unprocessableEntity( array $data = [] ): void{
             print( json_encode( array_merge( ["code"=>422, "message"=>"Not Found"], $data ) ) );
+            header("Access-Control-Allow-Origin: *");
             header("HTTP/1.1 422");
             exit();
         }
@@ -35,6 +36,7 @@ namespace App\Services;
          */
         function internalServerError( array $data = [] ): void {
             print( json_encode( array_merge( ["code" => 500, "message"=>"Internal Server Error"], $data ) ) );
+            header("Access-Control-Allow-Origin: *");
             header("HTTP/1.1 500");
             exit();
         }

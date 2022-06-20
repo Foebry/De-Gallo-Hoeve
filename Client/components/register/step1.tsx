@@ -5,7 +5,12 @@ import Button from "../buttons/Button";
 import { Controller } from "react-hook-form";
 import { FormStepProps } from "../form/FormTabs";
 
-const Step1: React.FC<FormStepProps> = ({ control, setActiveTab }) => {
+const Step1: React.FC<FormStepProps> = ({
+  control,
+  setActiveTab,
+  errors,
+  setErrors,
+}) => {
   return (
     <>
       <Controller
@@ -19,6 +24,8 @@ const Step1: React.FC<FormStepProps> = ({ control, setActiveTab }) => {
             value={value}
             onChange={onChange}
             onBlur={onBlur}
+            errors={errors}
+            setErrors={setErrors}
           />
         )}
       />
@@ -33,6 +40,8 @@ const Step1: React.FC<FormStepProps> = ({ control, setActiveTab }) => {
             value={value}
             onChange={onChange}
             onBlur={onBlur}
+            errors={errors}
+            setErrors={setErrors}
           />
         )}
       />
@@ -47,6 +56,8 @@ const Step1: React.FC<FormStepProps> = ({ control, setActiveTab }) => {
             value={value}
             onChange={onChange}
             onBlur={onBlur}
+            errors={errors}
+            setErrors={setErrors}
           />
         )}
       />
@@ -62,6 +73,8 @@ const Step1: React.FC<FormStepProps> = ({ control, setActiveTab }) => {
               value={value}
               onChange={onChange}
               onBlur={onBlur}
+              errors={errors}
+              setErrors={setErrors}
             />
           )}
         />
@@ -77,6 +90,8 @@ const Step1: React.FC<FormStepProps> = ({ control, setActiveTab }) => {
               value={value}
               onChange={onChange}
               onBlur={onBlur}
+              errors={errors}
+              setErrors={setErrors}
             />
           )}
         />
@@ -92,6 +107,8 @@ const Step1: React.FC<FormStepProps> = ({ control, setActiveTab }) => {
               value={value}
               onChange={onChange}
               onBlur={onBlur}
+              errors={errors}
+              setErrors={setErrors}
             />
           )}
         />
@@ -109,6 +126,8 @@ const Step1: React.FC<FormStepProps> = ({ control, setActiveTab }) => {
               value={value}
               onChange={onChange}
               onBlur={onBlur}
+              errors={errors}
+              setErrors={setErrors}
             />
           )}
         />
@@ -124,6 +143,8 @@ const Step1: React.FC<FormStepProps> = ({ control, setActiveTab }) => {
               value={value}
               onChange={onChange}
               onBlur={onBlur}
+              errors={errors}
+              setErrors={setErrors}
             />
           )}
         />
@@ -140,6 +161,8 @@ const Step1: React.FC<FormStepProps> = ({ control, setActiveTab }) => {
             value={value}
             onChange={onChange}
             onBlur={onBlur}
+            errors={errors}
+            setErrors={setErrors}
           />
         )}
       />

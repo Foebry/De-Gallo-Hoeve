@@ -30,6 +30,8 @@ const step2: React.FC<Props> = ({
   append,
   remove,
   options,
+  errors,
+  setErrors,
 }) => {
   const emptyHond = {
     naam: undefined,
@@ -68,6 +70,8 @@ const step2: React.FC<Props> = ({
                     value={value}
                     onChange={onChange}
                     onBlur={onBlur}
+                    errors={errors}
+                    setErrors={setErrors}
                   />
                 )}
               />
@@ -82,6 +86,8 @@ const step2: React.FC<Props> = ({
                     value={value}
                     onChange={onChange}
                     onBlur={onBlur}
+                    errors={errors}
+                    setErrors={setErrors}
                   />
                 )}
               />
@@ -120,6 +126,8 @@ const step2: React.FC<Props> = ({
                       value={value}
                       onChange={onChange}
                       onBlur={onBlur}
+                      errors={errors}
+                      setErrors={setErrors}
                     />
                   )}
                 />

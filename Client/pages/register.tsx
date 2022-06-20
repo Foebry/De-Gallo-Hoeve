@@ -11,6 +11,31 @@ import getData from "../hooks/useApi";
 import { RASSEN, REGISTERAPI } from "../types/apiTypes";
 import useMutation, { structureHondenPayload } from "../hooks/useMutation";
 
+interface RegisterHondErrorInterface {
+  naam?: string;
+  geboortedatum?: string;
+  ras_id?: string;
+  geslacht?: string;
+  chip_nr?: string;
+}
+
+interface RegisterErrorInterface {
+  vnaam?: string;
+  lnaam?: string;
+  email?: string;
+  straat?: string;
+  nr?: string;
+  bus?: string;
+  gemeente?: string;
+  postcode?: string;
+  telefoon?: string;
+  honden?: RegisterHondErrorInterface[];
+  password?: string;
+  password_verification?: string;
+}
+
+const registerErrors: RegisterErrorInterface = {};
+
 interface RegisterProps {
   rassen: OptionsOrGroups<any, optionInterface>[];
 }
@@ -21,13 +46,35 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
   const { control, handleSubmit } = useForm();
   const { fields, append, remove } = useFieldArray({ control, name: "honden" });
   const [activeTab, setActiveTab] = useState<number>(1);
+  const [formErrors, setFormErrors] = useState<RegisterErrorInterface>({});
+  const step1 = [
+    "vnaam",
+    "lnaam",
+    "email",
+    "straat",
+    "nr",
+    "bus",
+    "gemeente",
+    "postcode",
+    "telefoon",
+  ];
 
   const onSubmit = async (values: any) => {
     let payload = structureHondenPayload(values);
 
-    const { data, error } = await register(REGISTERAPI, payload);
-    if (error) console.log(error);
-    else router.push(LOGIN);
+    const { data, error } = await register(
+      REGISTERAPI,
+      payload,
+      registerErrors,
+      setFormErrors
+    );
+    console.log(error);
+    if (data) router.push(LOGIN);
+    else if (error) {
+      if (Object.keys(error).some((r) => step1.indexOf(r) >= 0))
+        setActiveTab(1);
+      else if (Object.keys(error).includes("honden")) setActiveTab(3);
+    }
   };
 
   return (
@@ -48,7 +95,12 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
         tabCount={3}
       >
         {activeTab === 1 ? (
-          <Step1 control={control} setActiveTab={setActiveTab} />
+          <Step1
+            control={control}
+            setActiveTab={setActiveTab}
+            errors={formErrors}
+            setErrors={setFormErrors}
+          />
         ) : activeTab === 2 ? (
           <Step2
             control={control}
@@ -57,9 +109,16 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
             append={append}
             remove={remove}
             options={rassen}
+            errors={formErrors}
+            setErrors={setFormErrors}
           />
         ) : activeTab === 3 ? (
-          <Step3 control={control} setActiveTab={setActiveTab} />
+          <Step3
+            control={control}
+            setActiveTab={setActiveTab}
+            errors={formErrors}
+            setErrors={setFormErrors}
+          />
         ) : null}
       </Form>
     </section>

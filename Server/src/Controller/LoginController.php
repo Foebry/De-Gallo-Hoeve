@@ -26,7 +26,7 @@ class LoginController extends AbstractController
         $password = $payload["password"];
 
         $klant = $loader->getKlantBy(["email", $email]);
-        if( !password_verify( $password, $klant->getPassword() ) ) $responseHandler->badRequest(["message" => "Nope!"]);
+        if( !password_verify( $password, $klant->getPassword() ) ) $responseHandler->badRequest(["password" => "Invalid password"]);
 
         $dbm->logger->info( sprintf( "Klant %s logged in.", $klant->getId() ) );
         return $this->json([
@@ -66,7 +66,7 @@ class LoginController extends AbstractController
     }
 
     /**
-     * @Route("/logout", name="app_logout")
+     * @Route("/api/logout", name="app_logout")
      */
     public function logout(): void
     {

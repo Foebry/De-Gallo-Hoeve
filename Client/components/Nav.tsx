@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-  INDEX,
-  HOTEL,
-  TRAINING,
-  CONTACT,
-  LOGIN,
-  REGISTER,
-} from "../types/linkTypes";
+import { INDEX, HOTEL, TRAINING, LOGIN, REGISTER } from "../types/linkTypes";
 import { Title3 } from "./Typography/Typography";
+import useMutation from "../hooks/useMutation";
+import { LOGOUT } from "../types/apiTypes";
+import getData from "../hooks/useApi";
 
 export const Nav = () => {
   const [userName, setUserName] = useState<string | null>();
+  const logout = useMutation();
+
+  const onLogout = async () => {
+    await getData(LOGOUT);
+    localStorage.clear();
+  };
 
   useEffect(() => {
     setInterval(() => {
@@ -47,7 +49,14 @@ export const Nav = () => {
         <Link href={INDEX}>Home</Link>
         <Link href={HOTEL}>Hotel</Link>
         <Link href={TRAINING}>Trainingen</Link>
-        <Link href={CONTACT}>Contact</Link>
+        {userName && (
+          <span
+            className="text-gray-900 hover:cursor-pointer text-lg"
+            onClick={onLogout}
+          >
+            Logout
+          </span>
+        )}
       </nav>
     </div>
   );
