@@ -1,8 +1,11 @@
 import { useRouter } from "next/router";
 import React from "react";
 import Button from "../components/buttons/Button";
-import { Body, Title2 } from "../components/Typography/Typography";
-import { INSCHRIJVING } from "../types/linkTypes";
+import FormRow from "../components/form/FormRow";
+import { Body, Caption, Title2 } from "../components/Typography/Typography";
+import getData from "../hooks/useApi";
+import { KLANT_HONDEN } from "../types/apiTypes";
+import { INSCHRIJVING_GROEP, INSCHRIJVING_PRIVE } from "../types/linkTypes";
 
 interface TrainingProps {}
 
@@ -11,8 +14,8 @@ const Trainingen: React.FC<TrainingProps> = () => {
   return (
     <>
       <section className="bg-grey-900 px-5 py-5">
-        <div className="max-w-8xl flex items-center py-24 mx-auto gap-12">
-          <div className="min-w-fit shadow-md">
+        <div className="max-w-8xl items-center py-24 mx-auto gap-12 mdl:flex">
+          <div className="w-1/2 mx-auto shadow-md mdl:min-w-fit">
             <img
               className="block aspect-3/4 h-auto w-full rounded border-2 border-grey-100"
               src="https://loremflickr.com/400/400/dog"
@@ -65,18 +68,19 @@ const Trainingen: React.FC<TrainingProps> = () => {
               nostrum ullam placeat harum error et corrupti ex, mollitia est
               temporibus! Minima consequatur sunt voluptatem accusantium quasi?
             </Body>
-            <Body>Groepslessen gaan door op zondag.</Body>
-            <Button
-              label="Ik schrijf me in"
-              onClick={() =>
-                router.push(`${INSCHRIJVING}?type=group`, INSCHRIJVING)
-              }
-            />
+            <Caption>Groepslessen gaan door op zondag.</Caption>
+            <FormRow className="mt-2">
+              <Button
+                className="mx-auto"
+                label="Ik schrijf me in"
+                onClick={() => router.push(INSCHRIJVING_GROEP)}
+              />
+            </FormRow>
           </div>
         </div>
       </section>
       <section className="bg-grey-500 px-5 py-5">
-        <div className="max-w-8xl flex items-center py-24 mx-auto gap-12">
+        <div className="max-w-8xl items-center py-24 mx-auto gap-12 mdl:flex">
           <div>
             <Title2>Privétrainingen</Title2>
             <Body>
@@ -126,16 +130,17 @@ const Trainingen: React.FC<TrainingProps> = () => {
               Vraag een privétraining aan voor woensdag, vrijdag of zaterdag.
               Voor een privéles vragen we een bijdrage van €23.90
             </Body>
-            <Button
-              label="Aanvragen"
-              onClick={() =>
-                router.push(`${INSCHRIJVING}?type=prive`, INSCHRIJVING)
-              }
-            />
+            <FormRow className="mt-2">
+              <Button
+                className="mx-auto"
+                label="Aanvragen"
+                onClick={() => router.push(INSCHRIJVING_PRIVE)}
+              />
+            </FormRow>
           </div>
-          <div className="min-w-fit shadow-md">
+          <div className="w-1/2 mx-auto mdl:min-w-fit shadow-md my-5 mdl:my-0">
             <img
-              className="block aspect-3/4 h-auto w-full rounded border-2 border-grey-100"
+              className="block w-full aspect-3/4 h-auto mdl:w-full mx-auto rounded border-2 border-grey-100"
               src="https://loremflickr.com/400/400/dog"
               alt=""
             />
@@ -147,3 +152,13 @@ const Trainingen: React.FC<TrainingProps> = () => {
 };
 
 export default Trainingen;
+
+export const getServerSideProps = async () => {
+  const honden = await getData(KLANT_HONDEN, { klantId: 1 });
+  console.log(honden);
+  return {
+    props: {
+      honden,
+    },
+  };
+};
