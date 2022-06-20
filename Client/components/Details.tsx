@@ -3,9 +3,16 @@ import React, { ReactNode, useState } from "react";
 interface DetailsProps {
   summary: string;
   children: ReactNode;
+  button?: boolean;
+  className?: string | null;
 }
 
-const Details: React.FC<DetailsProps> = ({ summary, children }) => {
+const Details: React.FC<DetailsProps> = ({
+  summary,
+  children,
+  button,
+  className,
+}) => {
   const [isOpen, setIsOpen] = useState<boolean>(true);
 
   const handleToggle = (e: any) => {
@@ -18,16 +25,18 @@ const Details: React.FC<DetailsProps> = ({ summary, children }) => {
       open={isOpen}
     >
       <summary
-        className="list-none text-xl text-green-200 text-center font-medium"
+        className={`${className} list-none text-xl text-green-200 text-center font-medium`}
         onClick={handleToggle}
       >
-        <span
-          className="absolute -left-30 -top-6 w-5 h-5 text-sm text-center bg-green-300 text-gray-100 pointer-events-auto"
-          onClick={handleToggle}
-        >
-          {isOpen ? "-" : "+"}
-        </span>
-        {!isOpen && summary}
+        {button && (
+          <span
+            className="absolute -left-30 -top-6 w-5 h-5 text-sm text-center bg-green-300 text-gray-100 pointer-events-auto"
+            onClick={handleToggle}
+          >
+            {isOpen ? "-" : "+"}
+          </span>
+        )}
+        {(!isOpen || !button) && summary}
       </summary>
       {children}
     </details>

@@ -14,6 +14,7 @@ const getData = async (endpoint: string, options: any={}) => {
         return {data, error: undefined};
     }
     catch(error: any) {
+        console.log(error);
         return {data: [], error};
     }
 }

@@ -48,7 +48,11 @@ class Validator {
             $missingData = ( !$columnCanBeNull && !in_array( $column, $payloadKeys ) && $method === "POST" );
             $requiresDefaultValue = ( !in_array( $column, $payloadKeys ) && !$missingData && $method === "POST" );
 
-            if( $missingData ) $this->responseHandler->badRequest( [$column => "Mag niet leeg zijn"] );
+            if( $missingData ) {
+                $message = "Mag niet leeg zijn";
+                if ($datatype === "tinyint") $message = "Gelieve te selecteren";
+                $this->responseHandler->badRequest( [$column => $message] );
+            }
             
             if( $requiresDefaultValue ) continue;
 

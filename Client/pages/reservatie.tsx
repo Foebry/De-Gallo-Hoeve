@@ -5,11 +5,23 @@ import Form from "../components/form/Form";
 import Step1 from "../components/reservatie/Step1";
 import Step2 from "../components/reservatie/Step2";
 import getData from "../hooks/useApi";
-import useMutation, { structureDetailsPayload } from "../hooks/useMutation";
+import useMutation, {
+  handleErrors,
+  structureDetailsPayload,
+} from "../hooks/useMutation";
 import { KLANT_HONDEN, RESERVATIEAPI } from "../types/apiTypes";
 import { LOGIN } from "../types/linkTypes";
 
 interface ReservatieProps {}
+
+interface ReservatieErrorInterface {
+  start?: string;
+  eind?: string;
+  hond_id?: string;
+  medicatie?: string;
+  ontsnapping?: string;
+  sociaal?: string;
+}
 
 const Reservatie: React.FC<ReservatieProps> = () => {
   const router = useRouter();
@@ -21,16 +33,28 @@ const Reservatie: React.FC<ReservatieProps> = () => {
   });
   const [activeTab, setActiveTab] = useState<number>(1);
   const [klantId, setKlantId] = useState<string | null>();
+  const [formErrors, setFormErrors] = useState<ReservatieErrorInterface>({});
   useEffect(() => {
     const id = localStorage.getItem("id");
     setKlantId(id);
   }, []);
 
+  const step1 = ["hond_id", "medicatie", "ontsnapping", "sociaal"];
+
+  const handleErrors = (error: any) => {
+    if (Object.keys(error).some((r) => step1.indexOf(r) >= 0)) setActiveTab(1);
+  };
+
   const onSubmit = async (values: any) => {
     values = structureDetailsPayload(values);
     values.klant_id = klantId;
-    const { data, error } = await makeReservation(RESERVATIEAPI, values);
-    if (error) console.log(error);
+    const { data, error } = await makeReservation(
+      RESERVATIEAPI,
+      values,
+      formErrors,
+      setFormErrors
+    );
+    if (error) handleErrors(error);
     else router.push(LOGIN);
   };
 
@@ -58,6 +82,8 @@ const Reservatie: React.FC<ReservatieProps> = () => {
             append={append}
             remove={remove}
             values={getValues}
+            errors={formErrors}
+            setErrors={setFormErrors}
           />
         ) : activeTab === 2 ? (
           <Step2 control={control} setActiveTab={setActiveTab} />

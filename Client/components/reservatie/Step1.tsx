@@ -38,6 +38,8 @@ const Step1: React.FC<Props> = ({
   append,
   remove,
   values,
+  errors,
+  setErrors,
 }) => {
   const [available, setAvailable] = useState<
     OptionsOrGroups<any, OptionInterface>
@@ -116,6 +118,8 @@ const Step1: React.FC<Props> = ({
             remove={removeHandler}
             id={values().details[index].hond_id}
             avatar={values().details[index].avatar}
+            errors={errors}
+            setErrors={setErrors}
           />
         ))}
       </div>

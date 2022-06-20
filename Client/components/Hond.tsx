@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Body, Title3 } from "./Typography/Typography";
+import { Body, FormError, Title3 } from "./Typography/Typography";
 import Select from "react-select";
 import FormRow from "./form/FormRow";
 import {
@@ -8,6 +8,7 @@ import {
   FieldValues,
   UseFieldArrayRemove,
 } from "react-hook-form";
+import Details from "./Details";
 
 interface HondProps {
   naam: string;
@@ -17,6 +18,8 @@ interface HondProps {
   remove: (index: number, id: number) => void;
   id: number;
   avatar: string;
+  errors: any;
+  setErrors: any;
 }
 interface OptionInterface {
   value: boolean;
@@ -35,10 +38,12 @@ const Hond: React.FC<HondProps> = ({
   control,
   remove,
   id,
+  errors,
+  setErrors,
 }) => {
   useEffect(() => console.log("id in Hond", id));
   return (
-    <div className="border-solid border-2 border-black-100 rounded p-2 my-2">
+    <div className="border-solid border-2 border-black-100 rounded px-2 py-4 my-2">
       <div className="flex gap-5 justify-between items-center">
         <div className="w-25 aspect-square">
           <img
@@ -68,33 +73,60 @@ const Hond: React.FC<HondProps> = ({
             name={`details.${index}.medicatie`}
             control={control}
             render={({ field: { onChange, value } }) => (
-              <Select
-                options={options}
-                onChange={onChange}
-                value={value ?? { label: "medicatie?", value: undefined }}
-              />
+              <div className="relative">
+                <Select
+                  options={options}
+                  onChange={(e) => {
+                    setErrors({
+                      ...errors,
+                      medicatie: undefined,
+                    });
+                    onChange(e);
+                  }}
+                  value={value ?? { label: "medicatie?", value: undefined }}
+                />
+                <FormError>{errors.medicatie}</FormError>
+              </div>
             )}
           />
           <Controller
             name={`details.${index}.ontsnapping`}
             control={control}
             render={({ field: { onChange, value } }) => (
-              <Select
-                options={options}
-                onChange={onChange}
-                value={value ?? { label: "ontsnapping?", value: undefined }}
-              />
+              <div className="relative">
+                <Select
+                  options={options}
+                  onChange={(e) => {
+                    setErrors({
+                      ...errors,
+                      ontsnapping: undefined,
+                    });
+                    onChange(e);
+                  }}
+                  value={value ?? { label: "ontsnapping?", value: undefined }}
+                />
+                <FormError>{errors.ontsnapping}</FormError>
+              </div>
             )}
           />
           <Controller
             name={`details.${index}.sociaal`}
             control={control}
             render={({ field: { onChange, value } }) => (
-              <Select
-                options={options}
-                onChange={onChange}
-                value={value ?? { label: "sociaal?", value: undefined }}
-              />
+              <div className="relative">
+                <Select
+                  options={options}
+                  onChange={(e) => {
+                    setErrors({
+                      ...errors,
+                      sociaal: undefined,
+                    });
+                    onChange(e);
+                  }}
+                  value={value ?? { label: "sociaal?", value: undefined }}
+                />
+                <FormError>{errors.sociaal}</FormError>
+              </div>
             )}
           />
         </FormRow>

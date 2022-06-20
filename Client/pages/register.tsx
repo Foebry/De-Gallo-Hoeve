@@ -9,7 +9,10 @@ import Step3 from "../components/register/step3";
 import { OptionsOrGroups } from "react-select";
 import getData from "../hooks/useApi";
 import { RASSEN, REGISTERAPI } from "../types/apiTypes";
-import useMutation, { structureHondenPayload } from "../hooks/useMutation";
+import useMutation, {
+  handleErrors,
+  structureHondenPayload,
+} from "../hooks/useMutation";
 
 interface RegisterHondErrorInterface {
   naam?: string;
@@ -58,9 +61,24 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
     "postcode",
     "telefoon",
   ];
+  const step2 = ["naam", "ras_id", "gelacht", "chip_nr", "geboortedatum"];
+
+  const handleErrors = (error: any) => {
+    if (Object.keys(error).some((r) => step1.indexOf(r) >= 0)) setActiveTab(1);
+    else if (Object.keys(error).some((r) => step2.indexOf(r) >= 0))
+      setActiveTab(2);
+    else if (Object.keys(error).includes("honden")) setActiveTab(3);
+  };
 
   const onSubmit = async (values: any) => {
     let payload = structureHondenPayload(values);
+    if (values.password !== values.password_verification) {
+      setFormErrors({
+        ...formErrors,
+        password_verification: "Komt niet overeen.",
+      });
+      return;
+    }
 
     const { data, error } = await register(
       REGISTERAPI,
@@ -68,13 +86,8 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
       registerErrors,
       setFormErrors
     );
-    console.log(error);
     if (data) router.push(LOGIN);
-    else if (error) {
-      if (Object.keys(error).some((r) => step1.indexOf(r) >= 0))
-        setActiveTab(1);
-      else if (Object.keys(error).includes("honden")) setActiveTab(3);
-    }
+    else if (error) handleErrors(error);
   };
 
   return (
@@ -87,8 +100,8 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
             : activeTab === 2
             ? "Gegevens viervoeters"
             : activeTab === 3
-            ? "Gegevens dierenarts"
-            : "Verifieer uw gegevens aub"
+            ? "Kies een wachtwoord"
+            : ""
         }
         activeTab={activeTab}
         setActiveTab={setActiveTab}

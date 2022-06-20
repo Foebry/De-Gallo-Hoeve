@@ -126,15 +126,12 @@ class Hond extends AbstractEntity
 
     public function initialize( array $data, EntityLoader $loader ): Hond {
         
-        // header("Access-Control-Allow-Origin: *");
-        // print(json_encode($data));
-        // exit();
-        
         $this->setNaam($data["naam"]);
         $this->setRas( $loader->getRasById( $data["ras_id"] ) );
         $this->setGeboortedatum(new DateTime($data["geboortedatum"]));
         $this->setChipNr($data["chip_nr"] ?? $loader->getHelper()->generateRandomString());
         $this->setKlant( $data["Klant"] );
+        $this->setGeslacht( $data["geslacht"] );
         
         return $this;
     }

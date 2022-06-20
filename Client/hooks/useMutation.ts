@@ -52,7 +52,8 @@ export const structureHondenPayload = (payload: any) => {
   const new_honden = honden.map((hond: any) => {
     const ras_id = hond.ras_id?.value;
     const geslacht = hond.geslacht?.value;
-    return { ...hond, ras_id, geslacht };
+    const geboortedatum = hond.geboortedatum?.[0] ?? "";
+    return { ...hond, ras_id, geslacht, geboortedatum };
   });
   return { ...payload, honden: new_honden };
 };

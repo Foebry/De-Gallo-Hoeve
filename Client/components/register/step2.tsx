@@ -11,6 +11,8 @@ import {
 } from "react-hook-form";
 import Details from "../Details";
 import { FormStepProps } from "../form/FormTabs";
+import { DatePicker } from "react-trip-date";
+import { FormError } from "../Typography/Typography";
 
 export interface optionInterface {
   options: [{ value: any; label: string }];
@@ -42,9 +44,8 @@ const step2: React.FC<Props> = ({
   };
 
   const geslachten = [
-    { label: "Geslacht", value: undefined },
-    { label: "Reu", value: 1 },
-    { label: "Teef", value: 0 },
+    { label: "Reu", value: true },
+    { label: "Teef", value: false },
   ];
 
   return (
@@ -58,6 +59,7 @@ const step2: React.FC<Props> = ({
                   ? "nieuwe hond"
                   : item.naam
               }
+              button={true}
             >
               <Controller
                 name={`honden.${index}.naam`}
@@ -67,22 +69,6 @@ const step2: React.FC<Props> = ({
                     label="naam"
                     name={`honden.${index}.naam`}
                     id={`honden.${index}.naam`}
-                    value={value}
-                    onChange={onChange}
-                    onBlur={onBlur}
-                    errors={errors}
-                    setErrors={setErrors}
-                  />
-                )}
-              />
-              <Controller
-                name={`honden.${index}.geboortedatum`}
-                control={control}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <FormInput
-                    label="geboortedatum"
-                    name={`honden.${index}.geboortedatum`}
-                    id={`honden.${index}.geboortedatum`}
                     value={value}
                     onChange={onChange}
                     onBlur={onBlur}
@@ -102,7 +88,7 @@ const step2: React.FC<Props> = ({
                   />
                 )}
               />
-              <FormRow>
+              <FormRow className="mt-5">
                 <Controller
                   name={`honden.${index}.geslacht`}
                   control={control}
@@ -122,7 +108,7 @@ const step2: React.FC<Props> = ({
                       label="chipNr"
                       name={`honden.${index}.chip_nr`}
                       id={`honden.${index}.chip_nr`}
-                      extra="w-1/6"
+                      extra="w-1/2"
                       value={value}
                       onChange={onChange}
                       onBlur={onBlur}
@@ -132,6 +118,26 @@ const step2: React.FC<Props> = ({
                   )}
                 />
               </FormRow>
+              <Controller
+                name={`honden.${index}.geboortedatum`}
+                control={control}
+                render={({ field: { onChange, onBlur, value } }) => {
+                  const error = errors.geboortedatum ? "text-red-800" : null;
+                  return (
+                    <Details summary="Geboortedatum" className={error}>
+                      <FormError>{errors.geboortedatum}</FormError>
+                      <DatePicker
+                        onChange={(e) => {
+                          setErrors({ ...errors, geboortedatum: undefined });
+                          onChange(e);
+                        }}
+                        startOfWeek={1}
+                        numberOfSelectableDays={1}
+                      />
+                    </Details>
+                  );
+                }}
+              />
             </Details>
             <span
               onClick={() => remove(index)}
