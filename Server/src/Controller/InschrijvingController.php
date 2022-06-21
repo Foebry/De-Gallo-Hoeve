@@ -39,10 +39,10 @@ class InschrijvingController extends AbstractController{
 
         $dag = date("l", strtotime($payload["datum"]));
 
-        if( !$dag === "Sunday" && $payload["training_id"] == 1 ) $responseHandler->badRequest(["datum" => "Privé trainingen gaan enkel door op Zondag"]);
+        if( $payload["training_id"] == 1 && !in_array($dag, ["Wednesday, Saturday"]) ) $responseHandler->badRequest(["datum" => "Privé trainingen gaan enkel door op Woensdag en Zaterdag"]);
         
-        elseif( $payload["trainign_id"] === 2 && !in_array($dag, ["Wednesday, Saturday"])){
-            $responseHandler->badRequest(["datum" => "Groepstrainingen gaan enkel door op Woensdag en Zaterdag"]);
+        elseif( $payload["training_id"] === 2 && !in_array($dag, ["Wednesday, Saturday"])){
+            $responseHandler->badRequest(["datum" => "Groepstrainingen gaan enkel door op Zondag"]);
             $inschrijvingen = $loader->getDbm()->query("select count(id) from training where id = :id and datum = :datum", ["id"=>$payload["training_id"], "datum"=>$payload["datum"]])[0];
             if( $inschrijvingen > 10 ) $responseHandler->badRequest(["training_id" => "Deze training is helaas volboekt."]);
         } 
