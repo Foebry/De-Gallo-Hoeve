@@ -53,7 +53,7 @@ use App\Entity\Training;
             $characters = "0123456789abcdefghijklmnopqrstuvwxyz";
             $randomString = "";
     
-            for( $i=0; $i<1000; $i++ ) {
+            for( $i=0; $i<15; $i++ ) {
                 $index = rand(0, strlen($characters)-1);
                 $randomString .= rand(0, 10) > 5 ? $characters[$index] : strtoupper($characters[$index]);
             }

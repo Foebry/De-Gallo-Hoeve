@@ -66,6 +66,7 @@ class EntityLoader {
      * @return Hond
      */
     public function getHondById( int $id ): Hond {
+        $this->dbm->logger->info("inside getHondById -- EntityLoader line 69");
 
         $hondRepo = $this->em->getRepository(Hond::class);
         $hond = $hondRepo->findOneBy(["id" => $id]);

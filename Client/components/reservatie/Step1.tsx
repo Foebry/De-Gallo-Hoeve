@@ -68,6 +68,7 @@ const Step1: React.FC<Props> = ({
       avatar,
     }));
   }, [honden]);
+
   useEffect(() => {
     setAvailable(options);
   }, [options]);

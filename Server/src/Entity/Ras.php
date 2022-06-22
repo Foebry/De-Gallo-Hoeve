@@ -46,6 +46,11 @@ class Ras
         $this->honden = new ArrayCollection();
     }
 
+    public function __toString()
+    {
+        return $this->naam;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

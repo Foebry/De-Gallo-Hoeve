@@ -4,11 +4,13 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\HondRepository;
+use App\Services\CustomHelper;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
 use App\Services\EntityLoader;
+use App\Services\Logger;
 
 /**
  * @ApiResource()
@@ -69,6 +71,8 @@ class Hond extends AbstractEntity
     {
         $this->boekings = new ArrayCollection();
         $this->inschrijvingen = new ArrayCollection();
+        $this->helper = new CustomHelper();
+        $this->logger = new Logger();
     }
 
     public function getId(): ?int
@@ -106,8 +110,9 @@ class Hond extends AbstractEntity
     }
 
     public function setChipNr(?string $chip_nr): self
-    {
-        $this->chip_nr = $chip_nr;
+    {   
+        
+        $this->chip_nr = $chip_nr ?? $this->helper->generateRandomString();
 
         return $this;
     }
@@ -124,14 +129,26 @@ class Hond extends AbstractEntity
         return $this;
     }
 
+    public function getKlantNaam(): string {
+        return $this->klant->getFullName();
+    }
+
+    public function getGender(): string {
+        return $this->geslacht ? "Reu" : "Teef";
+    }
+
+    public function getRasNaam(): string {
+        return $this->ras->getNaam();
+    }
+
     public function initialize( array $data, EntityLoader $loader ): Hond {
         
         $this->setNaam($data["naam"]);
         $this->setRas( $loader->getRasById( $data["ras_id"] ) );
         $this->setGeboortedatum(new DateTime($data["geboortedatum"]));
         $this->setChipNr($data["chip_nr"] ?? $loader->getHelper()->generateRandomString());
-        $this->setKlant( $data["Klant"] );
         $this->setGeslacht( $data["geslacht"] );
+        $this->setKlant( $data["Klant"] );
         
         return $this;
     }

@@ -63,6 +63,11 @@ class BoekingDetail extends AbstractEntity
      */
     public $hond;
 
+    public function __toString()
+    {
+        return $this->getHond()->getNaam();
+    }
+
     public function getId(): ?int
     {
         return $this->id;

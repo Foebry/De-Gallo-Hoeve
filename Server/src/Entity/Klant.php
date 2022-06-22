@@ -99,6 +99,11 @@ class Klant extends AbstractEntity implements UserInterface, PasswordAuthenticat
         $this->inschrijvingen = new ArrayCollection();
     }
 
+    public function __toString()
+    {
+        return $this->getFullName();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -166,6 +171,17 @@ class Klant extends AbstractEntity implements UserInterface, PasswordAuthenticat
         $this->password = $password;
 
         return $this;
+    }
+
+    public function getFullName(): string {
+        return $this->getVnaam()." ".$this->getLnaam();
+    }
+
+    public function getAuthorization(): string {
+        $roles = array_values( $this->getRoles() );
+        if( in_array( "ROLE_ADMIN", $roles ) ) return "ADMIN";
+        elseif( in_array( "ROLE_USER", $roles ) ) return "KLANT";
+        else return "NONE";
     }
 
     /**

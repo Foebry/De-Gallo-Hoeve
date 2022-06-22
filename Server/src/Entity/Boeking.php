@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\BoekingRepository;
-use App\Services\CustomHelper;
 use App\Services\EntityLoader;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -98,6 +97,10 @@ class Boeking extends AbstractEntity
         $this->referentie = $referentie;
 
         return $this;
+    }
+
+    public function getKlantNaam(): string {
+        return $this->getKlant()->getFullName();
     }
 
     public function initialize( array $data, EntityLoader $loader ): Boeking {

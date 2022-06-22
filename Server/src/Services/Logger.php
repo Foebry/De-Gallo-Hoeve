@@ -10,7 +10,7 @@ class Logger
     private $errorfile;
     private $infofile;
 
-    public function __construct( $dbfile, $errorfile, $infofile )
+    public function __construct( $dbfile="logs/database.log", $errorfile="logs/error.log", $infofile="logs/info.log" )
     {
         $this->dbfile = $dbfile;
         $this->infofile = $infofile;

@@ -10,6 +10,7 @@ use App\Services\Validator;
 use App\Services\EntityLoader;
 use App\Services\ResponseHandler;
 use Doctrine\ORM\EntityManagerInterface;
+use Error;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Annotation\Route;
@@ -46,6 +47,7 @@ use Symfony\Component\HttpFoundation\Response;
             $klant = $this->loader->getKlantBy( ["id", $payload["klant_id"]] );
 
             $data = $this->checkBoekingPayload();
+            $this->loader->getDbm()->logger->info("checked BoekingPayload  -  BoekingController line 49");
 
             /** @var Boeking $boeking */
             $boeking = $helper->create( Boeking::class, $data, $this->loader );
@@ -58,6 +60,7 @@ use Symfony\Component\HttpFoundation\Response;
             foreach( $detailRows as &$detailData ){
 
                 $hond = $this->loader->getHondById( $detailData["hond_id"]);
+                $this->loader->getDbm()->logger->info("Hond loaded  -  BoekingController line 62");
 
                 if( !$klant->isOwnerOf($hond) ) $this->responseHandler->unprocessableEntity(["message" => "Het lijkt dat deze hond niet bij jou hoort"]);
 
@@ -79,7 +82,12 @@ use Symfony\Component\HttpFoundation\Response;
         function checkBoekingPayload(): array {
 
             $boekingData = $this->validator->validatePayload();
-            $start = new DateTime( $boekingData["start"] );
+            // $startValue = $boekingData["start"];
+            $payload = json_encode( $boekingData );
+
+            $this->loader->getDbm()->logger->info("payload: $payload -- BoekingController line 84");
+             $start = new DateTime( $boekingData["start"] );
+            $this->loader->getDbm()->logger->info("created datetime from start -- BoekingController line 85");
             $eind = new DateTime( $boekingData["eind"] );
             $now = new DateTime();
 
