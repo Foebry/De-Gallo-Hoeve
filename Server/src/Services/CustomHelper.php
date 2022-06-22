@@ -49,15 +49,24 @@ use App\Entity\Training;
 
         }
 
-        public function generateRandomString() {
+        public function generateRandomString($length=15) {
             $characters = "0123456789abcdefghijklmnopqrstuvwxyz";
             $randomString = "";
     
-            for( $i=0; $i<15; $i++ ) {
+            for( $i=0; $i<$length; $i++ ) {
                 $index = rand(0, strlen($characters)-1);
                 $randomString .= rand(0, 10) > 5 ? $characters[$index] : strtoupper($characters[$index]);
             }
     
             return $randomString;
+        }
+
+        function checkPayloadHonden( array $hondenArray, Validator $validator ) {
+            $honden = [];
+            foreach($hondenArray as $hondData){
+                $data = $validator->validatePayload("hond", $hondData);
+                $honden[] = $data;
+            }
+            return $honden;
         }
     }

@@ -11,27 +11,31 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Klant;
 use App\Entity\Hond;
 use App\Services\CustomHelper;
+use App\Services\DbManager;
+use App\Services\MailService;
 
     class RegistrationController extends AbstractController {
 
         private $validator;
+				private $loader;
 
-        public function __construct( Validator $validator )
+        public function __construct( Validator $validator, EntityLoader $loader )
         {
             $this->validator = $validator;
+						$this->loader = $loader;
         }
 
         /**
          * @Route("/api/register", name="register", methods={"POST"})
          */
-        public function register( Request $request, EntityLoader $loader, CustomHelper $helper, EntityManagerInterface $em ){
+        public function register( Request $request, EntityLoader $loader, CustomHelper $helper, EntityManagerInterface $em, MailService $mailService ){
 
             $payload = json_decode( $request->getContent(), true );
 
             $loader->checkPayloadForKeys( $payload, ["honden"] );
 
             $data = $this->validator->validatePayload();
-            $payload["honden"] = $this->checkPayloadHonden( $payload["honden"] );
+            $payload["honden"] = $helper->checkPayloadHonden( $payload["honden"], $this->validator );
 
             /** @var Klant $klant */
             $klant = $helper->create(Klant::class, $data, $loader);
@@ -49,20 +53,28 @@ use App\Services\CustomHelper;
             }
             $em->flush();
 
-            return $this->json( ["message"=>"Bedankt voor uw registratie!"], 201 );
+            $mailService->send("register", $klant);
+
+            return $this->json( ["message"=>"Bedankt voor uw registratie! Gelieve uw registratie te bevestigen door op de knop 'bevestig registratie' te klikken in de email die we u hebben toegezonden.\n Geen mail ontvangen? bekijk dan zeker ook uw spam"], 201 );
         }
 
-        function checkPayloadHonden( array $hondenArray ) {
-            $honden = [];
-            foreach($hondenArray as $hondData){
-                $data = $this->validator->validatePayload("hond", $hondData);
-                $honden[] = $data;
-            }
-            return $honden;
-        }
+				/**
+				 * @Route("/confirm/{code}")
+				 */
+				function confirmRegistration( string $code, DbManager $dbm, EntityManagerInterface $em ){
 
-        function checkArtsPayload(): array {
+					$klant_id = $dbm->query("select klant_id from confirm where code = :code", ["code" => $code])[0];
+					$klant = $this->loader->getKlantBy(["id", $klant_id]);
 
-            return [];
-        }
+					$klant->setVerified(true);
+
+					$em->persist($klant);
+					$em->flush();
+					
+					$dbm->query("delete from confirm where code = :code", ["code" => $code]);
+
+					return $this->render("confirmed.html.twig");
+
+				}
+
     }
