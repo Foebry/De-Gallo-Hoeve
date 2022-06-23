@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 use DateTime;
 use App\Services\EntityLoader;
 use App\Services\Logger;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
  * @ApiResource()
@@ -43,11 +44,13 @@ class Hond extends AbstractEntity
     /**
      * @ORM\ManyToOne(targetEntity=Ras::class, inversedBy="honden")
      * @ORM\JoinColumn(nullable=false)
+     * @MaxDepth(1)
      */
     private $ras;
 
     /**
-     * @ORM\OneToMany(targetEntity=BoekingDetail::class, mappedBy="hond", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=BoekingDetail::class, mappedBy="hond", orphanRemoval=true)µ
+     * @MaxDepth(1)
      */
     private $boekings;
 

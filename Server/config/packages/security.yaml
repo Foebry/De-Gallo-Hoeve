@@ -13,10 +13,10 @@ security:
         # used to reload user from session & other features (e.g. switch_user)
     firewalls:
         login :
-            pattern: ^/api/login_check
+            pattern: ^/api/login
             stateless: true
             json_login:
-                check_path: /api/login_check # or api_login_check as defined in config/routes.yaml
+                check_path: /api/login # or api_login_check as defined in config/routes.yaml
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
@@ -55,8 +55,11 @@ security:
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
+        - { path : '/admin', roles : IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path : '/confirm', roles : IS_AUTHENTICATED_ANONYMOUSLY }
         - { path : '^/api/login', roles : IS_AUTHENTICATED_ANONYMOUSLY }
         - { path : '^/api/register', roles : IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path : '^/api/ras', roles : IS_AUTHENTICATED_ANONYMOUSLY }
         - { path : '^/api', roles : IS_AUTHENTICATED_FULLY }
 
 

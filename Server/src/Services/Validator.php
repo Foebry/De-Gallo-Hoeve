@@ -167,23 +167,6 @@ class Validator {
 
     }
 
-    function getDefaultValue( string $column ) {
-
-        switch( $column ){
-            case "referentie": 
-                $now = new DateTime();
-                return $now->format("m-siHdy");
-            case "loops": 
-                return "1111-11-11";
-            case "roles":
-                return "[]";
-            case "verified":
-                return 0;
-            default:
-                return "";
-        }
-    }
-
     /**
      * Controleer of embedded payload array steeds unieke waarden bevat, 
      * gechecked op key, met function.

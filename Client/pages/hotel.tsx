@@ -1,17 +1,19 @@
 import { useRouter } from "next/router";
 import React from "react";
 import Button from "../components/buttons/Button";
+import FormRow from "../components/form/FormRow";
 import { Body, Link, Title2 } from "../components/Typography/Typography";
 import { RESERVATIE } from "../types/linkTypes";
+import { SECTION_DARKER } from "../types/styleTypes";
 
 interface HotelProps {}
 
 const Hotel: React.FC<HotelProps> = ({}) => {
   const router = useRouter();
   return (
-    <section className="bg-grey-900 px-5 py-5">
-      <div className="max-w-8xl flex items-center py-24 mx-auto gap-12">
-        <div className="min-w-fit shadow-md">
+    <section className={SECTION_DARKER}>
+      <div className="block max-w-8xl md:flex items-center py-24 mx-auto gap-12">
+        <div className="w-1/2 mx-auto shadow-md mdl:min-w-fit">
           <img
             className="block aspect-3/4 h-auto w-full rounded border-2 border-grey-100"
             src="https://loremflickr.com/300/400/dog"
@@ -31,10 +33,13 @@ const Hotel: React.FC<HotelProps> = ({}) => {
             voor ontvangst ontsmet en gekuist zijn. Dit is dan ook wettelijk
             verplicht.
           </Body>
-          <Button
-            label="Reserveer een plekje"
-            onClick={() => router.push(RESERVATIE)}
-          />
+          <FormRow>
+            <Button
+              label="Reserveer een plekje"
+              onClick={() => router.push(RESERVATIE)}
+              className="mx-auto"
+            />
+          </FormRow>
           <Title2>Verblijven</Title2>
           <Body>
             Elk verblijf heeft een binnen en buitenkennel met afmetingen van 4

@@ -1,4 +1,5 @@
 import React, { Dispatch, ReactNode, SetStateAction } from "react";
+import { FORM_CONTAINER } from "../../types/styleTypes";
 import { Title3 } from "../Typography/Typography";
 import FormTabs from "./FormTabs";
 
@@ -24,9 +25,7 @@ const Form: React.FC<FormProps> = ({
   className,
 }) => {
   return (
-    <div
-      className={` w-1/2 min-h-50vh bg-grey-300 border-grey-900 border-solid border shadow-sm rounded-2xl mx-auto my-32 relative`}
-    >
+    <div className={FORM_CONTAINER}>
       {title && <Title3>{title}</Title3>}
       {tabCount && (
         <FormTabs
@@ -35,7 +34,7 @@ const Form: React.FC<FormProps> = ({
           tabCount={tabCount}
         />
       )}
-      <form className={`w-1/2 pt-7 mx-auto ${className}`} onSubmit={onSubmit}>
+      <form className={`${className} w-10/12 pt-7 mx-auto`} onSubmit={onSubmit}>
         {children}
         {action && (
           <input

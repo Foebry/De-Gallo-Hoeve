@@ -7,6 +7,7 @@ use App\Repository\InschrijvingRepository;
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
 use App\Services\EntityLoader;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
  * @ApiResource()

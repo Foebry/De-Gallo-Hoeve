@@ -34,7 +34,8 @@ class HondCrudController extends AbstractCrudController
         yield TextField::new("gender", "Geslacht")
             ->onlyOnIndex();
         yield BooleanField::new("geslacht", "isReu")
-            ->renderAsSwitch("false");
+            ->renderAsSwitch("false")
+            ->hideOnIndex();
         yield AssociationField::new("ras")
             ->hideOnIndex();
     }

@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import Form from "../../components/form/Form";
 import Step1 from "../../components/inschrijving/Step1";
@@ -15,26 +15,34 @@ import { RegisterHondInterface } from "../../types/formTypes/registerTypes";
 import { INDEX } from "../../types/linkTypes";
 import { SECTION_DARKER } from "../../types/styleTypes";
 
-interface PriveLessenProps {
-  honden: RegisterHondInterface[];
+export interface LessenProps {
   disabledDays: string[];
 }
 
-interface InschrijvingErrorInterface {
+export interface InschrijvingErrorInterface {
   hond_id?: number;
   training_id?: number;
   klant_id?: number;
   datum?: string;
 }
 
-const Privelessen: React.FC<PriveLessenProps> = ({ honden, disabledDays }) => {
+const Privelessen: React.FC<LessenProps> = ({ disabledDays }) => {
   const router = useRouter();
 
-  const { handleSubmit, control } = useForm();
+  const { handleSubmit, control, getValues } = useForm();
   const inschrijving = useMutation();
 
   const [activeTab, setActiveTab] = useState<number>(1);
   const [errors, setErrors] = useState<InschrijvingErrorInterface>({});
+  const [honden, setHonden] = useState<RegisterHondInterface[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const klant_id = localStorage.getItem("id");
+      const { data } = await getData(KLANT_HONDEN, { klant_id });
+      setHonden(data);
+    })();
+  }, []);
 
   const onSubmit = async (values: FieldValues) => {
     values.training_id = 1;
@@ -76,6 +84,7 @@ const Privelessen: React.FC<PriveLessenProps> = ({ honden, disabledDays }) => {
             control={control}
             setActiveTab={setActiveTab}
             honden={honden}
+            values={getValues}
           />
         ) : null}
       </Form>
@@ -86,14 +95,12 @@ const Privelessen: React.FC<PriveLessenProps> = ({ honden, disabledDays }) => {
 export default Privelessen;
 
 export const getServerSideProps = async () => {
-  const { data: honden } = await getData(KLANT_HONDEN, { klantId: 5 });
   const { data: inschrijvingen } = await getData(GET_FUTURE_INSCHRIJVINGS);
   const disabledDays = inschrijvingen.map(
     (inschrijving: any) => inschrijving.datum
   );
   return {
     props: {
-      honden,
       disabledDays,
     },
   };

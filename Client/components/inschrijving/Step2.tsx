@@ -6,6 +6,7 @@ import Hond from "../Hond";
 
 interface Props extends FormStepProps {
   honden?: any;
+  values?: any;
 }
 
 const Step2: React.FC<Props> = ({
@@ -14,6 +15,7 @@ const Step2: React.FC<Props> = ({
   honden,
   setErrors,
   errors,
+  values,
 }) => {
   return (
     <>
@@ -27,12 +29,13 @@ const Step2: React.FC<Props> = ({
           id={id}
           errors={errors}
           setErrors={setErrors}
+          values={values}
         />
       ))}
-      <FormRow>
+      <FormRow className="mt-20">
         <Button
           type="form"
-          className="left-14 right-auto"
+          className="right-auto"
           label="vorige"
           onClick={() => setActiveTab(1)}
         />

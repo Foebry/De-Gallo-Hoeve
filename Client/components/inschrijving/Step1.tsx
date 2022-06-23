@@ -2,6 +2,7 @@ import React from "react";
 import { Controller } from "react-hook-form";
 import { DatePicker } from "react-trip-date";
 import Button from "../buttons/Button";
+import FormRow from "../form/FormRow";
 import { FormStepProps } from "../form/FormTabs";
 
 const Step1: React.FC<FormStepProps> = ({
@@ -24,7 +25,9 @@ const Step1: React.FC<FormStepProps> = ({
           />
         )}
       />
-      <Button type="form" label="volgende" onClick={() => setActiveTab(2)} />
+      <FormRow className="mt-8">
+        <Button type="form" label="volgende" onClick={() => setActiveTab(2)} />
+      </FormRow>
     </>
   );
 };

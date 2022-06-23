@@ -12,6 +12,7 @@ import { KLANT_HONDEN } from "../../types/apiTypes";
 import getData from "../../hooks/useApi";
 import { Link, Title1, Title3 } from "../Typography/Typography";
 import { LOGIN } from "../../types/linkTypes";
+import FormRow from "../form/FormRow";
 
 interface SelectionInterface {
   id: number;
@@ -131,11 +132,13 @@ const Step1: React.FC<Props> = ({
               />
             ))}
           </div>
-          <Button
-            type="form"
-            label="volgende"
-            onClick={() => setActiveTab(2)}
-          />
+          <FormRow className="mt-20">
+            <Button
+              type="form"
+              label="volgende"
+              onClick={() => setActiveTab(2)}
+            />
+          </FormRow>
         </>
       ) : (
         <Title1>

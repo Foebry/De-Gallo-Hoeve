@@ -7,6 +7,7 @@ use App\Repository\BoekingDetailRepository;
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
 use App\Services\EntityLoader;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
  * @ApiResource()
@@ -48,18 +49,21 @@ class BoekingDetail extends AbstractEntity
 
     /**
      * @ORM\ManyToOne(targetEntity=Kennel::class, inversedBy="boekings")
+     * @MaxDepth(1)
      */
     private $kennel;
 
     /**
      * @ORM\ManyToOne(targetEntity=Boeking::class, inversedBy="details")
      * @ORM\JoinColumn(nullable=false)
+     * @MaxDepth(1)
      */
     private $boeking;
 
     /**
      * @ORM\ManyToOne(targetEntity=Hond::class, inversedBy="boekings")
      * @ORM\JoinColumn(nullable=false)
+     * @MaxDepth(1)
      */
     public $hond;
 

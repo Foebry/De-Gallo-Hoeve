@@ -9,10 +9,12 @@ use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
  * @ApiResource()
  * @ORM\Entity(repositoryClass=BoekingRepository::class)
+ * 
  */
 class Boeking extends AbstractEntity
 {
@@ -40,12 +42,14 @@ class Boeking extends AbstractEntity
 
     /**
      * @ORM\OneToMany(targetEntity=BoekingDetail::class, mappedBy="boeking")
+     * @MaxDepth(1)
      */
     private $details;
 
     /**
      * @ORM\ManyToOne(targetEntity=Klant::class, inversedBy="boekings")
      * @ORM\JoinColumn(nullable=false)
+     * @MaxDepth(1)
      */
     private $klant;
 

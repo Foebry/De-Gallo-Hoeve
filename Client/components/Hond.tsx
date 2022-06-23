@@ -21,6 +21,7 @@ interface HondProps {
   errors: any;
   setErrors: any;
   boeking?: boolean;
+  values?: any;
 }
 interface OptionInterface {
   value: boolean;
@@ -42,6 +43,7 @@ const Hond: React.FC<HondProps> = ({
   errors,
   setErrors,
   boeking,
+  values,
 }) => {
   return (
     <div className="border-solid border-2 border-black-100 rounded px-2 py-4 my-2">
@@ -75,6 +77,7 @@ const Hond: React.FC<HondProps> = ({
                   type="radio"
                   onChange={onChange}
                   value={id}
+                  checked={values().hond_id == id}
                 />
               )}
             />
