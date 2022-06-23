@@ -10,7 +10,9 @@ const getData = async (endpoint: string, options: any={}) => {
     }
     const route = `${api+endpoint}`
     try{
-        const {data} = await axios(route);
+        const {data} = await axios(route, {
+            withCredentials: true
+        });
         return {data, error: undefined};
     }
     catch(error: any) {

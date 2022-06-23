@@ -24,9 +24,7 @@ const useMutation = () => {
       const { data } = await axios(route, {
         method: "POST",
         data: payload,
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-        },
+        withCredentials: true,
       });
       return { data, error: undefined };
     } catch (errorData) {
