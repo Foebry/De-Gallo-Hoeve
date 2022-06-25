@@ -73,7 +73,7 @@ use App\Services\MailService;
 					
 					$dbm->query("delete from confirm where code = :code", ["code" => $code]);
 
-					return $this->render("confirmed.html.twig");
+					return $this->redirect("https://de-gallo-hoeve.vercel.app/");
 
 				}
 

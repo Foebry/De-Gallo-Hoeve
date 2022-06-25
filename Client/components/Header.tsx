@@ -7,7 +7,7 @@ const Header = () => {
       <div>
         <img
           className="block w-full object-fill aspect-3x xs:aspect-6x"
-          src="https://loremflickr.com/1400/320/dog"
+          src="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656191003/De-Gallo-Hoeve/images/65535_51988395290_2aaaf1b64e_h_1280_292_nofilter_uahozc.jpg"
           alt=""
         />
       </div>

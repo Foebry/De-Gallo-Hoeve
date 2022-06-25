@@ -102,18 +102,3 @@ const Reservatie: React.FC<ReservatieProps> = () => {
 };
 
 export default Reservatie;
-
-// export const getServerSideProps = async (ctx: any) => {
-//   const klantId = ctx.query?.klant ?? 0;
-//   const { data: honden } = await getData(KLANT_HONDEN, { klantId });
-//   const hondenOptions = honden.map((hond: any) => ({
-//     value: hond.id,
-//     label: hond.naam,
-//   }));
-//   return {
-//     props: {
-//       honden,
-//       hondenOptions,
-//     },
-//   };
-// };

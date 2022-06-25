@@ -6,6 +6,7 @@ use App\Controller\KlantController;
 use App\Services\DbManager;
 use DateTime;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Menu\SubMenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -122,12 +123,19 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
+        yield MenuItem::section("Data", "fa fa-cog");
+        
         yield MenuItem::LinkToCrud("Klanten", "fa fa-address-book", KlantCrudController::getEntityFqcn());
         yield MenuItem::LinkToCrud("Boekingen", "fa fa-hotel", BoekingCrudController::getEntityFqcn());
         yield MenuItem::LinkToCrud("Inschrijvingen", "fa fa-folder", InschrijvingCrudController::getEntityFqcn());
         yield MenuItem::LinkToCrud("Trainingen", "fa fa-list", TrainingCrudController::getEntityFqcn());
         yield MenuItem::LinkToCrud("Honden", "fa fa-dog", HondCrudController::getEntityFqcn());
         yield MenuItem::LinkToCrud("Rassen", "fa fa-list", RasCrudController::getEntityFqcn());
-        yield MenuItem::LinkToCrud("Kennels", "fa fa-file-chart-line", KennelCrudController::getEntityFqcn());
+        yield MenuItem::LinkToCrud("Kennels", "fa fa-list", KennelCrudController::getEntityFqcn());
+
+        yield MenuItem::section("Content", "fa fa-book");
+        
+        yield MenuItem::linkToCrud("Diensten", "fa fa-list", DienstCrudController::getEntityFqcn());
+        yield MenuItem::linkToCrud("Content", "fa fa-book", ContentCrudController::getEntityFqcn());
     }
 }

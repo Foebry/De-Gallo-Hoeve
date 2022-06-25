@@ -3,36 +3,42 @@ import React from "react";
 import Button from "../components/buttons/Button";
 import FormRow from "../components/form/FormRow";
 import { Body, Link, Title2 } from "../components/Typography/Typography";
+import getData from "../hooks/useApi";
+import { CONTENT_HOTELAPI } from "../types/apiTypes";
 import { RESERVATIE } from "../types/linkTypes";
-import { SECTION_DARKER } from "../types/styleTypes";
+import { SECTION_CONTENT, SECTION_DARKER } from "../types/styleTypes";
 
-interface HotelProps {}
+interface HotelProps {
+  reserveren: string[];
+  verblijven: string[];
+  verwachtingen: string[];
+}
 
-const Hotel: React.FC<HotelProps> = ({}) => {
+const Hotel: React.FC<HotelProps> = ({
+  reserveren,
+  verblijven,
+  verwachtingen,
+}) => {
   const router = useRouter();
   return (
     <section className={SECTION_DARKER}>
-      <div className="block max-w-8xl md:flex items-center py-24 mx-auto gap-12">
-        <div className="w-1/2 mx-auto shadow-md mdl:min-w-fit">
+      <div className={SECTION_CONTENT}>
+        <div className="w-95p xs:w-1/2 mx-auto shadow-md">
           <img
-            className="block aspect-3/4 h-auto w-full rounded border-2 border-grey-100"
-            src="https://loremflickr.com/300/400/dog"
+            className="w-full border-solid border-2 border-gray-100 rounded block aspect-3/4 h-auto"
+            src="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656192393/De-Gallo-Hoeve/images/65535_52063773527_a0d5f448de_300_400_nofilter_zcu4bp.jpg"
             alt=""
           />
         </div>
-        <div>
+        <div className="block align-center gap-12 p24 mx-auto md:max-w-2/3">
           <Title2>Reserveren</Title2>
           <Body>
             Reserveren van een plekje gebeurt uitsluitend op afspraak en na{" "}
             <Link to="register">registratie</Link>.
           </Body>
-          <Body>
-            Onze reserveringsprocedure is zeer gebruiksvriendelijk, waarbij u
-            zelf ook het verblijf (=de slaapkennel) van uw trouwe hond(en) kan
-            kiezen. Hierdoor kunnen wij er altijd voor zorgen dat de verblijven
-            voor ontvangst ontsmet en gekuist zijn. Dit is dan ook wettelijk
-            verplicht.
-          </Body>
+          {reserveren.map((paragraph) => (
+            <Body>{paragraph}</Body>
+          ))}
           <FormRow>
             <Button
               label="Reserveer een plekje"
@@ -41,29 +47,13 @@ const Hotel: React.FC<HotelProps> = ({}) => {
             />
           </FormRow>
           <Title2>Verblijven</Title2>
-          <Body>
-            Elk verblijf heeft een binnen en buitenkennel met afmetingen van 4
-            m². Indien er nood is aan een groter verblijf omwille van meerdere
-            honden hebben wij nog verblijven staan van 6 m².
-          </Body>
-          <Body>
-            Ook is er een grote speelweide waar jullie trouwe viervoeters eens
-            lekker kunnen rondspurten en spelen.
-          </Body>
-          <Body>
-            Indien de hond een oudere leeftijd heeft en dus meer nood heeft aan
-            rust, wordt hem dat zeker ook gegund. Voor iedere hond is hier een
-            plaatsje.
-          </Body>
+          {verblijven.map((paragraph) => (
+            <Body>{paragraph}</Body>
+          ))}
           <Title2>Wat verwachten wij van u?</Title2>
-          <Body>
-            Wanneer uw hond bij ons komt logeren, bent u verplicht het
-            paspoortje mee te nemen.
-          </Body>
-          <Body>
-            Daarnaast vragen wij u ervoor te zorgen dat uw hond de nodige
-            vaccinaties heeft gehad + ontwormd is.
-          </Body>
+          {verwachtingen.map((paragraph) => (
+            <Body>{paragraph}</Body>
+          ))}
         </div>
       </div>
     </section>
@@ -71,3 +61,16 @@ const Hotel: React.FC<HotelProps> = ({}) => {
 };
 
 export default Hotel;
+
+export const getStaticProps = async () => {
+  const { data } = await getData(CONTENT_HOTELAPI);
+
+  return {
+    props: {
+      reserveren: data.reserveren,
+      verblijven: data.verblijven,
+      verwachtingen: data.verwachtingen,
+    },
+    revalidate: 3600,
+  };
+};
