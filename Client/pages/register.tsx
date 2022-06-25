@@ -13,6 +13,7 @@ import useMutation, {
   handleErrors,
   structureHondenPayload,
 } from "../hooks/useMutation";
+import { SECTION_DARKER } from "../types/styleTypes";
 
 interface RegisterHondErrorInterface {
   naam?: string;
@@ -91,7 +92,7 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
   };
 
   return (
-    <section className="bg-grey-700 px-5 py-5">
+    <section className={SECTION_DARKER}>
       <Form
         onSubmit={handleSubmit(onSubmit)}
         title={
@@ -142,6 +143,7 @@ export default Register;
 
 export const getStaticProps = async () => {
   const { data } = await getData(RASSEN);
+  console.log(data);
   const rassen = data.map((ras: { id: number; naam: string }) => ({
     value: ras.id,
     label: ras.naam,

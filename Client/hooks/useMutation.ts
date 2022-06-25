@@ -30,7 +30,8 @@ const useMutation = () => {
     } catch (errorData) {
       const formError = errorData as ApiError;
       const errors: any = formError.response.data as typeof formErrors;
-      setFormErrors({...formError, ...errors})
+      setFormErrors({...formError, ...errors});
+      console.log(errorData);
       return { data: undefined, error: formError.response.data };
     }
   };

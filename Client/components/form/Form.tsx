@@ -22,10 +22,10 @@ const Form: React.FC<FormProps> = ({
   activeTab,
   setActiveTab,
   tabCount,
-  className,
+  className = "",
 }) => {
   return (
-    <div className={FORM_CONTAINER}>
+    <div className="w-full min-h-50vh bg-grey-300 border-grey-900 border-solid border shadow-sm rounded-2xl mx-auto my-32 relative mdl:w-7/12">
       {title && <Title3>{title}</Title3>}
       {tabCount && (
         <FormTabs
@@ -34,7 +34,10 @@ const Form: React.FC<FormProps> = ({
           tabCount={tabCount}
         />
       )}
-      <form className={`${className} w-10/12 pt-7 mx-auto`} onSubmit={onSubmit}>
+      <form
+        className={`${className} w-7/12 pt-7 mx-auto px-5 mb-30 mdl:w-7/12`}
+        onSubmit={onSubmit}
+      >
         {children}
         {action && (
           <input

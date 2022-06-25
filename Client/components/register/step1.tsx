@@ -12,7 +12,7 @@ const Step1: React.FC<FormStepProps> = ({
   setErrors,
 }) => {
   return (
-    <>
+    <div className="mx-auto">
       <Controller
         name="lnaam"
         control={control}
@@ -26,6 +26,7 @@ const Step1: React.FC<FormStepProps> = ({
             onBlur={onBlur}
             errors={errors}
             setErrors={setErrors}
+            extra="3xs:min-w-2xs"
           />
         )}
       />
@@ -42,6 +43,7 @@ const Step1: React.FC<FormStepProps> = ({
             onBlur={onBlur}
             errors={errors}
             setErrors={setErrors}
+            extra="3xs:min-w-2xs"
           />
         )}
       />
@@ -58,10 +60,11 @@ const Step1: React.FC<FormStepProps> = ({
             onBlur={onBlur}
             errors={errors}
             setErrors={setErrors}
+            extra="3xs:min-w-2xs"
           />
         )}
       />
-      <FormRow>
+      <FormRow className="flex-wrap">
         <Controller
           name="straat"
           control={control}
@@ -70,6 +73,7 @@ const Step1: React.FC<FormStepProps> = ({
               label="straat"
               name="straat"
               id="straat"
+              extra="w-full 3xs:min-w-2xs sm:w-1/2"
               value={value}
               onChange={onChange}
               onBlur={onBlur}
@@ -78,42 +82,44 @@ const Step1: React.FC<FormStepProps> = ({
             />
           )}
         />
-        <Controller
-          name="nr"
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <FormInput
-              label="nr"
-              name="nr"
-              id="nr"
-              extra="w-1/6"
-              value={value}
-              onChange={onChange}
-              onBlur={onBlur}
-              errors={errors}
-              setErrors={setErrors}
-            />
-          )}
-        />
-        <Controller
-          name="bus"
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <FormInput
-              label="bus"
-              name="bus"
-              id="bus"
-              extra="w-1/6"
-              value={value}
-              onChange={onChange}
-              onBlur={onBlur}
-              errors={errors}
-              setErrors={setErrors}
-            />
-          )}
-        />
+        <FormRow className="w-full 3xs:min-w-2xs sm:w-1/3 gap-5 flex-wrap">
+          <Controller
+            name="nr"
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <FormInput
+                label="nr"
+                name="nr"
+                id="nr"
+                extra="w-1/3 min-w-4xs"
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+                errors={errors}
+                setErrors={setErrors}
+              />
+            )}
+          />
+          <Controller
+            name="bus"
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <FormInput
+                label="bus"
+                name="bus"
+                id="bus"
+                extra="w-1/3 min-w-4xs"
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+                errors={errors}
+                setErrors={setErrors}
+              />
+            )}
+          />
+        </FormRow>
       </FormRow>
-      <FormRow>
+      <FormRow className="3xs:min-w-2xs flex-wrap gap-5">
         <Controller
           name="gemeente"
           control={control}
@@ -122,7 +128,7 @@ const Step1: React.FC<FormStepProps> = ({
               label="gemeente"
               name="gemeente"
               id="gemeente"
-              extra="w-1/2"
+              extra="w-1/2 3xs:min-w-3xs"
               value={value}
               onChange={onChange}
               onBlur={onBlur}
@@ -139,7 +145,7 @@ const Step1: React.FC<FormStepProps> = ({
               label="postcode"
               name="postcode"
               id="postcode"
-              extra="w-1/6"
+              extra="w-1/3 min-w-4xs"
               value={value}
               onChange={onChange}
               onBlur={onBlur}
@@ -157,7 +163,7 @@ const Step1: React.FC<FormStepProps> = ({
             label="telefoon"
             name="gsm"
             id="gsm"
-            extra="w-1/2"
+            extra="w-full 3xs:min-w-2xs"
             value={value}
             onChange={onChange}
             onBlur={onBlur}
@@ -167,7 +173,7 @@ const Step1: React.FC<FormStepProps> = ({
         )}
       />
       <Button type="form" label="volgende" onClick={() => setActiveTab(2)} />
-    </>
+    </div>
   );
 };
 

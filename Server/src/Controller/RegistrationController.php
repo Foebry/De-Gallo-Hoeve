@@ -29,7 +29,7 @@ use App\Services\MailService;
          * @Route("/api/register", name="register", methods={"POST"})
          */
         public function register( Request $request, EntityLoader $loader, CustomHelper $helper, EntityManagerInterface $em, MailService $mailService ){
-
+            $this->loader->getDbm()->logger->info("testing register");
             $payload = json_decode( $request->getContent(), true );
 
             $loader->checkPayloadForKeys( $payload, ["honden"] );

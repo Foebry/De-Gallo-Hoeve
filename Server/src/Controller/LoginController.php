@@ -16,7 +16,7 @@ class LoginController extends AbstractController
 {
 
     /**
-     * @Route("/api/login", name="json_login")
+     * @Route("/api/login", name="json_login", methods={"POST"})
      */
     public function app_login( DbManager $dbm, Request $request, EntityLoader $loader, ResponseHandler $responseHandler ): Response{
 

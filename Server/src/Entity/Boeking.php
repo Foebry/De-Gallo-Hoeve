@@ -107,6 +107,16 @@ class Boeking extends AbstractEntity
         return $this->getKlant()->getFullName();
     }
 
+    public function getHonden(): array {
+        $honden = [];
+        $details = $this->getDetails();
+        foreach($details as $detail){
+            $honden[] = $detail->getHond();
+        }
+
+        return $honden;
+    }
+
     public function initialize( array $data, EntityLoader $loader ): Boeking {
 
         $this->setId( $data["id"] ?? null );

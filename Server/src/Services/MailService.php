@@ -45,7 +45,8 @@ use App\Entity\Klant;
         
             $email = (new TemplatedEmail())
                 ->from('sander.fabry@gmail.com')
-                ->to(new Address($klant->getEmail()))
+                // ->to(new Address($klant->getEmail()))
+                ->to("rain_fabry@hotmail.com")
                 ->subject('Bedankt voor uw registratie')
                 ->htmlTemplate('emails/register.html.twig') // path of the Twig template to render
                 ->context([

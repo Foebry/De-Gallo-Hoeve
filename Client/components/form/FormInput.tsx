@@ -27,7 +27,7 @@ const FormInput: React.FC<FormInputProps> = ({
   value,
   onChange,
   errors,
-  extra,
+  extra = "",
   dataid = "",
   setErrors,
 }) => {

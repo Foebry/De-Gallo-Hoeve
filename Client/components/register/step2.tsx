@@ -88,7 +88,7 @@ const step2: React.FC<Props> = ({
                   />
                 )}
               />
-              <FormRow className="mt-5">
+              <FormRow className="mt-5 flex-wrap gap-5">
                 <Controller
                   name={`honden.${index}.geslacht`}
                   control={control}
@@ -108,7 +108,7 @@ const step2: React.FC<Props> = ({
                       label="chipNr"
                       name={`honden.${index}.chip_nr`}
                       id={`honden.${index}.chip_nr`}
-                      extra="w-1/2"
+                      extra="w-full 3xs:min-w-2xs sm:w-1/2"
                       value={value}
                       onChange={onChange}
                       onBlur={onBlur}
@@ -141,7 +141,7 @@ const step2: React.FC<Props> = ({
             </Details>
             <span
               onClick={() => remove(index)}
-              className="absolute capitalize tracking-wide border-solid rounded-md py-1 px-1.5 text-gray-100 bg-red-900 border-green-200 hover:cursor-pointer hover:border-none -right-48 bottom-auto top-5"
+              className="absolute capitalize tracking-wide border-solid rounded-md py-1 px-1.5 text-gray-100 bg-red-900 border-green-200 hover:cursor-pointer hover:border-none right-0 -top-10 bottom-auto"
             >
               verwijder
             </span>

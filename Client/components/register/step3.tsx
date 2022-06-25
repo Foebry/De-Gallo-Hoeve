@@ -8,7 +8,7 @@ import { FormStepProps } from "../form/FormTabs";
 const step3: React.FC<FormStepProps> = ({ control, errors, setErrors }) => {
   return (
     <div className="flex flex-col gap-20">
-      <FormRow>
+      <FormRow className="flex-wrap gap-5">
         <Controller
           name="password"
           control={control}
@@ -17,7 +17,7 @@ const step3: React.FC<FormStepProps> = ({ control, errors, setErrors }) => {
               label="wachtwoord"
               name="password"
               id="password"
-              extra="w-1/3"
+              extra="w-full 3xs:min-w-2xs sm:w-1/3"
               value={value}
               onChange={onChange}
               onBlur={onBlur}
@@ -35,7 +35,7 @@ const step3: React.FC<FormStepProps> = ({ control, errors, setErrors }) => {
               label="herhaal"
               name="password_verification"
               id="password_verification"
-              extra="w-1/3"
+              extra="w-full 3xs:min-w-2xs sm:w-1/3"
               value={value}
               onChange={onChange}
               onBlur={onBlur}

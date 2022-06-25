@@ -75,7 +75,11 @@ class Hond extends AbstractEntity
         $this->boekings = new ArrayCollection();
         $this->inschrijvingen = new ArrayCollection();
         $this->helper = new CustomHelper();
-        $this->logger = new Logger();
+    }
+
+    public function __toString()
+    {
+        return $this->getNaam();
     }
 
     public function getId(): ?int

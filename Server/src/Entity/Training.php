@@ -46,6 +46,11 @@ class Training
         $this->inschrijvingen = new ArrayCollection();
     }
 
+    public function __toString()
+    {
+        return $this->getNaam();
+    }
+
     public function getId(): ?int
     {
         return $this->id;

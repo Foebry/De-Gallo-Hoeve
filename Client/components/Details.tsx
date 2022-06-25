@@ -30,7 +30,7 @@ const Details: React.FC<DetailsProps> = ({
       >
         {button && (
           <span
-            className="absolute -left-30 -top-6 w-5 h-5 text-sm text-center bg-green-300 text-gray-100 pointer-events-auto"
+            className="absolute left-0 -top-10 w-5 h-5 text-sm text-center bg-green-300 text-gray-100 pointer-events-auto"
             onClick={handleToggle}
           >
             {isOpen ? "-" : "+"}
