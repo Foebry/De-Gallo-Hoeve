@@ -1,5 +1,6 @@
 import { Body, Title2 } from "../components/Typography/Typography";
 import Image from "../components/Image";
+import NextImage from "next/image";
 import { ImageProps } from "../components/Image";
 import Service, { ServiceProps } from "../components/Service";
 import {
@@ -9,6 +10,7 @@ import {
 } from "../types/styleTypes";
 import getData from "../hooks/useApi";
 import { CONTENT_INDEXAPI, DIENSTENAPI, IMAGESAPI } from "../types/apiTypes";
+import { nanoid } from "nanoid";
 
 interface IndexProps {
   images: ImageProps[];
@@ -29,7 +31,7 @@ const Index: React.FC<IndexProps> = ({
       <section className={SECTION_DARKER}>
         <div className={SECTION_CONTENT}>
           <div className="w-95p xs:w-1/2 mx-auto shadow-md">
-            <img
+            <NextImage
               className="w-full border-solid border-2 border-gray-100 rounded block aspect-3/4 h-auto"
               src={frontImage}
               alt="hond duitse herder gallo-hoeve"
@@ -38,7 +40,7 @@ const Index: React.FC<IndexProps> = ({
           <div className="block align-center gap-12 p24 mx-auto md:max-w-2/3">
             <Title2>Wie zijn we?</Title2>
             {content.map((paragraph) => (
-              <Body>{paragraph}</Body>
+              <Body key={nanoid(5)}>{paragraph}</Body>
             ))}
           </div>
         </div>
@@ -53,8 +55,8 @@ const Index: React.FC<IndexProps> = ({
       </section>
       <section className={SECTION_DARKER}>
         <div className="flex flex-grow flex-shrink flex-wrap gap-2.5 justify-center">
-          {images.map(({ id, ...rest }) => (
-            <Image key={id} id={id} {...rest} />
+          {images.map(({ id, source, alt }) => (
+            <Image key={id} id={id} source={source} alt={alt} />
           ))}
         </div>
       </section>

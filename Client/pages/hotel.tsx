@@ -1,3 +1,5 @@
+import { nanoid } from "nanoid";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import React from "react";
 import Button from "../components/buttons/Button";
@@ -24,7 +26,7 @@ const Hotel: React.FC<HotelProps> = ({
     <section className={SECTION_DARKER}>
       <div className={SECTION_CONTENT}>
         <div className="w-95p xs:w-1/2 mx-auto shadow-md">
-          <img
+          <Image
             className="w-full border-solid border-2 border-gray-100 rounded block aspect-3/4 h-auto"
             src="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656192393/De-Gallo-Hoeve/images/65535_52063773527_a0d5f448de_300_400_nofilter_zcu4bp.jpg"
             alt=""
@@ -37,7 +39,7 @@ const Hotel: React.FC<HotelProps> = ({
             <Link to="register">registratie</Link>.
           </Body>
           {reserveren.map((paragraph) => (
-            <Body>{paragraph}</Body>
+            <Body key={nanoid(5)}>{paragraph}</Body>
           ))}
           <FormRow>
             <Button
@@ -48,11 +50,11 @@ const Hotel: React.FC<HotelProps> = ({
           </FormRow>
           <Title2>Verblijven</Title2>
           {verblijven.map((paragraph) => (
-            <Body>{paragraph}</Body>
+            <Body key={nanoid(5)}>{paragraph}</Body>
           ))}
           <Title2>Wat verwachten wij van u?</Title2>
           {verwachtingen.map((paragraph) => (
-            <Body>{paragraph}</Body>
+            <Body key={nanoid(5)}>{paragraph}</Body>
           ))}
         </div>
       </div>

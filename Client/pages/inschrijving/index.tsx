@@ -6,6 +6,7 @@ import { Title2 } from "../../components/Typography/Typography";
 import { INSCHRIJVING_GROEP, INSCHRIJVING_PRIVE } from "../../types/linkTypes";
 import { SECTION_DARKER } from "../../types/styleTypes";
 import { Body } from "../../components/Typography/Typography";
+import Image from "next/image";
 
 const Index = () => {
   const router = useRouter();
@@ -15,7 +16,7 @@ const Index = () => {
         <div className="md:w-5/12">
           <Title2>Prive training</Title2>
           <div className="xs:w-3/4 mx-auto mb-2">
-            <img
+            <Image
               src="https://loremflickr.com/400/400/dogs"
               alt=""
               className="block w-full aspect-square"
@@ -48,7 +49,7 @@ const Index = () => {
         <div className="md:w-5/12">
           <Title2>Groepstraining</Title2>
           <div className="xs:w-3/4 mx-auto mb-2">
-            <img
+            <Image
               src="https://loremflickr.com/400/400/dogs"
               alt=""
               className="block w-full aspect-square"

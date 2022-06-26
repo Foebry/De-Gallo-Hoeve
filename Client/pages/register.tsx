@@ -143,7 +143,6 @@ export default Register;
 
 export const getStaticProps = async () => {
   const { data } = await getData(RASSEN);
-  console.log(data);
   const rassen = data.map((ras: { id: number; naam: string }) => ({
     value: ras.id,
     label: ras.naam,
@@ -152,5 +151,6 @@ export const getStaticProps = async () => {
     props: {
       rassen,
     },
+    revalidate: 86400,
   };
 };

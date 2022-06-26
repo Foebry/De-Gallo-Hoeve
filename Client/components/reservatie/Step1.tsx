@@ -60,7 +60,7 @@ const Step1: React.FC<Props> = ({
       const { data } = await getData(KLANT_HONDEN, { klantId });
       setHonden(data);
     })();
-  }, []);
+  }, [klantId]);
 
   const options = useMemo(() => {
     return honden.map(({ naam: label, id: value, avatar }: any) => ({

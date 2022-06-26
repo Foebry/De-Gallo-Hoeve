@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useRouter } from "next/router";
 import React from "react";
 import { Caption } from "./Typography/Typography";
@@ -26,7 +27,7 @@ const Service: React.FC<ServiceProps> = ({
         className="shadow-sm w-full rounded-sm hover:cursor-pointer hover:shadow-none hover:ml-1"
         onClick={() => router.push(link)}
       >
-        <img
+        <Image
           className="block rounded-sm w-full aspect-3/2"
           src={image}
           alt={alt}

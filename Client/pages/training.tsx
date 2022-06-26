@@ -1,3 +1,5 @@
+import { nanoid } from "nanoid";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import React from "react";
 import Button from "../components/buttons/Button";
@@ -29,7 +31,7 @@ const Trainingen: React.FC<TrainingProps> = ({
       <section className={SECTION_DARKER}>
         <div className={SECTION_CONTENT}>
           <div className="w-95p xs:w-1/2 mx-auto shadow-md">
-            <img
+            <Image
               className="w-full border-solid border-2 border-gray-100 rounded block aspect-3/4 h-auto"
               src={groupImg}
               alt=""
@@ -38,9 +40,8 @@ const Trainingen: React.FC<TrainingProps> = ({
           <div className="block align-center gap-12 p24 mx-auto md:max-w-2/3">
             <Title2>Groepstrainingen</Title2>
             {groupContent.map((paragraph) => (
-              <Body>{paragraph}</Body>
+              <Body key={nanoid(5)}>{paragraph}</Body>
             ))}
-            <Caption>Groepslessen gaan door op zondag.</Caption>
             <FormRow className="mt-2">
               <Button
                 className="mx-auto"
@@ -56,12 +57,8 @@ const Trainingen: React.FC<TrainingProps> = ({
           <div className="block align-center gap-12 p24 mx-auto md:max-w-2/3">
             <Title2>Privétrainingen</Title2>
             {priveContent.map((paragraph) => (
-              <Body>{paragraph}</Body>
+              <Body key={nanoid(5)}>{paragraph}</Body>
             ))}
-            <Body>
-              Vraag een privétraining aan voor woensdag, vrijdag of zaterdag.
-              Voor een privéles vragen we een bijdrage van €23.90
-            </Body>
             <FormRow className="mt-2 mb-10">
               <Button
                 className="mx-auto"
@@ -71,7 +68,7 @@ const Trainingen: React.FC<TrainingProps> = ({
             </FormRow>
           </div>
           <div className="w-95p xs:w-1/2 mx-auto shadow-md">
-            <img
+            <Image
               className="w-full border-solid border-2 border-gray-100 rounded block aspect-3/4 h-auto"
               src={priveImg}
               alt=""
