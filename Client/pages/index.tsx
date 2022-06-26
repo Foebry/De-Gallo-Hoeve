@@ -1,6 +1,5 @@
 import { Body, Title2 } from "../components/Typography/Typography";
 import Image from "../components/Image";
-import NextImage from "next/image";
 import { ImageProps } from "../components/Image";
 import Service, { ServiceProps } from "../components/Service";
 import {
@@ -9,32 +8,26 @@ import {
   SECTION_LIGHTER,
 } from "../types/styleTypes";
 import getData from "../hooks/useApi";
-import { CONTENT_INDEXAPI, DIENSTENAPI, IMAGESAPI } from "../types/apiTypes";
+import { CONTENT_INDEXAPI } from "../types/apiTypes";
 import { nanoid } from "nanoid";
 
 interface IndexProps {
   images: ImageProps[];
   services: ServiceProps[];
-  content: {
-    content: string[];
-    image: string;
-  };
+  content: string[];
+  image: string;
 }
 
-const Index: React.FC<IndexProps> = ({
-  images,
-  services,
-  content: { content, image: frontImage },
-}) => {
+const Index: React.FC<IndexProps> = ({ images, services, content, image }) => {
   return (
     <>
       <section className={SECTION_DARKER}>
         <div className={SECTION_CONTENT}>
           <div className="w-95p xs:w-1/2 mx-auto shadow-md">
-            <NextImage
+            <img
               className="w-full border-solid border-2 border-gray-100 rounded block aspect-3/4 h-auto"
-              src={frontImage}
-              alt="hond duitse herder gallo-hoeve"
+              src={image}
+              alt=""
             />
           </div>
           <div className="block align-center gap-12 p24 mx-auto md:max-w-2/3">
@@ -55,8 +48,8 @@ const Index: React.FC<IndexProps> = ({
       </section>
       <section className={SECTION_DARKER}>
         <div className="flex flex-grow flex-shrink flex-wrap gap-2.5 justify-center">
-          {images.map(({ id, source, alt }) => (
-            <Image key={id} id={id} source={source} alt={alt} />
+          {images.map(({ id, ...rest }) => (
+            <Image key={id} {...rest} />
           ))}
         </div>
       </section>
@@ -67,17 +60,16 @@ const Index: React.FC<IndexProps> = ({
 export default Index;
 
 export const getStaticProps = async () => {
-  const [services, images, content] = await Promise.all([
-    getData(DIENSTENAPI),
-    getData(IMAGESAPI),
-    getData(CONTENT_INDEXAPI),
-  ]);
+  const {
+    data: { images, diensten: services, content, image },
+  } = await getData(CONTENT_INDEXAPI);
 
   return {
     props: {
-      images: images.data,
-      services: services.data,
-      content: content.data,
+      images,
+      services,
+      content,
+      image,
     },
     revalidate: 3600,
   };

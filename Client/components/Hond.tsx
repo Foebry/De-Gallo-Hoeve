@@ -9,7 +9,6 @@ import {
   UseFieldArrayRemove,
 } from "react-hook-form";
 import Details from "./Details";
-import Image from "next/image";
 
 interface HondProps {
   naam: string;
@@ -50,7 +49,7 @@ const Hond: React.FC<HondProps> = ({
     <div className="border-solid border-2 border-black-100 rounded px-2 py-4 my-2">
       <div className="flex gap-5 justify-between items-center">
         <div className="w-25 aspect-square">
-          <Image
+          <img
             src={avatar}
             alt=""
             className="w-full object-cover aspect-square"

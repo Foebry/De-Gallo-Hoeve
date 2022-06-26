@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { useRouter } from "next/router";
 import React from "react";
 import { Caption } from "./Typography/Typography";
@@ -9,7 +8,7 @@ export interface ServiceProps {
   caption: string;
   image: string;
   summary: string;
-  alt: string;
+  alt?: string;
   link: string;
 }
 
@@ -17,7 +16,7 @@ const Service: React.FC<ServiceProps> = ({
   caption,
   image,
   summary,
-  alt,
+  alt = "",
   link,
 }) => {
   const router = useRouter();
@@ -27,7 +26,7 @@ const Service: React.FC<ServiceProps> = ({
         className="shadow-sm w-full rounded-sm hover:cursor-pointer hover:shadow-none hover:ml-1"
         onClick={() => router.push(link)}
       >
-        <Image
+        <img
           className="block rounded-sm w-full aspect-3/2"
           src={image}
           alt={alt}

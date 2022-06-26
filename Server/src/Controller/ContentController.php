@@ -18,32 +18,36 @@ use Symfony\Component\Routing\Annotation\Route;
         }
 
         /**
-         * @Route("/api/images")
-         */
-        public function getImages(): Response{
-            $data = $this->dbm->query("select * from image");
-            $images = [];
-
-            $indexes = array_rand($data, 12);
-            foreach($indexes as $index){
-                $images[] = $data[$index];
-            }
-
-            return $this->json($images);
-        }
-
-        /**
          * @Route("api/content/index")
          */
         public function getIndexContent(): Response {
-            $data = $this->dbm->query("select `content`, image from content where id = 1")[0];
-            $content = [
-                "content" => explode("\n", base64_decode($data["content"])),
-                "image" => $data["image"],
+            $content = $this->dbm->query("select `content`, image from content where id = 1")[0];
+            $imagesData = $this->dbm->query("select * from image");
+            $dienstenData = $this->dbm->query("select id, image, summary, caption, link from dienst");
+
+            $images = [];
+            $indexes = array_rand($imagesData, 12);
+            foreach($indexes as $index){
+                $images[] = $imagesData[$index];
+            }
+            
+            $diensten = [];
+            foreach($dienstenData as $dienst){
+                $this->dbm->logger->info("dienst:".json_encode($dienst));
+                $dienst["summary"] = explode("\n", base64_decode($dienst["summary"]));
+                $diensten[] = $dienst;
+            }
+
+
+            $data = [
+                "content" => explode("\n", base64_decode($content["content"])),
+                "image" => $content["image"],
+                "images" => $images,
+                "diensten" => $diensten
             ];
 
 
-            return $this->json($content);
+            return $this->json($data);
         }
 
         /**

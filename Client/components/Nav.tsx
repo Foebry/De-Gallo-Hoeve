@@ -5,7 +5,6 @@ import { Title3 } from "./Typography/Typography";
 import useMutation from "../hooks/useMutation";
 import { LOGOUT } from "../types/apiTypes";
 import getData from "../hooks/useApi";
-import Image from "next/image";
 
 export const Nav = () => {
   const [userName, setUserName] = useState<string | null>();
@@ -25,7 +24,7 @@ export const Nav = () => {
   return (
     <div className="relative hidden md:flex justify-between h-16 rounded-l-4xl items-center  max-w-8xl my-10 mx-auto w-98p bg-grey-500">
       <div className="w-24">
-        <Image
+        <img
           className="block w-full rounded-full aspect-square object-contain rotate-y-180 bg-grey-100"
           src={`${process.env.NEXT_PUBLIC_IMAGES}/logo-r.png`}
           alt=""
@@ -67,7 +66,7 @@ export const MobileNav = () => {
   return (
     <div className="visible md:invisible">
       <div className="navigation__logo">
-        <Image src="./images/logo.png" alt="" />
+        <img src="./images/logo.png" alt="" />
       </div>
       <nav className="burger">
         <ul>

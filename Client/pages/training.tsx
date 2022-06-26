@@ -1,10 +1,9 @@
 import { nanoid } from "nanoid";
-import Image from "next/image";
 import { useRouter } from "next/router";
 import React from "react";
 import Button from "../components/buttons/Button";
 import FormRow from "../components/form/FormRow";
-import { Body, Caption, Title2 } from "../components/Typography/Typography";
+import { Body, Title2 } from "../components/Typography/Typography";
 import getData from "../hooks/useApi";
 import { CONTENT_TRAININGAPI } from "../types/apiTypes";
 import { INSCHRIJVING_GROEP, INSCHRIJVING_PRIVE } from "../types/linkTypes";
@@ -31,7 +30,7 @@ const Trainingen: React.FC<TrainingProps> = ({
       <section className={SECTION_DARKER}>
         <div className={SECTION_CONTENT}>
           <div className="w-95p xs:w-1/2 mx-auto shadow-md">
-            <Image
+            <img
               className="w-full border-solid border-2 border-gray-100 rounded block aspect-3/4 h-auto"
               src={groupImg}
               alt=""
@@ -68,7 +67,7 @@ const Trainingen: React.FC<TrainingProps> = ({
             </FormRow>
           </div>
           <div className="w-95p xs:w-1/2 mx-auto shadow-md">
-            <Image
+            <img
               className="w-full border-solid border-2 border-gray-100 rounded block aspect-3/4 h-auto"
               src={priveImg}
               alt=""
