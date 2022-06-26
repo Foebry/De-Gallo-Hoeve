@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Services\DbManager;
 use App\Services\EntityLoader;
+use App\Services\Logger;
 use App\Services\ResponseHandler;
 use App\Services\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -53,9 +54,9 @@ class LoginController extends AbstractController
      */
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        // if ($this->getUser()) {
-        //     return $this->redirectToRoute('target_path');
-        // }
+        if ($this->getUser()) {
+            return $this->redirectToRoute('admin');
+        }
 
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
@@ -66,7 +67,7 @@ class LoginController extends AbstractController
     }
 
     /**
-     * @Route("/api/logout", name="app_logout")
+     * @Route("/logout", name="app_logout")
      */
     public function logout(): void
     {

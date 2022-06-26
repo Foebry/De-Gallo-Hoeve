@@ -151,6 +151,9 @@ module.exports = {
         "5vmax": "5vmax",
         "8vmin": "8vmin",
       },
+      lineHeight: {
+        12: "50px",
+      },
     },
   },
   plugins: [],

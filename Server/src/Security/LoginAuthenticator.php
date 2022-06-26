@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use App\Services\Logger;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,6 +23,7 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
     public const LOGIN_ROUTE = 'app_login';
 
     private $urlGenerator;
+    private $logger;
 
     public function __construct(UrlGeneratorInterface $urlGenerator)
     {

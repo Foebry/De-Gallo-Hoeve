@@ -129,6 +129,14 @@ class Validator {
         return intval( $value );
     }
 
+    function validateCSRF( $payload ){
+        $incorrect_csrf = !in_array("csrf", array_keys($payload)) || $payload["csrf"] != $_ENV["CSRF"];
+        $incorrect_csrf && $this->responseHandler
+                                ->unprocessableEntity(["failure" => "Uw verzoek kan niet worden verwerkt. Probeer het later opnieuw."]);
+        
+        
+    }
+
     /**
      * geeft tabelnaam terug die van toepassing is voor de huidige request.
      * @return string

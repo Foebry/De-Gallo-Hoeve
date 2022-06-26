@@ -15,9 +15,7 @@ import { RegisterHondInterface } from "../../types/formTypes/registerTypes";
 import { INDEX } from "../../types/linkTypes";
 import { SECTION_DARKER } from "../../types/styleTypes";
 
-export interface LessenProps {
-  disabledDays: string[];
-}
+export interface LessenProps {}
 
 export interface InschrijvingErrorInterface {
   hond_id?: number;
@@ -26,7 +24,7 @@ export interface InschrijvingErrorInterface {
   datum?: string;
 }
 
-const Privelessen: React.FC<LessenProps> = ({ disabledDays }) => {
+const Privelessen: React.FC<LessenProps> = () => {
   const router = useRouter();
 
   const { handleSubmit, control, getValues } = useForm();
@@ -35,12 +33,18 @@ const Privelessen: React.FC<LessenProps> = ({ disabledDays }) => {
   const [activeTab, setActiveTab] = useState<number>(1);
   const [errors, setErrors] = useState<InschrijvingErrorInterface>({});
   const [honden, setHonden] = useState<RegisterHondInterface[]>([]);
+  const [disabledDays, setDisabledDays] = useState<string[]>([]);
 
   useEffect(() => {
     (async () => {
       const klant_id = localStorage.getItem("id");
-      const { data } = await getData(KLANT_HONDEN, { klant_id });
-      setHonden(data);
+      const { data: honden } = await getData(KLANT_HONDEN, { klant_id });
+      const {
+        data: { prive: disabledDays },
+      } = await getData(GET_FUTURE_INSCHRIJVINGS);
+
+      setHonden(honden);
+      setDisabledDays(disabledDays.map((dag: { datum: string }) => dag.datum));
     })();
   }, []);
 

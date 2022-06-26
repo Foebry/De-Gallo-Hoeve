@@ -39,6 +39,7 @@ use Symfony\Component\HttpFoundation\Response;
          */
         function postBoeking(EntityManagerInterface $em, CustomHelper $helper): Response {
             $payload = json_decode( $this->request->getContent(), true );
+            $this->validator->validateCSRF($payload);
 
             $this->loader->checkPayloadForKeys( $payload, ["klant_id", "details"], [ "details" => ["message"=>"Gelieve minstens 1 hond aan te duiden"]]);
             if(count($payload["details"]) === 0) $this->responseHandler->badRequest(["message" => "Gelieve minstens 1 hond aan te duiden"]);
@@ -76,7 +77,7 @@ use Symfony\Component\HttpFoundation\Response;
 
             $data["details"] = $detailRows;
 
-            return $this->json( ["message" => "Uw boeking is goed ontvangen!"], 201 );           
+            return $this->json( ["success" => "Uw boeking is goed ontvangen!"], 201 );           
         }
 
         function checkBoekingPayload(): array {

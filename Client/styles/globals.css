@@ -14,6 +14,9 @@ body {
 * {
   box-sizing: border-box;
 }
+#__next {
+  position: relative;
+}
 
 .formInput:before {
   display: block;

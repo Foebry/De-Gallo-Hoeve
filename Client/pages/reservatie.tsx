@@ -5,13 +5,14 @@ import Form from "../components/form/Form";
 import Step1 from "../components/reservatie/Step1";
 import Step2 from "../components/reservatie/Step2";
 import { Title3 } from "../components/Typography/Typography";
+import { AppContext } from "../context/appContext";
 import getData from "../hooks/useApi";
 import useMutation, {
   handleErrors,
   structureDetailsPayload,
 } from "../hooks/useMutation";
 import { KLANT_HONDEN, RESERVATIEAPI } from "../types/apiTypes";
-import { LOGIN } from "../types/linkTypes";
+import { INDEX, LOGIN } from "../types/linkTypes";
 
 interface ReservatieProps {}
 
@@ -39,6 +40,7 @@ const Reservatie: React.FC<ReservatieProps> = () => {
     const id = localStorage.getItem("id");
     setKlantId(id);
   }, []);
+  const { setModal } = useContext(AppContext);
 
   const step1 = ["hond_id", "medicatie", "ontsnapping", "sociaal"];
 
@@ -49,6 +51,7 @@ const Reservatie: React.FC<ReservatieProps> = () => {
   const onSubmit = async (values: any) => {
     values = structureDetailsPayload(values);
     values.klant_id = klantId;
+    values.csrf = process.env.NEXT_PUBLIC_CSRF;
     const { data, error } = await makeReservation(
       RESERVATIEAPI,
       values,
@@ -56,7 +59,10 @@ const Reservatie: React.FC<ReservatieProps> = () => {
       setFormErrors
     );
     if (error) handleErrors(error);
-    else router.push(LOGIN);
+    else {
+      setModal({ active: true, message: data.success, type: "success" });
+      router.push(INDEX);
+    }
   };
 
   return (

@@ -1,9 +1,10 @@
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import Form from "../../components/form/Form";
 import Step1 from "../../components/inschrijving/Step1";
 import Step2 from "../../components/inschrijving/Step2";
+import { AppContext } from "../../context/appContext";
 import getData from "../../hooks/useApi";
 import useMutation from "../../hooks/useMutation";
 import {
@@ -16,7 +17,7 @@ import { INDEX } from "../../types/linkTypes";
 import { SECTION_DARKER } from "../../types/styleTypes";
 import { InschrijvingErrorInterface, LessenProps } from "./privelessen";
 
-const Groepslessen: React.FC<LessenProps> = ({ disabledDays }) => {
+const Groepslessen: React.FC<LessenProps> = () => {
   const router = useRouter();
 
   const { handleSubmit, control, getValues } = useForm();
@@ -25,12 +26,19 @@ const Groepslessen: React.FC<LessenProps> = ({ disabledDays }) => {
   const [activeTab, setActiveTab] = useState<number>(1);
   const [errors, setErrors] = useState<InschrijvingErrorInterface>({});
   const [honden, setHonden] = useState<RegisterHondInterface[]>([]);
+  const [disabledDays, setDisabledDays] = useState<string[]>([]);
+  const { setModal } = useContext(AppContext);
 
   useEffect(() => {
     (async () => {
       const klant_id = localStorage.getItem("id");
-      const { data } = await getData(KLANT_HONDEN, { klant_id });
-      setHonden(data);
+      const { data: honden } = await getData(KLANT_HONDEN, { klant_id });
+      const {
+        data: { groep: disabledDays },
+      } = await getData(GET_FUTURE_INSCHRIJVINGS);
+      console.log(disabledDays);
+      setHonden(honden);
+      setDisabledDays(disabledDays);
     })();
   }, []);
 
@@ -38,6 +46,7 @@ const Groepslessen: React.FC<LessenProps> = ({ disabledDays }) => {
     values.training_id = 2;
     values.klant_id = localStorage.getItem("id");
     values.datum = values.datum[0];
+    values.csrf = process.env.NEXT_PUBLIC_CSRF;
     const { data, error } = await inschrijving(
       POST_INSCHRIJVING,
       values,
@@ -45,7 +54,10 @@ const Groepslessen: React.FC<LessenProps> = ({ disabledDays }) => {
       setErrors
     );
     if (error) console.log(error);
-    else if (data) router.push(INDEX);
+    else if (data) {
+      setModal({ active: true, message: data.success, type: "success" });
+      router.push(INDEX);
+    }
   };
   return (
     <section className={SECTION_DARKER}>
@@ -83,16 +95,3 @@ const Groepslessen: React.FC<LessenProps> = ({ disabledDays }) => {
 };
 
 export default Groepslessen;
-
-export const getServerSideProps = async () => {
-  const { data: inschrijvingen } = await getData(GET_FUTURE_INSCHRIJVINGS);
-  const disabledDays = inschrijvingen.map(
-    (inschrijving: any) => inschrijving.datum
-  );
-
-  return {
-    props: {
-      disabledDays,
-    },
-  };
-};

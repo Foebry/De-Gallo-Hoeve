@@ -1,37 +1,21 @@
-import React, {
-  createContext,
-  Dispatch,
-  ReactNode,
-  SetStateAction,
-  useState,
-} from "react";
+import { createContext, useContext } from "react";
+import { ModalInterface } from "../components/Modal";
 
-export const AppContext = createContext<AppContextInterface | null>(null);
-
-export interface AppContextInterface {
-  children?: ReactNode;
-  requiresUpdate: boolean;
-  setRequiresUpdate: Dispatch<SetStateAction<boolean>>;
-  klantId: number | undefined;
-  setKlantId: Dispatch<SetStateAction<number | undefined>>;
+export type AppContent = {
+  modal: ModalContextInterface;
+  setModal: (modal: ModalContextInterface) => void;
+};
+export interface ModalContextInterface extends ModalInterface {
+  active: boolean;
 }
 
-const AppProvider: React.FC<{ children: any }> = ({ children }) => {
-  const [requiresUpdate, setRequiresUpdate] = useState<boolean>(false);
-  const [klantId, setKlantId] = useState<number>();
+export const AppContext = createContext<AppContent>({
+  modal: {
+    message: "",
+    type: "success",
+    active: false,
+  },
+  setModal: () => {},
+});
 
-  return (
-    <AppContext.Provider
-      value={{
-        requiresUpdate,
-        setRequiresUpdate,
-        klantId,
-        setKlantId,
-      }}
-    >
-      {children}
-    </AppContext.Provider>
-  );
-};
-
-export default AppProvider;
+export const useAppContext = () => useContext(AppContext);

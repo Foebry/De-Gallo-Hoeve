@@ -6,6 +6,7 @@ use Symfony\Component\Mime\Address;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 use App\Entity\Klant;
+use DateTime;
 
     class MailService {
 
@@ -26,6 +27,12 @@ use App\Entity\Klant;
                 case "register":
                     $this->sendRegisterMail( $info );
                     break;
+                case "inschrijving":
+                    $this->sendInschrijvingEmail( $info );
+                    break;
+                case "boeking":
+                    $this->sendBoekingEmail( $info );
+                    break;
                 default:
                     break;
             }
@@ -33,10 +40,12 @@ use App\Entity\Klant;
         }
 
         private function sendRegisterMail( Klant $klant ){
-            $this->dbm->logger->info("in sendRegisterMail");
 
             $randomCode = $this->helper->generateRandomString(30);
-            $this->dbm->generateInsertStatmentAndGetInsertId("confirm", ["klant_id" => $klant->getId(), "code" => $randomCode ]);
+            $created = new DateTime("now");
+            $this->dbm->query(
+                "insert into confirm set klant_id = :klant_id, code = :code, created_at = :created", 
+                ["klant_id" => $klant->getId(), "code" => $randomCode, "created" => $created->format("Y-m-d H:i:s")]);
 
             $plain_font = "font-family: 'Segoe UI', sans-serif; font-size: 16px;";
             $SP = '<p style="' . $plain_font . ' font-weight: normal; margin: 0; margin-bottom: 15px;">';
@@ -74,5 +83,43 @@ use App\Entity\Klant;
             ;
         
             $this->mailer->send($email);
+        }
+
+        function sendInschrijvingEmail(Klant $klant) {
+            $plain_font = "font-family: 'Segoe UI', sans-serif; font-size: 16px;";
+            $SP = '<p style="' . $plain_font . ' font-weight: normal; margin: 0; margin-bottom: 15px;">';
+            $EP = '</p>';
+        
+            $email = (new TemplatedEmail())
+                ->from('sander.fabry@gmail.com')
+                // ->to(new Address($klant->getEmail()))
+                ->to("rain_fabry@hotmail.com")
+                ->subject('Bedankt voor uw inschrijving')
+                ->htmlTemplate('emails/inschrijving.html.twig') // path of the Twig template to render
+                ->context([
+                    'MAIL_SUBJECT'
+                    => 'Bedankt voor uw registratie',
+                    'AANSPREKING'
+                    =>$SP . "Beste {$klant->getVnaam()}" . $EP,
+                    'BLOCK_VOOR_ACTION'
+                    =>$SP . 'U ontvangt deze email omdat u zich zonet heeft ingeschreven voor een training bij de Gallo-Hoeve' . $EP,
+                    'BLOCK_NA_ACTION'
+                    => $SP . 'Als u nog vragen hebt, aarzel niet om ons te contacteren. 
+                                        We zullen u met plezier verder helpen.<br><br>' . $EP,
+                    'SLOT_BEGROETING'
+                    => $SP . "Met vriendelijke groet,<br>De Gallo-hoeve". $EP,
+                    'font_fam_size_plain_text'
+                    => $plain_font,
+                    'footer_font_size'
+                    => "font-size: 14px;",
+                ])
+                //->attach( ... bijlage ...)
+            ;
+        
+            $this->mailer->send($email);
+        }
+
+        function sendBoekingEmail(Klant $klant) {
+
         }
     }

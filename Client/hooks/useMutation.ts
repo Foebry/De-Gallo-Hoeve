@@ -1,4 +1,6 @@
 import axios from "axios";
+import { useContext } from "react";
+import { AppContext } from "../context/appContext";
 
 interface ApiError {
   response: {
@@ -6,7 +8,10 @@ interface ApiError {
   };
 }
 
+
+
 const useMutation = () => {
+  const {setModal} = useContext(AppContext)
   const executerFunc = async (
     endpoint: string,
     payload: any,
@@ -32,6 +37,7 @@ const useMutation = () => {
       const errors: any = formError.response.data as typeof formErrors;
       setFormErrors({...formError, ...errors});
       console.log(errorData);
+      errors.failure && setModal({active:true, message: errors.failure, type:"failure"})
       return { data: undefined, error: formError.response.data };
     }
   };

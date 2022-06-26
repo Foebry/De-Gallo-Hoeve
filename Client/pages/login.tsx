@@ -10,6 +10,7 @@ import { useForm, Controller } from "react-hook-form";
 import useMutation from "../hooks/useMutation";
 import { LOGINAPI } from "../types/apiTypes";
 import { initializeLocalStorage } from "../helpers/localStorage";
+import nookies from "nookies";
 
 interface LoginErrorInterface {
   email?: string;
@@ -86,3 +87,12 @@ const Login: React.FC<{}> = () => {
 };
 
 export default Login;
+
+export const getServerSideProps = (ctx: any) => {
+  const cookies = nookies.get(ctx);
+  console.log("cookies:", cookies);
+
+  return {
+    props: {},
+  };
+};

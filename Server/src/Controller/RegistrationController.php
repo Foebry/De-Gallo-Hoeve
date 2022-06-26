@@ -13,6 +13,8 @@ use App\Entity\Hond;
 use App\Services\CustomHelper;
 use App\Services\DbManager;
 use App\Services\MailService;
+use \DateTime;
+use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 
     class RegistrationController extends AbstractController {
 
@@ -29,7 +31,6 @@ use App\Services\MailService;
          * @Route("/api/register", name="register", methods={"POST"})
          */
         public function register( Request $request, EntityLoader $loader, CustomHelper $helper, EntityManagerInterface $em, MailService $mailService ){
-            $this->loader->getDbm()->logger->info("testing register");
             $payload = json_decode( $request->getContent(), true );
 
             $loader->checkPayloadForKeys( $payload, ["honden"] );
@@ -53,9 +54,9 @@ use App\Services\MailService;
             }
             $em->flush();
 
-            $mailService->send("register", $klant);
+            // $mailService->send("register", $klant);
 
-            return $this->json( ["message"=>"Bedankt voor uw registratie! Gelieve uw registratie te bevestigen door op de knop 'bevestig registratie' te klikken in de email die we u hebben toegezonden.\n Geen mail ontvangen? bekijk dan zeker ook uw spam"], 201 );
+            return $this->json( ["success"=>"Hartelijk dank voor uw registratie! Bekijk zeker uw email om uw registratie te bevestigen"], 201 );
         }
 
 				/**
@@ -63,7 +64,11 @@ use App\Services\MailService;
 				 */
 				function confirmRegistration( string $code, DbManager $dbm, EntityManagerInterface $em ){
 
-					$klant_id = $dbm->query("select klant_id from confirm where code = :code", ["code" => $code])[0];
+					[$klant_id, $created_at] = $dbm->query("select klant_id, created_at from confirm where code = :code", ["code" => $code])[0];
+          if( new DateTime($created_at) > new DateTime("now - 1 hour")){
+            $this->render("expiredConfirm", ["code" => $code]);
+            exit();
+          }
 					$klant = $this->loader->getKlantBy(["id", $klant_id]);
 
 					$klant->setVerified(true);
@@ -76,5 +81,20 @@ use App\Services\MailService;
 					return $this->redirect("https://de-gallo-hoeve.vercel.app/");
 
 				}
+
+        /**
+         * @Route("/confirm/{code}/reset")
+         */
+        function resetConfirmRegistration(string $code, DbManager $dbm, CustomHelper $helper, MailService $mailService ){
+
+          $klant_id = $dbm->query("select klant_id from confirm where code = :code", ["code" => $code])[0];
+          $klant = $this->loader->getKlantBy(["id", $klant_id]);
+
+          $code = $helper->generateRandomString();
+          $dbm->query("update confirm set code = :code where klant_id = :klant_id", ["code" => $code, "klant_id" => $klant_id]);
+
+          $mailService->send("register", $klant);
+
+        }
 
     }

@@ -3,19 +3,27 @@ import type { AppProps } from "next/app";
 import Header from "../components/Header";
 import { Nav } from "../components/Nav";
 import Footer from "../components/Footer";
-import AppProvider from "../context/appContext";
+import { AppContext, ModalContextInterface } from "../context/appContext";
+import { useState } from "react";
+import Modal from "../components/Modal";
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const [modal, setModal] = useState<ModalContextInterface>({
+    active: false,
+    message: "",
+    type: "success",
+  });
   return (
     <>
-      <AppProvider>
+      <AppContext.Provider value={{ modal, setModal }}>
         <Header />
         <Nav />
-        <main>
+        <main className="relative">
+          {modal?.active && <Modal type={modal.type} message={modal.message} />}
           <Component {...pageProps} />
         </main>
         <Footer />
-      </AppProvider>
+      </AppContext.Provider>
     </>
   );
 }

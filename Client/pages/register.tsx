@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Form from "../components/form/Form";
 import { useRouter } from "next/router";
 import { LOGIN } from "../types/linkTypes";
@@ -14,6 +14,7 @@ import useMutation, {
   structureHondenPayload,
 } from "../hooks/useMutation";
 import { SECTION_DARKER } from "../types/styleTypes";
+import { AppContext } from "../context/appContext";
 
 interface RegisterHondErrorInterface {
   naam?: string;
@@ -51,6 +52,7 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
   const { fields, append, remove } = useFieldArray({ control, name: "honden" });
   const [activeTab, setActiveTab] = useState<number>(1);
   const [formErrors, setFormErrors] = useState<RegisterErrorInterface>({});
+  const { setModal } = useContext(AppContext);
   const step1 = [
     "vnaam",
     "lnaam",
@@ -87,8 +89,11 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
       registerErrors,
       setFormErrors
     );
-    if (data) router.push(LOGIN);
-    else if (error) handleErrors(error);
+    if (data) {
+      console.log(data);
+      setModal?.({ type: "success", active: true, message: data.success });
+      router.push(LOGIN);
+    } else if (error) handleErrors(error);
   };
 
   return (

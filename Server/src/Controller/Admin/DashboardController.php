@@ -23,6 +23,13 @@ class DashboardController extends AbstractDashboardController
     }
 
     /**
+     * @Route("/", name="home")
+     */
+    public function home(){
+        return $this->redirect("/admin");
+    }
+
+    /**
      * @Route("/admin", name="admin")
      */
     public function index(): Response
