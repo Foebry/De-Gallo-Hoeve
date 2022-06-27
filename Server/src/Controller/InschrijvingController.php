@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Inschrijving;
+use App\Services\AvailabilityChecker;
 use App\Services\DbManager;
 use App\Services\Validator;
 use App\Services\EntityLoader;
@@ -43,7 +44,7 @@ class InschrijvingController extends AbstractController{
     /**
      * @Route("/api/inschrijvings", name="post_inschrijving", methods={"POST"})
      */
-    function postInschrijving( Request $request, EntityLoader $loader, Validator $validator, ResponseHandler $responseHandler, EntityManagerInterface $em ) {
+    function postInschrijving( Request $request, EntityLoader $loader, Validator $validator, ResponseHandler $responseHandler, EntityManagerInterface $em, AvailabilityChecker $checker ) {
 
         $payload = json_decode($request->getContent(), true);
         $validator->validateCSRF($payload);
@@ -55,13 +56,15 @@ class InschrijvingController extends AbstractController{
 
         $dag = date("l", strtotime($payload["datum"]));
 
-        if( $payload["training_id"] == 1 && !in_array($dag, ["Wednesday, Saturday"]) ) $responseHandler->badRequest(["failure" => "Privé trainingen gaan enkel door op Woensdag en Zaterdag"]);
+        if( $payload["training_id"] == 1 && !in_array($dag, ["Wednesday", "Saturday"]) ) $responseHandler->badRequest(["failure" => "Privé trainingen gaan enkel door op Woensdag en Zaterdag"]);
         
         elseif( $payload["training_id"] === 2 && $dag !== "Sunday" ){
             $responseHandler->badRequest(["failure" => "Groepstrainingen gaan enkel door op Zondag"]);
         } 
         $inschrijvingen = $loader->getDbm()->query("select count(id) amount from inschrijving where id = :id and datum = :datum", ["id"=>$payload["training_id"], "datum"=>$payload["datum"]])[0]["amount"];
         if( $inschrijvingen >= 5 ) $responseHandler->badRequest(["failure" => "Deze training is helaas volboekt."]);
+
+        $checker->isKlantReedsIngeschrevenVoorTraining($klant, $payload["training_id"], $payload["datum"], $loader);
 
         $inschrijving = new Inschrijving();
         $inschrijving->initialize($payload, $loader);

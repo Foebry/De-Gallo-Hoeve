@@ -36,7 +36,6 @@ const Groepslessen: React.FC<LessenProps> = () => {
       const {
         data: { groep: disabledDays },
       } = await getData(GET_FUTURE_INSCHRIJVINGS);
-      console.log(disabledDays);
       setHonden(honden);
       setDisabledDays(disabledDays);
     })();

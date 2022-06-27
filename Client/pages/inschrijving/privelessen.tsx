@@ -1,9 +1,10 @@
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import Form from "../../components/form/Form";
 import Step1 from "../../components/inschrijving/Step1";
 import Step2 from "../../components/inschrijving/Step2";
+import { AppContext } from "../../context/appContext";
 import getData from "../../hooks/useApi";
 import useMutation from "../../hooks/useMutation";
 import {
@@ -34,6 +35,7 @@ const Privelessen: React.FC<LessenProps> = () => {
   const [errors, setErrors] = useState<InschrijvingErrorInterface>({});
   const [honden, setHonden] = useState<RegisterHondInterface[]>([]);
   const [disabledDays, setDisabledDays] = useState<string[]>([]);
+  const { setModal } = useContext(AppContext);
 
   useEffect(() => {
     (async () => {
@@ -52,6 +54,7 @@ const Privelessen: React.FC<LessenProps> = () => {
     values.training_id = 1;
     values.klant_id = localStorage.getItem("id");
     values.datum = values.datum[0];
+    values.csrf = process.env.NEXT_PUBLIC_CSRF;
     const { data, error } = await inschrijving(
       POST_INSCHRIJVING,
       values,
@@ -59,7 +62,10 @@ const Privelessen: React.FC<LessenProps> = () => {
       setErrors
     );
     if (error) console.log(error);
-    else if (data) router.push(INDEX);
+    else if (data) {
+      setModal({ active: true, message: data.success, type: "success" });
+      router.push(INDEX);
+    }
   };
   return (
     <section className={SECTION_DARKER}>

@@ -2,15 +2,15 @@
 
 namespace App\Controller;
 
+use DateTime;
 use App\Entity\Boeking;
 use App\Entity\BoekingDetail;
 use App\Services\CustomHelper;
-use DateTime;
 use App\Services\Validator;
 use App\Services\EntityLoader;
 use App\Services\ResponseHandler;
+use App\Services\AvailabilityChecker;
 use Doctrine\ORM\EntityManagerInterface;
-use Error;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Annotation\Route;
@@ -22,13 +22,15 @@ use Symfony\Component\HttpFoundation\Response;
         private $loader;
         private $responseHandler;
         private $request;
+        private $checker;
 
-        function __construct( Validator $validator, EntityLoader $loader, ResponseHandler $responseHandler, RequestStack $requestStack )
+        function __construct( Validator $validator, EntityLoader $loader, ResponseHandler $responseHandler, RequestStack $requestStack, AvailabilityChecker $checker )
         {
             $this->validator = $validator;
             $this->loader = $loader;
             $this->responseHandler = $responseHandler;
             $this->request = $requestStack->getCurrentRequest();
+            $this->checker = $checker;
         }
 
         /**
@@ -48,7 +50,7 @@ use Symfony\Component\HttpFoundation\Response;
             $klant = $this->loader->getKlantBy( ["id", $payload["klant_id"]] );
 
             $data = $this->checkBoekingPayload();
-            $this->loader->getDbm()->logger->info("checked BoekingPayload  -  BoekingController line 49");
+            $kennels = $this->checker->checkBoeking();
 
             /** @var Boeking $boeking */
             $boeking = $helper->create( Boeking::class, $data, $this->loader );
@@ -58,20 +60,28 @@ use Symfony\Component\HttpFoundation\Response;
             
             $detailRows = $this->checkDetailsPayload( $payload );
             
+            $index = 0;
             foreach( $detailRows as &$detailData ){
 
                 $hond = $this->loader->getHondById( $detailData["hond_id"]);
-                $this->loader->getDbm()->logger->info("Hond loaded  -  BoekingController line 62");
 
                 if( !$klant->isOwnerOf($hond) ) $this->responseHandler->unprocessableEntity(["message" => "Het lijkt dat deze hond niet bij jou hoort"]);
+                $this->checker->isHondNogNietGeboektTijdensBoekingPeriode($hond, $boeking->getStart(), $boeking->getEind());
+
+                $kennel_id = $kennels[$index];
+                $kennel = $this->loader->getKennelById($kennel_id);
 
                 $detailData["Boeking"] = $boeking;
+                $detailData["Kennel"] = $kennel;
+
                 /** @var BoekingDetail $detail */
                 $detail = $helper->create(BoekingDetail::class, $detailData, $this->loader);
                 $hond->addBoeking($detail);
                 $boeking->addDetail($detail);
 
                 $em->persist($detail);
+
+                $index += 1;
             }
             $em->flush();
 
@@ -83,11 +93,10 @@ use Symfony\Component\HttpFoundation\Response;
         function checkBoekingPayload(): array {
 
             $boekingData = $this->validator->validatePayload();
-            // $startValue = $boekingData["start"];
             $payload = json_encode( $boekingData );
 
             $this->loader->getDbm()->logger->info("payload: $payload -- BoekingController line 84");
-             $start = new DateTime( $boekingData["start"] );
+            $start = new DateTime( $boekingData["start"] );
             $this->loader->getDbm()->logger->info("created datetime from start -- BoekingController line 85");
             $eind = new DateTime( $boekingData["eind"] );
             $now = new DateTime();
