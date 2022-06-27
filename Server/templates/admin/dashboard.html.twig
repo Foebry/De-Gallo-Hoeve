@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+	<h1 class="title">De Gallo-hoeve</h1>
+	<section class="control">
+		<div class="control__item">
+			<h2 class="control__item__title">Inschrijvingen</h2>
+			<ul class="control__item__list">
+				<li class="control__item__list__item">Deze week:
+					<span class="amount">{{ subscriptions[0]["amount"] }}</span>
+					<span class="direction">(<span class={{ subscriptions[0]["direction"] > 0 ? "up" : "down"}}>{{ subscriptions[0]["direction"] }}</span>)</span>
+				</li>
+				<li class="control__item__list__item">Deze maand:
+					<span class="amount">{{ subscriptions[1]["amount"] }}</span>
+					<span class="direction">(<span class={{ subscriptions[1]["direction"] > 0 ? "up" : "down"}}>{{ subscriptions[1]["direction"] }}</span>)</span>
+				</li>
+				<li class="control__item__list__item">Dit jaar:
+					<span class="amount">{{ subscriptions[2]["amount"] }}</span>
+					<span class="direction">(<span class={{ subscriptions[2]["direction"] > 0 ? "up" : "down"}}>{{ subscriptions[2]["direction"] }}</span>)</span>
+				</li>
+			</ul>
+		</div>
+		<div class="control__item">
+			<h2 class="control__item__title">Boekingen</h2>
+			<ul class="control__item__list">
+				<li class="control__item__list__item">Deze week:
+					<span class="amount">{{ reservations[0]["amount"] }}</span>
+					<span class="direction">(<span class={{ reservations[0]["direction"] > 0 ? "up" : "down"}}>{{ reservations[0]["direction"] }}</span>)</span>
+				</li>
+				<li class="control__item__list__item">Deze maand:
+					<span class="amount">{{ reservations[1]["amount"] }}</span>
+					<span class="direction">(<span class={{ reservations[1]["direction"] > 0 ? "up" : "down"}}>{{ reservations[1]["direction"] }}</span>)</span>
+				</li>
+				<li class="control__item__list__item">Dit jaar:
+					<span class="amount">{{ reservations[2]["amount"] }}</span>
+					<span class="direction">(<span class={{ reservations[2]["direction"] > 0 ? "up" : "down"}}>{{ reservations[2]["direction"] }}</span>)</span>
+				</li>
+			</ul>
+		</div>
+	</section>
+	<button class="button">
+		<a href="/admin">Door naar dashboard</a>
+	</button>
+{% endblock %}

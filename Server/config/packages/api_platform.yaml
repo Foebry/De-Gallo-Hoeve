@@ -1,0 +1,34 @@
+# api_platform:
+#     mapping:
+#         paths: ['%kernel.project_dir%/src/Entity']
+#     patch_formats:
+#         json: ['application/merge-patch+json']
+#     swagger:
+#         versions: [3]
+#     formats:
+#             json :
+#                 mime_types : [ 'application/json' ]
+#             jsonld:
+#                 mime_types: ['application/ld+json']
+#             html:
+#                 mime_types: ['text/html']
+api_platform:
+    mapping:
+        paths: ['%kernel.project_dir%/src/Entity']
+    patch_formats:
+        json: ['application/merge-patch+json']
+    swagger:
+        versions: [3]
+        api_keys :
+            apiKey :
+                name : Authorization
+                type : header
+
+    # het eerste formaat is de default...
+    formats:
+        json :
+            mime_types : [ 'application/json' ]
+        jsonld:
+            mime_types: ['application/ld+json']
+        html:
+            mime_types: ['text/html']

@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  background-color: #cdcdcd;
+}
+
+* {
+  box-sizing: border-box;
+}
+#__next {
+  position: relative;
+}
+
+.formInput:before {
+  display: block;
+  position: absolute;
+  height: 1px;
+  content: "";
+  border-bottom: 2px solid #40909b;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+}
+header h1 {
+  text-shadow: -2px 2px 5px #cdcdcd;
+}
+.formInput:after {
+  display: block;
+  position: absolute;
+  height: 1px;
+  content: "";
+  border-bottom: 2px solid #40909b;
+  bottom: 0;
+  right: 50%;
+  width: 0;
+}
+
+.inputActive:before,
+.inputActive:after {
+  width: 50%;
+  transition: all 0.5s ease;
+}

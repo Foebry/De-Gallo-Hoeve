@@ -1,0 +1,82 @@
+@charset "UTF-8";
+* {
+  box-sizing: border-box;
+}
+
+.title {
+  text-align: center;
+  line-height: 200px;
+  font-size: 72px;
+}
+
+.control {
+  width: 95%;
+  max-width: 1280px;
+  display: flex;
+  gap: 50px;
+  margin: 0 auto;
+  justify-content: space-between;
+}
+.control__item {
+  border: 2px solid darkgrey;
+  width: 45%;
+  min-height: 500px;
+}
+.control__item__title {
+  text-align: center;
+  background-color: lightgrey;
+  line-height: 50px;
+  margin: 0;
+  border-bottom: 2px solid black;
+}
+.control__item__list {
+  list-style: none;
+  padding: 0;
+}
+.control__item__list__item {
+  width: 100%;
+  border: 1px solid darkgrey;
+  height: 50px;
+  margin-top: 30px;
+  line-height: 50px;
+  padding: 0 10%;
+  font-size: 32px;
+  position: relative;
+}
+.control__item__list__item span.amount {
+  position: absolute;
+  right: 150px;
+}
+.control__item__list__item span.direction {
+  position: absolute;
+  right: 30px;
+}
+.control__item__list__item span.direction span.up {
+  color: green;
+}
+.control__item__list__item span.direction span.up::after {
+  content: "▲";
+}
+.control__item__list__item span.direction span.down {
+  color: red;
+}
+.control__item__list__item span.direction span.down::after {
+  content: "▼";
+}
+
+.button {
+  position: absolute;
+  left: 50px;
+  top: 50px;
+  height: 60px;
+  line-height: 60px;
+  font-size: 20px;
+}
+.button a {
+  color: black;
+  text-decoration: none;
+  height: 100%;
+  width: 100%;
+}
+
+/*# sourceMappingURL=style.css.map */
