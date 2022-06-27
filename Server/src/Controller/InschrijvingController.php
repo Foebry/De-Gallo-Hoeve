@@ -44,7 +44,7 @@ class InschrijvingController extends AbstractController{
     /**
      * @Route("/api/inschrijvings", name="post_inschrijving", methods={"POST"})
      */
-    function postInschrijving( Request $request, EntityLoader $loader, Validator $validator, ResponseHandler $responseHandler, EntityManagerInterface $em, AvailabilityChecker $checker ) {
+    function postInschrijving( Request $request, EntityLoader $loader, Validator $validator, ResponseHandler $responseHandler, EntityManagerInterface $em, AvailabilityChecker $checker, MailService $mailService ) {
 
         $payload = json_decode($request->getContent(), true);
         $validator->validateCSRF($payload);
@@ -72,7 +72,7 @@ class InschrijvingController extends AbstractController{
         $em->persist($inschrijving);
         $em->flush();
 
-        // $mailService->send("inschrijving", $klant);
+        $mailService->send("inschrijving", $klant);
 
         return $this->json(["success" => "Uw inschrijving werd goed ontvangen!"], 201);
     }

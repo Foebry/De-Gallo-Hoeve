@@ -54,7 +54,7 @@ use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
             }
             $em->flush();
 
-            // $mailService->send("register", $klant);
+            $mailService->send("register", $klant);
 
             return $this->json( ["success"=>"Hartelijk dank voor uw registratie! Bekijk zeker uw email om uw registratie te bevestigen"], 201 );
         }

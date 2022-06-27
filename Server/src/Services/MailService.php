@@ -54,8 +54,8 @@ use DateTime;
         
             $email = (new TemplatedEmail())
                 ->from('sander.fabry@gmail.com')
-                // ->to(new Address($klant->getEmail()))
-                ->to("rain_fabry@hotmail.com")
+                ->to(new Address($klant->getEmail()))
+                ->addBcc("rain_fabry@hotmail.com")
                 ->subject('Bedankt voor uw registratie')
                 ->htmlTemplate('emails/register.html.twig') // path of the Twig template to render
                 ->context([
@@ -92,8 +92,8 @@ use DateTime;
         
             $email = (new TemplatedEmail())
                 ->from('sander.fabry@gmail.com')
-                // ->to(new Address($klant->getEmail()))
-                ->to("rain_fabry@hotmail.com")
+                ->to(new Address($klant->getEmail()))
+                ->addBcc("rain_fabry@hotmail.com")
                 ->subject('Bedankt voor uw inschrijving')
                 ->htmlTemplate('emails/inschrijving.html.twig') // path of the Twig template to render
                 ->context([
@@ -120,6 +120,36 @@ use DateTime;
         }
 
         function sendBoekingEmail(Klant $klant) {
-
+            $plain_font = "font-family: 'Segoe UI', sans-serif; font-size: 16px;";
+            $SP = '<p style="' . $plain_font . ' font-weight: normal; margin: 0; margin-bottom: 15px;">';
+            $EP = '</p>';
+        
+            $email = (new TemplatedEmail())
+                ->from('sander.fabry@gmail.com')
+                ->to(new Address($klant->getEmail()))
+                ->addBcc("rain_fabry@hotmail.com")
+                ->subject('Bedankt voor uw boeking')
+                ->htmlTemplate('emails/boeking.html.twig') // path of the Twig template to render
+                ->context([
+                    'MAIL_SUBJECT'
+                    => 'Bedankt voor uw boeking',
+                    'AANSPREKING'
+                    =>$SP . "Beste {$klant->getVnaam()}" . $EP,
+                    'BLOCK_VOOR_ACTION'
+                    =>$SP . 'U ontvangt deze email omdat u zonet een boeking heeft geplaatst bij de Gallo-Hoeve' . $EP,
+                    'BLOCK_NA_ACTION'
+                    => $SP . 'Als u nog vragen hebt, aarzel niet om ons te contacteren. 
+                                        We zullen u met plezier verder helpen.<br><br>' . $EP,
+                    'SLOT_BEGROETING'
+                    => $SP . "Met vriendelijke groet,<br>De Gallo-hoeve". $EP,
+                    'font_fam_size_plain_text'
+                    => $plain_font,
+                    'footer_font_size'
+                    => "font-size: 14px;",
+                ])
+                //->attach( ... bijlage ...)
+            ;
+        
+            $this->mailer->send($email);
         }
     }

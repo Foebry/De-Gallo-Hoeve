@@ -9,7 +9,7 @@ namespace App\Services;
          */
         function badRequest( array $data = [] ) {
             print( json_encode( array_merge( ["code"=>400, "message"=>"Bad Request"], $data ) ) );
-            header('Access-Control-Allow-Origin: http://localhost:3000');
+            header('Access-Control-Allow-Origin: https://de-gallo-hoeve.vercel.app');
             header("HTTP/1.1 400");
             exit();
         }
@@ -19,14 +19,14 @@ namespace App\Services;
          */
         function NotFound(array $data = []): void{
             print( json_encode( array_merge( ["code"=>404, "message"=>"Not Found"], $data ) ) );
-            header('Access-Control-Allow-Origin: http://localhost:3000');
+            header('Access-Control-Allow-Origin: https://de-gallo-hoeve.vercel.app');
             header("HTTP/1.1 404");
             exit();
         }
 
         function unprocessableEntity( array $data = [] ): void{
             print( json_encode( array_merge( ["code"=>422, "message"=>"Not Found"], $data ) ) );
-            header('Access-Control-Allow-Origin: http://localhost:3000');
+            header('Access-Control-Allow-Origin: https://de-gallo-hoeve.vercel.app');
             header("HTTP/1.1 422");
             exit();
         }
@@ -36,7 +36,7 @@ namespace App\Services;
          */
         function internalServerError( array $data = [] ): void {
             print( json_encode( array_merge( ["code" => 500, "message"=>"Internal Server Error"], $data ) ) );
-            header('Access-Control-Allow-Origin: http://localhost:3000');
+            header('Access-Control-Allow-Origin: https://de-gallo-hoeve.vercel.app');
             header("HTTP/1.1 500");
             exit();
         }

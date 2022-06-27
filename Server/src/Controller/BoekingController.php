@@ -10,6 +10,7 @@ use App\Services\Validator;
 use App\Services\EntityLoader;
 use App\Services\ResponseHandler;
 use App\Services\AvailabilityChecker;
+use App\Services\MailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -39,7 +40,7 @@ use Symfony\Component\HttpFoundation\Response;
          * @todo controleer of kennels vrij zijn gedurende de gevraagde periode.
          * @todo indien geen kennels aangeduidt, wijs zelf kennel toe.
          */
-        function postBoeking(EntityManagerInterface $em, CustomHelper $helper): Response {
+        function postBoeking(EntityManagerInterface $em, CustomHelper $helper, MailService $mailService): Response {
             $payload = json_decode( $this->request->getContent(), true );
             $this->validator->validateCSRF($payload);
 
@@ -86,6 +87,8 @@ use Symfony\Component\HttpFoundation\Response;
             $em->flush();
 
             $data["details"] = $detailRows;
+
+            $mailService->send("boeking", $klant);
 
             return $this->json( ["success" => "Uw boeking is goed ontvangen!"], 201 );           
         }

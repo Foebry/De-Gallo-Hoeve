@@ -63,7 +63,7 @@ export const Nav = () => {
 
 export const MobileNav = () => {
   return (
-    <div className="visible md:invisible">
+    <div className="block md:invisible">
       <div className="navigation__logo">
         <img src="./images/logo.png" alt="" />
       </div>
