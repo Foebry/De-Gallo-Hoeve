@@ -21,8 +21,8 @@ interface IndexProps {
 const Index: React.FC<IndexProps> = ({ images, services, content, image }) => {
   return (
     <>
-      <section className={SECTION_DARKER}>
-        <div className={SECTION_CONTENT}>
+      <section className="bg-grey-900 px-5 py-5">
+        <div className="block max-w-8xl items-center py-24 mx-auto gap-12  md:flex">
           <div className="w-95p xs:w-1/2 mx-auto shadow-md">
             <img
               className="w-full border-solid border-2 border-gray-100 rounded block aspect-3/4 h-auto"
