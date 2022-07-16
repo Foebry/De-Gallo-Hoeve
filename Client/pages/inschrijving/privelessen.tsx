@@ -1,3 +1,4 @@
+import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
@@ -6,6 +7,7 @@ import Step1 from "../../components/inschrijving/Step1";
 import Step2 from "../../components/inschrijving/Step2";
 import getData from "../../hooks/useApi";
 import useMutation from "../../hooks/useMutation";
+import { validator } from "../../middleware/Validator";
 import {
   GET_FUTURE_INSCHRIJVINGS,
   KLANT_HONDEN,
@@ -94,7 +96,9 @@ const Privelessen: React.FC<LessenProps> = ({ disabledDays }) => {
 
 export default Privelessen;
 
-export const getServerSideProps = async () => {
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  validator.securePage(ctx);
+
   const { data: inschrijvingen } = await getData(GET_FUTURE_INSCHRIJVINGS);
   const disabledDays = inschrijvingen.map(
     (inschrijving: any) => inschrijving.datum

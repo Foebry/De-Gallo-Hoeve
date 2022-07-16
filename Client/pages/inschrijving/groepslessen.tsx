@@ -1,3 +1,4 @@
+import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
@@ -15,6 +16,7 @@ import { RegisterHondInterface } from "../../types/formTypes/registerTypes";
 import { INDEX } from "../../types/linkTypes";
 import { SECTION_DARKER } from "../../types/styleTypes";
 import { InschrijvingErrorInterface, LessenProps } from "./privelessen";
+import { validator } from "../../middleware/Validator";
 
 const Groepslessen: React.FC<LessenProps> = ({ disabledDays }) => {
   const router = useRouter();
@@ -84,8 +86,11 @@ const Groepslessen: React.FC<LessenProps> = ({ disabledDays }) => {
 
 export default Groepslessen;
 
-export const getServerSideProps = async () => {
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  validator.securePage(ctx);
+
   const { data: inschrijvingen } = await getData(GET_FUTURE_INSCHRIJVINGS);
+
   const disabledDays = inschrijvingen.map(
     (inschrijving: any) => inschrijving.datum
   );

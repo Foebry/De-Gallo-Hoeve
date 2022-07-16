@@ -1,3 +1,4 @@
+import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import React from "react";
 import Button from "../components/buttons/Button";
@@ -8,7 +9,7 @@ import { SECTION_DARKER } from "../types/styleTypes";
 
 interface HotelProps {}
 
-const Hotel: React.FC<HotelProps> = ({}) => {
+const Hotel: React.FC<HotelProps> = ({ jwt }: { jwt?: any }) => {
   const router = useRouter();
   return (
     <section className={SECTION_DARKER}>
