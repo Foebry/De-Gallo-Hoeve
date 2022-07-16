@@ -6,23 +6,21 @@ interface ApiError {
   };
 }
 
+type REQUESTMETHOD = "POST" | "PUT" | "PATCH" | "DELETE";
+
 const useMutation = () => {
   const executerFunc = async (
     endpoint: string,
     payload: any,
     formErrors: any,
-    setFormErrors: any
-  ) => {
-    const environment = process.env.NODE_ENV;
-    const api =
-      environment === "production"
-        ? process.env.NEXT_PUBLIC_PROD_API
-        : process.env.NEXT_PUBLIC_DEV_API;
-
-    const route = `${api + endpoint}`;
+    setFormErrors: any,
+    options?: {
+      method: REQUESTMETHOD
+    }
+  ) => {;
     try {
-      const { data } = await axios(route, {
-        method: "POST",
+      const { data } = await axios(endpoint, {
+        method: options?.method ?? "POST",
         data: payload,
         withCredentials: true,
       });
