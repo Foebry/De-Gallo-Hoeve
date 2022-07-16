@@ -7,7 +7,7 @@ export interface ServiceProps {
   id: string;
   caption: string;
   image: string;
-  text: string;
+  summary: string;
   alt: string;
   link: string;
 }
@@ -15,7 +15,7 @@ export interface ServiceProps {
 const Service: React.FC<ServiceProps> = ({
   caption,
   image,
-  text,
+  summary,
   alt,
   link,
 }) => {
@@ -33,7 +33,7 @@ const Service: React.FC<ServiceProps> = ({
         />
       </div>
       <Caption>{caption}</Caption>
-      <Body>{text}</Body>
+      <Body>{summary}</Body>
     </article>
   );
 };

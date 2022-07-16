@@ -4,14 +4,13 @@ import { INDEX, HOTEL, TRAINING, LOGIN, REGISTER } from "../types/linkTypes";
 import { Title3 } from "./Typography/Typography";
 import useMutation from "../hooks/useMutation";
 import { LOGOUT } from "../types/apiTypes";
-import getData from "../hooks/useApi";
 
 export const Nav = () => {
   const [userName, setUserName] = useState<string | null>();
   const logout = useMutation();
 
   const onLogout = async () => {
-    await getData(LOGOUT);
+    await logout(LOGOUT, {}, {}, {}, { method: "DELETE" });
     localStorage.clear();
   };
 
