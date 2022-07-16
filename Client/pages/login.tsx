@@ -39,7 +39,7 @@ const Login: React.FC<{}> = () => {
         className="mt-20"
       >
         <Controller
-          name="username"
+          name="email"
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <FormInput
