@@ -3,7 +3,7 @@ import { Body, Link } from "../components/Typography/Typography";
 import Form from "../components/form/Form";
 import FormInput from "../components/form/FormInput";
 import { REGISTER, INDEX } from "../types/linkTypes";
-import { SubmitButton } from "../components/buttons/Button";
+import Button, { SubmitButton } from "../components/buttons/Button";
 import FormRow from "../components/form/FormRow";
 import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
@@ -34,51 +34,62 @@ const Login: React.FC<{ redirect: string }> = ({ redirect }) => {
   };
 
   return (
-    <section className="bg-grey-700 px-5 py-5">
-      <Form onSubmit={handleSubmit(onSubmit)} className="mt-20">
-        <Controller
-          name="email"
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <FormInput
-              label="email"
-              name="email"
-              id="email"
-              value={value}
-              onChange={onChange}
-              onBlur={onBlur}
-              errors={formErrors}
-              setErrors={setFormErrors}
-            />
-          )}
-        />
-        <Controller
-          name="password"
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <FormInput
-              label="password"
-              name="password"
-              id="password"
-              type="password"
-              value={value}
-              onChange={onChange}
-              onBlur={onBlur}
-              errors={formErrors}
-              setErrors={setFormErrors}
-            />
-          )}
-        />
-        <FormRow>
-          <Body>
-            Nog geen account?{"	"}
-            <span>
-              <Link to={REGISTER}>registreer</Link>
-            </span>
-          </Body>
-          <SubmitButton label="login" />
-        </FormRow>
-      </Form>
+    <section>
+      <div className="max-w-xl mx-auto mt-30 mb-48">
+        <Form onSubmit={handleSubmit(onSubmit)} className="mb-5">
+          <div className="text-center">
+            <Body>Login met email en wachtwoord</Body>
+          </div>
+          <Controller
+            name="email"
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <FormInput
+                label="email"
+                name="email"
+                id="email"
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+                errors={formErrors}
+                setErrors={setFormErrors}
+              />
+            )}
+          />
+          <Controller
+            name="password"
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <FormInput
+                label="password"
+                name="password"
+                id="password"
+                type="password"
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+                errors={formErrors}
+                setErrors={setFormErrors}
+              />
+            )}
+          />
+          <FormRow>
+            <Body>
+              Nog geen account?{"	"}
+              <span>
+                <Link to={REGISTER}>registreer</Link>
+              </span>
+            </Body>
+            <Button label="login" onClick={handleSubmit(onSubmit)} />
+          </FormRow>
+          <div className="text-center mt-20">
+            <Body>Login met andere app</Body>
+          </div>
+          <FormRow className="py-5">
+            <Button label="Login with Facebook" className="mx-auto" />
+          </FormRow>
+        </Form>
+      </div>
     </section>
   );
 };
