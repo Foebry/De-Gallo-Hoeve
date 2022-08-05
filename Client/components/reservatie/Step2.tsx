@@ -1,12 +1,20 @@
 import React from "react";
-import { Controller } from "react-hook-form";
+import { Control, Controller, FieldValues } from "react-hook-form";
 import { RangePicker } from "react-trip-date";
+import { ReservatieErrorInterface } from "../../pages/reservatie";
 import Button, { SubmitButton } from "../buttons/Button";
 import FormRow from "../form/FormRow";
-import { FormStepProps } from "../form/FormTabs";
 import { Body } from "../Typography/Typography";
 
-const Step2: React.FC<FormStepProps> = ({
+interface Step2Props {
+  control: Control<FieldValues, any>;
+  setActiveTab: React.Dispatch<React.SetStateAction<number>>;
+  errors: ReservatieErrorInterface;
+  setErrors: React.Dispatch<React.SetStateAction<ReservatieErrorInterface>>;
+  disabledDays: string[];
+}
+
+const Step2: React.FC<Step2Props> = ({
   control,
   setActiveTab,
   errors,
@@ -21,10 +29,12 @@ const Step2: React.FC<FormStepProps> = ({
           control={control}
           render={({ field: { onChange, value } }) => (
             <div>
-              <Body className="text-red-700 text-center">{errors.period}</Body>
+              <Body className="text-red-700 text-center">
+                {errors.medicatie}
+              </Body>
               <RangePicker
                 onChange={(e) => {
-                  setErrors({ ...errors, period: undefined });
+                  setErrors({ ...errors });
                   onChange(e);
                 }}
                 selectedDays={value}

@@ -14,8 +14,9 @@ import useMutation, {
   structureHondenPayload,
 } from "../hooks/useMutation";
 import { SECTION_DARKER } from "../types/styleTypes";
+import FormSteps from "../components/form/FormSteps";
 
-interface RegisterHondErrorInterface {
+export interface RegisterHondErrorInterface {
   naam?: string;
   geboortedatum?: string;
   ras_id?: string;
@@ -23,7 +24,7 @@ interface RegisterHondErrorInterface {
   chip_nr?: string;
 }
 
-interface RegisterErrorInterface {
+export interface RegisterErrorInterface {
   vnaam?: string;
   lnaam?: string;
   email?: string;
@@ -49,7 +50,8 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
   const register = useMutation();
   const { control, handleSubmit } = useForm();
   const { fields, append, remove } = useFieldArray({ control, name: "honden" });
-  const [activeTab, setActiveTab] = useState<number>(1);
+  const [activeStep, setActiveStep] = useState<number>(2);
+  const [errorSteps, setErrorSteps] = useState<number[]>([]);
   const [formErrors, setFormErrors] = useState<RegisterErrorInterface>({});
   const step1 = [
     "vnaam",
@@ -64,11 +66,15 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
   ];
   const step2 = ["naam", "ras_id", "gelacht", "chip_nr", "geboortedatum"];
 
+  const setErrors = (step: number) => {
+    setErrorSteps((prev) => [...prev, step]);
+    setActiveStep(Math.min(...errorSteps));
+  };
   const handleErrors = (error: any) => {
-    if (Object.keys(error).some((r) => step1.indexOf(r) >= 0)) setActiveTab(1);
-    else if (Object.keys(error).some((r) => step2.indexOf(r) >= 0))
-      setActiveTab(2);
-    else if (Object.keys(error).includes("honden")) setActiveTab(3);
+    if (Object.keys(error).some((r) => step1.indexOf(r) >= 0)) setErrors(0);
+    else if (Object.keys(error).some((r) => step2.indexOf(r) >= 1))
+      setErrors(1);
+    else if (Object.keys(error).includes("honden")) setErrors(2);
   };
 
   const onSubmit = async (values: any) => {
@@ -95,30 +101,26 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
     <section className={SECTION_DARKER}>
       <Form
         onSubmit={handleSubmit(onSubmit)}
-        title={
-          activeTab === 1
-            ? "Persoonlijke gegevens"
-            : activeTab === 2
-            ? "Gegevens viervoeters"
-            : activeTab === 3
-            ? "Kies een wachtwoord"
-            : ""
-        }
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        tabCount={3}
+        steps={[
+          "Persoonlijke gegevens",
+          "Honden aanmaken",
+          "Wachtwoord aanmaken",
+        ]}
+        activeStep={activeStep}
+        errorSteps={errorSteps}
+        setActiveStep={setActiveStep}
       >
-        {activeTab === 1 ? (
+        {activeStep === 0 ? (
           <Step1
             control={control}
-            setActiveTab={setActiveTab}
+            setActiveStep={setActiveStep}
             errors={formErrors}
             setErrors={setFormErrors}
           />
-        ) : activeTab === 2 ? (
+        ) : activeStep === 1 ? (
           <Step2
             control={control}
-            setActiveTab={setActiveTab}
+            setActiveStep={setActiveStep}
             fields={fields}
             append={append}
             remove={remove}
@@ -126,10 +128,10 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
             errors={formErrors}
             setErrors={setFormErrors}
           />
-        ) : activeTab === 3 ? (
+        ) : activeStep === 2 ? (
           <Step3
             control={control}
-            setActiveTab={setActiveTab}
+            setActiveStep={setActiveStep}
             errors={formErrors}
             setErrors={setFormErrors}
           />

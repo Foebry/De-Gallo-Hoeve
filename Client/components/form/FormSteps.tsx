@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import React from "react";
 
 interface FormStepsProps {
@@ -24,6 +25,7 @@ const FormSteps: React.FC<FormStepsProps> = ({
             : "";
           return (
             <div
+              key={nanoid(5)}
               className={`w-full text-center flex flex-col justify-between formstep ${extra}`}
             >
               <p

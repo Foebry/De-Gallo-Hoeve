@@ -2,10 +2,17 @@ import React from "react";
 import { SubmitButton } from "../buttons/Button";
 import FormInput from "../form/FormInput";
 import FormRow from "../form/FormRow";
-import { Controller } from "react-hook-form";
-import { FormStepProps } from "../form/FormTabs";
+import { Control, Controller, FieldValues } from "react-hook-form";
+import { RegisterErrorInterface } from "../../pages/register";
 
-const step3: React.FC<FormStepProps> = ({ control, errors, setErrors }) => {
+interface Step3Props {
+  control: Control<FieldValues, any>;
+  setActiveStep: React.Dispatch<React.SetStateAction<number>>;
+  errors: RegisterErrorInterface;
+  setErrors: React.Dispatch<React.SetStateAction<RegisterErrorInterface>>;
+}
+
+const step3: React.FC<Step3Props> = ({ control, errors, setErrors }) => {
   return (
     <div className="flex flex-col gap-20">
       <FormRow className="flex-wrap gap-5">

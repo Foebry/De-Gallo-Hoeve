@@ -4,29 +4,38 @@ import FormInput from "../form/FormInput";
 import FormRow from "../form/FormRow";
 import Select, { OptionsOrGroups } from "react-select";
 import {
+  Control,
   Controller,
   FieldValues,
   UseFieldArrayAppend,
   UseFieldArrayRemove,
 } from "react-hook-form";
 import Details from "../Details";
-import { FormStepProps } from "../form/FormTabs";
 import { DatePicker } from "react-trip-date";
 import { FormError } from "../Typography/Typography";
+import { InschrijvingErrorInterface } from "../../pages/inschrijving/privelessen";
+import {
+  RegisterErrorInterface,
+  RegisterHondErrorInterface,
+} from "../../pages/register";
 
 export interface optionInterface {
   options: [{ value: any; label: string }];
 }
 
-interface Props extends FormStepProps {
+interface Step2Props {
   fields: Record<"id", string>[];
   append: UseFieldArrayAppend<FieldValues, "honden">;
   remove: UseFieldArrayRemove;
   options: OptionsOrGroups<any, optionInterface>[];
+  control: Control<FieldValues, any>;
+  setActiveStep: React.Dispatch<React.SetStateAction<number>>;
+  errors: RegisterErrorInterface;
+  setErrors: React.Dispatch<React.SetStateAction<RegisterErrorInterface>>;
 }
 
-const step2: React.FC<Props> = ({
-  setActiveTab,
+const step2: React.FC<Step2Props> = ({
+  setActiveStep,
   control,
   fields,
   append,
@@ -122,13 +131,17 @@ const step2: React.FC<Props> = ({
                 name={`honden.${index}.geboortedatum`}
                 control={control}
                 render={({ field: { onChange, onBlur, value } }) => {
-                  const error = errors.geboortedatum ? "text-red-800" : null;
+                  const error = errors.honden?.[index].geboortedatum
+                    ? "text-red-800"
+                    : null;
                   return (
                     <Details summary="Geboortedatum" className={error}>
-                      <FormError>{errors.geboortedatum}</FormError>
+                      <FormError>
+                        {errors.honden?.[index].geboortedatum}
+                      </FormError>
                       <DatePicker
                         onChange={(e) => {
-                          setErrors({ ...errors, geboortedatum: undefined });
+                          setErrors({ ...errors });
                           onChange(e);
                         }}
                         startOfWeek={1}
@@ -160,7 +173,7 @@ const step2: React.FC<Props> = ({
         type="form"
         label="volgende"
         onClick={() => {
-          setActiveTab(3);
+          setActiveStep(3);
         }}
       />
     </>

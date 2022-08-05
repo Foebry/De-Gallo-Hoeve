@@ -1,40 +1,26 @@
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
-import Form from "../../components/form/Form";
-import Step1 from "../../components/inschrijving/Step1";
+import Step1, { Session } from "../../components/inschrijving/Step1";
 import Step2 from "../../components/inschrijving/Step2";
-import getData from "../../hooks/useApi";
 import useMutation from "../../hooks/useMutation";
-import {
-  GET_FUTURE_INSCHRIJVINGS,
-  KLANT_HONDEN,
-  POST_INSCHRIJVING,
-} from "../../types/apiTypes";
-import { RegisterHondInterface } from "../../types/formTypes/registerTypes";
+import { POST_INSCHRIJVING } from "../../types/apiTypes";
 import { INDEX } from "../../types/linkTypes";
-import { SECTION_DARKER } from "../../types/styleTypes";
 import { InschrijvingErrorInterface, LessenProps } from "./privelessen";
 import { validator } from "../../middleware/Validator";
+import db, { conn } from "../../middleware/db";
+import FormSteps from "../../components/form/FormSteps";
 
-const Groepslessen: React.FC<LessenProps> = ({ disabledDays }) => {
+const Groepslessen: React.FC<LessenProps> = ({ honden, sessions }) => {
   const router = useRouter();
 
   const { handleSubmit, control, getValues } = useForm();
   const inschrijving = useMutation();
 
-  const [activeTab, setActiveTab] = useState<number>(1);
+  const [activeStep, setActiveStep] = useState<number>(0);
   const [errors, setErrors] = useState<InschrijvingErrorInterface>({});
-  const [honden, setHonden] = useState<RegisterHondInterface[]>([]);
-
-  useEffect(() => {
-    (async () => {
-      const klant_id = localStorage.getItem("id");
-      const { data } = await getData(KLANT_HONDEN, { klant_id });
-      setHonden(data);
-    })();
-  }, []);
+  const [errorSteps, setErrorSteps] = useState<number[]>([]);
 
   const onSubmit = async (values: FieldValues) => {
     values.training_id = 2;
@@ -50,36 +36,33 @@ const Groepslessen: React.FC<LessenProps> = ({ disabledDays }) => {
     else if (data) router.push(INDEX);
   };
   return (
-    <section className={SECTION_DARKER}>
-      <Form
-        onSubmit={handleSubmit(onSubmit)}
-        title={
-          activeTab === 1
-            ? "Kies de datum waarop u een les wil bijwonen"
-            : activeTab === 2
-            ? "Welke hond zal je voor deze les meenemen?"
-            : ""
-        }
-        tabCount={2}
-        setActiveTab={setActiveTab}
-      >
-        {activeTab === 1 ? (
+    <section className="mx-5 mdl:mx-auto">
+      <FormSteps
+        steps={["Selecteer datum", "Selecteer hond"]}
+        activeStep={activeStep}
+        errorSteps={errorSteps}
+        setActiveStep={setActiveStep}
+      />
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-8xl mx-auto">
+        {activeStep === 0 ? (
           <Step1
             control={control}
-            setActiveTab={setActiveTab}
-            disabledDays={disabledDays}
+            setActiveStep={setActiveStep}
+            errors={errors}
+            setErrors={setErrors}
+            sessions={sessions as Session[]}
+          />
+        ) : activeStep === 1 ? (
+          <Step2
+            control={control}
+            setActiveStep={setActiveStep}
+            honden={honden}
+            values={getValues}
             errors={errors}
             setErrors={setErrors}
           />
-        ) : activeTab === 2 ? (
-          <Step2
-            control={control}
-            setActiveTab={setActiveTab}
-            honden={honden}
-            values={getValues}
-          />
         ) : null}
-      </Form>
+      </form>
     </section>
   );
 };
@@ -87,17 +70,43 @@ const Groepslessen: React.FC<LessenProps> = ({ disabledDays }) => {
 export default Groepslessen;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  validator.securePage(ctx);
+  const verifiedToken = validator.securePage(ctx);
+  if (Object.keys(verifiedToken).includes("payload")) {
+    const klant_id = verifiedToken.payload.id;
+    const honden = await db.query({
+      builder: conn.select("*").from("hond").where({ klant_id }),
+    });
 
-  const { data: inschrijvingen } = await getData(GET_FUTURE_INSCHRIJVINGS);
+    interface Subscription {
+      aantal: Number;
+    }
 
-  const disabledDays = inschrijvingen.map(
-    (inschrijving: any) => inschrijving.datum
-  );
+    const createSession = async (date: string) => {
+      const inschrijvingen = (await db.query({
+        builder: conn
+          .select("datum as aantal")
+          .count("datum as aantal")
+          .from("inschrijving")
+          .where({ datum: date })
+          .first(),
+      })) as Subscription;
+      return {
+        date,
+        spots: 10,
+        subscriptons: inschrijvingen.aantal,
+      };
+    };
+    const nextGroupSessions = db.getThisMonthsGroupSessions(new Date());
+    const sessions = await Promise.all(
+      nextGroupSessions.map(async (date: string) => await createSession(date))
+    );
 
-  return {
-    props: {
-      disabledDays,
-    },
-  };
+    return {
+      props: {
+        honden,
+        sessions,
+      },
+    };
+  }
+  return { props: { disabledDays: [], honden: [], sessions: [] } };
 };

@@ -26,10 +26,10 @@ const login = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const createJWT = async (req: NextApiRequest, res: NextApiResponse) => {
   const secret = process.env.JWT_SECRET;
-	const payload = await db.getJwtPayload(req.body, res);
+  const payload = await db.getJwtPayload(req.body, res);
   if (res.statusCode !== 200) return;
   try {
-    const token = jwt.sign({payload}, `${secret}`);
+    const token = jwt.sign({ payload }, `${secret}`);
     setCookie({ res }, "jwt", token, {
       httpOnly: true,
       maxAge: 3600,

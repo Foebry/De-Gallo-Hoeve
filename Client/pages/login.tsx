@@ -10,13 +10,15 @@ import { useForm, Controller } from "react-hook-form";
 import useMutation from "../hooks/useMutation";
 import { LOGINAPI } from "../types/apiTypes";
 import { initializeLocalStorage } from "../helpers/localStorage";
+import { GetServerSidePropsContext } from "next";
+import { validator } from "../middleware/Validator";
 
 interface LoginErrorInterface {
   email?: string;
   password?: string;
 }
 
-const Login: React.FC<{}> = () => {
+const Login: React.FC<{ redirect: string }> = ({ redirect }) => {
   const router = useRouter();
   const login = useMutation();
 
@@ -27,17 +29,13 @@ const Login: React.FC<{}> = () => {
     const { data } = await login(LOGINAPI, values, formErrors, setFormErrors);
     if (data) {
       initializeLocalStorage(data);
-      router.push(INDEX);
+      router.push(redirect);
     }
   };
 
   return (
     <section className="bg-grey-700 px-5 py-5">
-      <Form
-        title="Welkom bij de Gallo-hoeve"
-        onSubmit={handleSubmit(onSubmit)}
-        className="mt-20"
-      >
+      <Form onSubmit={handleSubmit(onSubmit)} className="mt-20">
         <Controller
           name="email"
           control={control}
@@ -86,3 +84,9 @@ const Login: React.FC<{}> = () => {
 };
 
 export default Login;
+
+export const getServerSideProps = (ctx: GetServerSidePropsContext) => {
+  const redirect = validator.redirect ?? INDEX;
+  validator.redirect = undefined;
+  return { props: { redirect } };
+};

@@ -1,18 +1,19 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
+  Control,
   FieldValues,
   UseFieldArrayAppend,
   UseFieldArrayRemove,
 } from "react-hook-form";
 import Button from "../buttons/Button";
 import Select, { OptionsOrGroups } from "react-select";
-import { FormStepProps } from "../form/FormTabs";
 import Hond from "../Hond";
 import { KLANT_HONDEN } from "../../types/apiTypes";
 import getData from "../../hooks/useApi";
 import { Link, Title1, Title3 } from "../Typography/Typography";
 import { LOGIN } from "../../types/linkTypes";
 import FormRow from "../form/FormRow";
+import { ReservatieErrorInterface } from "../../pages/reservatie";
 
 interface SelectionInterface {
   id: number;
@@ -27,16 +28,20 @@ interface OptionInterface {
   ];
 }
 
-interface Props extends FormStepProps {
+interface Step1Props {
+  control: Control<FieldValues, any>;
+  setActiveStep: React.Dispatch<React.SetStateAction<number>>;
   fields: Record<"id", string>[];
   append: UseFieldArrayAppend<FieldValues, "details">;
   remove: UseFieldArrayRemove;
   values: any;
+  errors: ReservatieErrorInterface;
+  setErrors: React.Dispatch<React.SetStateAction<ReservatieErrorInterface>>;
 }
 
-const Step1: React.FC<Props> = ({
+const Step1: React.FC<Step1Props> = ({
   control,
-  setActiveTab,
+  setActiveStep,
   fields,
   append,
   remove,
@@ -136,7 +141,7 @@ const Step1: React.FC<Props> = ({
             <Button
               type="form"
               label="volgende"
-              onClick={() => setActiveTab(2)}
+              onClick={() => setActiveStep(2)}
             />
           </FormRow>
         </>

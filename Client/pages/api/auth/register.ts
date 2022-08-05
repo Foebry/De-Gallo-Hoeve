@@ -12,9 +12,13 @@ const handler = (req: NextApiRequest, res: NextApiResponse<Response>) => {
         : res.status(405).json({code:405, message:"Not Allowed"});
 }
 
-const register = (req: NextApiRequest, res: NextApiResponse) => {
+const register = async (req: NextApiRequest, res: NextApiResponse) => {
 
-    validate( req, res, {schema: registerSchema} );
+    const { success, response } = await validate(req, res, {
+        schema: registerSchema,
+      });
+      
+      if(!success) return res.status(400).send(response);
 
     mailer.sendMail("register");
 

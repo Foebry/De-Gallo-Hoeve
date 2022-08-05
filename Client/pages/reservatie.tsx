@@ -15,7 +15,7 @@ import { LOGIN } from "../types/linkTypes";
 
 interface ReservatieProps {}
 
-interface ReservatieErrorInterface {
+export interface ReservatieErrorInterface {
   start?: string;
   eind?: string;
   hond_id?: string;
@@ -64,23 +64,14 @@ const Reservatie: React.FC<ReservatieProps> = () => {
       <Form
         className="md:w-10/12"
         onSubmit={handleSubmit(onSubmit)}
-        title={
-          !klantId
-            ? "U bent niet ingelogd"
-            : activeTab === 1
-            ? "Wie komt logeren?"
-            : activeTab === 2
-            ? "Wanneer komen zij logeren?"
-            : ""
-        }
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        tabCount={klantId ? 2 : null}
+        steps={["Selecteer honden", "Selecteer periode"]}
+        activeStep={activeTab}
+        setActiveStep={setActiveTab}
       >
         {activeTab === 1 ? (
           <Step1
             control={control}
-            setActiveTab={setActiveTab}
+            setActiveStep={setActiveTab}
             fields={fields}
             append={append}
             remove={remove}
@@ -94,6 +85,7 @@ const Reservatie: React.FC<ReservatieProps> = () => {
             setActiveTab={setActiveTab}
             errors={formErrors}
             setErrors={setFormErrors}
+            disabledDays={[]}
           />
         ) : null}
       </Form>

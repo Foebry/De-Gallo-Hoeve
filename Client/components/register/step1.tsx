@@ -2,12 +2,19 @@ import React from "react";
 import FormInput from "../form/FormInput";
 import FormRow from "../form/FormRow";
 import Button from "../buttons/Button";
-import { Controller } from "react-hook-form";
-import { FormStepProps } from "../form/FormTabs";
+import { Control, Controller, FieldValues } from "react-hook-form";
+import { RegisterErrorInterface } from "../../pages/register";
 
-const Step1: React.FC<FormStepProps> = ({
+interface Step1Props {
+  control: Control<FieldValues, any>;
+  setActiveStep: React.Dispatch<React.SetStateAction<number>>;
+  errors: RegisterErrorInterface;
+  setErrors: React.Dispatch<React.SetStateAction<RegisterErrorInterface>>;
+}
+
+const Step1: React.FC<Step1Props> = ({
   control,
-  setActiveTab,
+  setActiveStep,
   errors,
   setErrors,
 }) => {
@@ -172,7 +179,7 @@ const Step1: React.FC<FormStepProps> = ({
           />
         )}
       />
-      <Button type="form" label="volgende" onClick={() => setActiveTab(2)} />
+      <Button type="form" label="volgende" onClick={() => setActiveStep(2)} />
     </div>
   );
 };

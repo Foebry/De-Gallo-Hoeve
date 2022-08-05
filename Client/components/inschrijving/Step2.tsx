@@ -1,17 +1,22 @@
-import React, { useEffect } from "react";
+import React from "react";
+import { Control, FieldValues, UseFormGetValues } from "react-hook-form";
+import { InschrijvingErrorInterface } from "../../pages/inschrijving/privelessen";
 import Button, { SubmitButton } from "../buttons/Button";
+import Hond from "../buttons/RadioButtons/Hond";
 import FormRow from "../form/FormRow";
-import { FormStepProps } from "../form/FormTabs";
-import Hond from "../Hond";
 
-interface Props extends FormStepProps {
-  honden?: any;
-  values?: any;
+interface Step2Props {
+  control: Control<FieldValues, any>;
+  setActiveStep: React.Dispatch<React.SetStateAction<number>>;
+  errors: InschrijvingErrorInterface;
+  setErrors: React.Dispatch<React.SetStateAction<InschrijvingErrorInterface>>;
+  honden: any;
+  values: UseFormGetValues<FieldValues>;
 }
 
-const Step2: React.FC<Props> = ({
+const Step2: React.FC<Step2Props> = ({
   control,
-  setActiveTab,
+  setActiveStep,
   honden,
   setErrors,
   errors,
@@ -37,7 +42,7 @@ const Step2: React.FC<Props> = ({
           type="form"
           className="right-auto"
           label="vorige"
-          onClick={() => setActiveTab(1)}
+          onClick={() => setActiveStep((activeStep) => activeStep - 1)}
         />
         <SubmitButton label="Aanvragen" />
       </FormRow>

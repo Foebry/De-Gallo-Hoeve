@@ -10,7 +10,7 @@ const register = object({
     csrf: string().required({failure: "Invalid form"}),
     email: string().email({email: "invalid email"}).required({email: "email is required"}),
     password: string().required({password: "password is required"}),
-    vnaam: string().required({vnaam: "Voornaam is required"}),
+    vnaam: string().required({vnaam: "Voornaam is required"}).max(1, {vnaam: "Maximaal 1 characters"}),
     lnaam: string().required({lnaam: "Naam is required"}),
     gsm: string().required({gsm: "Telefoon is required"}),
     straat: string().required({straat: "Straat is required"}),

@@ -7,6 +7,7 @@ import Step1 from "../../components/inschrijving/Step1";
 import Step2 from "../../components/inschrijving/Step2";
 import getData from "../../hooks/useApi";
 import useMutation from "../../hooks/useMutation";
+import db, { conn } from "../../middleware/db";
 import { validator } from "../../middleware/Validator";
 import {
   GET_FUTURE_INSCHRIJVINGS,
@@ -18,7 +19,8 @@ import { INDEX } from "../../types/linkTypes";
 import { SECTION_DARKER } from "../../types/styleTypes";
 
 export interface LessenProps {
-  disabledDays: string[];
+  honden: any;
+  sessions?: {}[];
 }
 
 export interface InschrijvingErrorInterface {
@@ -28,23 +30,23 @@ export interface InschrijvingErrorInterface {
   datum?: string;
 }
 
-const Privelessen: React.FC<LessenProps> = ({ disabledDays }) => {
+const Privelessen: React.FC<LessenProps> = ({ sessions, honden }) => {
   const router = useRouter();
 
   const { handleSubmit, control, getValues } = useForm();
   const inschrijving = useMutation();
 
-  const [activeTab, setActiveTab] = useState<number>(1);
+  const [activeStep, setActiveStep] = useState<number>(1);
   const [errors, setErrors] = useState<InschrijvingErrorInterface>({});
-  const [honden, setHonden] = useState<RegisterHondInterface[]>([]);
+  // const [honden, setHonden] = useState<RegisterHondInterface[]>([]);
 
-  useEffect(() => {
-    (async () => {
-      const klant_id = localStorage.getItem("id");
-      const { data } = await getData(KLANT_HONDEN, { klant_id });
-      setHonden(data);
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     const klant_id = localStorage.getItem("id");
+  //     const { data } = await getData(KLANT_HONDEN, { klant_id });
+  //     setHonden(data);
+  //   })();
+  // }, []);
 
   const onSubmit = async (values: FieldValues) => {
     values.training_id = 1;
@@ -63,30 +65,25 @@ const Privelessen: React.FC<LessenProps> = ({ disabledDays }) => {
     <section className={SECTION_DARKER}>
       <Form
         onSubmit={handleSubmit(onSubmit)}
-        title={
-          activeTab === 1
-            ? "Wanneer wilt u een prive training reserveren?"
-            : activeTab === 2
-            ? "Voor welke hond is deze inschrijving?"
-            : ""
-        }
-        tabCount={2}
-        setActiveTab={setActiveTab}
+        setActiveStep={setActiveStep}
+        steps={["Selecteer datum", "selecteer hond"]}
       >
-        {activeTab === 1 ? (
+        {activeStep === 1 ? (
           <Step1
             control={control}
-            setActiveTab={setActiveTab}
-            disabledDays={disabledDays}
+            setActiveStep={setActiveStep}
             errors={errors}
             setErrors={setErrors}
+            sessions={[]}
           />
-        ) : activeTab === 2 ? (
+        ) : activeStep === 2 ? (
           <Step2
             control={control}
-            setActiveTab={setActiveTab}
+            setActiveStep={setActiveStep}
             honden={honden}
             values={getValues}
+            errors={errors}
+            setErrors={setErrors}
           />
         ) : null}
       </Form>
@@ -97,7 +94,13 @@ const Privelessen: React.FC<LessenProps> = ({ disabledDays }) => {
 export default Privelessen;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  validator.securePage(ctx);
+  const verifiedToken = validator.securePage(ctx);
+
+  const klant_id = verifiedToken.payload.id;
+
+  const honden = await db.query({
+    builder: conn.select("*").from("hond").where({ klant_id }),
+  });
 
   const { data: inschrijvingen } = await getData(GET_FUTURE_INSCHRIJVINGS);
   const disabledDays = inschrijvingen.map(
@@ -106,6 +109,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   return {
     props: {
       disabledDays,
+      honden,
     },
   };
 };
