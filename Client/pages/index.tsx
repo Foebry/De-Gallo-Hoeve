@@ -91,7 +91,7 @@ const Index: React.FC<IndexProps> = ({
                 "€ 15,00",
               ]}
               link={INSCHRIJVING_GROEP}
-              image="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656189950/De-Gallo-Hoeve/images/hondenschool-740x433_hove6a.jpg"
+              image="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656189950/De-Gallo-Hoeve/content/hondenschool-740x433_hove6a.jpg"
             />
             <TrainingCard
               title="Privétrainingen"
@@ -103,7 +103,7 @@ const Index: React.FC<IndexProps> = ({
                 "Woensdag, Vrijdag en Zaterdag",
                 "€ 25,00",
               ]}
-              image="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656188984/De-Gallo-Hoeve/images/pexels-blue-bird-7210258_m74qdh.jpg"
+              image="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656188984/De-Gallo-Hoeve/content/pexels-blue-bird-7210258_m74qdh.jpg"
             />
           </div>
         </div>
