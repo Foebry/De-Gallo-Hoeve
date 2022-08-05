@@ -11,12 +11,13 @@ interface Connection {
   getJwtPayload: (body: LoginPayload, res: NextApiResponse) => Promise<void>;
   query: (
     query: { builder: knex.QueryBuilder },
-    res: NextApiResponse
-  ) => Promise<void>;
+    res?: NextApiResponse
+  ) => Promise<any[] |{}>;
   multiQuery: (
     queryList: { key: string; builder: knex.QueryBuilder }[],
     res?: NextApiResponse
   ) => Promise<void | any>;
+  getThisMonthsGroupSessions: (date: Date) => string[];
 }
 
 const config: Knex.Config = {
@@ -60,10 +61,10 @@ const db: Connection = {
     try {
       const response = await query.builder;
       const data = JSON.parse(JSON.stringify(response));
-      return res.status(200).json(data);
+      return res ? res.status(200).json(data) : data;
     } catch (error: any) {
       console.log(error.message);
-      return res.status(500).json({ failure: "Internal Server Error" });
+      return res?.status(500).json({ failure: "Internal Server Error" });
     }
   },
 
@@ -85,7 +86,8 @@ const db: Connection = {
     );
 
     if (error)
-      return res?.status(500)
+      return res
+        ?.status(500)
         .json({ code: 500, failure: "Internal Server Error" });
 
     const data = response.reduce((prev, curr) => {
@@ -96,6 +98,19 @@ const db: Connection = {
     }, {});
 
     return res ? res.send(data) : data;
+  },
+
+  getThisMonthsGroupSessions: (date) => {
+    const nextSessions = [];
+    const month = date.getMonth();
+    const oneWeek = 7;
+    while (true) {
+      const sunday = new Date(
+        date.setDate(date.getDate() - date.getDay() + oneWeek)
+      );
+      if (sunday.getMonth() > month) return nextSessions;
+      nextSessions.push(sunday.toISOString().split(".")[0].split("T")[0])
+    }
   },
 };
 

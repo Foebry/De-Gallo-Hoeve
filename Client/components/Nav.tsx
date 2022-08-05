@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { INDEX, HOTEL, TRAINING, LOGIN, REGISTER } from "../types/linkTypes";
+import { INDEX, LOGIN, REGISTER } from "../types/linkTypes";
 import { Title3 } from "./Typography/Typography";
 import useMutation from "../hooks/useMutation";
 import { LOGOUT } from "../types/apiTypes";
+import Button from "./buttons/Button";
+import Image from "next/image";
+import { useRouter } from "next/router";
 
 export const Nav = () => {
   const [userName, setUserName] = useState<string | null>();
   const logout = useMutation();
+  const router = useRouter();
 
   const onLogout = async () => {
     await logout(LOGOUT, {}, {}, {}, { method: "DELETE" });
@@ -21,33 +25,29 @@ export const Nav = () => {
   }, []);
 
   return (
-    <div className="relative hidden md:flex justify-between h-16 rounded-l-4xl items-center  max-w-8xl my-10 mx-auto w-98p bg-grey-500">
-      <div className="w-24">
-        <img
-          className="block w-full rounded-full aspect-square object-contain rotate-y-180 bg-grey-100"
-          src={`${process.env.NEXT_PUBLIC_IMAGES}/logo-r.png`}
-          alt=""
-        />
+    <div className="relative w-full h-16 hidden md:flex justify-between items-center px-76 shadow z-20">
+      <div
+        className="flex gap-10 items-center cursor-pointer"
+        onClick={() => router.push(INDEX)}
+      >
+        <div className="w-16">
+          <Image
+            src="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1659613403/De-Gallo-Hoeve/content/logo-r_vwnpdy.png"
+            width={64}
+            height={64}
+          />
+        </div>
+        <div className="text-lg uppercase text-green-200 font-medium">
+          <Title3>De Gallo-Hoeve</Title3>
+        </div>
       </div>
-      <div className="absolute left-40 flex gap-10 text-lg uppercase pr-5 text-gray-100">
-        {!userName ? (
-          <>
-            <Link href={LOGIN}>Login</Link>
-            <Link href={REGISTER}>Registreer</Link>
-          </>
-        ) : (
-          <Title3>
-            Welkom{" "}
-            <span className="hover:cursor-pointer text-gray-900">
-              {userName}
-            </span>
-          </Title3>
-        )}
-      </div>
-      <nav className="flex gap-10 text-lg uppercase pr-5 text-gray-100">
-        <Link href={INDEX}>Home</Link>
-        <Link href={HOTEL}>Hotel</Link>
-        <Link href={TRAINING}>Trainingen</Link>
+      <nav className="flex gap-4 text-lg uppercase pr-5 text-gray-50 font-medium">
+        <Link href={LOGIN}>
+          <Button label="Login" />
+        </Link>
+        <Link href={REGISTER}>
+          <Button label="Registreer" />
+        </Link>
         {userName && (
           <span
             className="text-gray-900 hover:cursor-pointer text-lg"

@@ -1,56 +1,111 @@
-import { Body, Title2 } from "../components/Typography/Typography";
-import Image from "../components/Image";
-import { ImageProps } from "../components/Image";
-import Service, { ServiceProps } from "../components/Service";
+import { Body, Title1, Title2 } from "../components/Typography/Typography";
 import { atob } from "buffer";
-import {
-  SECTION_CONTENT,
-  SECTION_DARKER,
-  SECTION_LIGHTER,
-} from "../types/styleTypes";
-import { nanoid } from "nanoid";
 import db, { conn } from "../middleware/db";
+import { GetServerSideProps } from "next";
+import TrainingCard from "../components/Cards/TrainingCard";
+import { nanoid } from "nanoid";
+import Image from "next/image";
+import { INSCHRIJVING_GROEP, INSCHRIJVING_PRIVE } from "../types/linkTypes";
 
 interface IndexProps {
-  images: ImageProps[];
-  diensten: ServiceProps[];
-  image: string;
-  content: string[];
+  privetraining: string[];
+  groepstraining: string[];
+  wie: string[];
+  image: { image: string };
 }
 
-const Index: React.FC<IndexProps> = ({ images, diensten, image, content }) => {
+const Index: React.FC<IndexProps> = ({
+  privetraining,
+  groepstraining,
+  wie,
+  image,
+}) => {
   return (
     <>
-      <section className={SECTION_DARKER}>
-        <div className={SECTION_CONTENT}>
-          <div className="w-95p xs:w-1/2 mx-auto shadow-md">
-            <img
-              className="w-full border-solid border-2 border-gray-100 rounded block aspect-3/4 h-auto"
-              src={image}
-              alt="hond duitse herder gallo-hoeve"
+      <section className="mb-40 mx-5 flex flex-wrap gap-10 mt-10 items-center max-w-7xl md:mx-auto">
+        <div className="relative w-2/3 mx-auto mdl:w-4/12">
+          <div className="absolute left-20 -top-48 w-48 h-48 rotate-45 border-4 border-green-200 overflow-hidden">
+            <div className="w-80 h-80 -rotate-45 absolute -top-16 -left-8">
+              <Image
+                src={
+                  "https://res.cloudinary.com/dv7gjzlsa/image/upload/v1659626902/De-Gallo-Hoeve/content/image1_swsxl6.png"
+                }
+                width={400}
+                height={400}
+                objectFit="cover"
+              />
+            </div>
+          </div>
+          <div className="absolute -top-12 -right-4 w-48 h-48 rotate-45 border-4 border-green-200 overflow-hidden">
+            <div className="w-80 h-80 -rotate-45 absolute -top-16 -left-8">
+              <Image
+                src={
+                  "https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656188518/De-Gallo-Hoeve/content/intro_gfgoo0.jpg"
+                }
+                width={400}
+                height={400}
+                objectFit="cover"
+              />
+            </div>
+          </div>
+          <div className="absolute top-24 left-20 w-48 h-48 rotate-45 border-4 border-green-200 overflow-hidden">
+            <div className="w-80 h-80 -rotate-45 absolute -top-24 -left-20">
+              <Image
+                src={
+                  "https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656174227/De-Gallo-Hoeve/images/pexels-helena-lopes-1959052_eosst4.jpg"
+                }
+                width={400}
+                height={400}
+                objectFit="cover"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="w-7/12">
+          <Title1 className="text-green-200">De Gallo-hoeve</Title1>
+          {wie.map((paragraph) => (
+            <Body key={nanoid(5)} className="max-w-7xl mx-10 mdl:mx-auto">
+              {paragraph}
+            </Body>
+          ))}
+        </div>
+      </section>
+      <section className="bg-white pb-2">
+        <div className="mx-auto  max-w-7xl px-5">
+          <Title1 className="text-green-200">Onze diensten</Title1>
+          {groepstraining.slice(0, 1).map((paragraph) => (
+            <Body key={nanoid(5)} className="mdl:mx-auto">
+              {paragraph}
+            </Body>
+          ))}
+        </div>
+        <div className="mx-5 max-w-7xl mdl:mx-auto py-24 relative">
+          <div className="mx-auto flex gap-10 justify-center flex-wrap ">
+            <TrainingCard
+              title="Groepstrainingen"
+              body={groepstraining}
+              items={[
+                "1 hond per inschrijving",
+                "max 10 inschrijvingen per training",
+                "Training op Zondag",
+                "€ 15,00",
+              ]}
+              link={INSCHRIJVING_GROEP}
+              image="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656189950/De-Gallo-Hoeve/images/hondenschool-740x433_hove6a.jpg"
+            />
+            <TrainingCard
+              title="Privétrainingen"
+              body={privetraining}
+              link={INSCHRIJVING_PRIVE}
+              items={[
+                "1 hond per inschrijving",
+                "Bij u thuis of op locatie",
+                "Woensdag, Vrijdag en Zaterdag",
+                "€ 25,00",
+              ]}
+              image="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656188984/De-Gallo-Hoeve/images/pexels-blue-bird-7210258_m74qdh.jpg"
             />
           </div>
-          <div className="block align-center gap-12 p24 mx-auto md:max-w-2/3">
-            <Title2>Wie zijn we?</Title2>
-            {content.map((paragraph) => (
-              <Body key={nanoid(5)}>{paragraph}</Body>
-            ))}
-          </div>
-        </div>
-      </section>
-      <section className={SECTION_LIGHTER}>
-        <Title2>Onze diensten</Title2>
-        <div className="max-w-8xl flex items-center gap-5 mx-auto justify-center flex-wrap sm:pb-25">
-          {diensten.map(({ id, ...rest }) => (
-            <Service key={id} id={id} {...rest} />
-          ))}
-        </div>
-      </section>
-      <section className={SECTION_DARKER}>
-        <div className="flex flex-grow flex-shrink flex-wrap gap-2.5 justify-center">
-          {images.map(({ id }) => (
-            <Image key={id} />
-          ))}
         </div>
       </section>
     </>
@@ -59,37 +114,24 @@ const Index: React.FC<IndexProps> = ({ images, diensten, image, content }) => {
 
 export default Index;
 
-export const getStaticProps = async () => {
-  const data = await db.multiQuery([
-    {
-      key: "image",
-      builder: conn.select("image").from("content").where({ id: 1 }).first(),
-    },
-    {
-      key: "content",
-      builder: conn.select("content").from("content").where({ id: 1 }).first(),
-    },
-    {
-      key: "images",
-      builder: conn.select("*").from("image"),
-    },
-    {
-      key: "diensten",
-      builder: conn
-        .select("id", "image", "summary", "caption", "link")
-        .from("dienst"),
-    },
-  ]);
+export const getServerSideProps = async (ctx: GetServerSideProps) => {
+  interface ContentResult {
+    content: string;
+  }
+
+  const data = (await db.query({
+    builder: conn.select("content").from("content").whereIn("id", [1, 5, 6]),
+  })) as ContentResult[];
+  const image = await db.query({
+    builder: conn.select("image").from("content").where({ id: 1 }).first(),
+  });
 
   return {
     props: {
-      images: data.images.slice(0, 12),
-      diensten: data.diensten.map((dienst: any) => ({
-        ...dienst,
-        summary: atob(dienst.summary),
-      })),
-      content: atob(data.content).split("\n"),
-      image: data.image,
+      image,
+      wie: atob(data[0].content).split("\n"),
+      privetraining: atob(data[1].content).split("\n"),
+      groepstraining: atob(data[2].content).split("\n"),
     },
   };
 };

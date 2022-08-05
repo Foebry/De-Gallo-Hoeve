@@ -7,9 +7,11 @@ export interface Props {
   className?: string;
 }
 
-export const Title1: React.FC<Props> = ({ children }) => {
+export const Title1: React.FC<Props> = ({ children, className }) => {
   return (
-    <h1 className="text-5xl text-center my-18 text-black-200 3xs:text-6xl xs:text-7xl">
+    <h1
+      className={`${className} text-5xl text-center my-18 text-black-200 3xs:text-6xl xs:text-7xl`}
+    >
       {children}
     </h1>
   );

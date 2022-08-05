@@ -8,7 +8,6 @@ body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  background-color: #cdcdcd;
 }
 
 * {
@@ -43,4 +42,46 @@ header h1 {
 .inputActive:after {
   width: 50%;
   transition: all 0.5s ease;
+}
+.formstep_bullet {
+  content: "";
+  width: 25px;
+  height: 25px;
+  display: block;
+  border: 1px solid grey;
+  border-radius: 50%;
+  background-color: white;
+  z-index: 1;
+}
+.formstep {
+  position: relative;
+  color: gray;
+}
+.formstep::before {
+  content: "";
+  border: 1px solid grey;
+  position: absolute;
+  width: 100%;
+  bottom: 12.5px;
+  right: 50%;
+}
+.formstep:first-of-type::before {
+  width: 0%;
+}
+.formstep_bullets {
+  overflow: hidden;
+}
+
+.formstep.active {
+  color: black;
+}
+.formstep.active::before {
+  border-color: #40909b;
+}
+.formstep.active .formstep_bullet {
+  border-color: #40909b;
+  background-color: #40909b;
+}
+.formstep.error {
+  color: red;
 }

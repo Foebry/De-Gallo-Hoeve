@@ -1,49 +1,107 @@
-import { Title1, Title2, Title3, FootNote } from "./Typography/Typography";
+import {
+  Title1,
+  Title2,
+  Title3,
+  FootNote,
+  Body,
+} from "./Typography/Typography";
+import {
+  IoLogoFacebook,
+  IoLogoInstagram,
+  IoMdMail,
+  IoMdPhonePortrait,
+} from "react-icons/io";
+import Form from "./form/Form";
+import FormInput from "./form/FormInput";
+import { Controller, useForm } from "react-hook-form";
 
 const Footer = () => {
+  const { control, handleSubmit } = useForm();
+
   return (
-    <footer className="pt-20 pb-12 w-80p mx-auto relative">
-      <Title1>Contacteer ons</Title1>
-      <Title2>Hondenhotel de Gallo-hoeve</Title2>
-      <Title3>Fakestraat 00 0000 Fakegemeente</Title3>
-      <Title3>
-        <a href="tel:+32400000000">+32400 00 00 00</a>
-      </Title3>
-      <Title3>
-        <a href="mailto:info@gallohoeve.be">info@gallohoeve.be</a>
-      </Title3>
-      <Title3>Openingsuren</Title3>
-      <ul className="w-11/12 mt-18 mx-auto mb-30 3xs:w-76">
-        <li className="flex justify-between my-2.5 mx-0">
-          <p>Maandag</p>
-          <p className="text-right">10:00 - 18:00</p>
-        </li>
-        <li className="flex justify-between my-2.5 mx-0">
-          <p>Dinsdag</p>
-          <p className="text-right">10:00 - 18:00</p>
-        </li>
-        <li className="flex justify-between my-2.5 mx-0">
-          <p>Woensdag</p>
-          <p className="text-right">12:30 - 18:00</p>
-        </li>
-        <li className="flex justify-between my-2.5 mx-0">
-          <p>Donderdag</p>
-          <p className="text-right">10:00 - 18:00</p>
-        </li>
-        <li className="flex justify-between my-2.5 mx-0">
-          <p>Vrijdag</p>
-          <p className="text-right">10:00 - 18:00</p>
-        </li>
-        <li className="flex justify-between my-2.5 mx-0">
-          <p>Zaterdag</p>
-          <p className="text-right">10:00 - 14:00</p>
-        </li>
-        <li className="flex justify-between my-2.5 mx-0">
-          <p>Zondag</p>
-          <p className="text-right">10:00 - 14:00</p>
-        </li>
-      </ul>
-      <FootNote>&copy; Copyright 2022. All rights reserved.</FootNote>
+    <footer className="mx-auto relative">
+      <div className="max-w-7xl mx-auto mb-20">
+        <Title1 className="text-green-200">Contacteer ons</Title1>
+        <div className="flex gap-10 justify-evenly px-5">
+          <div>
+            <Body className="flex gap-2 items-center">
+              <IoMdPhonePortrait className="text-green-200 text-2xl" />
+              Telephone
+            </Body>
+            <Body className="flex gap-2 items-center">
+              <IoMdMail className="text-green-200 text-2xl" />
+              E-mail
+            </Body>
+            <Body className="flex gap-2 items-center">
+              <IoLogoFacebook className="text-green-200 text-2xl" />
+              Facebook
+            </Body>
+            <Body className="flex gap-2 items-center">
+              <IoLogoInstagram className="text-green-200 text-2xl" />
+              Instagram
+            </Body>
+          </div>
+          <div>
+            <Form onSubmit={() => {}} action="verzend">
+              <Controller
+                name="naam"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <FormInput
+                    label="Naam"
+                    name="naam"
+                    id="naam"
+                    value={value}
+                    onChange={onChange}
+                  />
+                )}
+              />
+              <Controller
+                name="email"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <FormInput
+                    label="email"
+                    name="email"
+                    id="email"
+                    value={value}
+                    onChange={onChange}
+                  />
+                )}
+              />
+              <Controller
+                name="telefoon"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <FormInput
+                    label="telefoon"
+                    name="telefoon"
+                    id="telefoon"
+                    value={value}
+                    onChange={onChange}
+                  />
+                )}
+              />
+              <Controller
+                name="bericht"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <FormInput
+                    label="bericht"
+                    name="bericht"
+                    id="bericht"
+                    value={value}
+                    onChange={onChange}
+                  />
+                )}
+              />
+            </Form>
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center justify-center w-full h-16 px-76 border-2 z-20">
+        <Body>&copy; Copyright 2022. All rights reserved.</Body>
+      </div>
     </footer>
   );
 };

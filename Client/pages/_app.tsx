@@ -9,11 +9,8 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <AppProvider>
-        <Header />
         <Nav />
-        <main>
-          <Component {...pageProps} />
-        </main>
+        <Component {...pageProps} />
         <Footer />
       </AppProvider>
     </>
