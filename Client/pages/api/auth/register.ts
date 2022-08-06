@@ -14,15 +14,15 @@ const handler = (req: NextApiRequest, res: NextApiResponse<Response>) => {
 
 const register = async (req: NextApiRequest, res: NextApiResponse) => {
 
-    const { success, response } = await validate(req, res, {
+    return await validate(req, res, {
         schema: registerSchema,
-      });
+      }, () => {});
       
-      if(!success) return res.status(400).send(response);
+    //   if(!success) return res.status(400).send(response);
 
-    mailer.sendMail("register");
+    // mailer.sendMail("register");
 
-    res.status(201).json({success: "Bedankt voor uw registratie!"});
+    // res.status(201).json({success: "Bedankt voor uw registratie!"});
 }
 
 export default handler;

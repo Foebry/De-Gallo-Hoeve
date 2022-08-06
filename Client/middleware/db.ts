@@ -5,12 +5,12 @@ interface Connection {
   query: (
     query: { builder: knex.QueryBuilder },
     res?: NextApiResponse
-  ) => Promise<any[] |{}>;
+  ) => Promise<any[] | {}>;
   multiQuery: (
     queryList: { key: string; builder: knex.QueryBuilder }[],
     res?: NextApiResponse
   ) => Promise<void | any>;
-  getThisMonthsGroupSessions: (date: Date) => string[];
+  getNextGroupTrainings: () => string[];
 }
 
 const config: Knex.Config = {
@@ -68,15 +68,16 @@ const db: Connection = {
     return res ? res.send(data) : data;
   },
 
-  getThisMonthsGroupSessions: (date) => {
+  getNextGroupTrainings: () => {
     const nextSessions = [];
+    const date = new Date();
     const month = date.getMonth();
     const oneWeek = 7;
     while (true) {
       const sunday = new Date(
         date.setDate(date.getDate() - date.getDay() + oneWeek)
       );
-      if (sunday.getMonth() > month) return nextSessions;
+      if (nextSessions.length === 5) return nextSessions;
       nextSessions.push(sunday.toISOString().split(".")[0].split("T")[0])
     }
   },

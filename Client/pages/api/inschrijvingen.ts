@@ -18,7 +18,7 @@ const handler = (req: NextApiRequest, res:NextApiResponse<Response>) => {
 
 const postInschrijving = (req: NextApiRequest, res: NextApiResponse) => {
 
-    validate(req.body, res, {schema: inschrijvingSchema});
+    validate(req.body, res, {schema: inschrijvingSchema}, () => {});
 
     mailer.sendMail("inschrijving");
 
