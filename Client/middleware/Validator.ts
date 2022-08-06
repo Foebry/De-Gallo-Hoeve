@@ -16,8 +16,9 @@ interface Validator {
   validate: (
     req: NextApiRequest,
     res: NextApiResponse,
-    options: OptionsInterface
-  ) => Promise<{ success: boolean; response?: {} }>;
+    options: OptionsInterface,
+    callback: (obj: any) => void
+  ) => Promise<void>;
   securePage: (ctx: GetServerSidePropsContext) => JwtPayload;
   secureApi: (req: NextApiRequest, res: NextApiResponse) => {} | void;
   redirectToLogin: (ctx: GetServerSidePropsContext, redirect?: string) => void;
@@ -25,21 +26,19 @@ interface Validator {
 }
 
 export const validator: Validator = {
-  validate: async (req, res, options) => {
+  validate: async (req, res, options, callback) => {
     try {
       await options.schema.validate(req.body, {
         abortEarly: false,
         stripUnknown: true,
       });
-      return { success: true };
+      return callback({req, res})
     } catch (error: any) {
-      return {
-        success: false,
-        response: error.errors.reduce((prev: any, el: any) => {
-          const [key, value] = Object.entries(el)[0];
-          return { ...prev, [key]: value };
-        }),
-      };
+      const response = error.errors.reduce((prev: any, el: any) => {
+        const [key, value] = Object.entries(el)[0];
+        return { ...prev, [key]: value}
+      })
+      return res.status(400).json(response)
     }
   },
 
@@ -47,7 +46,7 @@ export const validator: Validator = {
     try {
     	validator.redirect = ctx.req.url;
       const cookies = nookies.get(ctx);
-      const token = cookies.jwt;
+      const token = cookies.JWT;
       const secret = process.env.JWT_SECRET;
       return jwt.verify(token, `${secret}`, { algorithms: ["RS256", "HS256"] }) as JwtPayload;
     } catch (error: any) {

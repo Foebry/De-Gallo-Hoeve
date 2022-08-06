@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Form from "../components/form/Form";
 import { useRouter } from "next/router";
-import { LOGIN } from "../types/linkTypes";
+import { INDEX, LOGIN } from "../types/linkTypes";
 import { useFieldArray, useForm } from "react-hook-form";
 import Step1 from "../components/register/step1";
 import Step2, { optionInterface } from "../components/register/step2";
@@ -15,6 +15,8 @@ import useMutation, {
 } from "../hooks/useMutation";
 import { SECTION_DARKER } from "../types/styleTypes";
 import FormSteps from "../components/form/FormSteps";
+import { GetServerSidePropsContext } from "next";
+import nookies from "nookies";
 
 export interface RegisterHondErrorInterface {
   naam?: string;
@@ -143,16 +145,14 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
 
 export default Register;
 
-export const getStaticProps = async () => {
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { data } = await getData(RASSEN);
-  console.log(data);
   const rassen = data.map((ras: { id: number; naam: string }) => ({
     value: ras.id,
     label: ras.naam,
   }));
-  return {
-    props: {
-      rassen,
-    },
-  };
+
+  return nookies.get(ctx).JWT
+    ? { redirect: { permanent: false, destination: INDEX } }
+    : { props: { rassen } };
 };

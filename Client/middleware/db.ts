@@ -1,14 +1,7 @@
 import { Knex, knex } from "knex";
 import { NextApiResponse } from "next";
-import bcrypt from "bcrypt";
-
-interface LoginPayload {
-  email: string;
-  password: string;
-}
 
 interface Connection {
-  getJwtPayload: (body: LoginPayload, res: NextApiResponse) => Promise<void>;
   query: (
     query: { builder: knex.QueryBuilder },
     res?: NextApiResponse
@@ -32,31 +25,6 @@ const config: Knex.Config = {
 };
 
 const db: Connection = {
-  getJwtPayload: async ({ email, password }, res) => {
-    try {
-      const response = await conn
-        .select("id", "email", "roles", "vnaam", "verified", "password")
-        .from("klant")
-        .where({ email })
-        .first();
-
-      if (!response)
-        return res.status(400).json({ code: 400, email: "Email not found" });
-
-      const data = JSON.parse(JSON.stringify(response));
-      const match = await bcrypt.compare(password, data.password);
-
-      return match
-        ? { ...data, password: undefined }
-        : res.status(400).json({ code: 400, password: "Invalid password" });
-    } catch (error: any) {
-      console.log(error.message);
-      return res
-        .status(500)
-        .json({ code: 500, failure: "Internal server Error" });
-    }
-  },
-
   query: async (query, res) => {
     try {
       const response = await query.builder;

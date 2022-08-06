@@ -12,6 +12,7 @@ import { LOGINAPI } from "../types/apiTypes";
 import { initializeLocalStorage } from "../helpers/localStorage";
 import { GetServerSidePropsContext } from "next";
 import { validator } from "../middleware/Validator";
+import nookies from "nookies";
 
 interface LoginErrorInterface {
   email?: string;
@@ -35,7 +36,7 @@ const Login: React.FC<{ redirect: string }> = ({ redirect }) => {
 
   return (
     <section>
-      <div className="max-w-xl mx-auto mt-30 mb-48">
+      <div className="max-w-xl mx-auto mt-30 mb-48 border-2 rounded">
         <Form onSubmit={handleSubmit(onSubmit)} className="mb-5">
           <div className="text-center">
             <Body>Login met email en wachtwoord</Body>
@@ -80,15 +81,15 @@ const Login: React.FC<{ redirect: string }> = ({ redirect }) => {
                 <Link to={REGISTER}>registreer</Link>
               </span>
             </Body>
-            <Button label="login" onClick={handleSubmit(onSubmit)} />
+            <SubmitButton label="login" onClick={handleSubmit(onSubmit)} />
           </FormRow>
           <div className="text-center mt-20">
             <Body>Login met andere app</Body>
           </div>
-          <FormRow className="py-5">
-            <Button label="Login with Facebook" className="mx-auto" />
-          </FormRow>
         </Form>
+        <FormRow className="py-5">
+          <Button label="Login with Facebook" className="mx-auto" />
+        </FormRow>
       </div>
     </section>
   );
@@ -99,5 +100,8 @@ export default Login;
 export const getServerSideProps = (ctx: GetServerSidePropsContext) => {
   const redirect = validator.redirect ?? INDEX;
   validator.redirect = undefined;
-  return { props: { redirect } };
+
+  return nookies.get(ctx).JWT
+    ? { redirect: { permanent: false, destination: INDEX } }
+    : { props: { redirect } };
 };
