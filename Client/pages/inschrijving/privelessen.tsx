@@ -20,7 +20,7 @@ import { SECTION_DARKER } from "../../types/styleTypes";
 
 export interface LessenProps {
   honden: any;
-  sessions?: {}[];
+  trainingsmomenten?: {}[];
 }
 
 export interface InschrijvingErrorInterface {
@@ -30,7 +30,7 @@ export interface InschrijvingErrorInterface {
   datum?: string;
 }
 
-const Privelessen: React.FC<LessenProps> = ({ sessions, honden }) => {
+const Privelessen: React.FC<LessenProps> = ({ trainingsmomenten, honden }) => {
   const router = useRouter();
 
   const { handleSubmit, control, getValues } = useForm();
