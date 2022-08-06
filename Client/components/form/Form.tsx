@@ -23,7 +23,7 @@ const Form: React.FC<FormProps> = ({
   steps = [],
 }) => {
   return (
-    <div className="border-2 rounded mx-auto relative">
+    <div className="mx-auto relative">
       {setActiveStep && (
         <FormSteps
           activeStep={activeStep}

@@ -1,28 +1,36 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { INDEX, LOGIN, REGISTER } from "../types/linkTypes";
-import { Title3 } from "./Typography/Typography";
+import { Body, Title3 } from "./Typography/Typography";
 import useMutation from "../hooks/useMutation";
 import { LOGOUT } from "../types/apiTypes";
 import Button from "./buttons/Button";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import NavLink from "./NavLink";
+import { parseCookies } from "nookies";
+import jwt from "jsonwebtoken";
 
 export const Nav = () => {
-  const [userName, setUserName] = useState<string | null>();
+  const [userName, setUserName] = useState<string | undefined>();
   const logout = useMutation();
   const router = useRouter();
 
   const onLogout = async () => {
     await logout(LOGOUT, {}, {}, {}, { method: "DELETE" });
-    localStorage.clear();
+    router.push(INDEX);
   };
 
-  useEffect(() => {
-    setInterval(() => {
-      setUserName(localStorage.getItem("naam"));
-    }, 1000);
-  }, []);
+  const token = parseCookies().Client;
+  const secret = process.env.NEXT_PUBLIC_COOKIE_SECRET;
+  let name: string | undefined = undefined;
+  if (token) {
+    const verifiedToken = jwt.verify(token, `${secret}`, {
+      algorithms: ["RS256", "HS256"],
+    });
+    name = JSON.parse(JSON.stringify(verifiedToken)).name;
+  }
+  if (userName !== name) setUserName(name);
 
   return (
     <div className="relative w-full h-16 hidden md:flex justify-between items-center px-76 shadow z-20">
@@ -41,22 +49,21 @@ export const Nav = () => {
           <Title3>De Gallo-Hoeve</Title3>
         </div>
       </div>
-      <nav className="flex gap-4 text-lg uppercase pr-5 text-gray-50 font-medium">
-        <Link href={LOGIN}>
-          <Button label="Login" />
-        </Link>
-        <Link href={REGISTER}>
-          <Button label="Registreer" />
-        </Link>
-        {userName && (
-          <span
-            className="text-gray-900 hover:cursor-pointer text-lg"
-            onClick={onLogout}
-          >
-            Logout
-          </span>
-        )}
-      </nav>
+      {userName ? (
+        <div className="flex gap-10 items-center">
+          <div className="uppercase text-green-200 text-lg font-medium">
+            <Title3>
+              <span className="capitalize">Hallo</span> {userName}
+            </Title3>
+          </div>
+          <Button label={"Logout"} onClick={onLogout} />
+        </div>
+      ) : (
+        <nav className="flex gap-4 text-lg uppercase pr-5 text-gray-50 font-medium">
+          <NavLink href={LOGIN} label="login" />
+          <NavLink href={REGISTER} label="registreer" />
+        </nav>
+      )}
     </div>
   );
 };
