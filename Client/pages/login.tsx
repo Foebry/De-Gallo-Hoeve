@@ -30,7 +30,7 @@ const Login: React.FC<{ redirect: string }> = ({ redirect }) => {
     const { data } = await login(LOGINAPI, values, formErrors, setFormErrors);
     if (data) {
       initializeLocalStorage(data);
-      router.push(redirect);
+      redirect ? router.push(redirect) : router.back();
     }
   };
 
@@ -98,7 +98,7 @@ const Login: React.FC<{ redirect: string }> = ({ redirect }) => {
 export default Login;
 
 export const getServerSideProps = (ctx: GetServerSidePropsContext) => {
-  const redirect = validator.redirect ?? INDEX;
+  const redirect = validator.redirect ?? null;
   validator.redirect = undefined;
 
   return nookies.get(ctx).JWT

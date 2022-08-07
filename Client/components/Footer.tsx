@@ -41,7 +41,7 @@ const Footer = () => {
               Instagram
             </Body>
           </div>
-          <div>
+          <div className="border-2 rounded">
             <Form onSubmit={() => {}} action="verzend">
               <Controller
                 name="naam"

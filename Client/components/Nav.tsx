@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { INDEX, LOGIN, REGISTER } from "../types/linkTypes";
 import { Body, Title3 } from "./Typography/Typography";
@@ -12,7 +12,6 @@ import { parseCookies } from "nookies";
 import jwt from "jsonwebtoken";
 
 export const Nav = () => {
-  const [userName, setUserName] = useState<string | undefined>();
   const logout = useMutation();
   const router = useRouter();
 
@@ -21,16 +20,19 @@ export const Nav = () => {
     router.push(INDEX);
   };
 
-  const token = parseCookies().Client;
-  const secret = process.env.NEXT_PUBLIC_COOKIE_SECRET;
-  let name: string | undefined = undefined;
-  if (token) {
-    const verifiedToken = jwt.verify(token, `${secret}`, {
-      algorithms: ["RS256", "HS256"],
-    });
-    name = JSON.parse(JSON.stringify(verifiedToken)).name;
-  }
-  if (userName !== name) setUserName(name);
+  const userName = useMemo(() => {
+    const cookies = parseCookies();
+    const token = cookies.Client;
+    const secret = process.env.NEXT_PUBLIC_COOKIE_SECRET;
+    if (token) {
+      const verifiedToken = jwt.verify(token, `${secret}`, {
+        algorithms: ["RS256", "HS256"],
+      });
+      const payload = JSON.parse(JSON.stringify(verifiedToken));
+      return payload.name;
+    }
+    return undefined;
+  }, [parseCookies()]);
 
   return (
     <div className="relative w-full h-16 hidden md:flex justify-between items-center px-76 shadow z-20">
