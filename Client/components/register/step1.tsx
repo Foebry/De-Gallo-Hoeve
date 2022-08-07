@@ -179,7 +179,12 @@ const Step1: React.FC<Step1Props> = ({
           />
         )}
       />
-      <Button type="form" label="volgende" onClick={() => setActiveStep(2)} />
+      <FormRow className="flex-row-reverse mt-20">
+        <Button
+          label="volgende"
+          onClick={() => setActiveStep((activeStep) => activeStep + 1)}
+        />
+      </FormRow>
     </div>
   );
 };

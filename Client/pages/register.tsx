@@ -17,6 +17,7 @@ import { SECTION_DARKER } from "../types/styleTypes";
 import FormSteps from "../components/form/FormSteps";
 import { GetServerSidePropsContext } from "next";
 import nookies from "nookies";
+import db, { conn } from "../middleware/db";
 
 export interface RegisterHondErrorInterface {
   naam?: string;
@@ -52,7 +53,7 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
   const register = useMutation();
   const { control, handleSubmit } = useForm();
   const { fields, append, remove } = useFieldArray({ control, name: "honden" });
-  const [activeStep, setActiveStep] = useState<number>(2);
+  const [activeStep, setActiveStep] = useState<number>(0);
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
   const [formErrors, setFormErrors] = useState<RegisterErrorInterface>({});
   const step1 = [
@@ -100,45 +101,54 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
   };
 
   return (
-    <section className={SECTION_DARKER}>
-      <Form
-        onSubmit={handleSubmit(onSubmit)}
-        steps={[
-          "Persoonlijke gegevens",
-          "Honden aanmaken",
-          "Wachtwoord aanmaken",
-        ]}
-        activeStep={activeStep}
-        errorSteps={errorSteps}
-        setActiveStep={setActiveStep}
-      >
-        {activeStep === 0 ? (
-          <Step1
-            control={control}
-            setActiveStep={setActiveStep}
-            errors={formErrors}
-            setErrors={setFormErrors}
-          />
-        ) : activeStep === 1 ? (
-          <Step2
-            control={control}
-            setActiveStep={setActiveStep}
-            fields={fields}
-            append={append}
-            remove={remove}
-            options={rassen}
-            errors={formErrors}
-            setErrors={setFormErrors}
-          />
-        ) : activeStep === 2 ? (
-          <Step3
-            control={control}
-            setActiveStep={setActiveStep}
-            errors={formErrors}
-            setErrors={setFormErrors}
-          />
-        ) : null}
-      </Form>
+    <section className="mb-48">
+      <div className="max-w-7xl mx-auto">
+        <FormSteps
+          activeStep={activeStep}
+          errorSteps={[]}
+          setActiveStep={setActiveStep}
+          steps={[
+            "Persoonlijke gegevens",
+            "Honden aanmaken",
+            "Wachtwoord aanmaken",
+          ]}
+        />
+      </div>
+      <div className="max-w-4xl mx-auto border-2 rounded mt-20 py-10">
+        <Form
+          onSubmit={handleSubmit(onSubmit)}
+          activeStep={activeStep}
+          errorSteps={errorSteps}
+          setActiveStep={setActiveStep}
+        >
+          {activeStep === 0 ? (
+            <Step1
+              control={control}
+              setActiveStep={setActiveStep}
+              errors={formErrors}
+              setErrors={setFormErrors}
+            />
+          ) : activeStep === 1 ? (
+            <Step2
+              control={control}
+              setActiveStep={setActiveStep}
+              fields={fields}
+              append={append}
+              remove={remove}
+              options={rassen}
+              errors={formErrors}
+              setErrors={setFormErrors}
+            />
+          ) : activeStep === 2 ? (
+            <Step3
+              control={control}
+              setActiveStep={setActiveStep}
+              errors={formErrors}
+              setErrors={setFormErrors}
+            />
+          ) : null}
+        </Form>
+      </div>
     </section>
   );
 };
@@ -146,11 +156,9 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
 export default Register;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  const { data } = await getData(RASSEN);
-  const rassen = data.map((ras: { id: number; naam: string }) => ({
-    value: ras.id,
-    label: ras.naam,
-  }));
+  const rassen = await db.query({
+    builder: conn.select("id as value", "naam as label").from("ras"),
+  });
 
   return nookies.get(ctx).JWT
     ? { redirect: { permanent: false, destination: INDEX } }

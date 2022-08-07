@@ -53,7 +53,7 @@ const FormInput: React.FC<FormInputProps> = ({
         {label}
       </label>
       <input
-        className="block w-full text-xl outline-none border-b-[1px] border-b-grey-500 py-1 px-2.5 text-green-100"
+        className="block w-full text-xl outline-none border-b-[1px] border-b-grey-500 py-1 px-2.5 text-black-100"
         type={type}
         id={id}
         name={name}
