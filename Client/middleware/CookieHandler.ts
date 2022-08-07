@@ -1,4 +1,8 @@
-import { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from "next";
+import {
+  GetServerSidePropsContext,
+  NextApiRequest,
+  NextApiResponse,
+} from "next";
 import { conn } from "./db";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -12,7 +16,11 @@ interface Controller {
   createJWT: (res: NextApiResponse, data: any) => void;
   setClientCookie: (res: NextApiResponse, data: any) => void;
   secureApi: (req: NextApiRequest, res: NextApiResponse) => void;
-  authenticatedUser: (ctx: GetServerSidePropsContext, callback: (userId?: number) => any) => void;
+  authenticatedUser: (
+    ctx: GetServerSidePropsContext,
+    callback: (userId?: number) => any
+  ) => void;
+  getDataFromCookie: (cookie: string, item: string | string[]) => any;
 }
 
 export const controller: Controller = {
@@ -79,17 +87,36 @@ export const controller: Controller = {
     return verifiedToken;
   },
 
-  authenticatedUser: async ({req}, callback) => {
-    const token = nookies.get({req}).JWT;
+  authenticatedUser: async ({ req }, callback) => {
+    const token = nookies.get({ req }).JWT;
     let klant_id = undefined;
-    if(token){
+    if (token) {
       const verifiedToken = jwt.verify(token, `${secret}`, {
         algorithms: ["RS256", "HS256"],
       });
       klant_id = JSON.parse(JSON.stringify(verifiedToken)).payload.id;
     }
     return await callback(klant_id);
-  }
+  },
+
+  getDataFromCookie: (cookie, item) => {
+    console.log("trying to access cookies");
+    // try{
+    // const cookies = parseCookies();
+    // console.log(cookies)
+    // }
+    // catch(error: any){
+    //   console.log("something went wrong")
+    // }
+    return {};
+  },
 };
 
 export default controller.setCookies;
+export const {
+  getDataFromCookie,
+  createJWT,
+  authenticatedUser,
+  secureApi,
+  setClientCookie,
+} = controller;

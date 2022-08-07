@@ -74,7 +74,7 @@ const Privelessen: React.FC<LessenProps> = ({ trainingsmomenten, honden }) => {
             setActiveStep={setActiveStep}
             errors={errors}
             setErrors={setErrors}
-            sessions={[]}
+            trainingsmomenten={[]}
           />
         ) : activeStep === 2 ? (
           <Step2

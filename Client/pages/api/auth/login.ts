@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import validate from "../../../middleware/Validator";
 import baseResponse from "../../../types/responseType";
-import setCookies from "../../../middleware/Controller";
+import setCookies from "../../../middleware/CookieHandler";
 import { loginSchema } from "../../../types/schemas";
 
 interface Response extends baseResponse {}

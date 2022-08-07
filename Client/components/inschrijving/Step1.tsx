@@ -1,12 +1,11 @@
 import { nanoid } from "nanoid";
-import React from "react";
+import React, { useState } from "react";
 import { Control, Controller, FieldValues } from "react-hook-form";
 import { InschrijvingErrorInterface } from "../../pages/inschrijving/privelessen";
 import Button from "../buttons/Button";
 import DayCard from "../Cards/DayCard";
 import FormRow from "../form/FormRow";
 import Session from "../Session";
-import { Title3 } from "../Typography/Typography";
 
 export interface Session {
   date: string;
@@ -16,32 +15,41 @@ export interface Session {
 }
 
 interface Step1Props {
-  sessions: Session[];
+  trainingsmomenten: Session[];
   control: Control<FieldValues, any>;
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
   errors: InschrijvingErrorInterface;
   setErrors: React.Dispatch<React.SetStateAction<InschrijvingErrorInterface>>;
 }
 
-const Step1: React.FC<Step1Props> = ({ control, setActiveStep, sessions }) => {
+const Step1: React.FC<Step1Props> = ({
+  control,
+  setActiveStep,
+  trainingsmomenten,
+}) => {
+  const [numberOfTrainings, setNumberOfTrainings] = useState<number>(5);
+  const onClick = async () => {
+    setNumberOfTrainings((numberOfTrainings) => numberOfTrainings + 5);
+  };
   return (
     <>
-      <Title3>Toekomstige trainingmomenten voor {sessions[0]?.month}</Title3>
       <div>
-        {sessions.map((session) => (
+        {trainingsmomenten.slice(0, numberOfTrainings).map((moment) => (
           <Controller
             key={nanoid(5)}
             name="datum"
             control={control}
             render={({ field: { onChange } }) => (
-              <DayCard key={nanoid(5)} {...session} onChange={onChange} />
+              <DayCard key={nanoid(5)} {...moment} onChange={onChange} />
             )}
           />
         ))}
       </div>
-      <FormRow className="mt-8">
+      <div className="flex justify-center">
+        <Button label="Meer laden" onClick={onClick} />
+      </div>
+      <FormRow className="flex-row-reverse">
         <Button
-          type="form"
           label="volgende"
           onClick={() => setActiveStep((activeStep) => activeStep + 1)}
         />

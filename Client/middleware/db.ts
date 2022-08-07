@@ -10,7 +10,7 @@ interface Connection {
     queryList: { key: string; builder: knex.QueryBuilder }[],
     res?: NextApiResponse
   ) => Promise<void | any>;
-  getNextGroupTrainings: () => string[];
+  getNextGroupTrainings: (date?: Date) => string[];
 }
 
 const config: Knex.Config = {
@@ -68,16 +68,15 @@ const db: Connection = {
     return res ? res.send(data) : data;
   },
 
-  getNextGroupTrainings: () => {
+  getNextGroupTrainings: (start?: Date) => {
     const nextSessions = [];
-    const date = new Date();
-    const month = date.getMonth();
+    const date = start ?? new Date();
     const oneWeek = 7;
     while (true) {
       const sunday = new Date(
         date.setDate(date.getDate() - date.getDay() + oneWeek)
       );
-      if (nextSessions.length === 5) return nextSessions;
+      if (nextSessions.length === 100) return nextSessions;
       nextSessions.push(sunday.toISOString().split(".")[0].split("T")[0])
     }
   },
