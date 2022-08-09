@@ -22,7 +22,7 @@ const Footer = () => {
     <footer className="mx-auto relative">
       <div className="max-w-7xl mx-auto mb-20">
         <Title1 className="text-green-200">Contacteer ons</Title1>
-        <div className="flex gap-10 justify-evenly px-5">
+        <div className="flex flex-wrap-reverse gap-10 justify-evenly px-5">
           <div>
             <Body className="flex gap-2 items-center">
               <IoMdPhonePortrait className="text-green-200 text-2xl" />
@@ -99,7 +99,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-center w-full h-16 px-76 border-2 z-20">
+      <div className="flex items-center justify-center w-full h-16 border-2 z-20">
         <Body>&copy; Copyright 2022. All rights reserved.</Body>
       </div>
     </footer>

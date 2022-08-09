@@ -1,4 +1,4 @@
-import { Body, Title1, Title2 } from "../components/Typography/Typography";
+import { Body, Title1 } from "../components/Typography/Typography";
 import { atob } from "buffer";
 import db, { conn } from "../middleware/db";
 import { GetServerSideProps } from "next";
@@ -18,50 +18,49 @@ const Index: React.FC<IndexProps> = ({
   privetraining,
   groepstraining,
   wie,
-  image,
 }) => {
   return (
     <>
-      <section className="mb-40 mx-5 flex flex-wrap gap-10 mt-10 items-center max-w-7xl md:mx-auto">
-        <div className="relative w-2/3 mx-auto mdl:w-4/12">
-          <div className="absolute left-20 -top-48 w-48 h-48 rotate-45 border-4 border-green-200 overflow-hidden">
-            <div className="w-80 h-80 -rotate-45 absolute -top-16 -left-8">
+      <section className="mb-40 mx-5 block flex-wrap mt-10 items-center max-w-7xl justify-between md:mx-auto md:flex">
+        <div className="md:mb-0 max-w-sm relative flex flex-wrap md:px-0 md:w-4/12 rotate-135 gap-5 self-center mx-auto mdl:self-end">
+          <div className="w-5/12 aspect-square border-4 border-green-200 overflow-hidden relative images">
+            <div className="aspect-square -rotate-135 absolute image">
               <Image
                 src={
                   "https://res.cloudinary.com/dv7gjzlsa/image/upload/v1659626902/De-Gallo-Hoeve/content/image1_swsxl6.png"
                 }
-                width={400}
-                height={400}
+                width={800}
+                height={800}
                 objectFit="cover"
               />
             </div>
           </div>
-          <div className="absolute -top-12 -right-4 w-48 h-48 rotate-45 border-4 border-green-200 overflow-hidden">
-            <div className="w-80 h-80 -rotate-45 absolute -top-16 -left-8">
+          <div className="w-5/12 aspect-square border-4 border-green-200 overflow-hidden relative images -order-1">
+            <div className="aspect-square -rotate-135 absolute image">
               <Image
                 src={
                   "https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656188518/De-Gallo-Hoeve/content/intro_gfgoo0.jpg"
                 }
-                width={400}
-                height={400}
+                width={800}
+                height={800}
                 objectFit="cover"
               />
             </div>
           </div>
-          <div className="absolute top-24 left-20 w-48 h-48 rotate-45 border-4 border-green-200 overflow-hidden">
-            <div className="w-80 h-80 -rotate-45 absolute -top-24 -left-20">
+          <div className="w-5/12 max-w-sm aspect-square border-4 border-green-200 overflow-hidden relative images">
+            <div className="aspect-square -rotate-135 absolute image">
               <Image
                 src={
                   "https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656174227/De-Gallo-Hoeve/images/pexels-helena-lopes-1959052_eosst4.jpg"
                 }
-                width={400}
-                height={400}
+                width={800}
+                height={800}
                 objectFit="cover"
               />
             </div>
           </div>
         </div>
-        <div className="w-7/12">
+        <div className="mx-auto md:mx-0 md:w-7/12">
           <Title1 className="text-green-200">De Gallo-hoeve</Title1>
           {wie.map((paragraph) => (
             <Body key={nanoid(5)} className="max-w-7xl mx-10 mdl:mx-auto">
@@ -79,8 +78,8 @@ const Index: React.FC<IndexProps> = ({
             </Body>
           ))}
         </div>
-        <div className="mx-5 max-w-7xl mdl:mx-auto py-24 relative">
-          <div className="mx-auto flex gap-10 justify-center flex-wrap ">
+        <div className="mx-5 max-w-7xl md:mx-auto py-24 relative">
+          <div className="flex gap-10 justify-center flex-wrap sm:flex-nowrap max-w-7xl md:mx-auto py-24 relative ">
             <TrainingCard
               title="Groepstrainingen"
               body={groepstraining}
