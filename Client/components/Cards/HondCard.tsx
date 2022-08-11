@@ -14,6 +14,10 @@ interface HondCardProps {
   setErrors: React.Dispatch<React.SetStateAction<RegisterErrorInterface>>;
   rassen: OptionsOrGroups<any, optionInterface>[];
 }
+export const geslachten = [
+  { label: "Reu", value: true },
+  { label: "Teef", value: false },
+];
 
 const HondCard: React.FC<HondCardProps> = ({
   control,
@@ -23,10 +27,10 @@ const HondCard: React.FC<HondCardProps> = ({
   rassen,
 }) => {
   const [active, setActive] = useState<boolean>(true);
-  const geslachten = [
-    { label: "Reu", value: true },
-    { label: "Teef", value: false },
-  ];
+  // const geslachten = [
+  //   { label: "Reu", value: true },
+  //   { label: "Teef", value: false },
+  // ];
   return (
     <>
       {active ? (

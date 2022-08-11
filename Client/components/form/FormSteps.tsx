@@ -15,7 +15,7 @@ const FormSteps: React.FC<FormStepsProps> = ({
   setActiveStep,
 }) => {
   return (
-    <div className="w-8/12 mx-auto formstep_bullets mt-20">
+    <div className="w-8/12 mx-auto formstep_bullets">
       <div className="flex justify-between formsteps">
         {steps.map((step, index) => {
           const extra = errorSteps.includes(index)
