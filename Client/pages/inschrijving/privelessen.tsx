@@ -2,9 +2,10 @@ import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
+import { OptionsOrGroups } from "react-select";
 import Form from "../../components/form/Form";
-import Step1 from "../../components/inschrijving/Step1";
 import Step2 from "../../components/inschrijving/Step2";
+import { optionInterface } from "../../components/register/step2";
 import getData from "../../hooks/useApi";
 import useMutation from "../../hooks/useMutation";
 import db, { conn } from "../../middleware/db";
@@ -14,13 +15,14 @@ import {
   KLANT_HONDEN,
   POST_INSCHRIJVING,
 } from "../../types/apiTypes";
-import { RegisterHondInterface } from "../../types/formTypes/registerTypes";
 import { INDEX } from "../../types/linkTypes";
 import { SECTION_DARKER } from "../../types/styleTypes";
 
 export interface LessenProps {
   honden: any;
-  trainingsmomenten?: {}[];
+  disabledDays?: string[];
+  loggedIn: boolean;
+  rassen: OptionsOrGroups<any, optionInterface>[];
 }
 
 export interface InschrijvingErrorInterface {
@@ -30,7 +32,7 @@ export interface InschrijvingErrorInterface {
   datum?: string;
 }
 
-const Privelessen: React.FC<LessenProps> = ({ trainingsmomenten, honden }) => {
+const Privelessen: React.FC<LessenProps> = ({ disabledDays, honden }) => {
   const router = useRouter();
 
   const { handleSubmit, control, getValues } = useForm();
@@ -69,21 +71,15 @@ const Privelessen: React.FC<LessenProps> = ({ trainingsmomenten, honden }) => {
         steps={["Selecteer datum", "selecteer hond"]}
       >
         {activeStep === 1 ? (
-          <Step1
-            control={control}
-            setActiveStep={setActiveStep}
-            errors={errors}
-            setErrors={setErrors}
-            trainingsmomenten={[]}
-          />
+          <></>
         ) : activeStep === 2 ? (
           <Step2
             control={control}
-            setActiveStep={setActiveStep}
-            honden={honden}
+            rassen={honden}
             values={getValues}
             errors={errors}
             setErrors={setErrors}
+            selectedDates={[]}
           />
         ) : null}
       </Form>

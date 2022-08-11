@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Body, Link } from "../components/Typography/Typography";
 import Form from "../components/form/Form";
 import FormInput from "../components/form/FormInput";
@@ -11,15 +11,21 @@ import useMutation from "../hooks/useMutation";
 import { LOGINAPI } from "../types/apiTypes";
 import { initializeLocalStorage } from "../helpers/localStorage";
 import { GetServerSidePropsContext } from "next";
-import { validator } from "../middleware/Validator";
+import { refreshCsrf, validator } from "../middleware/Validator";
 import nookies from "nookies";
+import bcrypt from "bcrypt";
 
 interface LoginErrorInterface {
   email?: string;
   password?: string;
 }
 
-const Login: React.FC<{ redirect: string }> = ({ redirect }) => {
+interface LoginPropsInterface {
+  redirect: string;
+  csrf: string;
+}
+
+const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
   const router = useRouter();
   const login = useMutation();
 
@@ -27,7 +33,12 @@ const Login: React.FC<{ redirect: string }> = ({ redirect }) => {
   const { control, handleSubmit } = useForm();
 
   const onSubmit = async (values: any) => {
-    const { data } = await login(LOGINAPI, values, formErrors, setFormErrors);
+    const { data } = await login(
+      LOGINAPI,
+      { ...values, csrf },
+      formErrors,
+      setFormErrors
+    );
     if (data) {
       initializeLocalStorage(data);
       redirect ? router.push(redirect) : router.back();
@@ -97,11 +108,11 @@ const Login: React.FC<{ redirect: string }> = ({ redirect }) => {
 
 export default Login;
 
-export const getServerSideProps = (ctx: GetServerSidePropsContext) => {
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const redirect = validator.redirect ?? null;
-  validator.redirect = undefined;
+  const csrf = refreshCsrf();
 
   return nookies.get(ctx).JWT
     ? { redirect: { permanent: false, destination: INDEX } }
-    : { props: { redirect } };
+    : { props: { redirect, csrf } };
 };

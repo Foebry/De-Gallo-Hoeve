@@ -1,4 +1,6 @@
 import axios from "axios";
+import react from "react";
+import { toast } from "react-toastify";
 
 interface ApiError {
   response: {
@@ -15,9 +17,9 @@ const useMutation = () => {
     formErrors: any,
     setFormErrors: any,
     options?: {
-      method: REQUESTMETHOD
+      method: REQUESTMETHOD;
     }
-  ) => {;
+  ) => {
     try {
       const { data } = await axios(endpoint, {
         method: options?.method ?? "POST",
@@ -28,8 +30,8 @@ const useMutation = () => {
     } catch (errorData) {
       const formError = errorData as ApiError;
       const errors: any = formError.response.data as typeof formErrors;
-      setFormErrors({...formError, ...errors});
-      console.log(errorData);
+      setFormErrors({ ...formError, ...errors });
+      toast.error(errors.message);
       return { data: undefined, error: formError.response.data };
     }
   };
