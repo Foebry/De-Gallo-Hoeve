@@ -10,7 +10,7 @@ interface Connection {
     queryList: { key: string; builder: knex.QueryBuilder }[],
     res?: NextApiResponse
   ) => Promise<void | any>;
-  getNextGroupTrainings: (date?: Date) => string[];
+  getDisabledDays: (excep: string) => string[];
 }
 
 const config: Knex.Config = {
@@ -68,16 +68,19 @@ const db: Connection = {
     return res ? res.send(data) : data;
   },
 
-  getNextGroupTrainings: (start?: Date) => {
-    const nextSessions = [];
-    const date = start ?? new Date();
-    const oneWeek = 7;
+  getDisabledDays: (exep: string) => {
+    const date = new Date();
+    const disabledDays = [date.toISOString().split(".")[0].split("T")[0]];
+    const temp = new Date();
+    const enddate = new Date(temp.setDate(temp.getDate() + 365));
     while (true) {
-      const sunday = new Date(
-        date.setDate(date.getDate() - date.getDay() + oneWeek)
-      );
-      if (nextSessions.length === 100) return nextSessions;
-      nextSessions.push(sunday.toISOString().split(".")[0].split("T")[0])
+      const newDate = new Date(date.setDate(date.getDate() + 1));
+      const dateString = newDate.toISOString().split(".")[0].split("T")[0];
+      if (exep === "groep" && newDate.getDay() !== 0)
+        disabledDays.push(dateString);
+      else if (exep === "prive" && ![3, 5, 6].includes(newDate.getDay()))
+        disabledDays.push(dateString);
+      if (newDate.getTime() > enddate.getTime()) return disabledDays;
     }
   },
 };
