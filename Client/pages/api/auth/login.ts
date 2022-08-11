@@ -1,5 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import validate from "../../../middleware/Validator";
+import {
+  validate,
+  validateCsrfToken,
+  validator,
+} from "../../../middleware/Validator";
 import baseResponse from "../../../types/responseType";
 import setCookies from "../../../middleware/CookieHandler";
 import { loginSchema } from "../../../types/schemas";
@@ -16,12 +20,9 @@ const handler = (req: NextApiRequest, res: NextApiResponse<Response>) => {
 };
 
 const login = async (req: NextApiRequest, res: NextApiResponse) => {
-  return await validate(req, res, {
-    schema: loginSchema
-  }, 
-  setCookies);
+  return validateCsrfToken({ req, res }, () => {
+    return validate(req, res, { schema: loginSchema }, setCookies);
+  });
 };
-
-
 
 export default handler;
