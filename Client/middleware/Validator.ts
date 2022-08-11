@@ -6,6 +6,9 @@ import {
 import { AnySchema } from "yup";
 import nookies, { parseCookies } from "nookies";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { nanoid } from "nanoid";
+import { compare, hash } from "./Hashing";
+import db, { conn } from "./db";
 
 interface OptionsInterface {
   schema: AnySchema;
@@ -13,6 +16,9 @@ interface OptionsInterface {
 }
 
 interface Validator {
+  redirect?: string;
+  csrf?: string;
+  salt?: string;
   validate: (
     req: NextApiRequest,
     res: NextApiResponse,
@@ -22,7 +28,16 @@ interface Validator {
   securePage: (ctx: GetServerSidePropsContext) => JwtPayload;
   secureApi: (req: NextApiRequest, res: NextApiResponse) => {} | void;
   redirectToLogin: (ctx: GetServerSidePropsContext, redirect?: string) => void;
-	redirect?: string;
+  validateCsrfToken: (
+    obj: { req: NextApiRequest; res: NextApiResponse },
+    callback: any
+  ) => void;
+  refreshCsrf: () => string;
+  confirmRegister: (
+    req: NextApiRequest,
+    res: NextApiResponse,
+    callback: () => void
+  ) => Promise<void>;
 }
 
 export const validator: Validator = {
@@ -32,26 +47,28 @@ export const validator: Validator = {
         abortEarly: false,
         stripUnknown: true,
       });
-      return callback({req, res})
+      return callback({ req, res });
     } catch (error: any) {
       const response = error.errors.reduce((prev: any, el: any) => {
         const [key, value] = Object.entries(el)[0];
-        return { ...prev, [key]: value}
-      })
-      return res.status(400).json(response)
+        return { ...prev, [key]: value };
+      });
+      return res.status(400).json(response);
     }
   },
 
   securePage: (ctx) => {
     try {
-    	validator.redirect = ctx.req.url;
+      validator.redirect = ctx.req.url;
       const cookies = nookies.get(ctx);
       const token = cookies.JWT;
       const secret = process.env.JWT_SECRET;
-      return jwt.verify(token, `${secret}`, { algorithms: ["RS256", "HS256"] }) as JwtPayload;
+      return jwt.verify(token, `${secret}`, {
+        algorithms: ["RS256", "HS256"],
+      }) as JwtPayload;
     } catch (error: any) {
       validator.redirectToLogin(ctx, ctx.req.url);
-      return {} as JwtPayload
+      return {} as JwtPayload;
     }
   },
 
@@ -80,7 +97,43 @@ export const validator: Validator = {
     ctx.res.statusCode = 302;
   },
 
-	redirect: undefined
-};
+  refreshCsrf: () => {
+    const secret = `${process.env.CSRF_SECRET}`;
+    return hash(nanoid(20), secret);
+  },
 
-export default validator.validate;
+  redirect: undefined,
+  csrf: undefined,
+  salt: undefined,
+
+  validateCsrfToken: async ({ req, res }, callback) => {
+    const secret = `${process.env.CSRF_SECRET}`;
+    if (!req.body.csrf || !compare(req.body.csrf, secret))
+      return res.status(400).json({ message: "Ongeldig formulier" });
+    return await callback();
+  },
+
+  confirmRegister: async (req, res, callback) => {
+    const email = req.body.email;
+    const data = await db.query({
+      builder: conn.select("email").from("klant").where(email).first(),
+    });
+    if (data)
+      return res.status(400).json({
+        email: "Email adres in gebruik",
+        message: "Registratie kon niet verwerkt worden.",
+      });
+    return res.status(201).json({});
+  },
+};
+export const {
+  validate,
+  secureApi,
+  securePage,
+  redirectToLogin,
+  validateCsrfToken,
+  refreshCsrf,
+  redirect,
+  csrf,
+  confirmRegister,
+} = validator;
