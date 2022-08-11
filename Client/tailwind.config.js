@@ -9,8 +9,8 @@ module.exports = {
     screens: {
       lg: "1280px",
       mdl: "1050px",
-      md: "950px",
-      sm: "800px",
+      md: "900px",
+      sm: "750px",
       xs: "625px",
       "2xs": "550px",
       "3xs": "380px",
@@ -137,6 +137,7 @@ module.exports = {
         "90p": "90%",
         "95p": "95%",
         "98p": "98%",
+        "166p": "166%",
         full: "100%",
         18: "75px",
         25: "100px",
@@ -150,6 +151,9 @@ module.exports = {
       fontSize: {
         "5vmax": "5vmax",
         "8vmin": "8vmin",
+      },
+      rotate: {
+        135: "135deg",
       },
     },
   },

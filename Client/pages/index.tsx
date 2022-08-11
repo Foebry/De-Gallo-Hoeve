@@ -21,9 +21,9 @@ const Index: React.FC<IndexProps> = ({
 }) => {
   return (
     <>
-      <section className="mb-40 mx-5 block flex-wrap mt-10 items-center max-w-7xl justify-between md:mx-auto md:flex">
-        <div className="md:mb-0 max-w-sm relative flex flex-wrap md:px-0 md:w-4/12 rotate-135 gap-5 self-center mx-auto mdl:self-end">
-          <div className="w-5/12 aspect-square border-4 border-green-200 overflow-hidden relative images">
+      <section className="mb-40 block flex-wrap mt-10 items-center max-w-7xl justify-between mx-auto md:flex md:px-5">
+        <div className="mx-auto w-1/2 relative flex flex-wrap rotate-135 gap-5 self-center md:w-4/12 md:mx-0 mdl:self-end">
+          <div className="w-5/12 max-w-sm aspect-square border-4 border-green-200 overflow-hidden relative images">
             <div className="aspect-square -rotate-135 absolute image">
               <Image
                 src={
@@ -60,25 +60,25 @@ const Index: React.FC<IndexProps> = ({
             </div>
           </div>
         </div>
-        <div className="mx-auto md:mx-0 md:w-7/12">
+        <div className="px-5 mx-auto md:mx-0 md:w-7/12 md:px-0">
           <Title1 className="text-green-200">De Gallo-hoeve</Title1>
           {wie.map((paragraph) => (
-            <Body key={nanoid(5)} className="max-w-7xl mx-10 mdl:mx-auto">
+            <Body key={nanoid(5)} className="max-w-7xl px-2 md:mx-auto">
               {paragraph}
             </Body>
           ))}
         </div>
       </section>
-      <section className="bg-white pb-2">
-        <div className="mx-auto  max-w-7xl px-5">
+      <section className="bg-white pb-2 mx-auto md:px-5">
+        <div className="px-5 mx-auto  max-w-7xl md:px-0">
           <Title1 className="text-green-200">Onze diensten</Title1>
           {groepstraining.slice(0, 1).map((paragraph) => (
-            <Body key={nanoid(5)} className="mdl:mx-auto">
+            <Body key={nanoid(5)} className="px-2 md:mx-auto">
               {paragraph}
             </Body>
           ))}
         </div>
-        <div className="mx-5 max-w-7xl md:mx-auto py-24 relative">
+        <div className="px-5 max-w-7xl py-24 relative md:mx-auto md:px-0">
           <div className="flex gap-10 justify-center flex-wrap sm:flex-nowrap max-w-7xl md:mx-auto py-24 relative ">
             <TrainingCard
               title="Groepstrainingen"
