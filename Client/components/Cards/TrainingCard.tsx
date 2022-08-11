@@ -26,7 +26,7 @@ const TrainingCard: React.FC<TrainingProps> = ({
   const router = useRouter();
   return (
     <div
-      className="border cursor-pointer border-gray-100 rounded-lg pb-2 hover:shadow-xl max-w-md min-w-2xs"
+      className="border cursor-pointer border-gray-100 rounded-lg pb-2 hover:shadow-xl max-w-md flex-shrink"
       onClick={() => router.push(link)}
     >
       <div className="bg-green-200 text-center text-2xl py-8 text-gray-50 rounded-t-lg">
@@ -41,7 +41,7 @@ const TrainingCard: React.FC<TrainingProps> = ({
             {paragraph}
           </Body>
         ))}
-        <ul className="pl-20 mt-10">
+        <ul className="pl-5 md:pl-20 mt-10">
           {items.map((item) => (
             <Body key={nanoid(5)} className="flex gap-2">
               <GiCheckMark />

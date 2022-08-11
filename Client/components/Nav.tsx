@@ -35,37 +35,39 @@ export const Nav = () => {
   }, [parseCookies()]);
 
   return (
-    <div className="relative w-full h-16 hidden md:flex justify-between items-center px-76 shadow z-20">
-      <div
-        className="flex gap-10 items-center cursor-pointer"
-        onClick={() => router.push(INDEX)}
-      >
-        <div className="w-16">
-          <Image
-            src="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1659613403/De-Gallo-Hoeve/content/logo-r_vwnpdy.png"
-            width={64}
-            height={64}
-          />
-        </div>
-        <div className="text-lg uppercase text-green-200 font-medium">
-          <Title3>De Gallo-Hoeve</Title3>
-        </div>
-      </div>
-      {userName ? (
-        <div className="flex gap-10 items-center">
-          <div className="uppercase text-green-200 text-lg font-medium">
-            <Title3>
-              <span className="capitalize">Hallo</span> {userName}
-            </Title3>
+    <div className="relative mb-30 w-full shadow h-16 z-20 md:mb-0 md:block">
+      <div className="max-w-7xl flex justify-between items-center mx-auto px-5">
+        <div
+          className="flex gap-10 items-center cursor-pointer"
+          onClick={() => router.push(INDEX)}
+        >
+          <div className="w-16">
+            <Image
+              src="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1659613403/De-Gallo-Hoeve/content/logo-r_vwnpdy.png"
+              width={64}
+              height={64}
+            />
           </div>
-          <Button label={"Logout"} onClick={onLogout} />
+          <div className="hidden xs:block text-lg uppercase text-green-200 font-medium">
+            <Title3>De Gallo-Hoeve</Title3>
+          </div>
         </div>
-      ) : (
-        <nav className="flex gap-4 text-lg uppercase pr-5 text-gray-50 font-medium">
-          <NavLink href={LOGIN} label="login" />
-          <NavLink href={REGISTER} label="registreer" />
-        </nav>
-      )}
+        {userName ? (
+          <div className="flex gap-10 items-center">
+            <div className="uppercase text-green-200 text-lg font-medium">
+              <Title3>
+                <span className="capitalize">Hallo</span> {userName}
+              </Title3>
+            </div>
+            <Button label={"Logout"} onClick={onLogout} />
+          </div>
+        ) : (
+          <nav className="hidden md:flex gap-4 text-lg uppercase pr-5 text-gray-50 font-medium">
+            <NavLink href={LOGIN} label="login" />
+            <NavLink href={REGISTER} label="registreer" />
+          </nav>
+        )}
+      </div>
     </div>
   );
 };

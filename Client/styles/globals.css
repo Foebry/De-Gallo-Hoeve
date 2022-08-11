@@ -85,3 +85,15 @@ header h1 {
 .formstep.error {
   color: red;
 }
+.images .image {
+  width: 166%;
+}
+
+.images .image {
+  right: -35%;
+  top: -35%;
+}
+.images:nth-of-type(2) .image {
+  left: -30%;
+  top: -50%;
+}
