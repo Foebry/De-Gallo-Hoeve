@@ -19,17 +19,21 @@ import { INDEX } from "../../types/linkTypes";
 import { SECTION_DARKER } from "../../types/styleTypes";
 
 export interface LessenProps {
-  honden: any;
+  honden: OptionsOrGroups<any, optionInterface>[];
   disabledDays?: string[];
-  loggedIn: boolean;
+  klant_id?: number;
   rassen: OptionsOrGroups<any, optionInterface>[];
+  csrf: string;
 }
 
 export interface InschrijvingErrorInterface {
-  hond_id?: number;
-  training_id?: number;
-  klant_id?: number;
-  datum?: string;
+  inschrijvingen: {
+    datum: string;
+    hond_naam?: string;
+    hond_ras?: number;
+    hond_geslacht?: string;
+  }[];
+  email?: string;
 }
 
 const Privelessen: React.FC<LessenProps> = ({ disabledDays, honden }) => {

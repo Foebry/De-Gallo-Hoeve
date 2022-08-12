@@ -1,12 +1,11 @@
 interface Mailer {
-    sendMail: (type: string) => void;
+  sendMail: (type: string) => void;
 }
 
 const mailer: Mailer = {
-
-    sendMail: (type) => {
-
-    }
-}
+  sendMail: (type) => {
+    console.log(`sending ${type} mail`);
+  },
+};
 
 export default mailer;

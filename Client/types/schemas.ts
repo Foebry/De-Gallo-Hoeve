@@ -40,11 +40,20 @@ const register = object({
 });
 
 const inschrijving = object({
-  csrf: string().required({ failure: "Invalid form" }),
-  hond_id: number().required(),
-  training_id: number().required(),
-  klant_id: number().required(),
-  datum: date().required(),
+  inschrijvingen: array(
+    object({
+      datum: string().required({ message: "Ongeldige datum" }),
+      hond_id: number().optional(),
+      hond_naam: string().optional(),
+      hond_ras: number().optional(),
+      hond_geslacht: string().optional(),
+    })
+  ).required({ message: "Geen datum geselecteerd" }),
+  training_id: number().required({ message: "Ongeldige training" }),
+  klant_id: number().optional().nullable(),
+  email: string()
+    .email({ message: "ongeldige email", email: "ongeldige email" })
+    .optional(),
 });
 
 const boeking = object({

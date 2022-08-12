@@ -1,6 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import mailer from "../../middleware/Mailer";
-import { validate } from "../../middleware/Validator";
+import {
+  confirmInschrijving,
+  validate,
+  validateCsrfToken,
+} from "../../middleware/Validator";
 import baseResponse from "../../types/responseType";
 import { inschrijvingSchema } from "../../types/schemas";
 
@@ -12,12 +16,22 @@ const handler = (req: NextApiRequest, res: NextApiResponse<Response>) => {
   res.status(405).json({ code: 405, message: "Not Allowed" });
 };
 
-const postInschrijving = (req: NextApiRequest, res: NextApiResponse) => {
-  validate(req.body, res, { schema: inschrijvingSchema }, () => {});
+const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
+  await validateCsrfToken({ req, res }, () => {
+    return validate(req, res, { schema: inschrijvingSchema }, () => {
+      return confirmInschrijving({ req, res });
+    });
+  });
 
-  mailer.sendMail("inschrijving");
+  if (res.statusCode === 200) mailer.sendMail("inschrijving");
+  return res;
+  // validate(req.body, res, { schema: inschrijvingSchema }, () => {});
 
-  res.status(201).json({ success: "Uw boeking is goed ontvangen!" });
+  // mailer.sendMail("inschrijving");
+
+  // res
+  //   .status(201)
+  //   .json({ success: "We hebben uw inschrijving(en) goed ontvangen!" });
 };
 
 export default handler;

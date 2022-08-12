@@ -38,6 +38,18 @@ interface Validator {
     res: NextApiResponse,
     callback: () => void
   ) => Promise<void>;
+  confirmInschrijving: (obj: {
+    req: NextApiRequest;
+    res: NextApiResponse;
+  }) => Promise<void>;
+  inschrijvingNotLoggedIn: (obj: {
+    req: NextApiRequest;
+    res: NextApiResponse;
+  }) => Promise<void>;
+  inschrijvingLoggedIn: (obj: {
+    req: NextApiRequest;
+    res: NextApiResponse;
+  }) => Promise<void>;
 }
 
 export const validator: Validator = {
@@ -110,6 +122,7 @@ export const validator: Validator = {
     const secret = `${process.env.CSRF_SECRET}`;
     if (!req.body.csrf || !compare(req.body.csrf, secret))
       return res.status(400).json({ message: "Ongeldig formulier" });
+
     return await callback();
   },
 
@@ -125,7 +138,25 @@ export const validator: Validator = {
       });
     return res.status(201).json({});
   },
+
+  confirmInschrijving: async ({ req, res }) => {
+    const { klant_id } = req.body;
+    return klant_id === 0
+      ? validator.inschrijvingNotLoggedIn({ req, res })
+      : validator.inschrijvingLoggedIn({ req, res });
+  },
+
+  inschrijvingNotLoggedIn: async ({ req, res }) => {
+    return res
+      .status(200)
+      .json({ message: "Inschrijving(en) goed ontvangen!" });
+  },
+
+  inschrijvingLoggedIn: async ({ req, res }) => {
+    return res.status(400).json({ message: "logged in" });
+  },
 };
+
 export const {
   validate,
   secureApi,
@@ -136,4 +167,5 @@ export const {
   redirect,
   csrf,
   confirmRegister,
+  confirmInschrijving,
 } = validator;
