@@ -49,53 +49,55 @@ const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
     <section>
       <div className="max-w-xl mx-auto mt-30 mb-48 border-2 rounded">
         <Form onSubmit={handleSubmit(onSubmit)} className="mb-5">
-          <div className="text-center">
-            <Body>Login met email en wachtwoord</Body>
-          </div>
-          <Controller
-            name="email"
-            control={control}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <FormInput
-                label="email"
-                name="email"
-                id="email"
-                value={value}
-                onChange={onChange}
-                onBlur={onBlur}
-                errors={formErrors}
-                setErrors={setFormErrors}
-              />
-            )}
-          />
-          <Controller
-            name="password"
-            control={control}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <FormInput
-                label="password"
-                name="password"
-                id="password"
-                type="password"
-                value={value}
-                onChange={onChange}
-                onBlur={onBlur}
-                errors={formErrors}
-                setErrors={setFormErrors}
-              />
-            )}
-          />
-          <FormRow>
-            <Body>
-              Nog geen account?{"	"}
-              <span>
-                <Link to={REGISTER}>registreer</Link>
-              </span>
-            </Body>
-            <SubmitButton label="login" onClick={handleSubmit(onSubmit)} />
-          </FormRow>
-          <div className="text-center mt-20">
-            <Body>Login met andere app</Body>
+          <div className="px-20 py-10">
+            <div className="text-center mb-10">
+              <Body>Login met email en wachtwoord</Body>
+            </div>
+            <Controller
+              name="email"
+              control={control}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <FormInput
+                  label="email"
+                  name="email"
+                  id="email"
+                  value={value}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  errors={formErrors}
+                  setErrors={setFormErrors}
+                />
+              )}
+            />
+            <Controller
+              name="password"
+              control={control}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <FormInput
+                  label="password"
+                  name="password"
+                  id="password"
+                  type="password"
+                  value={value}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  errors={formErrors}
+                  setErrors={setFormErrors}
+                />
+              )}
+            />
+            <FormRow>
+              <Body>
+                Nog geen account?{"	"}
+                <span>
+                  <Link to={REGISTER}>registreer</Link>
+                </span>
+              </Body>
+              <SubmitButton label="login" onClick={handleSubmit(onSubmit)} />
+            </FormRow>
+            <div className="text-center mt-20">
+              <Body>Login met andere app</Body>
+            </div>
           </div>
         </Form>
         <FormRow className="py-5">

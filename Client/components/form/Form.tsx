@@ -19,7 +19,7 @@ const Form: React.FC<FormProps> = ({
 }) => {
   return (
     <div className="mx-auto relative">
-      <form className={`${className} mx-auto px-20`} onSubmit={onSubmit}>
+      <form className={`${className} mx-auto`} onSubmit={onSubmit}>
         {children}
         {action && (
           <div className="flex flex-row-reverse">

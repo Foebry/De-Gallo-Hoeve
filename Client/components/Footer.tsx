@@ -43,64 +43,68 @@ const Footer = () => {
           </div>
           <div className="border-2 rounded">
             <Form onSubmit={() => {}} action="verzend">
-              <Controller
-                name="naam"
-                control={control}
-                render={({ field: { value, onChange } }) => (
-                  <FormInput
-                    label="Naam"
-                    name="naam"
-                    id="naam"
-                    value={value}
-                    onChange={onChange}
-                  />
-                )}
-              />
-              <Controller
-                name="email"
-                control={control}
-                render={({ field: { value, onChange } }) => (
-                  <FormInput
-                    label="email"
-                    name="email"
-                    id="email"
-                    value={value}
-                    onChange={onChange}
-                  />
-                )}
-              />
-              <Controller
-                name="telefoon"
-                control={control}
-                render={({ field: { value, onChange } }) => (
-                  <FormInput
-                    label="telefoon"
-                    name="telefoon"
-                    id="telefoon"
-                    value={value}
-                    onChange={onChange}
-                  />
-                )}
-              />
-              <Controller
-                name="bericht"
-                control={control}
-                render={({ field: { value, onChange } }) => (
-                  <FormInput
-                    label="bericht"
-                    name="bericht"
-                    id="bericht"
-                    value={value}
-                    onChange={onChange}
-                  />
-                )}
-              />
+              <div className="3xs:px-20">
+                <Controller
+                  name="naam"
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <FormInput
+                      label="Naam"
+                      name="naam"
+                      id="naam"
+                      value={value}
+                      onChange={onChange}
+                    />
+                  )}
+                />
+                <Controller
+                  name="email"
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <FormInput
+                      label="email"
+                      name="email"
+                      id="email"
+                      value={value}
+                      onChange={onChange}
+                    />
+                  )}
+                />
+                <Controller
+                  name="telefoon"
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <FormInput
+                      label="telefoon"
+                      name="telefoon"
+                      id="telefoon"
+                      value={value}
+                      onChange={onChange}
+                    />
+                  )}
+                />
+                <Controller
+                  name="bericht"
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <FormInput
+                      label="bericht"
+                      name="bericht"
+                      id="bericht"
+                      value={value}
+                      onChange={onChange}
+                    />
+                  )}
+                />
+              </div>
             </Form>
           </div>
         </div>
       </div>
       <div className="flex items-center justify-center w-full h-16 border-2 z-20">
-        <Body>&copy; Copyright 2022. All rights reserved.</Body>
+        <Body className="text-center">
+          &copy; Copyright 2022. All rights reserved.
+        </Body>
       </div>
     </footer>
   );
