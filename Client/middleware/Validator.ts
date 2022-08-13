@@ -8,7 +8,9 @@ import nookies, { parseCookies } from "nookies";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { nanoid } from "nanoid";
 import { compare, hash } from "./Hashing";
-import db, { conn } from "./db";
+import db from "./db";
+import bcrypt from "bcrypt";
+import { getKlantByEmail, getKlantById } from "./Loader";
 
 interface OptionsInterface {
   schema: AnySchema;
@@ -31,22 +33,22 @@ interface Validator {
   validateCsrfToken: (
     obj: { req: NextApiRequest; res: NextApiResponse },
     callback: any
-  ) => void;
+  ) => Promise<void>;
   refreshCsrf: () => string;
   confirmRegister: (
     req: NextApiRequest,
     res: NextApiResponse,
-    callback: () => void
-  ) => Promise<void>;
+    callback: () => Promise<void>
+  ) => Promise<void | NextApiResponse<any>>;
   confirmInschrijving: (obj: {
     req: NextApiRequest;
     res: NextApiResponse;
   }) => Promise<void>;
-  inschrijvingNotLoggedIn: (obj: {
+  AnoniemeInschrijving: (obj: {
     req: NextApiRequest;
     res: NextApiResponse;
   }) => Promise<void>;
-  inschrijvingLoggedIn: (obj: {
+  AangemeldeInschrijving: (obj: {
     req: NextApiRequest;
     res: NextApiResponse;
   }) => Promise<void>;
@@ -55,7 +57,7 @@ interface Validator {
 export const validator: Validator = {
   validate: async (req, res, options, callback) => {
     try {
-      await options.schema.validate(req.body, {
+      req.body = await options.schema.validate(req.body, {
         abortEarly: false,
         stripUnknown: true,
       });
@@ -127,32 +129,37 @@ export const validator: Validator = {
   },
 
   confirmRegister: async (req, res, callback) => {
-    const email = req.body.email;
-    const data = await db.query({
-      builder: conn.select("email").from("klant").where(email).first(),
-    });
-    if (data)
+    const { email, password } = req.body;
+    const klant = await getKlantByEmail(email);
+    if (klant)
       return res.status(400).json({
         email: "Email adres in gebruik",
         message: "Registratie kon niet verwerkt worden.",
       });
-    return res.status(201).json({});
+
+    req.body.password = await bcrypt.hash(password, 10);
+    return db.register(req, res, callback);
   },
 
   confirmInschrijving: async ({ req, res }) => {
     const { klant_id } = req.body;
+    const { verified } = await getKlantById(klant_id);
+    if (verified === 0)
+      return res
+        .status(422)
+        .json({ message: "Gelieve uw email te verifiëren" });
     return klant_id === 0
-      ? validator.inschrijvingNotLoggedIn({ req, res })
-      : validator.inschrijvingLoggedIn({ req, res });
+      ? validator.AnoniemeInschrijving({ req, res })
+      : validator.AangemeldeInschrijving({ req, res });
   },
 
-  inschrijvingNotLoggedIn: async ({ req, res }) => {
+  AnoniemeInschrijving: async ({ req, res }) => {
     return res
       .status(200)
       .json({ message: "Inschrijving(en) goed ontvangen!" });
   },
 
-  inschrijvingLoggedIn: async ({ req, res }) => {
+  AangemeldeInschrijving: async ({ req, res }) => {
     return res.status(400).json({ message: "logged in" });
   },
 };

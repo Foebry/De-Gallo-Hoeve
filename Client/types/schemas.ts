@@ -15,26 +15,44 @@ const register = object({
     .required({ email: "email is required" }),
   password: string().required({ password: "password is required" }),
   vnaam: string()
+    .matches(/^[a-z ,.'-éëèçêïü]+$/i, {
+      message: { vnaam: "Kan enkel letters bevatten" },
+    })
     .required({ vnaam: "Voornaam is required" })
-    .max(1, { vnaam: "Maximaal 1 characters" }),
-  lnaam: string().required({ lnaam: "Naam is required" }),
+    .max(255, { vnaam: "Maximaal 255 characters" }),
+  lnaam: string()
+    .required({ lnaam: "Naam is required" })
+    .matches(/^[a-z ,.'-éëèçêïü]+$/i, {
+      message: { lnaam: "Kan enkel letters bevatten" },
+    }),
   gsm: string().required({ gsm: "Telefoon is required" }),
-  straat: string().required({ straat: "Straat is required" }),
+  straat: string()
+    .required({ straat: "Straat is required" })
+    .matches(/^[a-z ,.'-éëèçêïü]+$/i, {
+      message: { straat: "Kan enkel letters bevatten" },
+    }),
   nr: number().required({ nr: "Huisnr is required" }),
-  gemeente: string().required({ gemeente: "Gemeente is required" }),
+  gemeente: string()
+    .required({ gemeente: "Gemeente is required" })
+    .matches(/^[a-z ,.'-éëèçêïü]+$/i, {
+      message: { gemeente: "Kan enkel letters bevatten" },
+    }),
   postcode: number().required({ postcode: "Postcode is required" }),
   honden: array(
     object({
       ras_id: number().required({ ras_id: "Gelieve een ras te selecteren" }),
-      naam: string().required({ naam: "Naam is required" }),
+      naam: string()
+        .required({ naam: "Naam is required" })
+        .matches(/^[a-z ,.'-éëèçêïü]+$/i, {
+          message: { honden: "Kan enkel letters bevatten" },
+        }),
       geboortedatum: date().required({
         geboortedatum: "Geboortedatum is required",
       }),
-      chip_nr: string().optional(),
-      geslacht: number()
-        .min(0, { geslacht: "Invalid geslacht" })
-        .max(1, { geslacht: "Invalid geslacht" })
-        .required({ geslacht: "Gelieve een geslacht aan te duiden" }),
+      chip_nr: string().optional().default(""),
+      geslacht: string().required({
+        geslacht: "Gelieve een geslacht aan te duiden",
+      }),
     })
   ),
 });

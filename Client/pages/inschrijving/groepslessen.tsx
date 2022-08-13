@@ -21,6 +21,11 @@ import { refreshCsrf } from "../../middleware/Validator";
 import FormInput from "../../components/form/FormInput";
 import Contactgegevens from "../../components/inschrijving/Contactgegevens";
 import { toast } from "react-toastify";
+import {
+  getDisabledDays,
+  getHondOptions,
+  getRasOptions,
+} from "../../middleware/Loader";
 
 const Groepslessen: React.FC<LessenProps> = ({
   honden,
@@ -138,25 +143,15 @@ export default Groepslessen;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   return authenticatedUser(ctx, async (klant_id?: number) => {
-    let honden = [] as RegisterHondInterface[];
+    let honden = klant_id ? await getHondOptions(klant_id) : [];
     const csrf = refreshCsrf();
-    const disabledDays = db.getDisabledDays("groep");
-    const rassen = await db.query({
-      builder: conn.select("id as value", "naam as label").from("ras"),
-    });
+    const disabledDays = await getDisabledDays("groep");
+    const rassen = await getRasOptions();
 
-    if (klant_id) {
-      honden = (await db.query({
-        builder: conn
-          .select("id as value", "naam as label")
-          .from("hond")
-          .where({ klant_id }),
-      })) as RegisterHondInterface[];
-    }
     return {
       props: {
         rassen,
-        honden: honden ?? [],
+        honden,
         disabledDays,
         klant_id: klant_id ?? null,
         csrf,

@@ -17,17 +17,13 @@ const handler = (req: NextApiRequest, res: NextApiResponse<Response>) => {
 };
 
 const register = async (req: NextApiRequest, res: NextApiResponse) => {
-  return validateCsrfToken({ req, res }, () => {
-    return validate(req, res, { schema: registerSchema }, () => {
-      return confirmRegister(req, res, () => {
-        mailer.sendMail("register");
+  return await validateCsrfToken({ req, res }, async () => {
+    return await validate(req, res, { schema: registerSchema }, async () => {
+      return await confirmRegister(req, res, async () => {
+        return mailer.sendMail("register");
       });
     });
   });
-
-  // mailer.sendMail("register");
-
-  // res.status(201).json({success: "Bedankt voor uw registratie!"});
 };
 
 export default handler;

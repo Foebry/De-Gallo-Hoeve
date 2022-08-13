@@ -18,6 +18,8 @@ import FormSteps from "../components/form/FormSteps";
 import { GetServerSidePropsContext } from "next";
 import nookies from "nookies";
 import db, { conn } from "../middleware/db";
+import { refreshCsrf } from "../middleware/Validator";
+import { toast } from "react-toastify";
 
 export interface RegisterHondErrorInterface {
   naam?: string;
@@ -46,9 +48,11 @@ const registerErrors: RegisterErrorInterface = {};
 
 interface RegisterProps {
   rassen: OptionsOrGroups<any, optionInterface>[];
+  csrf: string;
 }
 
-const Register: React.FC<RegisterProps> = ({ rassen }) => {
+const Register: React.FC<RegisterProps> = ({ rassen, csrf }) => {
+  console.log({ csrf });
   const router = useRouter();
   const register = useMutation();
   const { control, handleSubmit } = useForm();
@@ -92,12 +96,14 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
 
     const { data, error } = await register(
       REGISTERAPI,
-      payload,
+      { ...payload, csrf },
       registerErrors,
       setFormErrors
     );
-    if (data) router.push(LOGIN);
-    else if (error) handleErrors(error);
+    if (data) {
+      toast.success(data.message);
+      router.push(LOGIN);
+    }
   };
 
   return (
@@ -156,11 +162,12 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
 export default Register;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  const csrf = refreshCsrf();
   const rassen = await db.query({
     builder: conn.select("id as value", "naam as label").from("ras"),
   });
 
   return nookies.get(ctx).JWT
     ? { redirect: { permanent: false, destination: INDEX } }
-    : { props: { rassen } };
+    : { props: { rassen, csrf } };
 };

@@ -3,10 +3,10 @@ import {
   NextApiRequest,
   NextApiResponse,
 } from "next";
-import { conn } from "./db";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import nookies, { parseCookies, setCookie } from "nookies";
+import { getKlantByEmail } from "./Loader";
 
 const secret = process.env.JWT_SECRET;
 const cookieSecret = process.env.NEXT_PUBLIC_COOKIE_SECRET;
@@ -20,25 +20,20 @@ interface Controller {
     ctx: GetServerSidePropsContext,
     callback: (userId?: number) => any
   ) => void;
-  getDataFromCookie: (cookie: string, item: string | string[]) => any;
 }
 
 export const controller: Controller = {
   setCookies: async ({ req, res }) => {
     const { email, password } = req.body;
-    const response = await conn
-      .select("id", "email", "roles", "vnaam", "verified", "password")
-      .from("klant")
-      .where({ email })
-      .first();
-    if (!response) {
+    const klant = await getKlantByEmail(email);
+    if (!klant) {
       return res.status(400).json({ code: 400, email: "Email not found" });
     }
-    const data = JSON.parse(JSON.stringify(response));
-    const match = await bcrypt.compare(password, data.password);
+    const { lnaam, gsm, straat, nr, gemeente, postcode, ...payload } = klant;
+    const match = await bcrypt.compare(password, payload.password);
     if (match) {
-      controller.createJWT(res, data);
-      controller.setClientCookie(res, data);
+      controller.createJWT(res, payload);
+      controller.setClientCookie(res, payload);
       return res.status(200).json({});
     }
     return res.status(400).json({ code: 400, password: "Invalid password" });
@@ -98,25 +93,8 @@ export const controller: Controller = {
     }
     return await callback(klant_id);
   },
-
-  getDataFromCookie: (cookie, item) => {
-    console.log("trying to access cookies");
-    // try{
-    // const cookies = parseCookies();
-    // console.log(cookies)
-    // }
-    // catch(error: any){
-    //   console.log("something went wrong")
-    // }
-    return {};
-  },
 };
 
 export default controller.setCookies;
-export const {
-  getDataFromCookie,
-  createJWT,
-  authenticatedUser,
-  secureApi,
-  setClientCookie,
-} = controller;
+export const { createJWT, authenticatedUser, secureApi, setClientCookie } =
+  controller;

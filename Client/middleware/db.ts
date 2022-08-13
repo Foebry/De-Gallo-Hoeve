@@ -1,16 +1,26 @@
 import { Knex, knex } from "knex";
-import { NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 
 interface Connection {
   query: (
     query: { builder: knex.QueryBuilder },
     res?: NextApiResponse
-  ) => Promise<any[] | {}>;
+  ) => Promise<any[] | any>;
   multiQuery: (
     queryList: { key: string; builder: knex.QueryBuilder }[],
     res?: NextApiResponse
   ) => Promise<void | any>;
-  getDisabledDays: (excep: string) => string[];
+  insert: (
+    obj: any,
+    table: string,
+    res: NextApiResponse,
+    callback?: (id: number[]) => Promise<void>
+  ) => Promise<void>;
+  register: (
+    req: NextApiRequest,
+    res: NextApiResponse,
+    callback: () => Promise<void>
+  ) => void;
 }
 
 const config: Knex.Config = {
@@ -68,20 +78,65 @@ const db: Connection = {
     return res ? res.send(data) : data;
   },
 
-  getDisabledDays: (exep: string) => {
-    const date = new Date();
-    const disabledDays = [date.toISOString().split(".")[0].split("T")[0]];
-    const temp = new Date();
-    const enddate = new Date(temp.setDate(temp.getDate() + 365));
-    while (true) {
-      const newDate = new Date(date.setDate(date.getDate() + 1));
-      const dateString = newDate.toISOString().split(".")[0].split("T")[0];
-      if (exep === "groep" && newDate.getDay() !== 0)
-        disabledDays.push(dateString);
-      else if (exep === "prive" && ![3, 5, 6].includes(newDate.getDay()))
-        disabledDays.push(dateString);
-      if (newDate.getTime() > enddate.getTime()) return disabledDays;
+  insert: async (data, table, res, callback) => {
+    try {
+      const id = await conn.insert({ ...data }).into(table);
+      callback ? await callback(id) : res.status(200);
+    } catch (error: any) {
+      console.log(error.message);
+      return res.status(500).json({ message: "Internal Server Error" });
     }
+  },
+
+  register: async (req, res, callback) => {
+    try {
+      return await conn.transaction((trx) => {
+        const { csrf, honden, password_verification, ...klantData } = req.body;
+        conn
+          .insert({ ...klantData })
+          .into("klant")
+          .transacting(trx)
+          .then((ids) => {
+            honden.forEach((hond: any) => (hond.klant_id = ids[0]));
+            return conn("hond").insert(honden).transacting(trx);
+          })
+          .then(() => {
+            trx.commit();
+            callback();
+            return res
+              .status(201)
+              .json({ message: "Registratie goed ontvangen!" });
+          })
+          .catch(() => {
+            trx.rollback();
+            return res
+              .status(500)
+              .json({ message: "Internal Server Error inner" });
+          });
+      });
+    } catch {
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+    // const { csrf, honden, password_verification, ...klantData } = req.body;
+    // return await db.insert({ ...klantData }, "klant", res, async (klant_id) => {
+    //   const promises = await Promise.all(
+    //     honden.map(async (hond: any) => {
+    //       return await db.insert(
+    //         { ...hond, klant_id: klant_id?.[0] },
+    //         "hond",
+    //         res
+    //       );
+    //     })
+    //   );
+    //   promises.forEach((promise: any) => console.log({ promise }));
+    //   if (res.statusCode === 200) {
+    //     callback();
+    //     return res
+    //       .status(201)
+    //       .json({ message: "Bedankt voor uw registratie!" });
+    //   }
+    //   return res.status(400).json({ message: "Something not quite right" });
+    // });
   },
 };
 

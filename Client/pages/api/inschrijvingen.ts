@@ -23,15 +23,9 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
     });
   });
 
-  if (res.statusCode === 200) mailer.sendMail("inschrijving");
+  if (res.statusCode === 201) mailer.sendMail("inschrijving");
+
   return res;
-  // validate(req.body, res, { schema: inschrijvingSchema }, () => {});
-
-  // mailer.sendMail("inschrijving");
-
-  // res
-  //   .status(201)
-  //   .json({ success: "We hebben uw inschrijving(en) goed ontvangen!" });
 };
 
 export default handler;
