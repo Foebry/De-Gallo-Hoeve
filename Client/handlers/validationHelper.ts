@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { AnySchema } from "yup";
 import { nanoid } from "nanoid";
-import { compare, hash } from "../middleware/Hashing";
+import { compare, hash } from "./authenticationHandler";
 
 interface OptionsInterface {
   schema: AnySchema;

@@ -7,10 +7,12 @@ import {
   UseFormRegister,
 } from "react-hook-form";
 import { OptionsOrGroups } from "react-select";
-import { InschrijvingErrorInterface } from "../../pages/inschrijvingen/privelessen";
+import { InschrijvingErrorInterface } from "../../pages/inschrijving";
 import DayCard from "../Cards/DayCard";
 import { optionInterface } from "../register/HondGegevens";
 import { Body } from "../Typography/Typography";
+
+type TrainingType = "prive" | "groep";
 
 interface Props {
   control: Control<FieldValues, any>;
@@ -21,6 +23,7 @@ interface Props {
   values: UseFormGetValues<FieldValues>;
   selectedDates: string[];
   honden?: OptionsOrGroups<any, optionInterface>[];
+  type: TrainingType;
 }
 
 const HondGegevens: React.FC<Props> = ({
@@ -29,6 +32,7 @@ const HondGegevens: React.FC<Props> = ({
   rassen,
   honden = [],
   selectedDates = [],
+  type,
 }) => {
   return (
     <>
@@ -44,6 +48,7 @@ const HondGegevens: React.FC<Props> = ({
               options={rassen}
               index={index}
               honden={honden}
+              type={type}
             />
           ))
       ) : (

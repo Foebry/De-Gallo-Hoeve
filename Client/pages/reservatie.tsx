@@ -49,12 +49,7 @@ const Reservatie: React.FC<ReservatieProps> = () => {
   const onSubmit = async (values: any) => {
     values = structureDetailsPayload(values);
     values.klant_id = klantId;
-    const { data, error } = await makeReservation(
-      RESERVATIEAPI,
-      values,
-      formErrors,
-      setFormErrors
-    );
+    const { data, error } = await makeReservation(RESERVATIEAPI, values);
     if (error) handleErrors(error);
     else router.push(LOGIN);
   };

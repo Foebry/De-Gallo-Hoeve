@@ -41,7 +41,11 @@ const Footer = () => {
             </Body>
             <Body className="flex gap-2 items-center">
               <IoLogoInstagram className="text-green-200 text-2xl" />
-              <a href="https://www.instagram.com/degallohoeve" target="_blank">
+              <a
+                href="https://www.instagram.com/degallohoeve"
+                target="_blank"
+                rel="noreferrer"
+              >
                 @degallohoeve
               </a>
             </Body>

@@ -14,10 +14,13 @@ import base64 from "base-64";
 interface AuthenticationHandlerInterface {
   createJWT: (res: NextApiResponse, klantData: any) => void;
   setClientCookie: (res: NextApiResponse, payload: any) => void;
-  secureApi: (obj: {
-    req: NextApiRequest;
-    res: NextApiResponse;
-  }) => void | string | JwtPayload;
+  secureApi: (
+    obj: {
+      req: NextApiRequest;
+      res: NextApiResponse;
+    },
+    callback: () => Promise<void>
+  ) => void | string | JwtPayload;
   redirectToLogin: (ctx: GetServerSidePropsContext, redirect?: string) => void;
   securepage: (
     ctx: GetServerSidePropsContext,
@@ -55,16 +58,16 @@ const authenticationHandler: AuthenticationHandlerInterface = {
     });
   },
 
-  secureApi: ({ req, res }) => {
+  secureApi: ({ req, res }, callback) => {
     const cookies = parseCookies({ req });
-    const token = cookies.jwt;
+    const token = cookies.JWT;
     if (!token) return unauthorizedAccess(res);
 
     const verifiedToken = jwt.verify(token, `${secret}`, {
       algorithms: ["RS256", "HS256"],
     });
 
-    return verifiedToken ?? unauthorizedAccess(res);
+    return verifiedToken ? callback() : unauthorizedAccess(res);
   },
 
   redirectToLogin: (ctx) => {
@@ -114,4 +117,5 @@ export const {
   redirectToLogin,
   securepage,
   hash,
+  compare,
 } = authenticationHandler;

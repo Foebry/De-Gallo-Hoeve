@@ -3,6 +3,7 @@ import { processInschrijving } from "../../middleware/Helper";
 import { validate, validateCsrfToken } from "../../handlers/validationHelper";
 import baseResponse from "../../types/responseType";
 import { inschrijvingSchema } from "../../types/schemas";
+import { secureApi } from "../../handlers/authenticationHandler";
 
 interface Response extends baseResponse {}
 

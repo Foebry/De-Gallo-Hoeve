@@ -14,7 +14,7 @@ import {
 import Details from "../Details";
 import { DatePicker } from "react-trip-date";
 import { FormError } from "../Typography/Typography";
-import { InschrijvingErrorInterface } from "../../pages/inschrijvingen/privelessen";
+import { InschrijvingErrorInterface } from "../../pages/inschrijving";
 import {
   RegisterErrorInterface,
   RegisterHondErrorInterface,
@@ -25,7 +25,7 @@ export interface optionInterface {
   options: [{ value: any; label: string }];
 }
 
-interface Step2Props {
+interface Props {
   fields: Record<"id", string>[];
   append: UseFieldArrayAppend<FieldValues, "honden">;
   remove: UseFieldArrayRemove;
@@ -37,7 +37,7 @@ interface Step2Props {
   values: UseFormGetValues<FieldValues>;
 }
 
-const step2: React.FC<Step2Props> = ({
+const HondGegevens: React.FC<Props> = ({
   setActiveStep,
   control,
   fields,
@@ -91,4 +91,4 @@ const step2: React.FC<Step2Props> = ({
   );
 };
 
-export default step2;
+export default HondGegevens;

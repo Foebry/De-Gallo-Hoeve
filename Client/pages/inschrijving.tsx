@@ -23,12 +23,15 @@ import { getDisabledDays } from "../middleware/Helper";
 import { generateCsrf } from "../handlers/validationHelper";
 import { securepage } from "../handlers/authenticationHandler";
 
+type TrainingType = "prive" | "groep";
+
 interface LessenProps {
   honden: OptionsOrGroups<any, optionInterface>[];
   disabledDays?: string[];
   klant_id?: number;
   rassen: OptionsOrGroups<any, optionInterface>[];
   csrf: string;
+  type: TrainingType;
 }
 
 export interface InschrijvingErrorInterface {
@@ -49,6 +52,7 @@ const Groepslessen: React.FC<LessenProps> = ({
   klant_id,
   rassen,
   csrf,
+  type,
 }) => {
   const [errors, setErrors] = useState<InschrijvingErrorInterface>({});
   const [activeStep, setActiveStep] = useState<number>(0);
@@ -125,6 +129,7 @@ const Groepslessen: React.FC<LessenProps> = ({
                 setErrors={setErrors}
                 selectedDates={getValues().datum}
                 honden={honden}
+                type={type}
               />
             ) : activeStep === 2 ? (
               <Contactgegevens control={control} />
@@ -170,6 +175,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
         disabledDays,
         klant_id: klant_id?.toString() ?? null,
         csrf,
+        type,
       },
     };
   });
