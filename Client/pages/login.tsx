@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Body, Link } from "../components/Typography/Typography";
 import Form from "../components/form/Form";
 import FormInput from "../components/form/FormInput";
@@ -11,13 +11,12 @@ import useMutation from "../hooks/useMutation";
 import { LOGINAPI } from "../types/apiTypes";
 import { initializeLocalStorage } from "../helpers/localStorage";
 import { GetServerSidePropsContext } from "next";
-import { refreshCsrf, validator } from "../middleware/Validator";
 import nookies from "nookies";
-import bcrypt from "bcrypt";
+import validator, { generateCsrf } from "../handlers/validationHelper";
 
-interface LoginErrorInterface {
-  email?: string;
-  password?: string;
+export interface LoginErrorInterface {
+  email: string;
+  password: string;
 }
 
 interface LoginPropsInterface {
@@ -26,19 +25,17 @@ interface LoginPropsInterface {
 }
 
 const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
-  const router = useRouter();
-  const login = useMutation();
+  const [formErrors, setFormErrors] = useState<LoginErrorInterface>({
+    email: "",
+    password: "",
+  });
 
-  const [formErrors, setFormErrors] = useState<LoginErrorInterface>({});
+  const router = useRouter();
+  const login = useMutation(formErrors, setFormErrors);
   const { control, handleSubmit } = useForm();
 
   const onSubmit = async (values: any) => {
-    const { data } = await login(
-      LOGINAPI,
-      { ...values, csrf },
-      formErrors,
-      setFormErrors
-    );
+    const { data } = await login(LOGINAPI, { ...values, csrf });
     if (data) {
       initializeLocalStorage(data);
       redirect ? router.push(redirect) : router.back();
@@ -112,7 +109,8 @@ export default Login;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const redirect = validator.redirect ?? null;
-  const csrf = refreshCsrf();
+  console.log({ redirect });
+  const csrf = generateCsrf();
 
   return nookies.get(ctx).JWT
     ? { redirect: { permanent: false, destination: INDEX } }

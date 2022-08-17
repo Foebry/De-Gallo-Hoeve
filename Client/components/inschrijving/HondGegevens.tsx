@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Control,
   FieldValues,
@@ -7,12 +7,12 @@ import {
   UseFormRegister,
 } from "react-hook-form";
 import { OptionsOrGroups } from "react-select";
-import { InschrijvingErrorInterface } from "../../pages/inschrijving/privelessen";
+import { InschrijvingErrorInterface } from "../../pages/inschrijvingen/privelessen";
 import DayCard from "../Cards/DayCard";
-import { optionInterface } from "../register/step2";
+import { optionInterface } from "../register/HondGegevens";
 import { Body } from "../Typography/Typography";
 
-interface Step2Props {
+interface Props {
   control: Control<FieldValues, any>;
   register: UseFormRegister<FieldValues>;
   errors: InschrijvingErrorInterface;
@@ -23,14 +23,11 @@ interface Step2Props {
   honden?: OptionsOrGroups<any, optionInterface>[];
 }
 
-const Step2: React.FC<Step2Props> = ({
+const HondGegevens: React.FC<Props> = ({
   control,
   register,
   rassen,
   honden = [],
-  setErrors,
-  errors,
-  values,
   selectedDates = [],
 }) => {
   return (
@@ -58,4 +55,4 @@ const Step2: React.FC<Step2Props> = ({
   );
 };
 
-export default Step2;
+export default HondGegevens;

@@ -5,12 +5,13 @@ export interface Props {
   to?: string;
   onClick?: () => void;
   className?: string;
+  color?: string;
 }
 
-export const Title1: React.FC<Props> = ({ children, className }) => {
+export const Title1: React.FC<Props> = ({ children, className, color }) => {
   return (
     <h1
-      className={`${className} text-5xl text-center my-18 text-black-200 3xs:text-6xl xs:text-7xl`}
+      className={`${className} text-5xl text-center my-18 text-black-200 4xs:text-6xl xs:text-7xl`}
     >
       {children}
     </h1>
@@ -19,7 +20,7 @@ export const Title1: React.FC<Props> = ({ children, className }) => {
 
 export const Title2: React.FC<Props> = ({ children }) => {
   return (
-    <h2 className="text-4xl text-black-200 3xs:text-5xl text-center mt-12 mx-auto mb-18">
+    <h2 className="text-4xl text-black-200 4xs:text-5xl text-center mt-12 mx-auto mb-18">
       {children}
     </h2>
   );
@@ -39,9 +40,11 @@ export const Caption: React.FC<Props> = ({ children }) => {
   );
 };
 
-export const Body: React.FC<Props> = ({ children, className }) => {
+export const Body: React.FC<Props> = ({ children, className, color }) => {
   return (
-    <p className={`${className} text-black-100 text-base mb-2`}>{children}</p>
+    <p className={`${className} text-${color ?? "black-100"} text-base mb-2`}>
+      {children}
+    </p>
   );
 };
 

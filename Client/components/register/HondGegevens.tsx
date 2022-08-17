@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import Button from "../buttons/Button";
 import FormInput from "../form/FormInput";
 import FormRow from "../form/FormRow";
@@ -9,11 +9,12 @@ import {
   FieldValues,
   UseFieldArrayAppend,
   UseFieldArrayRemove,
+  UseFormGetValues,
 } from "react-hook-form";
 import Details from "../Details";
 import { DatePicker } from "react-trip-date";
 import { FormError } from "../Typography/Typography";
-import { InschrijvingErrorInterface } from "../../pages/inschrijving/privelessen";
+import { InschrijvingErrorInterface } from "../../pages/inschrijvingen/privelessen";
 import {
   RegisterErrorInterface,
   RegisterHondErrorInterface,
@@ -33,6 +34,7 @@ interface Step2Props {
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
   errors: RegisterErrorInterface;
   setErrors: React.Dispatch<React.SetStateAction<RegisterErrorInterface>>;
+  values: UseFormGetValues<FieldValues>;
 }
 
 const step2: React.FC<Step2Props> = ({
@@ -44,6 +46,7 @@ const step2: React.FC<Step2Props> = ({
   options,
   errors,
   setErrors,
+  values,
 }) => {
   const emptyHond = {
     naam: undefined,
@@ -52,43 +55,39 @@ const step2: React.FC<Step2Props> = ({
     geslacht: undefined,
     chipNr: undefined,
   };
+  const sorted = useMemo(() => {
+    return values().honden.reverse();
+  }, [values()]);
+
+  useEffect(() => {
+    values().honden.length === 0 && append(emptyHond);
+  }, []);
 
   return (
-    <>
-      <ul>
-        {fields?.map((item: any, index: any) => (
-          <li key={item.id} className="relative mb-20">
+    <div className="md:px-5">
+      <ul className="mb-20">
+        {sorted.map((item: any, index: any) => (
+          <li key={item.id} className="relative mb-5">
             <HondCard
               control={control}
               index={index}
               rassen={options}
               errors={errors}
               setErrors={setErrors}
+              fields={fields}
+              values={values}
+              remove={remove}
             />
           </li>
         ))}
       </ul>
-      <div className="max-w-fit mx-auto">
+      <div className="mb-10 max-w-fit mx-auto">
         <Button
-          label={
-            fields.length === 0 ? "Nieuwe hond aanmaken" : "Ik heb nog een hond"
-          }
+          label="Nieuwe hond aanmaken"
           onClick={() => append(emptyHond)}
         />
       </div>
-      <FormRow className="mt-40">
-        <Button
-          label="vorige"
-          onClick={() => setActiveStep((activeStep) => activeStep - 1)}
-        />
-        <Button
-          label="volgende"
-          onClick={() => {
-            setActiveStep((activeStep) => activeStep + 1);
-          }}
-        />
-      </FormRow>
-    </>
+    </div>
   );
 };
 

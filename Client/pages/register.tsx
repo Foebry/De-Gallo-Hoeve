@@ -3,23 +3,19 @@ import Form from "../components/form/Form";
 import { useRouter } from "next/router";
 import { INDEX, LOGIN } from "../types/linkTypes";
 import { useFieldArray, useForm } from "react-hook-form";
-import Step1 from "../components/register/step1";
-import Step2, { optionInterface } from "../components/register/step2";
-import Step3 from "../components/register/step3";
+import PersoonlijkeGegevens from "../components/register/PersoonlijkeGegevens";
+import Step2, { optionInterface } from "../components/register/HondGegevens";
 import { OptionsOrGroups } from "react-select";
-import getData from "../hooks/useApi";
-import { RASSEN, REGISTERAPI } from "../types/apiTypes";
-import useMutation, {
-  handleErrors,
-  structureHondenPayload,
-} from "../hooks/useMutation";
-import { SECTION_DARKER } from "../types/styleTypes";
+import { REGISTERAPI } from "../types/apiTypes";
+import useMutation, { structureHondenPayload } from "../hooks/useMutation";
 import FormSteps from "../components/form/FormSteps";
 import { GetServerSidePropsContext } from "next";
 import nookies from "nookies";
-import db, { conn } from "../middleware/db";
-import { refreshCsrf } from "../middleware/Validator";
 import { toast } from "react-toastify";
+import FormRow from "../components/form/FormRow";
+import Button, { SubmitButton } from "../components/buttons/Button";
+import { getRasOptions } from "../middleware/MongoDb";
+import { generateCsrf } from "../handlers/validationHelper";
 
 export interface RegisterHondErrorInterface {
   naam?: string;
@@ -44,22 +40,22 @@ export interface RegisterErrorInterface {
   password_verification?: string;
 }
 
-const registerErrors: RegisterErrorInterface = {};
-
 interface RegisterProps {
   rassen: OptionsOrGroups<any, optionInterface>[];
   csrf: string;
 }
 
 const Register: React.FC<RegisterProps> = ({ rassen, csrf }) => {
-  console.log({ csrf });
+  const [formErrors, setFormErrors] = useState<RegisterErrorInterface>({});
   const router = useRouter();
-  const register = useMutation();
-  const { control, handleSubmit } = useForm();
-  const { fields, append, remove } = useFieldArray({ control, name: "honden" });
+  const register = useMutation(formErrors, setFormErrors);
+  const { control, handleSubmit, getValues } = useForm();
+  const { fields, remove, append } = useFieldArray({
+    control,
+    name: "honden",
+  });
   const [activeStep, setActiveStep] = useState<number>(0);
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
-  const [formErrors, setFormErrors] = useState<RegisterErrorInterface>({});
   const step1 = [
     "vnaam",
     "lnaam",
@@ -94,12 +90,7 @@ const Register: React.FC<RegisterProps> = ({ rassen, csrf }) => {
       return;
     }
 
-    const { data, error } = await register(
-      REGISTERAPI,
-      { ...payload, csrf },
-      registerErrors,
-      setFormErrors
-    );
+    const { data, error } = await register(REGISTERAPI, { ...payload, csrf });
     if (data) {
       toast.success(data.message);
       router.push(LOGIN);
@@ -107,52 +98,59 @@ const Register: React.FC<RegisterProps> = ({ rassen, csrf }) => {
   };
 
   return (
-    <section className="mb-48">
+    <section className="mb-48 md:px-5 mt-20">
       <div className="max-w-7xl mx-auto">
         <FormSteps
           activeStep={activeStep}
           errorSteps={[]}
           setActiveStep={setActiveStep}
-          steps={[
-            "Persoonlijke gegevens",
-            "Honden aanmaken",
-            "Wachtwoord aanmaken",
-          ]}
+          steps={["Persoonlijke gegevens", "Honden gegevens"]}
         />
       </div>
-      <div className="max-w-4xl mx-auto border-2 rounded mt-20 py-10">
+      <div>
         <Form
           onSubmit={handleSubmit(onSubmit)}
           activeStep={activeStep}
           errorSteps={errorSteps}
           setActiveStep={setActiveStep}
         >
-          {activeStep === 0 ? (
-            <Step1
-              control={control}
-              setActiveStep={setActiveStep}
-              errors={formErrors}
-              setErrors={setFormErrors}
+          <div className="max-w-4xl mx-auto mt-20 py-10">
+            {activeStep === 0 ? (
+              <PersoonlijkeGegevens
+                control={control}
+                setActiveStep={setActiveStep}
+                errors={formErrors}
+                setErrors={setFormErrors}
+              />
+            ) : activeStep === 1 ? (
+              <Step2
+                control={control}
+                setActiveStep={setActiveStep}
+                fields={fields}
+                append={append}
+                remove={remove}
+                options={rassen}
+                errors={formErrors}
+                setErrors={setFormErrors}
+                values={getValues}
+              />
+            ) : null}
+          </div>
+          <FormRow className="max-w-3xl mx-auto">
+            <Button
+              label="vorige"
+              onClick={() => setActiveStep(activeStep - 1)}
+              disabled={activeStep === 0}
             />
-          ) : activeStep === 1 ? (
-            <Step2
-              control={control}
-              setActiveStep={setActiveStep}
-              fields={fields}
-              append={append}
-              remove={remove}
-              options={rassen}
-              errors={formErrors}
-              setErrors={setFormErrors}
-            />
-          ) : activeStep === 2 ? (
-            <Step3
-              control={control}
-              setActiveStep={setActiveStep}
-              errors={formErrors}
-              setErrors={setFormErrors}
-            />
-          ) : null}
+            {activeStep === 1 ? (
+              <SubmitButton label="verzend" />
+            ) : (
+              <Button
+                label="volgende"
+                onClick={() => setActiveStep(activeStep + 1)}
+              />
+            )}
+          </FormRow>
         </Form>
       </div>
     </section>
@@ -162,10 +160,8 @@ const Register: React.FC<RegisterProps> = ({ rassen, csrf }) => {
 export default Register;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  const csrf = refreshCsrf();
-  const rassen = await db.query({
-    builder: conn.select("id as value", "naam as label").from("ras"),
-  });
+  const csrf = generateCsrf();
+  const rassen = await getRasOptions();
 
   return nookies.get(ctx).JWT
     ? { redirect: { permanent: false, destination: INDEX } }

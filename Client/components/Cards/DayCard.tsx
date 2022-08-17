@@ -7,8 +7,11 @@ import {
 } from "react-hook-form";
 import FormInput from "../form/FormInput";
 import Select, { OptionsOrGroups } from "react-select";
-import { optionInterface } from "../register/step2";
+import { optionInterface } from "../register/HondGegevens";
 import { geslachten } from "./HondCard";
+import { Body, Title3 } from "../Typography/Typography";
+
+type TrainingType = "prive" | "groep";
 
 interface DayCardProps {
   onChange?: () => void;
@@ -18,6 +21,7 @@ interface DayCardProps {
   options: OptionsOrGroups<any, optionInterface>[];
   index: number;
   honden?: OptionsOrGroups<any, optionInterface>[];
+  type: TrainingType;
 }
 
 const DayCard: React.FC<DayCardProps> = ({
@@ -27,9 +31,10 @@ const DayCard: React.FC<DayCardProps> = ({
   index,
   register,
   honden,
+  type,
 }) => {
   return (
-    <div className="3xs:flex border-2 rounded justify-between 3xs:pr-5 max-w-lg mx-auto mb-2">
+    <div className="4xs:flex border-2 rounded justify-between 4xs:pr-5 max-w-lg mx-auto mb-2">
       <div className="border-r-2 rounded-l p-10 flex flex-col gap-1 items-center bg-green-200">
         <input
           type="hidden"
@@ -43,19 +48,27 @@ const DayCard: React.FC<DayCardProps> = ({
         </span>
         <span className="text-gray-200">{date.split("-")[2]}</span>
       </div>
-      <div className="py-2 mx-auto my-auto">
+      <div className="py-2 my-auto">
         {honden && honden.length > 0 ? (
-          <Controller
-            control={control}
-            name={`inschrijvingen.[${index}.hond_id]`}
-            render={({ field: { value, onChange } }) => (
-              <Select
-                options={honden}
-                value={value ?? { label: "Selecteer hond", key: 0 }}
-                onChange={onChange}
-              />
-            )}
-          />
+          <>
+            <div className="text-center mb-8">
+              <Body>
+                Welke hond neemt u mee naar deze{" "}
+                {type === "groep" ? "groepstraining" : "privetraining"}
+              </Body>
+            </div>
+            <Controller
+              control={control}
+              name={`inschrijvingen.[${index}.hond_id]`}
+              render={({ field: { value, onChange } }) => (
+                <Select
+                  options={honden}
+                  value={value ?? { label: "Selecteer hond", key: 0 }}
+                  onChange={onChange}
+                />
+              )}
+            />
+          </>
         ) : (
           <>
             <Controller

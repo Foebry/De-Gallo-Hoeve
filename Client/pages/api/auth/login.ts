@@ -1,12 +1,12 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import baseResponse from "../../../types/responseType";
+import { notAllowed } from "../../../handlers/ResponseHandler";
 import {
   validate,
   validateCsrfToken,
-  validator,
-} from "../../../middleware/Validator";
-import baseResponse from "../../../types/responseType";
-import setCookies from "../../../middleware/CookieHandler";
+} from "../../../handlers/validationHelper";
 import { loginSchema } from "../../../types/schemas";
+import { onLoginSuccess } from "../../../handlers/loginHandler";
 
 interface Response extends baseResponse {}
 
@@ -15,13 +15,13 @@ const handler = (req: NextApiRequest, res: NextApiResponse<Response>) => {
     case "POST":
       return login(req, res);
     default:
-      return res.status(405).json({ code: 405, message: "Not Allowed" });
+      return notAllowed(res);
   }
 };
 
 const login = async (req: NextApiRequest, res: NextApiResponse) => {
   return validateCsrfToken({ req, res }, () => {
-    return validate(req, res, { schema: loginSchema }, setCookies);
+    return validate({ req, res }, { schema: loginSchema }, onLoginSuccess);
   });
 };
 

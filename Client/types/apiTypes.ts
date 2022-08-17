@@ -7,6 +7,7 @@ const ApiTypes = {
   LOGOUT: "/api/auth/logout",
   GET_FUTURE_INSCHRIJVINGS: "/api/inschrijvingen",
   POST_INSCHRIJVING: "/api/inschrijvingen",
+  TRANSFER: "/api/transfer",
 };
 
 export const {
@@ -18,4 +19,5 @@ export const {
   LOGOUT,
   GET_FUTURE_INSCHRIJVINGS,
   POST_INSCHRIJVING,
+  TRANSFER,
 } = ApiTypes;

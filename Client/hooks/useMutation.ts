@@ -1,6 +1,7 @@
 import axios from "axios";
-import react from "react";
 import { toast } from "react-toastify";
+import { InschrijvingErrorInterface } from "../pages/inschrijvingen/privelessen";
+import { LoginErrorInterface } from "../pages/login";
 
 interface ApiError {
   response: {
@@ -8,14 +9,17 @@ interface ApiError {
   };
 }
 
+type FormError = InschrijvingErrorInterface | LoginErrorInterface;
+
 type REQUESTMETHOD = "POST" | "PUT" | "PATCH" | "DELETE";
 
-const useMutation = () => {
+const useMutation = (
+  errors?: any,
+  setErrors?: React.Dispatch<React.SetStateAction<any>>
+) => {
   const executerFunc = async (
     endpoint: string,
     payload: any,
-    formErrors: any,
-    setFormErrors: any,
     options?: {
       method: REQUESTMETHOD;
     }
@@ -27,12 +31,11 @@ const useMutation = () => {
         withCredentials: true,
       });
       return { data, error: undefined };
-    } catch (errorData) {
-      const formError = errorData as ApiError;
-      const errors: any = formError.response.data as typeof formErrors;
-      setFormErrors({ ...formError, ...errors });
-      toast.error(errors.message);
-      return { data: undefined, error: formError.response.data };
+    } catch (error: any) {
+      const data = error.response.data;
+      setErrors?.({ ...errors, ...data });
+      toast.error(data.message);
+      return { data: undefined, error: data };
     }
   };
   return executerFunc;
@@ -49,10 +52,9 @@ export const handleErrors = (errors: any, setError: any) => {
 export const structureHondenPayload = (payload: any) => {
   const honden = payload?.honden ?? [];
   const new_honden = honden.map((hond: any) => {
-    const ras_id = hond.ras_id?.value;
-    const geslacht = hond.geslacht?.value;
-    const geboortedatum = hond.geboortedatum?.[0] ?? "";
-    return { ...hond, ras_id, geslacht, geboortedatum };
+    const ras = hond.ras?.label;
+    const geslacht = hond.geslacht?.label;
+    return { ...hond, ras, geslacht };
   });
   return { ...payload, honden: new_honden };
 };

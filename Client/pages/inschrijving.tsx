@@ -2,30 +2,46 @@ import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import React, { useMemo, useState } from "react";
 import { Controller, FieldValues, useForm } from "react-hook-form";
-import Step2 from "../../components/inschrijving/Step2";
-import useMutation from "../../hooks/useMutation";
-import { POST_INSCHRIJVING } from "../../types/apiTypes";
-import { INDEX, LOGIN } from "../../types/linkTypes";
-import { InschrijvingErrorInterface, LessenProps } from "./privelessen";
-import db, { conn } from "../../middleware/db";
-import FormSteps from "../../components/form/FormSteps";
-import Form from "../../components/form/Form";
-import { Body, FormError } from "../../components/Typography/Typography";
+import useMutation from "../hooks/useMutation";
+import { POST_INSCHRIJVING } from "../types/apiTypes";
+import { INDEX, LOGIN } from "../types/linkTypes";
+import FormSteps from "../components/form/FormSteps";
+import Form from "../components/form/Form";
+import { Body } from "../components/Typography/Typography";
 import Link from "next/link";
-import { authenticatedUser } from "../../middleware/CookieHandler";
-import { RegisterHondInterface } from "../../types/formTypes/registerTypes";
-import FormRow from "../../components/form/FormRow";
-import Button, { SubmitButton } from "../../components/buttons/Button";
+import FormRow from "../components/form/FormRow";
+import Button, { SubmitButton } from "../components/buttons/Button";
 import { DatePicker } from "react-trip-date";
-import { refreshCsrf } from "../../middleware/Validator";
-import FormInput from "../../components/form/FormInput";
-import Contactgegevens from "../../components/inschrijving/Contactgegevens";
+import Contactgegevens from "../components/inschrijving/Contactgegevens";
 import { toast } from "react-toastify";
-import {
-  getDisabledDays,
-  getHondOptions,
-  getRasOptions,
-} from "../../middleware/Loader";
+import { OptionsOrGroups } from "react-select";
+import { optionInterface } from "../components/register/HondGegevens";
+import HondGegevens from "../components/inschrijving/HondGegevens";
+import { getHondOptions, getRasOptions } from "../middleware/MongoDb";
+import { ObjectId } from "mongodb";
+import { getDisabledDays } from "../middleware/Helper";
+import { generateCsrf } from "../handlers/validationHelper";
+import { securepage } from "../handlers/authenticationHandler";
+
+interface LessenProps {
+  honden: OptionsOrGroups<any, optionInterface>[];
+  disabledDays?: string[];
+  klant_id?: number;
+  rassen: OptionsOrGroups<any, optionInterface>[];
+  csrf: string;
+}
+
+export interface InschrijvingErrorInterface {
+  inschrijvingen?: {
+    datum: string;
+    hond_naam?: string;
+    hond_ras?: number;
+    hond_geslacht?: string;
+  }[];
+  email?: string;
+  aanspreking?: string;
+  naam?: string;
+}
 
 const Groepslessen: React.FC<LessenProps> = ({
   honden,
@@ -34,17 +50,13 @@ const Groepslessen: React.FC<LessenProps> = ({
   rassen,
   csrf,
 }) => {
-  const router = useRouter();
-
-  const { handleSubmit, control, getValues, register } = useForm();
-  const inschrijving = useMutation();
-
+  const [errors, setErrors] = useState<InschrijvingErrorInterface>({});
   const [activeStep, setActiveStep] = useState<number>(0);
-  const [errors, setErrors] = useState<InschrijvingErrorInterface>({
-    inschrijvingen: [],
-    email: "",
-  });
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
+
+  const router = useRouter();
+  const { handleSubmit, control, getValues, register } = useForm();
+  const inschrijving = useMutation(errors, setErrors);
 
   const steps = useMemo(() => {
     return klant_id
@@ -53,12 +65,12 @@ const Groepslessen: React.FC<LessenProps> = ({
   }, [klant_id]);
 
   const onSubmit = async (values: FieldValues) => {
-    const { data, error } = await inschrijving(
-      POST_INSCHRIJVING,
-      { ...values, csrf, klant_id: klant_id ?? 0, training_id: 2 },
-      errors,
-      setErrors
-    );
+    const { data, error } = await inschrijving(POST_INSCHRIJVING, {
+      ...values,
+      csrf,
+      klant_id: klant_id ?? 0,
+      training_id: 2,
+    });
     if (data) {
       toast.success(data.message);
       router.push(INDEX);
@@ -104,7 +116,7 @@ const Groepslessen: React.FC<LessenProps> = ({
                 />
               </>
             ) : activeStep === 1 ? (
-              <Step2
+              <HondGegevens
                 control={control}
                 register={register}
                 rassen={rassen}
@@ -120,7 +132,7 @@ const Groepslessen: React.FC<LessenProps> = ({
           </div>
           <FormRow className="max-w-3xl mx-auto">
             <Button
-              label="vorige stap"
+              label="vorige"
               onClick={() => setActiveStep(activeStep - 1)}
               disabled={activeStep === 0}
             />
@@ -128,7 +140,7 @@ const Groepslessen: React.FC<LessenProps> = ({
               <SubmitButton label="inschrijven" />
             ) : (
               <Button
-                label="volgende stap"
+                label="volgende"
                 onClick={() => setActiveStep(activeStep + 1)}
               />
             )}
@@ -142,10 +154,13 @@ const Groepslessen: React.FC<LessenProps> = ({
 export default Groepslessen;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  return authenticatedUser(ctx, async (klant_id?: number) => {
+  const { type } = ctx.query;
+  if (!type) return { redirect: { permanent: false, destination: INDEX } };
+
+  return securepage(ctx, async (klant_id: ObjectId) => {
     let honden = klant_id ? await getHondOptions(klant_id) : [];
-    const csrf = refreshCsrf();
-    const disabledDays = await getDisabledDays("groep");
+    const csrf = generateCsrf();
+    const disabledDays = await getDisabledDays(type as string);
     const rassen = await getRasOptions();
 
     return {
@@ -153,7 +168,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
         rassen,
         honden,
         disabledDays,
-        klant_id: klant_id ?? null,
+        klant_id: klant_id?.toString() ?? null,
         csrf,
       },
     };

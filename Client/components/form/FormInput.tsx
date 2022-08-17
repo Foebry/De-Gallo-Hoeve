@@ -16,6 +16,7 @@ export interface FormInputProps {
   errors?: any;
   dataid?: string;
   setErrors?: any;
+  onClick?: (e: React.FormEvent<HTMLInputElement>) => void;
 }
 
 const FormInput: React.FC<FormInputProps> = ({

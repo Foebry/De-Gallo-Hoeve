@@ -14,6 +14,7 @@ import {
 import Form from "./form/Form";
 import FormInput from "./form/FormInput";
 import { Controller, useForm } from "react-hook-form";
+import Link from "next/link";
 
 const Footer = () => {
   const { control, handleSubmit } = useForm();
@@ -26,11 +27,13 @@ const Footer = () => {
           <div>
             <Body className="flex gap-2 items-center">
               <IoMdPhonePortrait className="text-green-200 text-2xl" />
-              Telephone
+              <a href="tel:+32000000000">+32000000000</a>
             </Body>
             <Body className="flex gap-2 items-center">
               <IoMdMail className="text-green-200 text-2xl" />
-              E-mail
+              <Link href="mailto:info@degallohoeve.be">
+                info@degalohoeve.be
+              </Link>
             </Body>
             <Body className="flex gap-2 items-center">
               <IoLogoFacebook className="text-green-200 text-2xl" />
@@ -38,12 +41,14 @@ const Footer = () => {
             </Body>
             <Body className="flex gap-2 items-center">
               <IoLogoInstagram className="text-green-200 text-2xl" />
-              Instagram
+              <a href="https://www.instagram.com/degallohoeve" target="_blank">
+                @degallohoeve
+              </a>
             </Body>
           </div>
           <div className="border-2 rounded">
             <Form onSubmit={() => {}} action="verzend">
-              <div className="3xs:px-20">
+              <div className="4xs:px-20">
                 <Controller
                   name="naam"
                   control={control}

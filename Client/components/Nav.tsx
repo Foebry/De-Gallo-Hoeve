@@ -1,22 +1,22 @@
-import React, { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+import React, { useMemo } from "react";
 import { INDEX, LOGIN, REGISTER } from "../types/linkTypes";
-import { Body, Title3 } from "./Typography/Typography";
+import { Title3 } from "./Typography/Typography";
 import useMutation from "../hooks/useMutation";
-import { LOGOUT } from "../types/apiTypes";
+import { LOGOUT, TRANSFER } from "../types/apiTypes";
 import Button from "./buttons/Button";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import NavLink from "./NavLink";
 import { parseCookies } from "nookies";
 import jwt from "jsonwebtoken";
+import getData from "../hooks/useApi";
 
 export const Nav = () => {
   const logout = useMutation();
   const router = useRouter();
 
   const onLogout = async () => {
-    await logout(LOGOUT, {}, {}, {}, { method: "DELETE" });
+    await logout(LOGOUT, {}, { method: "DELETE" });
     router.push(INDEX);
   };
 
@@ -33,6 +33,11 @@ export const Nav = () => {
     }
     return undefined;
   }, [parseCookies()]);
+
+  const transferData = async () => {
+    const { data } = await getData(TRANSFER);
+    console.log(data);
+  };
 
   return (
     <div className="relative mb-30 w-full shadow h-16 z-20 md:mb-0 md:block">

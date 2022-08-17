@@ -1,10 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import mailer from "../../../middleware/Mailer";
+import { handleRegistration } from "../../../handlers/registratieHandler";
 import {
-  confirmRegister,
   validateCsrfToken,
   validate,
-} from "../../../middleware/Validator";
+} from "../../../handlers/validationHelper";
 import baseResponse from "../../../types/responseType";
 import { registerSchema } from "../../../types/schemas";
 
@@ -17,11 +16,10 @@ const handler = (req: NextApiRequest, res: NextApiResponse<Response>) => {
 };
 
 const register = async (req: NextApiRequest, res: NextApiResponse) => {
+  const options = { schema: registerSchema };
   return await validateCsrfToken({ req, res }, async () => {
-    return await validate(req, res, { schema: registerSchema }, async () => {
-      return await confirmRegister(req, res, async () => {
-        return mailer.sendMail("register");
-      });
+    return await validate({ req, res }, options, async () => {
+      return await handleRegistration({ req, res });
     });
   });
 };

@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import { useRouter } from "next/router";
 import React, { ReactNode } from "react";
-import { INSCHRIJVING_PRIVE } from "../../types/linkTypes";
+import { INSCHRIJVING, INSCHRIJVING_PRIVE } from "../../types/linkTypes";
 import Button from "../buttons/Button";
 import FormRow from "../form/FormRow";
 import { Body } from "../Typography/Typography";
@@ -11,23 +11,25 @@ import Image from "next/image";
 interface TrainingProps {
   title: string;
   body: string[];
-  link: string;
   items?: string[];
   image: string;
+  type: string;
 }
 
 const TrainingCard: React.FC<TrainingProps> = ({
   body,
   title,
-  link = INSCHRIJVING_PRIVE,
   items = [],
   image,
+  type,
 }) => {
   const router = useRouter();
   return (
     <div
       className="border cursor-pointer border-gray-100 rounded-lg pb-2 hover:shadow-xl max-w-md flex-shrink"
-      onClick={() => router.push(link)}
+      onClick={() =>
+        router.push({ pathname: INSCHRIJVING, query: { type } }, INSCHRIJVING)
+      }
     >
       <div className="bg-green-200 text-center text-2xl py-8 text-gray-50 rounded-t-lg">
         {title}
@@ -54,7 +56,12 @@ const TrainingCard: React.FC<TrainingProps> = ({
         <Button
           className="mx-auto"
           label="Aanvragen"
-          onClick={() => router.push(link)}
+          onClick={() =>
+            router.push(
+              { pathname: INSCHRIJVING, query: { type } },
+              INSCHRIJVING
+            )
+          }
         />
       </FormRow>
     </div>

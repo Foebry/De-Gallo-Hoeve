@@ -11,36 +11,44 @@ const login = object({
 const register = object({
   csrf: string().required({ message: "Invalid form" }),
   email: string()
-    .email({ email: "invalid email" })
-    .required({ email: "email is required" }),
-  password: string().required({ password: "password is required" }),
+    .email({ email: "ongeldige email" })
+    .required({ email: "verplicht veld" }),
+  password: string()
+    .required({ password: "verplicht veld" })
+    .min(8, { password: "Minstens 8 characters" })
+    .matches(/[a-z]+/, { message: { password: "Minstens 1 kleine letter" } })
+    .matches(/[A-Z]+/, { message: { password: "Minstens 1 hoofdletter" } })
+    .matches(/[&é@#§è!çà$£µ%ù?./<>°}{"'^*+-=~},;]+/, {
+      message: { password: "Minstens 1 speciaal character" },
+    })
+    .matches(/[0-9]+/, { message: { password: "Minstens 1 cijfer" } }),
   vnaam: string()
     .matches(/^[a-z ,.'-éëèçêïü]+$/i, {
       message: { vnaam: "Kan enkel letters bevatten" },
     })
-    .required({ vnaam: "Voornaam is required" })
+    .required({ vnaam: "verplicht veld" })
     .max(255, { vnaam: "Maximaal 255 characters" }),
   lnaam: string()
-    .required({ lnaam: "Naam is required" })
+    .required({ lnaam: "verplicht veld" })
     .matches(/^[a-z ,.'-éëèçêïü]+$/i, {
       message: { lnaam: "Kan enkel letters bevatten" },
     }),
-  gsm: string().required({ gsm: "Telefoon is required" }),
+  gsm: string().required({ gsm: "verplicht veld" }),
   straat: string()
-    .required({ straat: "Straat is required" })
+    .required({ straat: "verplicht veld" })
     .matches(/^[a-z ,.'-éëèçêïü]+$/i, {
       message: { straat: "Kan enkel letters bevatten" },
     }),
-  nr: number().required({ nr: "Huisnr is required" }),
+  nr: number().required({ nr: "verplicht veld" }),
   gemeente: string()
-    .required({ gemeente: "Gemeente is required" })
+    .required({ gemeente: "verplicht veld" })
     .matches(/^[a-z ,.'-éëèçêïü]+$/i, {
       message: { gemeente: "Kan enkel letters bevatten" },
     }),
-  postcode: number().required({ postcode: "Postcode is required" }),
+  postcode: number().required({ postcode: "verplicht veld" }),
   honden: array(
     object({
-      ras_id: number().required({ ras_id: "Gelieve een ras te selecteren" }),
+      ras: string().required({ ras: "Gelieve een ras te selecteren" }),
       naam: string()
         .required({ naam: "Naam is required" })
         .matches(/^[a-z ,.'-éëèçêïü]+$/i, {
@@ -74,6 +82,24 @@ const inschrijving = object({
     .optional(),
 });
 
+const anoniemeInschrijving = object({
+  inschrijvingen: array(
+    object({
+      datum: date().required({ datum: "verplicht" }),
+      hond_naam: string().required({ hond_naam: "verplicht" }),
+      hond_ras: number().required({ hond_ras: "verplicht" }),
+      hond_geslacht: string().required({ hond_geslacht: "verplicht" }),
+    })
+  )
+    .required({ message: "Gelieve minstens 1 datum aan te duiden" })
+    .min(1, { datum: "gelieve minimum 1 datum aan te duiden" }),
+  aanspreking: string().required({ aanspreking: "verplicht" }),
+  naam: string().required({ naam: "verplicht" }),
+  email: string()
+    .email({ email: "Ongeldige email" })
+    .required({ email: "verplicht" }),
+});
+
 const boeking = object({
   csrf: string().required({ failure: "Invalid form" }),
   klant_id: number().required(),
@@ -92,11 +118,18 @@ const boeking = object({
   ).required({ details: "Gelieve minstens 1 hond op te geven" }),
 });
 
-const schemas = { login, register, inschrijving, boeking };
+const schemas = {
+  login,
+  register,
+  inschrijving,
+  boeking,
+  anoniemeInschrijving,
+};
 
 export const {
   login: loginSchema,
   register: registerSchema,
   inschrijving: inschrijvingSchema,
+  anoniemeInschrijving: anoniemeInschrijvingSchema,
   boeking: boekingSchema,
 } = schemas;

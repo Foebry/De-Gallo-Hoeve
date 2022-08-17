@@ -1,11 +1,9 @@
 import { Body, Title1 } from "../components/Typography/Typography";
-import { atob } from "buffer";
-import db, { conn } from "../middleware/db";
-import { GetServerSideProps } from "next";
 import TrainingCard from "../components/Cards/TrainingCard";
 import { nanoid } from "nanoid";
 import Image from "next/image";
-import { INSCHRIJVING_GROEP, INSCHRIJVING_PRIVE } from "../types/linkTypes";
+import { kanInschrijvenTraining, getIndexData } from "../middleware/MongoDb";
+import { ObjectId } from "mongodb";
 
 interface IndexProps {
   privetraining: string[];
@@ -22,7 +20,7 @@ const Index: React.FC<IndexProps> = ({
   return (
     <>
       <section className="mb-40 block flex-wrap mt-10 items-center max-w-7xl justify-between mx-auto md:flex md:px-5">
-        <div className="mx-auto w-1/2 relative flex flex-wrap rotate-135 gap-5 self-center md:w-4/12 md:mx-0 mdl:self-end">
+        <div className="mx-auto w-1/2 relative flex flex-wrap rotate-135 gap-5 self-center md:w-4/12 md:mx-0 md:self-end">
           <div className="w-5/12 max-w-sm aspect-square border-4 border-green-200 overflow-hidden relative images">
             <div className="aspect-square -rotate-135 absolute image">
               <Image
@@ -83,19 +81,19 @@ const Index: React.FC<IndexProps> = ({
             <TrainingCard
               title="Groepstrainingen"
               body={groepstraining}
+              type="groep"
               items={[
                 "1 hond per inschrijving",
                 "max 10 inschrijvingen per training",
                 "Training op Zondag",
                 "€ 15,00",
               ]}
-              link={INSCHRIJVING_GROEP}
               image="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656189950/De-Gallo-Hoeve/content/hondenschool-740x433_hove6a.jpg"
             />
             <TrainingCard
               title="Privétrainingen"
               body={privetraining}
-              link={INSCHRIJVING_PRIVE}
+              type="prive"
               items={[
                 "1 hond per inschrijving",
                 "Bij u thuis of op locatie",
@@ -113,24 +111,15 @@ const Index: React.FC<IndexProps> = ({
 
 export default Index;
 
-export const getServerSideProps = async (ctx: GetServerSideProps) => {
-  interface ContentResult {
-    content: string;
-  }
-
-  const data = (await db.query({
-    builder: conn.select("content").from("content").whereIn("id", [1, 5, 6]),
-  })) as ContentResult[];
-  const image = await db.query({
-    builder: conn.select("image").from("content").where({ id: 1 }).first(),
-  });
+export const getStaticProps = async () => {
+  const { wie, privetraining, groepstraining } = await getIndexData();
 
   return {
     props: {
-      image,
-      wie: atob(data[0].content).split("\n"),
-      privetraining: atob(data[1].content).split("\n"),
-      groepstraining: atob(data[2].content).split("\n"),
+      wie,
+      privetraining,
+      groepstraining,
     },
+    revalidate: 3600,
   };
 };

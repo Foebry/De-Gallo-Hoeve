@@ -24,8 +24,8 @@ const Contactgegevens: React.FC<ContactProps> = ({ control }) => {
                 onChange={onChange}
                 options={[
                   { key: undefined, label: "Aanspreking" },
-                  { key: 1, label: "Mr." },
-                  { key: 2, label: "Mevr." },
+                  { value: 1, label: "Meneer" },
+                  { value: 2, label: "Mevrouw" },
                 ]}
               />
             )}

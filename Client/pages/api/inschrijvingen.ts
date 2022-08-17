@@ -1,10 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import mailer from "../../middleware/Mailer";
-import {
-  confirmInschrijving,
-  validate,
-  validateCsrfToken,
-} from "../../middleware/Validator";
+import { processInschrijving } from "../../middleware/Helper";
+import { validate, validateCsrfToken } from "../../handlers/validationHelper";
 import baseResponse from "../../types/responseType";
 import { inschrijvingSchema } from "../../types/schemas";
 
@@ -17,15 +13,25 @@ const handler = (req: NextApiRequest, res: NextApiResponse<Response>) => {
 };
 
 const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
-  await validateCsrfToken({ req, res }, () => {
-    return validate(req, res, { schema: inschrijvingSchema }, () => {
-      return confirmInschrijving({ req, res });
+  const options = { schema: inschrijvingSchema, message: "Foutieve input" };
+  return secureApi({ req, res }, async () => {
+    return validateCsrfToken({ req, res }, async () => {
+      return validate({ req, res }, options, processInschrijving);
     });
   });
-
-  if (res.statusCode === 201) mailer.sendMail("inschrijving");
-
-  return res;
 };
+// const { klant_id } = req.body;
+// const schema = inschrijvingSchema;
+// const message = "Inschrijcing niet verwerkt";
+// const options = { schema, message };
+
+// return await validateCsrfToken({ req, res }, () => {
+//   return validate(req, res, options, () => {
+//     return confirmInschrijving({ req, res }, async () => {
+//       return mailer.sendMail("inschrijving");
+//     });
+//   });
+// });
+// };
 
 export default handler;

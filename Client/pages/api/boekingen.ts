@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import mailer from "../../middleware/Mailer";
-import { validate } from "../../middleware/Validator";
+import { validate } from "../../handlers/validationHelper";
 import baseResponse from "../../types/responseType";
 import { boekingSchema } from "../../types/schemas";
 
@@ -13,7 +13,7 @@ const handler = (req: NextApiRequest, res: NextApiResponse<Response>) => {
 };
 
 const postBoeking = (req: NextApiRequest, res: NextApiResponse<Response>) => {
-  validate(req.body, res, { schema: boekingSchema }, () => {});
+  validate({ req, res }, { schema: boekingSchema }, () => {});
 
   mailer.sendMail("boeking");
 

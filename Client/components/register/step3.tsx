@@ -14,7 +14,7 @@ interface Step3Props {
 
 const step3: React.FC<Step3Props> = ({ control, errors, setErrors }) => {
   return (
-    <div className="flex flex-col gap-20">
+    <div className="flex flex-col gap-20 px-28">
       <FormRow className="flex-wrap gap-5">
         <Controller
           name="password"
@@ -24,7 +24,7 @@ const step3: React.FC<Step3Props> = ({ control, errors, setErrors }) => {
               label="wachtwoord"
               name="password"
               id="password"
-              extra="w-full 3xs:min-w-2xs sm:w-1/3"
+              extra="w-full 4xs:min-w-2xs sm:w-1/3"
               value={value}
               onChange={onChange}
               onBlur={onBlur}
@@ -42,7 +42,7 @@ const step3: React.FC<Step3Props> = ({ control, errors, setErrors }) => {
               label="herhaal"
               name="password_verification"
               id="password_verification"
-              extra="w-full 3xs:min-w-2xs sm:w-1/3"
+              extra="w-full 4xs:min-w-2xs sm:w-1/3"
               value={value}
               onChange={onChange}
               onBlur={onBlur}
@@ -53,7 +53,7 @@ const step3: React.FC<Step3Props> = ({ control, errors, setErrors }) => {
           )}
         />
       </FormRow>
-      <SubmitButton type="form" label="Verzend" />
+      {/* <SubmitButton type="form" label="Verzend" /> */}
     </div>
   );
 };
