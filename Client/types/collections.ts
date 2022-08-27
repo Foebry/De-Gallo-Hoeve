@@ -1,5 +1,7 @@
 import { ObjectId } from "mongodb";
 
+export type TrainingType = "prive" | "groep";
+export type geslachtType = "Reu" | "Teef";
 type HondSoort = "klein" | "middlegroot" | "groot";
 
 export interface Content {
@@ -15,8 +17,6 @@ export interface Geslacht {
   naam: string;
 }
 
-type geslachtType = "Reu" | "Teef";
-
 export interface KlantReservatie {}
 
 export interface Hond {
@@ -26,7 +26,14 @@ export interface Hond {
   naam: string;
   ras: string;
 }
-export interface KlantInschrijving {}
+export interface KlantInschrijving {
+  datum: Date;
+  training: TrainingType;
+  hond: {
+    _id: ObjectId;
+    naam: string;
+  };
+}
 
 export interface Klant {
   _id?: ObjectId;
@@ -42,8 +49,8 @@ export interface Klant {
   postcode: number;
   verified: boolean;
   honden: Hond[];
-  inschrijvingen: KlantInschrijving[];
-  reservaties: KlantReservatie[];
+  inschrijvingen: ObjectId[];
+  reservaties: ObjectId[];
 }
 
 export interface Ras {
@@ -58,33 +65,27 @@ export interface GroepTraining {
   naam: string;
   prijs: number;
   max_inschrijvingen: number;
-  inschrijvingen: {
-    datum: Date;
-    aantal: number;
-    klanten: {
-      _id: ObjectId;
-      naam: string;
-      hond: {
-        _id: ObjectId;
-        naam: string;
-      };
-    }[];
-  }[];
+  inschrijvingen: Inschrijving[];
 }
 
 export interface PriveTraining {
   _id?: ObjectId;
   naam: string;
   prijs: number;
-  inschrijvingen: {
-    datum: Date;
-    klant: {
-      _id: ObjectId;
-      naam: string;
-      hond: {
-        _id: ObjectId;
-        naam: string;
-      };
-    };
-  }[];
+  inschrijvingen: Inschrijving[];
+}
+
+export interface Inschrijving {
+  _id?: ObjectId;
+  datum: Date;
+  training: string;
+  hond: {
+    id: string;
+    naam: string;
+  };
+  klant: {
+    id: string;
+    vnaam: string;
+    lnaam: string;
+  };
 }

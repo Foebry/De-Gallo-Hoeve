@@ -5,6 +5,7 @@ import {
   FieldValues,
   UseFormGetValues,
   UseFormRegister,
+  UseFormSetValue,
 } from "react-hook-form";
 import { OptionsOrGroups } from "react-select";
 import { InschrijvingErrorInterface } from "../../pages/inschrijving";
@@ -24,6 +25,8 @@ interface Props {
   selectedDates: string[];
   honden?: OptionsOrGroups<any, optionInterface>[];
   type: TrainingType;
+  handleDelete: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  timeslots: any;
 }
 
 const HondGegevens: React.FC<Props> = ({
@@ -33,12 +36,14 @@ const HondGegevens: React.FC<Props> = ({
   honden = [],
   selectedDates = [],
   type,
+  handleDelete,
+  timeslots,
 }) => {
   return (
     <>
       {selectedDates.length > 0 ? (
         selectedDates
-          .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+          // .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
           .map((date: any, index: number) => (
             <DayCard
               key={nanoid(5)}
@@ -49,6 +54,8 @@ const HondGegevens: React.FC<Props> = ({
               index={index}
               honden={honden}
               type={type}
+              handleDelete={handleDelete}
+              timeslots={timeslots[date] ?? timeslots.default}
             />
           ))
       ) : (

@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { findOneBy } from "../middleware/MongoDb";
+import client, { findOneBy } from "../middleware/MongoDb";
 import { badRequest } from "./ResponseHandler";
 import { Klant } from "../types/collections";
 import brcypt from "bcrypt";
@@ -15,7 +15,7 @@ interface LoginHandlerInterface {
 const loginHandler: LoginHandlerInterface = {
   onLoginSuccess: async ({ req, res }) => {
     const { email, password } = req.body;
-    const klant = (await findOneBy("klant", {
+    const klant = (await findOneBy(client, "klant", {
       email: email.toLowerCase(),
     })) as Klant;
     if (!klant) return badRequest(res, undefined, { email: "Foutieve email" });

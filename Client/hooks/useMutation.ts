@@ -2,6 +2,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { InschrijvingErrorInterface } from "../pages/inschrijving";
 import { LoginErrorInterface } from "../pages/login";
+import moment from "moment";
 
 interface ApiError {
   response: {
@@ -57,6 +58,20 @@ export const structureHondenPayload = (payload: any) => {
     return { ...hond, ras, geslacht };
   });
   return { ...payload, honden: new_honden };
+};
+
+export const structureInschrijvingenPayload = (payload: any) => {
+  const inschrijvingen = payload?.inschrijvingen ?? [];
+  console.log({ inschrijvingen });
+  const new_inschrijvingen = inschrijvingen.map((inschrijving: any) => ({
+    ...inschrijving,
+    hond_id: inschrijving.hond_id.value,
+    hond_naam: inschrijving.hond_id.label,
+    datum: moment
+      .utc([inschrijving.datum, inschrijving.tijdslot.value].join(" "))
+      .local(),
+  }));
+  return { ...payload, inschrijvingen: new_inschrijvingen };
 };
 
 export const structureDetailsPayload = (payload: any) => {

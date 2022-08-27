@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { INDEX, LOGIN, REGISTER } from "../types/linkTypes";
 import { Title3 } from "./Typography/Typography";
 import useMutation from "../hooks/useMutation";
@@ -9,7 +9,6 @@ import { useRouter } from "next/router";
 import NavLink from "./NavLink";
 import { parseCookies } from "nookies";
 import jwt from "jsonwebtoken";
-import getData from "../hooks/useApi";
 
 export const Nav = () => {
   const logout = useMutation();
@@ -20,8 +19,10 @@ export const Nav = () => {
     router.push(INDEX);
   };
 
-  const userName = useMemo(() => {
-    const cookies = parseCookies();
+  const [userName, setUserName] = useState<string>();
+
+  const cookies = parseCookies();
+  useEffect(() => {
     const token = cookies.Client;
     const secret = process.env.NEXT_PUBLIC_COOKIE_SECRET;
     if (token) {
@@ -29,15 +30,22 @@ export const Nav = () => {
         algorithms: ["RS256", "HS256"],
       });
       const payload = JSON.parse(JSON.stringify(verifiedToken));
-      return payload.name;
-    }
-    return undefined;
-  }, [parseCookies()]);
+      setUserName(payload.name);
+    } else setUserName(undefined);
+  }, [cookies]);
 
-  const transferData = async () => {
-    const { data } = await getData(TRANSFER);
-    console.log(data);
-  };
+  // const userName = useMemo(() => {
+  //   const token = cookies.Client;
+  //   const secret = process.env.NEXT_PUBLIC_COOKIE_SECRET;
+  //   if (token) {
+  //     const verifiedToken = jwt.verify(token, `${secret}`, {
+  //       algorithms: ["RS256", "HS256"],
+  //     });
+  //     const payload = JSON.parse(JSON.stringify(verifiedToken));
+  //     return payload.name;
+  //   }
+  //   return undefined;
+  // }, [cookies]);
 
   return (
     <div className="relative mb-30 w-full shadow h-16 z-20 md:mb-0 md:block">

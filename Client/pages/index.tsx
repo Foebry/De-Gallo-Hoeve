@@ -2,8 +2,7 @@ import { Body, Title1 } from "../components/Typography/Typography";
 import TrainingCard from "../components/Cards/TrainingCard";
 import { nanoid } from "nanoid";
 import Image from "next/image";
-import { kanInschrijvenTraining, getIndexData } from "../middleware/MongoDb";
-import { ObjectId } from "mongodb";
+import { getIndexData } from "../middleware/MongoDb";
 
 interface IndexProps {
   privetraining: string[];
@@ -70,7 +69,7 @@ const Index: React.FC<IndexProps> = ({
       <section className="bg-white pb-2 mx-auto md:px-5">
         <div className="px-5 mx-auto  max-w-7xl md:px-0">
           <Title1 className="text-green-200">Onze diensten</Title1>
-          {groepstraining.slice(0, 1).map((paragraph) => (
+          {privetraining.slice(0, 1).map((paragraph) => (
             <Body key={nanoid(5)} className="px-2 md:mx-auto">
               {paragraph}
             </Body>
@@ -78,7 +77,7 @@ const Index: React.FC<IndexProps> = ({
         </div>
         <div className="px-5 max-w-7xl py-24 relative md:mx-auto md:px-0">
           <div className="flex gap-10 justify-center flex-wrap sm:flex-nowrap max-w-7xl md:mx-auto py-24 relative ">
-            <TrainingCard
+            {/* <TrainingCard
               title="Groepstrainingen"
               body={groepstraining}
               type="groep"
@@ -89,7 +88,7 @@ const Index: React.FC<IndexProps> = ({
                 "€ 15,00",
               ]}
               image="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656189950/De-Gallo-Hoeve/content/hondenschool-740x433_hove6a.jpg"
-            />
+            /> */}
             <TrainingCard
               title="Privétrainingen"
               body={privetraining}
@@ -118,7 +117,7 @@ export const getStaticProps = async () => {
     props: {
       wie,
       privetraining,
-      groepstraining,
+      // groepstraining,
     },
     revalidate: 3600,
   };

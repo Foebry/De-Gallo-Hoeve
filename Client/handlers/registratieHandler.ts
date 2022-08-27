@@ -2,13 +2,9 @@ import { NextApiRequest, NextApiResponse } from "next";
 import mailer from "../middleware/Mailer";
 import client from "../middleware/MongoDb";
 import { internalServerError } from "./ResponseHandler";
-import {
-  Hond,
-  Klant,
-  KlantInschrijving,
-  KlantReservatie,
-} from "../types/collections";
+import { Hond, Klant } from "../types/collections";
 import brcypt from "bcrypt";
+import { ObjectId } from "mongodb";
 
 interface RegistratieHandlerInterface {
   handleRegistration: (obj: {
@@ -53,11 +49,12 @@ const registratieHandler: RegistratieHandlerInterface = {
       ...klantData,
       password: await brcypt.hash(klantData.password, 10),
       honden,
-      inschrijvingen: [] as KlantInschrijving[],
-      reservaties: [] as KlantReservatie[],
+      inschrijvingen: [] as ObjectId[],
+      reservaties: [] as ObjectId[],
       roles: "[]",
       verified: false,
       email: klantData.email.toLowerCase(),
+      created_at: new Date().getTimezoneOffset(),
     };
     return klant as Klant;
   },

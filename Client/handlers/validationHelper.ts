@@ -37,7 +37,7 @@ const validationHelper: ValidationHelperInterface = {
         const [key, value] = Object.entries(el)[0];
         return { ...prev, [key]: value };
       });
-      return res.status(400).json({ ...response, message: message });
+      return res.status(400).json({ ...response, message });
     }
   },
 

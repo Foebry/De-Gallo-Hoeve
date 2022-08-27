@@ -55,13 +55,14 @@ const HondGegevens: React.FC<Props> = ({
     geslacht: undefined,
     chipNr: undefined,
   };
+  const formValues = values();
   const sorted = useMemo(() => {
     return values().honden.reverse();
-  }, [values()]);
+  }, [formValues]);
 
   useEffect(() => {
     values().honden.length === 0 && append(emptyHond);
-  }, []);
+  }, [values, append, emptyHond]);
 
   return (
     <div className="md:px-5">

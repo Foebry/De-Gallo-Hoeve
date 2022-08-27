@@ -2,7 +2,9 @@ import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import React, { useMemo, useState } from "react";
 import { Controller, FieldValues, useForm } from "react-hook-form";
-import useMutation from "../hooks/useMutation";
+import useMutation, {
+  structureInschrijvingenPayload,
+} from "../hooks/useMutation";
 import { POST_INSCHRIJVING } from "../types/apiTypes";
 import { INDEX, LOGIN } from "../types/linkTypes";
 import FormSteps from "../components/form/FormSteps";
@@ -17,7 +19,11 @@ import { toast } from "react-toastify";
 import { OptionsOrGroups } from "react-select";
 import { optionInterface } from "../components/register/HondGegevens";
 import HondGegevens from "../components/inschrijving/HondGegevens";
-import { getHondOptions, getRasOptions } from "../middleware/MongoDb";
+import {
+  getFreeTimeSlots,
+  getHondOptions,
+  getRasOptions,
+} from "../middleware/MongoDb";
 import { ObjectId } from "mongodb";
 import { getDisabledDays } from "../middleware/Helper";
 import { generateCsrf } from "../handlers/validationHelper";
@@ -32,6 +38,7 @@ interface LessenProps {
   rassen: OptionsOrGroups<any, optionInterface>[];
   csrf: string;
   type: TrainingType;
+  timeslots: any;
 }
 
 export interface InschrijvingErrorInterface {
@@ -53,13 +60,15 @@ const Groepslessen: React.FC<LessenProps> = ({
   rassen,
   csrf,
   type,
+  timeslots,
 }) => {
   const [errors, setErrors] = useState<InschrijvingErrorInterface>({});
   const [activeStep, setActiveStep] = useState<number>(0);
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
+  const [selectedDates, setSelectedDates] = useState<string[]>([]);
 
   const router = useRouter();
-  const { handleSubmit, control, getValues, register } = useForm();
+  const { handleSubmit, control, getValues, register, setValue } = useForm();
   const inschrijving = useMutation(errors, setErrors);
 
   const steps = useMemo(() => {
@@ -68,18 +77,36 @@ const Groepslessen: React.FC<LessenProps> = ({
       : ["Selecteer datum(s)", "Gegevens hond", "Contactgegevens"];
   }, [klant_id]);
 
+  const handleDelete = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const index = parseInt(e.currentTarget.dataset.id ?? "-1");
+    if (index >= 0) {
+      console.log(getValues().inschrijvingen[index]);
+      const el = selectedDates[index];
+      setSelectedDates(() =>
+        selectedDates.filter((date: string) => date !== el)
+      );
+      setValue("inschrijvingen", {
+        ...getValues().inschrijvingen,
+        [index]: null,
+      });
+    }
+  };
+
   const onSubmit = async (values: FieldValues) => {
+    const payload = structureInschrijvingenPayload(values);
     const { data, error } = await inschrijving(POST_INSCHRIJVING, {
-      ...values,
+      ...payload,
       csrf,
-      klant_id: klant_id ?? 0,
-      training_id: 2,
+      klant_id,
+      training: type,
     });
+    if (error?.code === 401) router.push(LOGIN);
     if (data) {
       toast.success(data.message);
       router.push(INDEX);
     }
   };
+
   return (
     <section className="mx-5 pb-24 md:mx-auto">
       {!klant_id && (
@@ -105,16 +132,25 @@ const Groepslessen: React.FC<LessenProps> = ({
             {activeStep === 0 ? (
               <>
                 <Controller
-                  name="datum"
+                  name="dates"
                   control={control}
                   render={({ field: { onChange } }) => (
                     <DatePicker
-                      onChange={onChange}
+                      onChange={(e) => {
+                        onChange(e);
+                        setSelectedDates(
+                          getValues().dates.sort(
+                            (a: string, b: string) =>
+                              new Date(a).getTime() - new Date(b).getTime()
+                          )
+                        );
+                        setValue("inschrijvingen", []);
+                      }}
                       disabledBeforeToday={true}
                       numberOfSelectableDays={5}
                       startOfWeek={1}
                       disabledDays={disabledDays}
-                      selectedDays={getValues().datum}
+                      selectedDays={selectedDates}
                     />
                   )}
                 />
@@ -127,9 +163,11 @@ const Groepslessen: React.FC<LessenProps> = ({
                 values={getValues}
                 errors={errors}
                 setErrors={setErrors}
-                selectedDates={getValues().datum}
+                selectedDates={selectedDates}
                 honden={honden}
                 type={type}
+                handleDelete={handleDelete}
+                timeslots={timeslots}
               />
             ) : activeStep === 2 ? (
               <Contactgegevens control={control} />
@@ -159,7 +197,8 @@ const Groepslessen: React.FC<LessenProps> = ({
 export default Groepslessen;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  const { type } = ctx.query;
+  // const { type } = ctx.query;
+  const type = "prive";
   if (!type) return { redirect: { permanent: false, destination: INDEX } };
 
   return securepage(ctx, async (klant_id: ObjectId) => {
@@ -167,6 +206,8 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     const csrf = generateCsrf();
     const disabledDays = await getDisabledDays(type as string);
     const rassen = await getRasOptions();
+    const timeslots = await getFreeTimeSlots();
+    console.log({ timeslots: timeslots["2022-08-26"] });
 
     return {
       props: {
@@ -176,6 +217,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
         klant_id: klant_id?.toString() ?? null,
         csrf,
         type,
+        timeslots,
       },
     };
   });

@@ -1,15 +1,18 @@
-import React from "react";
+import React, { ButtonHTMLAttributes } from "react";
 import {
   Control,
   Controller,
   FieldValues,
+  UseFormGetValues,
   UseFormRegister,
+  UseFormSetValue,
 } from "react-hook-form";
 import FormInput from "../form/FormInput";
 import Select, { OptionsOrGroups } from "react-select";
 import { optionInterface } from "../register/HondGegevens";
 import { geslachten } from "./HondCard";
-import { Body, Title3 } from "../Typography/Typography";
+import { Body } from "../Typography/Typography";
+import { RiDeleteBin6Line } from "react-icons/ri";
 
 type TrainingType = "prive" | "groep";
 
@@ -22,6 +25,9 @@ interface DayCardProps {
   index: number;
   honden?: OptionsOrGroups<any, optionInterface>[];
   type: TrainingType;
+  handleDelete: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  error?: boolean;
+  timeslots: any;
 }
 
 const DayCard: React.FC<DayCardProps> = ({
@@ -32,34 +38,37 @@ const DayCard: React.FC<DayCardProps> = ({
   register,
   honden,
   type,
+  handleDelete,
+  error = false,
+  timeslots,
 }) => {
   return (
-    <div className="4xs:flex border-2 rounded justify-between 4xs:pr-5 max-w-lg mx-auto mb-2">
-      <div className="border-r-2 rounded-l p-10 flex flex-col gap-1 items-center bg-green-200">
+    <div className="4xs:flex border-2 rounded justify-between 4xs:pr-5 max-w-lg mx-auto mb-2 relative items-center">
+      <div
+        className={`border-r-2 rounded-l p-10 flex flex-col gap-1 items-center ${
+          error ? "bg-red-900" : "bg-green-200"
+        }`}
+      >
         <input
           type="hidden"
-          {...register(`inschrijvingen.[${index}].datum`)}
+          {...register(`inschrijvingen[${index}].datum`)}
           value={date}
         />
-        <span className="text-gray-200">
-          {new Date(date)
-            .toLocaleString("default", { month: "long" })
-            .substring(0, 3)}
-        </span>
-        <span className="text-gray-200">{date.split("-")[2]}</span>
+        <div className="text-gray-200 flex flex-col items-center">
+          <span className="text-gray-200">
+            {new Date(date)
+              .toLocaleString("default", { month: "long" })
+              .substring(0, 3)}
+          </span>
+          <span className="text-gray-200">{date.split("-")[2]}</span>
+        </div>
       </div>
-      <div className="py-2 my-auto">
+      <div className="py-2 my-auto w-full pl-5">
         {honden && honden.length > 0 ? (
-          <>
-            <div className="text-center mb-8">
-              <Body>
-                Welke hond neemt u mee naar deze{" "}
-                {type === "groep" ? "groepstraining" : "privetraining"}
-              </Body>
-            </div>
+          <div className="flex flex-col gap-2">
             <Controller
               control={control}
-              name={`inschrijvingen.[${index}.hond_id]`}
+              name={`inschrijvingen[${index}].hond_id`}
               render={({ field: { value, onChange } }) => (
                 <Select
                   options={honden}
@@ -68,7 +77,18 @@ const DayCard: React.FC<DayCardProps> = ({
                 />
               )}
             />
-          </>
+            <Controller
+              control={control}
+              name={`inschrijvingen[${index}].tijdslot`}
+              render={({ field: { value, onChange } }) => (
+                <Select
+                  options={timeslots}
+                  value={value ?? { label: "Selecteer tijdstip", key: 0 }}
+                  onChange={onChange}
+                />
+              )}
+            />
+          </div>
         ) : (
           <>
             <Controller
@@ -82,12 +102,12 @@ const DayCard: React.FC<DayCardProps> = ({
                   onChange={onChange}
                 />
               )}
-              name={`inschrijvingen.[${index}].naam`}
+              name={`inschrijvingen[${index}].naam`}
             />
             <div className="mb-2">
               <Controller
                 control={control}
-                name={`inschrijvingen.[${index}].ras`}
+                name={`inschrijvingen[${index}].ras`}
                 render={({ field: { value, onChange } }) => (
                   <Select
                     options={options}
@@ -100,7 +120,7 @@ const DayCard: React.FC<DayCardProps> = ({
             <div>
               <Controller
                 control={control}
-                name={`inschrijvingen.[${index}].geslacht`}
+                name={`inschrijvingen[${index}].geslacht`}
                 render={({ field: { value, onChange } }) => (
                   <Select
                     options={geslachten}
@@ -112,6 +132,13 @@ const DayCard: React.FC<DayCardProps> = ({
             </div>
           </>
         )}
+      </div>
+      <div
+        className="absolute -right-20 text-3xl text-red-900 cursor-pointer"
+        onClick={handleDelete}
+        data-id={index}
+      >
+        <RiDeleteBin6Line className="pointer-events-none" />
       </div>
     </div>
   );

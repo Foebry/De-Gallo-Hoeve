@@ -68,18 +68,15 @@ const register = object({
 const inschrijving = object({
   inschrijvingen: array(
     object({
-      datum: string().required({ message: "Ongeldige datum" }),
-      hond_id: number().optional(),
-      hond_naam: string().optional(),
-      hond_ras: number().optional(),
+      datum: date().required({ message: "Ongeldige datum" }),
+      hond_id: string().required(),
+      hond_naam: string().required(),
       hond_geslacht: string().optional(),
+      // tijdslot: string().required("Gelieve een tijdslot aan te duiden"),
     })
   ).required({ message: "Geen datum geselecteerd" }),
-  training_id: number().required({ message: "Ongeldige training" }),
-  klant_id: number().optional().nullable(),
-  email: string()
-    .email({ message: "ongeldige email", email: "ongeldige email" })
-    .optional(),
+  training: string().required({ message: "Ongeldige training" }),
+  klant_id: string().optional().nullable(),
 });
 
 const anoniemeInschrijving = object({

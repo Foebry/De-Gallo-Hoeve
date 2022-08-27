@@ -17,13 +17,15 @@ interface MongoDbInterface {
     privetraining: string[];
     groepstraining: string[];
   }>;
-  kanInschrijvenTraining: (
-    naam: string,
-    datum: Date
-  ) => Promise<boolean | null>;
-  findOneBy: (collection: string, filter: object) => Promise<any | null>;
+  findOneBy: (
+    client: MongoClient,
+    collection: string,
+    filter: object
+  ) => Promise<any | null>;
   getRasOptions: () => Promise<Option[] | null>;
   getHondOptions: (klant_id: ObjectId) => Promise<Option[]>;
+  getCollections: (collections: string[]) => any;
+  getFreeTimeSlots: () => Promise<any>;
 }
 
 const MongoDb: MongoDbInterface = {
@@ -56,48 +58,16 @@ const MongoDb: MongoDbInterface = {
     }
   },
 
-  kanInschrijvenTraining: async (naam, datum) => {
-    await client.connect();
-    const { max_inschrijvingen, _id } = await findOneBy("training", {
-      naam,
-    });
-    const filter =
-      naam === "groep"
-        ? {
-            _id,
-            inschrijvingen: {
-              $elemMatch: { aantal: { $lt: max_inschrijvingen }, datum },
-            },
-          }
-        : {
-            _id,
-            "inschrijvingen.datum": {
-              $ne: datum,
-            },
-          };
-    console.log({ filter });
+  findOneBy: async (client, collection, filter) => {
     try {
-      const training = await findOneBy("training", filter);
-      return training ? true : false;
-    } catch (e: any) {
-      console.error(e.message);
-      return null;
-    } finally {
-      await client.close();
-    }
-  },
-
-  findOneBy: async (collection, filter) => {
-    try {
-      await client.connect();
       return await client
         .db("degallohoeve")
         .collection(collection)
         .findOne(filter);
     } catch (e: any) {
+      await client.close();
       return null;
     } finally {
-      await client.close();
     }
   },
 
@@ -142,6 +112,55 @@ const MongoDb: MongoDbInterface = {
     }
     return [];
   },
+
+  getCollections: (collections) => {
+    return collections.reduce((prev, curr) => {
+      return {
+        ...prev,
+        [curr + "Collection"]: client.db("degallohoeve").collection(curr),
+      };
+    }, {});
+  },
+
+  getFreeTimeSlots: async () => {
+    const all = [
+      "10:00",
+      "11:00",
+      "12:00",
+      "13:00",
+      "14:00",
+      "15:00",
+      "16:00",
+      "17:00",
+    ].map((el) => ({ label: el, value: el }));
+    await client.connect();
+    const inschrijvingen = await client
+      .db("degallohoeve")
+      .collection("inschrijving")
+      .find({ training: "prive", datum: { $gt: new Date() } })
+      .toArray();
+    await client.close();
+    const timeSlots = inschrijvingen.reduce((prev, curr) => {
+      const [date, time] = curr.datum.toISOString().split("T");
+      const keys = Object.keys(prev);
+      if (keys.includes(date)) {
+        return {
+          ...prev,
+          [date]: prev[date].filter(
+            (el: Option) => el.label !== time.substring(0, 5)
+          ),
+        };
+      } else
+        return {
+          ...prev,
+          [date]: all.filter((el: Option) => el.label !== time.substring(0, 5)),
+        };
+    }, {});
+    return {
+      ...timeSlots,
+      default: all,
+    };
+  },
 };
 
 const client = new MongoClient(
@@ -150,8 +169,9 @@ const client = new MongoClient(
 export default client;
 export const {
   getIndexData,
-  kanInschrijvenTraining,
   findOneBy,
   getRasOptions,
   getHondOptions,
+  getCollections,
+  getFreeTimeSlots,
 } = MongoDb;

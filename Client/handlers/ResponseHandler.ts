@@ -1,4 +1,6 @@
 import { NextApiResponse } from "next";
+import { destroyCookie } from "nookies";
+import { LOGIN } from "../types/linkTypes";
 
 interface ResponseHandler {
   badRequest: (
@@ -23,6 +25,13 @@ const responseHandler: ResponseHandler = {
     return res.end();
   },
   unauthorizedAccess: (res) => {
+    destroyCookie({ res }, "Client", {
+      httpOnly: false,
+      maxAge: 3600,
+      secure: false,
+      sameSite: "strict",
+      path: "/",
+    });
     res.status(401).json({ code: 401, message: "Unauthorized Access" });
     return res.end();
   },

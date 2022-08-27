@@ -109,10 +109,11 @@ export default Login;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const redirect = validator.redirect ?? null;
-  console.log({ redirect });
   const csrf = generateCsrf();
 
-  return nookies.get(ctx).JWT
+  const cookies = nookies.get(ctx);
+  console.log({ cookies });
+  return cookies.JWT
     ? { redirect: { permanent: false, destination: INDEX } }
     : { props: { redirect, csrf } };
 };
