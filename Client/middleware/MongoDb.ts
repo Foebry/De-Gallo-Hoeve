@@ -155,7 +155,7 @@ const MongoDb: MongoDbInterface = {
           ...prev,
           [date]: all.filter((el: Option) => el.label !== time.substring(0, 5)),
         };
-    }, {});
+    }, {} as any);
     return {
       ...timeSlots,
       default: all,
