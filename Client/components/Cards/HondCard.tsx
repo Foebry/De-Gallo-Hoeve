@@ -66,18 +66,7 @@ const HondCard: React.FC<HondCardProps> = ({
                 />
               )}
             />
-            <Controller
-              name={`honden.${index}.ras`}
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Select
-                  options={rassen}
-                  onChange={onChange}
-                  value={value ?? { label: "Ras", value: undefined }}
-                />
-              )}
-            />
-            <FormRow className="mt-5 flex-wrap gap-5">
+            <FormRow className="mt-5 flex-wrap gap-5 mb-3">
               <div className="w-1/3 min-w-fit">
                 <Controller
                   name={`honden.${index}.geslacht`}
@@ -91,21 +80,15 @@ const HondCard: React.FC<HondCardProps> = ({
                   )}
                 />
               </div>
-              <div className="w-1/3 min-w-fit">
+              <div className="w-5/12 min-w-fit">
                 <Controller
-                  name={`honden.${index}.chip_nr`}
+                  name={`honden.${index}.ras`}
                   control={control}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <FormInput
-                      label="chipNr"
-                      name={`honden.${index}.chip_nr`}
-                      id={`honden.${index}.chip_nr`}
-                      extra="w-full 4xs:min-w-2xs sm:w-1/2"
-                      value={value}
+                  render={({ field: { onChange, value } }) => (
+                    <Select
+                      options={rassen}
                       onChange={onChange}
-                      onBlur={onBlur}
-                      errors={errors}
-                      setErrors={setErrors}
+                      value={value ?? { label: "Ras", value: undefined }}
                     />
                   )}
                 />

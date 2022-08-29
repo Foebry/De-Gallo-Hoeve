@@ -1,24 +1,14 @@
 import React, { useEffect, useMemo } from "react";
 import Button from "../buttons/Button";
-import FormInput from "../form/FormInput";
-import FormRow from "../form/FormRow";
-import Select, { OptionsOrGroups } from "react-select";
+import { OptionsOrGroups } from "react-select";
 import {
   Control,
-  Controller,
   FieldValues,
   UseFieldArrayAppend,
   UseFieldArrayRemove,
   UseFormGetValues,
 } from "react-hook-form";
-import Details from "../Details";
-import { DatePicker } from "react-trip-date";
-import { FormError } from "../Typography/Typography";
-import { InschrijvingErrorInterface } from "../../pages/inschrijving";
-import {
-  RegisterErrorInterface,
-  RegisterHondErrorInterface,
-} from "../../pages/register";
+import { RegisterErrorInterface } from "../../pages/register";
 import HondCard from "../Cards/HondCard";
 
 export interface optionInterface {

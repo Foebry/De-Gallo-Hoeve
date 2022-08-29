@@ -57,7 +57,7 @@ const register = object({
       geboortedatum: date().required({
         geboortedatum: "Geboortedatum is required",
       }),
-      chip_nr: string().optional().default(""),
+      // chip_nr: string().optional().default(""),
       geslacht: string().required({
         geslacht: "Gelieve een geslacht aan te duiden",
       }),
