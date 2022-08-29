@@ -185,6 +185,7 @@ const PersoonlijkeGegevens: React.FC<Step1Props> = ({
           control={control}
           render={({ field: { value, onChange } }) => (
             <FormInput
+              type="password"
               name="password"
               id="wachtwoord"
               label="wachtwoord"
@@ -200,6 +201,7 @@ const PersoonlijkeGegevens: React.FC<Step1Props> = ({
           control={control}
           render={({ field: { value, onChange } }) => (
             <FormInput
+              type="password"
               name="password_verification"
               id="wachtwoord"
               label="herhaal"
