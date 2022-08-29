@@ -1,15 +1,15 @@
 interface Mailer {
-  sendMail: (type: string) => void;
+  sendMail: (type: string, data: any) => void;
 }
 
 const mailer: Mailer = {
-  sendMail: (type) => {
+  sendMail: (type, data) => {
     // using Twilio SendGrid's v3 Node.js Library
     // https://github.com/sendgrid/sendgrid-nodejs
     const sgMail = require("@sendgrid/mail");
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     const msg = {
-      to: "rain_fabry@hotmail.com", // Change to your recipient
+      to: data.email, // Change to your recipient
       from: "info@degallohoeve.be", // Change to your verified sender
       subject: `Sending ${type} email`,
       text: "and easy to do anywhere, even with Node.js",

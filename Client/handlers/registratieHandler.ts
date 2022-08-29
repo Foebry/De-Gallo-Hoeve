@@ -5,6 +5,7 @@ import { internalServerError } from "./ResponseHandler";
 import { Hond, Klant } from "../types/collections";
 import brcypt from "bcrypt";
 import { ObjectId } from "mongodb";
+import moment from "moment";
 
 interface RegistratieHandlerInterface {
   handleRegistration: (obj: {
@@ -33,7 +34,7 @@ const registratieHandler: RegistratieHandlerInterface = {
 
       const klant = await generateKlant(klantData, honden);
       await klantCollection.insertOne(klant);
-      mailer.sendMail("register");
+      mailer.sendMail("register", klantData);
 
       return res.status(201).json({ message: "Registatie succesvol!" });
     } catch (e: any) {
@@ -54,7 +55,7 @@ const registratieHandler: RegistratieHandlerInterface = {
       roles: "[]",
       verified: false,
       email: klantData.email.toLowerCase(),
-      created_at: new Date().getTimezoneOffset(),
+      created_at: moment().local().format(),
     };
     return klant as Klant;
   },
