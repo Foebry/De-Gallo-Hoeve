@@ -7,10 +7,9 @@ import {
 } from "react-hook-form";
 import Button from "../buttons/Button";
 import Select, { OptionsOrGroups } from "react-select";
-import Hond from "../Hond";
 import { KLANT_HONDEN } from "../../types/apiTypes";
 import getData from "../../hooks/useApi";
-import { Link, Title1, Title3 } from "../Typography/Typography";
+import { Link, Title1 } from "../Typography/Typography";
 import { LOGIN } from "../../types/linkTypes";
 import FormRow from "../form/FormRow";
 import { ReservatieErrorInterface } from "../../pages/reservatie";
@@ -122,7 +121,7 @@ const Step1: React.FC<Step1Props> = ({
                 value: undefined,
               }}
             />
-            {fields.map((el: any, index: number) => (
+            {/* {fields.map((el: any, index: number) => (
               <Hond
                 key={el.id}
                 naam={values().details[index].naam}
@@ -135,7 +134,7 @@ const Step1: React.FC<Step1Props> = ({
                 setErrors={setErrors}
                 boeking={true}
               />
-            ))}
+            ))} */}
           </div>
           <FormRow className="mt-20">
             <Button

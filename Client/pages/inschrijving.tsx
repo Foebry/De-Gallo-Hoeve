@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Controller, FieldValues, useForm } from "react-hook-form";
 import useMutation, {
   structureInschrijvingenPayload,
@@ -80,7 +80,6 @@ const Groepslessen: React.FC<LessenProps> = ({
   const handleDelete = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     const index = parseInt(e.currentTarget.dataset.id ?? "-1");
     if (index >= 0) {
-      console.log(getValues().inschrijvingen[index]);
       const el = selectedDates[index];
       setSelectedDates(() =>
         selectedDates.filter((date: string) => date !== el)
@@ -207,7 +206,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     const disabledDays = await getDisabledDays(type as string);
     const rassen = await getRasOptions();
     const timeslots = await getFreeTimeSlots();
-    console.log({ timeslots: timeslots["2022-08-26"] });
 
     return {
       props: {

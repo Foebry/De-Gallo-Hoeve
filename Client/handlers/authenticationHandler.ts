@@ -5,7 +5,7 @@ import {
 } from "next";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import nookies, { parseCookies, setCookie } from "nookies";
-import { unauthorizedAccess } from "./ResponseHandler";
+import { badRequest, unauthorizedAccess } from "./ResponseHandler";
 import { ObjectId } from "mongodb";
 import { INSCHRIJVING, LOGIN } from "../types/linkTypes";
 import validationHelper from "./validationHelper";
@@ -66,8 +66,10 @@ const authenticationHandler: AuthenticationHandlerInterface = {
     const verifiedToken = jwt.verify(token, `${secret}`, {
       algorithms: ["RS256", "HS256"],
     });
-
-    return verifiedToken ? callback() : unauthorizedAccess(res);
+    const { verified } = JSON.parse(JSON.stringify(verifiedToken));
+    if (!verifiedToken) return unauthorizedAccess(res);
+    if (!verified) return badRequest(res, "Gelieve uw email te verifiëren");
+    return callback();
   },
 
   redirectToLogin: (ctx) => {
@@ -81,7 +83,9 @@ const authenticationHandler: AuthenticationHandlerInterface = {
       const verifiedToken = jwt.verify(token, `${secret}`, {
         algorithms: ["RS256", "HS256"],
       });
-      const klant_id = JSON.parse(JSON.stringify(verifiedToken)).payload._id;
+      const { _id: klant_id } = JSON.parse(
+        JSON.stringify(verifiedToken)
+      ).payload;
       return await callback(new ObjectId(klant_id));
     }
     validationHelper.redirect = INSCHRIJVING;
@@ -89,6 +93,7 @@ const authenticationHandler: AuthenticationHandlerInterface = {
       redirect: { permanent: false, destination: LOGIN },
     };
   },
+
   hash: (value, secret) => {
     const encValue = base64.encode(
       typeof value === "string" ? value : JSON.stringify(value)

@@ -49,7 +49,7 @@ const registratieHandler: RegistratieHandlerInterface = {
     const klant = {
       ...klantData,
       password: await brcypt.hash(klantData.password, 10),
-      honden,
+      honden: honden.map((hond) => ({ ...hond, _id: new ObjectId() })),
       inschrijvingen: [] as ObjectId[],
       reservaties: [] as ObjectId[],
       roles: "[]",
