@@ -15,7 +15,7 @@ const handler = (req: NextApiRequest, res: NextApiResponse<Response>) => {
 const postBoeking = (req: NextApiRequest, res: NextApiResponse<Response>) => {
   validate({ req, res }, { schema: boekingSchema }, () => {});
 
-  mailer.sendMail("boeking");
+  mailer.sendMail("boeking", {});
 
   res.status(201).json({ success: "Uw boeking is goed ontvangen!" });
 };
