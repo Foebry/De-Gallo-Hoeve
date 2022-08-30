@@ -62,13 +62,16 @@ const inschrijvingsHandler: InschrijvingsHandlerInterface = {
     if (!trainingEnKlantGevonden(req))
       return notFound(res, "Probeer later opnieuw.");
 
+    const { email } = await findOneBy(client, "klant", {
+      _id: new ObjectId(klant_id),
+    });
+    const data = { email, inschrijvingen: [] as Inschrijving[] };
     const session = client.startSession();
 
     try {
       await session.withTransaction(async () => {
         await Promise.all(
           inschrijvingen.map(async (item: any, index: number) => {
-            console.log({ item });
             const { hond_id, hond_naam, datum, tijdslot } = item;
             const inschrijvingData = {
               hond_id,
@@ -108,6 +111,7 @@ const inschrijvingsHandler: InschrijvingsHandlerInterface = {
             const inschrijving = await createInschrijvingDocument(
               inschrijvingData
             );
+            data.inschrijvingen.push(inschrijving);
             const succes = await createInschrijving(
               klant_id,
               training,
@@ -131,7 +135,7 @@ const inschrijvingsHandler: InschrijvingsHandlerInterface = {
     }
 
     if (allChecksPassed) {
-      mailer.sendMail("inschrijving");
+      mailer.sendMail("inschrijving", data);
 
       return res.status(201).json({ message: "Inschrijving ontvangen!" });
     }

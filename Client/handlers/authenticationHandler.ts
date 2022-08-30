@@ -66,7 +66,9 @@ const authenticationHandler: AuthenticationHandlerInterface = {
     const verifiedToken = jwt.verify(token, `${secret}`, {
       algorithms: ["RS256", "HS256"],
     });
-    const { verified } = JSON.parse(JSON.stringify(verifiedToken));
+    const {
+      payload: { verified },
+    } = JSON.parse(JSON.stringify(verifiedToken));
     if (!verifiedToken) return unauthorizedAccess(res);
     if (!verified) return badRequest(res, "Gelieve uw email te verifiëren");
     return callback();
