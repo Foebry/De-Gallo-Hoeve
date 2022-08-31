@@ -89,3 +89,10 @@ export interface Inschrijving {
     lnaam: string;
   };
 }
+
+export interface Confirm {
+  _id?: ObjectId;
+  klant_id: ObjectId;
+  code: string;
+  created_at: Date;
+}
