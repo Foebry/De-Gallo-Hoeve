@@ -1,11 +1,22 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import mailer from "../middleware/Mailer";
-import client from "../middleware/MongoDb";
+import client, { getCollections } from "../middleware/MongoDb";
 import { internalServerError } from "./ResponseHandler";
 import { Hond, Klant } from "../types/collections";
 import brcypt from "bcrypt";
-import { ObjectId } from "mongodb";
+import { Collection, ObjectId } from "mongodb";
 import moment from "moment";
+import { nanoid } from "nanoid";
+
+interface Confirm {
+  klant_id: ObjectId;
+  code: string;
+  created_at: string;
+}
+
+interface InsertedKlant extends Klant {
+  klantId: ObjectId;
+}
 
 interface RegistratieHandlerInterface {
   handleRegistration: (obj: {
@@ -13,6 +24,7 @@ interface RegistratieHandlerInterface {
     res: NextApiResponse;
   }) => Promise<void>;
   generateKlant: (klantData: Klant, honden: Hond[]) => Promise<Klant>;
+  generateConfirm: (klantData: InsertedKlant) => Confirm;
 }
 
 const registratieHandler: RegistratieHandlerInterface = {
@@ -21,8 +33,13 @@ const registratieHandler: RegistratieHandlerInterface = {
 
     try {
       await client.connect();
-
-      const klantCollection = client.db("degallohoeve").collection("klant");
+      const { klantCollection, confirmCollection } = getCollections([
+        "klant",
+        "confirm",
+      ]) as {
+        klantCollection: Collection<Klant>;
+        confirmCollection: Collection<Confirm>;
+      };
       const filter = { email: klantData.email.toLowerCase() };
       const emailTaken = await klantCollection.findOne(filter);
 
@@ -33,8 +50,13 @@ const registratieHandler: RegistratieHandlerInterface = {
         });
 
       const klant = await generateKlant(klantData, honden);
-      await klantCollection.insertOne(klant);
-      mailer.sendMail("register", klantData);
+      const { insertedId: klantId } = await klantCollection.insertOne(klant);
+
+      const confirm = generateConfirm({ ...klantData, klantId });
+      console.log({ confirm });
+      await confirmCollection.insertOne(confirm);
+
+      mailer.sendMail("register", { ...klantData, confirmCode: confirm.code });
 
       return res.status(201).json({ message: "Registatie succesvol!" });
     } catch (e: any) {
@@ -59,6 +81,15 @@ const registratieHandler: RegistratieHandlerInterface = {
     };
     return klant as Klant;
   },
+
+  generateConfirm: (klantData) => {
+    const klant_id = klantData.klantId as ObjectId;
+    const code = nanoid(50);
+    const created_at = moment().local().format();
+
+    return { klant_id, code, created_at };
+  },
 };
 
-export const { handleRegistration, generateKlant } = registratieHandler;
+export const { handleRegistration, generateKlant, generateConfirm } =
+  registratieHandler;
