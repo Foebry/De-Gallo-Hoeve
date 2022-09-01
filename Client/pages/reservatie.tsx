@@ -5,13 +5,14 @@ import Form from "../components/form/Form";
 import Step1 from "../components/reservatie/Step1";
 import Step2 from "../components/reservatie/Step2";
 import { Title3 } from "../components/Typography/Typography";
+import { AppContext } from "../context/appContext";
 import getData from "../hooks/useApi";
 import useMutation, {
   handleErrors,
   structureDetailsPayload,
 } from "../hooks/useMutation";
 import { KLANT_HONDEN, RESERVATIEAPI } from "../types/apiTypes";
-import { LOGIN } from "../types/linkTypes";
+import { INDEX, LOGIN } from "../types/linkTypes";
 
 interface ReservatieProps {}
 
@@ -39,6 +40,7 @@ const Reservatie: React.FC<ReservatieProps> = () => {
     const id = localStorage.getItem("id");
     setKlantId(id);
   }, []);
+  const { setModal } = useContext(AppContext);
 
   const step1 = ["hond_id", "medicatie", "ontsnapping", "sociaal"];
 
@@ -51,7 +53,10 @@ const Reservatie: React.FC<ReservatieProps> = () => {
     values.klant_id = klantId;
     const { data, error } = await makeReservation(RESERVATIEAPI, values);
     if (error) handleErrors(error);
-    else router.push(LOGIN);
+    else {
+      setModal({ active: true, message: data.success, type: "success" });
+      router.push(INDEX);
+    }
   };
 
   return (
@@ -89,18 +94,3 @@ const Reservatie: React.FC<ReservatieProps> = () => {
 };
 
 export default Reservatie;
-
-// export const getServerSideProps = async (ctx: any) => {
-//   const klantId = ctx.query?.klant ?? 0;
-//   const { data: honden } = await getData(KLANT_HONDEN, { klantId });
-//   const hondenOptions = honden.map((hond: any) => ({
-//     value: hond.id,
-//     label: hond.naam,
-//   }));
-//   return {
-//     props: {
-//       honden,
-//       hondenOptions,
-//     },
-//   };
-// };

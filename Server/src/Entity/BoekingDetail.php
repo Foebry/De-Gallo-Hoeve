@@ -142,7 +142,7 @@ class BoekingDetail extends AbstractEntity
         $this->setBoeking($data["Boeking"]);
         $this->setExtra($data["extra"] ?? "");
         $this->setHond( $loader->getHondById( $data["hond_id"] ) );
-        $this->setKennel( $loader->getKennelById( $data["kennel_id"] ?? 1 ) );
+        $this->setKennel( $data["Kennel"] );
         $this->setLoops(new DateTime($data["loops"] ?? "1990-01-01") );
         $this->setMedicatie($data["medicatie"]);
         $this->setOntsnapping($data["ontsnapping"]);

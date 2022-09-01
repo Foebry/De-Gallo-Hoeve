@@ -74,7 +74,8 @@ class JWTSubscriber implements EventSubscriberInterface
             $klant = $klantRepo->findOneBy(["email" => $user_email]);
             $event->setData([
                 "naam"=>$klant->getVnaam(),
-                "id" => $klant->getId()
+                "id" => $klant->getId(),
+                "csrf" => "f0d06032a286c4687959e1a63e3e8105902fd48f23cd73d63765b1f82ea73e29"
             ]);
             $jwt = $eventData['token'];
 

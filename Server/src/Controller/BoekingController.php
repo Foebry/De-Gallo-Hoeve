@@ -2,15 +2,16 @@
 
 namespace App\Controller;
 
+use DateTime;
 use App\Entity\Boeking;
 use App\Entity\BoekingDetail;
 use App\Services\CustomHelper;
-use DateTime;
 use App\Services\Validator;
 use App\Services\EntityLoader;
 use App\Services\ResponseHandler;
+use App\Services\AvailabilityChecker;
+use App\Services\MailService;
 use Doctrine\ORM\EntityManagerInterface;
-use Error;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Annotation\Route;
@@ -22,13 +23,15 @@ use Symfony\Component\HttpFoundation\Response;
         private $loader;
         private $responseHandler;
         private $request;
+        private $checker;
 
-        function __construct( Validator $validator, EntityLoader $loader, ResponseHandler $responseHandler, RequestStack $requestStack )
+        function __construct( Validator $validator, EntityLoader $loader, ResponseHandler $responseHandler, RequestStack $requestStack, AvailabilityChecker $checker )
         {
             $this->validator = $validator;
             $this->loader = $loader;
             $this->responseHandler = $responseHandler;
             $this->request = $requestStack->getCurrentRequest();
+            $this->checker = $checker;
         }
 
         /**
@@ -37,8 +40,9 @@ use Symfony\Component\HttpFoundation\Response;
          * @todo controleer of kennels vrij zijn gedurende de gevraagde periode.
          * @todo indien geen kennels aangeduidt, wijs zelf kennel toe.
          */
-        function postBoeking(EntityManagerInterface $em, CustomHelper $helper): Response {
+        function postBoeking(EntityManagerInterface $em, CustomHelper $helper, MailService $mailService): Response {
             $payload = json_decode( $this->request->getContent(), true );
+            $this->validator->validateCSRF($payload);
 
             $this->loader->checkPayloadForKeys( $payload, ["klant_id", "details"], [ "details" => ["message"=>"Gelieve minstens 1 hond aan te duiden"]]);
             if(count($payload["details"]) === 0) $this->responseHandler->badRequest(["message" => "Gelieve minstens 1 hond aan te duiden"]);
@@ -47,7 +51,7 @@ use Symfony\Component\HttpFoundation\Response;
             $klant = $this->loader->getKlantBy( ["id", $payload["klant_id"]] );
 
             $data = $this->checkBoekingPayload();
-            $this->loader->getDbm()->logger->info("checked BoekingPayload  -  BoekingController line 49");
+            $kennels = $this->checker->checkBoeking();
 
             /** @var Boeking $boeking */
             $boeking = $helper->create( Boeking::class, $data, $this->loader );
@@ -57,36 +61,45 @@ use Symfony\Component\HttpFoundation\Response;
             
             $detailRows = $this->checkDetailsPayload( $payload );
             
+            $index = 0;
             foreach( $detailRows as &$detailData ){
 
                 $hond = $this->loader->getHondById( $detailData["hond_id"]);
-                $this->loader->getDbm()->logger->info("Hond loaded  -  BoekingController line 62");
 
                 if( !$klant->isOwnerOf($hond) ) $this->responseHandler->unprocessableEntity(["message" => "Het lijkt dat deze hond niet bij jou hoort"]);
+                $this->checker->isHondNogNietGeboektTijdensBoekingPeriode($hond, $boeking->getStart(), $boeking->getEind());
+
+                $kennel_id = $kennels[$index];
+                $kennel = $this->loader->getKennelById($kennel_id);
 
                 $detailData["Boeking"] = $boeking;
+                $detailData["Kennel"] = $kennel;
+
                 /** @var BoekingDetail $detail */
                 $detail = $helper->create(BoekingDetail::class, $detailData, $this->loader);
                 $hond->addBoeking($detail);
                 $boeking->addDetail($detail);
 
                 $em->persist($detail);
+
+                $index += 1;
             }
             $em->flush();
 
             $data["details"] = $detailRows;
 
-            return $this->json( ["message" => "Uw boeking is goed ontvangen!"], 201 );           
+            $mailService->send("boeking", $klant);
+
+            return $this->json( ["success" => "Uw boeking is goed ontvangen!"], 201 );           
         }
 
         function checkBoekingPayload(): array {
 
             $boekingData = $this->validator->validatePayload();
-            // $startValue = $boekingData["start"];
             $payload = json_encode( $boekingData );
 
             $this->loader->getDbm()->logger->info("payload: $payload -- BoekingController line 84");
-             $start = new DateTime( $boekingData["start"] );
+            $start = new DateTime( $boekingData["start"] );
             $this->loader->getDbm()->logger->info("created datetime from start -- BoekingController line 85");
             $eind = new DateTime( $boekingData["eind"] );
             $now = new DateTime();
