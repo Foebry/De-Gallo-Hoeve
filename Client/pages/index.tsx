@@ -1,56 +1,107 @@
-import { Body, Title2 } from "../components/Typography/Typography";
-import Image from "../components/Image";
-import { ImageProps } from "../components/Image";
-import Service, { ServiceProps } from "../components/Service";
-import {
-  SECTION_CONTENT,
-  SECTION_DARKER,
-  SECTION_LIGHTER,
-} from "../types/styleTypes";
-import getData from "../hooks/useApi";
-import { CONTENT_INDEXAPI } from "../types/apiTypes";
+import { Body, Title1 } from "../components/Typography/Typography";
+import TrainingCard from "../components/Cards/TrainingCard";
 import { nanoid } from "nanoid";
+import Image from "next/image";
+import { getIndexData } from "../middleware/MongoDb";
 
 interface IndexProps {
-  images: ImageProps[];
-  services: ServiceProps[];
-  content: string[];
-  image: string;
+  privetraining: string[];
+  groepstraining: string[];
+  wie: string[];
+  image: { image: string };
 }
 
-const Index: React.FC<IndexProps> = ({ images, services, content, image }) => {
+const Index: React.FC<IndexProps> = ({
+  privetraining,
+  groepstraining,
+  wie,
+}) => {
   return (
     <>
-      <section className="bg-grey-900 px-5 py-5">
-        <div className="block max-w-8xl items-center py-24 mx-auto gap-12  md:flex">
-          <div className="w-95p xs:w-1/2 mx-auto shadow-md">
-            <img
-              className="w-full border-solid border-2 border-gray-100 rounded block aspect-3/4 h-auto"
-              src={image}
-              alt=""
+      <section className="mb-40 block flex-wrap mt-10 items-center max-w-7xl justify-between mx-auto md:flex md:px-5">
+        <div className="mx-auto w-1/2 relative flex flex-wrap rotate-135 gap-5 self-center md:w-4/12 md:mx-0 md:self-end">
+          <div className="w-5/12 max-w-sm aspect-square border-4 border-green-200 overflow-hidden relative images">
+            <div className="aspect-square -rotate-135 absolute image">
+              <Image
+                src={
+                  "https://res.cloudinary.com/dv7gjzlsa/image/upload/v1659626902/De-Gallo-Hoeve/content/image1_swsxl6.png"
+                }
+                width={800}
+                height={800}
+                objectFit="cover"
+              />
+            </div>
+          </div>
+          <div className="w-5/12 aspect-square border-4 border-green-200 overflow-hidden relative images -order-1">
+            <div className="aspect-square -rotate-135 absolute image">
+              <Image
+                src={
+                  "https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656188518/De-Gallo-Hoeve/content/intro_gfgoo0.jpg"
+                }
+                width={800}
+                height={800}
+                objectFit="cover"
+              />
+            </div>
+          </div>
+          <div className="w-5/12 max-w-sm aspect-square border-4 border-green-200 overflow-hidden relative images">
+            <div className="aspect-square -rotate-135 absolute image">
+              <Image
+                src={
+                  "https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656174227/De-Gallo-Hoeve/images/pexels-helena-lopes-1959052_eosst4.jpg"
+                }
+                width={800}
+                height={800}
+                objectFit="cover"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="px-5 mx-auto md:mx-0 md:w-7/12 md:px-0">
+          <Title1 className="text-green-200">De Gallo-hoeve</Title1>
+          {wie.map((paragraph) => (
+            <Body key={nanoid(5)} className="max-w-7xl px-2 md:mx-auto">
+              {paragraph}
+            </Body>
+          ))}
+        </div>
+      </section>
+      <section className="bg-white pb-2 mx-auto md:px-5">
+        <div className="px-5 mx-auto  max-w-7xl md:px-0">
+          <Title1 className="text-green-200">Onze diensten</Title1>
+          {privetraining.slice(0, 1).map((paragraph) => (
+            <Body key={nanoid(5)} className="px-2 md:mx-auto">
+              {paragraph}
+            </Body>
+          ))}
+        </div>
+        <div className="px-5 max-w-7xl py-24 relative md:mx-auto md:px-0">
+          <div className="flex gap-10 justify-center flex-wrap sm:flex-nowrap max-w-7xl md:mx-auto py-24 relative ">
+            {/* <TrainingCard
+              title="Groepstrainingen"
+              body={groepstraining}
+              type="groep"
+              items={[
+                "1 hond per inschrijving",
+                "max 10 inschrijvingen per training",
+                "Training op Zondag",
+                "€ 15,00",
+              ]}
+              image="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656189950/De-Gallo-Hoeve/content/hondenschool-740x433_hove6a.jpg"
+            /> */}
+            <TrainingCard
+              title="Privétrainingen"
+              body={privetraining}
+              type="prive"
+              items={[
+                "1 hond per inschrijving",
+                "Bij u thuis of op locatie",
+                "Woensdag, Vrijdag en Zaterdag",
+                "€ 25,00",
+              ]}
+              image="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656188984/De-Gallo-Hoeve/content/pexels-blue-bird-7210258_m74qdh.jpg"
             />
           </div>
-          <div className="block align-center gap-12 p24 mx-auto md:max-w-2/3">
-            <Title2>Wie zijn we?</Title2>
-            {content.map((paragraph) => (
-              <Body key={nanoid(5)}>{paragraph}</Body>
-            ))}
-          </div>
-        </div>
-      </section>
-      <section className={SECTION_LIGHTER}>
-        <Title2>Onze diensten</Title2>
-        <div className="max-w-8xl flex items-center gap-5 mx-auto justify-center flex-wrap sm:pb-25">
-          {services.map(({ id, ...rest }) => (
-            <Service key={id} id={id} {...rest} />
-          ))}
-        </div>
-      </section>
-      <section className={SECTION_DARKER}>
-        <div className="flex flex-grow flex-shrink flex-wrap gap-2.5 justify-center">
-          {images.map(({ id, ...rest }) => (
-            <Image key={id} {...rest} />
-          ))}
         </div>
       </section>
     </>
@@ -60,16 +111,13 @@ const Index: React.FC<IndexProps> = ({ images, services, content, image }) => {
 export default Index;
 
 export const getStaticProps = async () => {
-  const {
-    data: { images, diensten: services, content, image },
-  } = await getData(CONTENT_INDEXAPI);
+  const { wie, privetraining, groepstraining } = await getIndexData();
 
   return {
     props: {
-      images,
-      services,
-      content,
-      image,
+      wie,
+      privetraining,
+      // groepstraining,
     },
     revalidate: 3600,
   };

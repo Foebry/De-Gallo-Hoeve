@@ -1,22 +1,23 @@
 import React, { useContext, useState } from "react";
 import Form from "../components/form/Form";
 import { useRouter } from "next/router";
-import { LOGIN } from "../types/linkTypes";
+import { INDEX, LOGIN } from "../types/linkTypes";
 import { useFieldArray, useForm } from "react-hook-form";
-import Step1 from "../components/register/step1";
-import Step2, { optionInterface } from "../components/register/step2";
-import Step3 from "../components/register/step3";
+import PersoonlijkeGegevens from "../components/register/PersoonlijkeGegevens";
+import Step2, { optionInterface } from "../components/register/HondGegevens";
 import { OptionsOrGroups } from "react-select";
-import getData from "../hooks/useApi";
-import { RASSEN, REGISTERAPI } from "../types/apiTypes";
-import useMutation, {
-  handleErrors,
-  structureHondenPayload,
-} from "../hooks/useMutation";
-import { SECTION_DARKER } from "../types/styleTypes";
-import { AppContext } from "../context/appContext";
+import { REGISTERAPI } from "../types/apiTypes";
+import useMutation, { structureHondenPayload } from "../hooks/useMutation";
+import FormSteps from "../components/form/FormSteps";
+import { GetServerSidePropsContext } from "next";
+import nookies from "nookies";
+import { toast } from "react-toastify";
+import FormRow from "../components/form/FormRow";
+import Button, { SubmitButton } from "../components/buttons/Button";
+import { getRasOptions } from "../middleware/MongoDb";
+import { generateCsrf } from "../handlers/validationHelper";
 
-interface RegisterHondErrorInterface {
+export interface RegisterHondErrorInterface {
   naam?: string;
   geboortedatum?: string;
   ras_id?: string;
@@ -24,7 +25,7 @@ interface RegisterHondErrorInterface {
   chip_nr?: string;
 }
 
-interface RegisterErrorInterface {
+export interface RegisterErrorInterface {
   vnaam?: string;
   lnaam?: string;
   email?: string;
@@ -39,20 +40,22 @@ interface RegisterErrorInterface {
   password_verification?: string;
 }
 
-const registerErrors: RegisterErrorInterface = {};
-
 interface RegisterProps {
   rassen: OptionsOrGroups<any, optionInterface>[];
+  csrf: string;
 }
 
-const Register: React.FC<RegisterProps> = ({ rassen }) => {
-  const router = useRouter();
-  const register = useMutation();
-  const { control, handleSubmit } = useForm();
-  const { fields, append, remove } = useFieldArray({ control, name: "honden" });
-  const [activeTab, setActiveTab] = useState<number>(1);
+const Register: React.FC<RegisterProps> = ({ rassen, csrf }) => {
   const [formErrors, setFormErrors] = useState<RegisterErrorInterface>({});
-  const { setModal } = useContext(AppContext);
+  const router = useRouter();
+  const register = useMutation(formErrors, setFormErrors);
+  const { control, handleSubmit, getValues } = useForm();
+  const { fields, remove, append } = useFieldArray({
+    control,
+    name: "honden",
+  });
+  const [activeStep, setActiveStep] = useState<number>(0);
+  const [errorSteps, setErrorSteps] = useState<number[]>([]);
   const step1 = [
     "vnaam",
     "lnaam",
@@ -66,11 +69,15 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
   ];
   const step2 = ["naam", "ras_id", "gelacht", "chip_nr", "geboortedatum"];
 
+  const setErrors = (step: number) => {
+    setErrorSteps((prev) => [...prev, step]);
+    setActiveStep(Math.min(...errorSteps));
+  };
   const handleErrors = (error: any) => {
-    if (Object.keys(error).some((r) => step1.indexOf(r) >= 0)) setActiveTab(1);
-    else if (Object.keys(error).some((r) => step2.indexOf(r) >= 0))
-      setActiveTab(2);
-    else if (Object.keys(error).includes("honden")) setActiveTab(3);
+    if (Object.keys(error).some((r) => step1.indexOf(r) >= 0)) setErrors(0);
+    else if (Object.keys(error).some((r) => step2.indexOf(r) >= 1))
+      setErrors(1);
+    else if (Object.keys(error).includes("honden")) setErrors(2);
   };
 
   const onSubmit = async (values: any) => {
@@ -83,79 +90,80 @@ const Register: React.FC<RegisterProps> = ({ rassen }) => {
       return;
     }
 
-    const { data, error } = await register(
-      REGISTERAPI,
-      payload,
-      registerErrors,
-      setFormErrors
-    );
+    const { data, error } = await register(REGISTERAPI, { ...payload, csrf });
     if (data) {
-      console.log(data);
-      setModal?.({ type: "success", active: true, message: data.success });
+      toast.success(data.message);
       router.push(LOGIN);
-    } else if (error) handleErrors(error);
+    }
   };
 
   return (
-    <section className={SECTION_DARKER}>
-      <Form
-        onSubmit={handleSubmit(onSubmit)}
-        title={
-          activeTab === 1
-            ? "Persoonlijke gegevens"
-            : activeTab === 2
-            ? "Gegevens viervoeters"
-            : activeTab === 3
-            ? "Kies een wachtwoord"
-            : ""
-        }
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        tabCount={3}
-      >
-        {activeTab === 1 ? (
-          <Step1
-            control={control}
-            setActiveTab={setActiveTab}
-            errors={formErrors}
-            setErrors={setFormErrors}
-          />
-        ) : activeTab === 2 ? (
-          <Step2
-            control={control}
-            setActiveTab={setActiveTab}
-            fields={fields}
-            append={append}
-            remove={remove}
-            options={rassen}
-            errors={formErrors}
-            setErrors={setFormErrors}
-          />
-        ) : activeTab === 3 ? (
-          <Step3
-            control={control}
-            setActiveTab={setActiveTab}
-            errors={formErrors}
-            setErrors={setFormErrors}
-          />
-        ) : null}
-      </Form>
+    <section className="mb-48 md:px-5 mt-20">
+      <div className="max-w-7xl mx-auto">
+        <FormSteps
+          activeStep={activeStep}
+          errorSteps={[]}
+          setActiveStep={setActiveStep}
+          steps={["Persoonlijke gegevens", "Honden gegevens"]}
+        />
+      </div>
+      <div>
+        <Form
+          onSubmit={handleSubmit(onSubmit)}
+          activeStep={activeStep}
+          errorSteps={errorSteps}
+          setActiveStep={setActiveStep}
+        >
+          <div className="max-w-4xl mx-auto mt-20 py-10">
+            {activeStep === 0 ? (
+              <PersoonlijkeGegevens
+                control={control}
+                setActiveStep={setActiveStep}
+                errors={formErrors}
+                setErrors={setFormErrors}
+              />
+            ) : activeStep === 1 ? (
+              <Step2
+                control={control}
+                setActiveStep={setActiveStep}
+                fields={fields}
+                append={append}
+                remove={remove}
+                options={rassen}
+                errors={formErrors}
+                setErrors={setFormErrors}
+                values={getValues}
+              />
+            ) : null}
+          </div>
+          <FormRow className="max-w-3xl mx-auto">
+            <Button
+              label="vorige"
+              onClick={() => setActiveStep(activeStep - 1)}
+              disabled={activeStep === 0}
+            />
+            {activeStep === 1 ? (
+              <SubmitButton label="verzend" />
+            ) : (
+              <Button
+                label="volgende"
+                onClick={() => setActiveStep(activeStep + 1)}
+              />
+            )}
+          </FormRow>
+        </Form>
+      </div>
     </section>
   );
 };
 
 export default Register;
 
-export const getStaticProps = async () => {
-  const { data } = await getData(RASSEN);
-  const rassen = data.map((ras: { id: number; naam: string }) => ({
-    value: ras.id,
-    label: ras.naam,
-  }));
-  return {
-    props: {
-      rassen,
-    },
-    revalidate: 86400,
-  };
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  const csrf = generateCsrf();
+  const rassen = await getRasOptions();
+
+  return nookies.get(ctx).JWT
+    ? { redirect: { permanent: false, destination: INDEX } }
+    : { props: { rassen, csrf } };
 };

@@ -2,12 +2,19 @@ import React from "react";
 import { SubmitButton } from "../buttons/Button";
 import FormInput from "../form/FormInput";
 import FormRow from "../form/FormRow";
-import { Controller } from "react-hook-form";
-import { FormStepProps } from "../form/FormTabs";
+import { Control, Controller, FieldValues } from "react-hook-form";
+import { RegisterErrorInterface } from "../../pages/register";
 
-const step3: React.FC<FormStepProps> = ({ control, errors, setErrors }) => {
+interface Step3Props {
+  control: Control<FieldValues, any>;
+  setActiveStep: React.Dispatch<React.SetStateAction<number>>;
+  errors: RegisterErrorInterface;
+  setErrors: React.Dispatch<React.SetStateAction<RegisterErrorInterface>>;
+}
+
+const step3: React.FC<Step3Props> = ({ control, errors, setErrors }) => {
   return (
-    <div className="flex flex-col gap-20">
+    <div className="flex flex-col gap-20 px-28">
       <FormRow className="flex-wrap gap-5">
         <Controller
           name="password"
@@ -17,7 +24,7 @@ const step3: React.FC<FormStepProps> = ({ control, errors, setErrors }) => {
               label="wachtwoord"
               name="password"
               id="password"
-              extra="w-full 3xs:min-w-2xs sm:w-1/3"
+              extra="w-full 4xs:min-w-2xs sm:w-1/3"
               value={value}
               onChange={onChange}
               onBlur={onBlur}
@@ -35,7 +42,7 @@ const step3: React.FC<FormStepProps> = ({ control, errors, setErrors }) => {
               label="herhaal"
               name="password_verification"
               id="password_verification"
-              extra="w-full 3xs:min-w-2xs sm:w-1/3"
+              extra="w-full 4xs:min-w-2xs sm:w-1/3"
               value={value}
               onChange={onChange}
               onBlur={onBlur}
@@ -46,7 +53,7 @@ const step3: React.FC<FormStepProps> = ({ control, errors, setErrors }) => {
           )}
         />
       </FormRow>
-      <SubmitButton type="form" label="Verzend" />
+      {/* <SubmitButton type="form" label="Verzend" /> */}
     </div>
   );
 };

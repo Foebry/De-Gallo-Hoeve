@@ -1,29 +1,21 @@
 import "../styles/globals.css";
+import react from "react";
 import type { AppProps } from "next/app";
-import Header from "../components/Header";
 import { Nav } from "../components/Nav";
 import Footer from "../components/Footer";
-import { AppContext, ModalContextInterface } from "../context/appContext";
-import { useState } from "react";
-import Modal from "../components/Modal";
+import AppProvider from "../context/appContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const [modal, setModal] = useState<ModalContextInterface>({
-    active: false,
-    message: "",
-    type: "success",
-  });
   return (
     <>
-      <AppContext.Provider value={{ modal, setModal }}>
-        <Header />
+      <AppProvider>
         <Nav />
-        <main className="relative">
-          {modal?.active && <Modal type={modal.type} message={modal.message} />}
-          <Component {...pageProps} />
-        </main>
+        <ToastContainer position="top-right" />
+        <Component {...pageProps} />
         <Footer />
-      </AppContext.Provider>
+      </AppProvider>
     </>
   );
 }

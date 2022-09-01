@@ -1,6 +1,8 @@
 import axios from "axios";
-import { useContext } from "react";
-import { AppContext } from "../context/appContext";
+import { toast } from "react-toastify";
+import { InschrijvingErrorInterface } from "../pages/inschrijving";
+import { LoginErrorInterface } from "../pages/login";
+import moment from "moment";
 
 interface ApiError {
   response: {
@@ -8,37 +10,33 @@ interface ApiError {
   };
 }
 
+type FormError = InschrijvingErrorInterface | LoginErrorInterface;
 
+type REQUESTMETHOD = "POST" | "PUT" | "PATCH" | "DELETE";
 
-const useMutation = () => {
-  const {setModal} = useContext(AppContext)
+const useMutation = (
+  errors?: any,
+  setErrors?: React.Dispatch<React.SetStateAction<any>>
+) => {
   const executerFunc = async (
     endpoint: string,
     payload: any,
-    formErrors: any,
-    setFormErrors: any
+    options?: {
+      method: REQUESTMETHOD;
+    }
   ) => {
-    const environment = process.env.NODE_ENV;
-    const api =
-      environment === "production"
-        ? process.env.NEXT_PUBLIC_PROD_API
-        : process.env.NEXT_PUBLIC_DEV_API;
-
-    const route = `${api + endpoint}`;
     try {
-      const { data } = await axios(route, {
-        method: "POST",
+      const { data } = await axios(endpoint, {
+        method: options?.method ?? "POST",
         data: payload,
         withCredentials: true,
       });
       return { data, error: undefined };
-    } catch (errorData) {
-      const formError = errorData as ApiError;
-      const errors: any = formError.response.data as typeof formErrors;
-      setFormErrors({...formError, ...errors});
-      console.log(errorData);
-      errors.failure && setModal({active:true, message: errors.failure, type:"failure"})
-      return { data: undefined, error: formError.response.data };
+    } catch (error: any) {
+      const data = error.response.data;
+      setErrors?.({ ...errors, ...data });
+      toast.error(data.message);
+      return { data: undefined, error: data };
     }
   };
   return executerFunc;
@@ -55,12 +53,25 @@ export const handleErrors = (errors: any, setError: any) => {
 export const structureHondenPayload = (payload: any) => {
   const honden = payload?.honden ?? [];
   const new_honden = honden.map((hond: any) => {
-    const ras_id = hond.ras_id?.value;
-    const geslacht = hond.geslacht?.value;
-    const geboortedatum = hond.geboortedatum?.[0] ?? "";
-    return { ...hond, ras_id, geslacht, geboortedatum };
+    const ras = hond.ras?.label;
+    const geslacht = hond.geslacht?.label;
+    return { ...hond, ras, geslacht };
   });
   return { ...payload, honden: new_honden };
+};
+
+export const structureInschrijvingenPayload = (payload: any) => {
+  const inschrijvingen = payload?.inschrijvingen ?? [];
+  console.log({ inschrijvingen });
+  const new_inschrijvingen = inschrijvingen.map((inschrijving: any) => ({
+    ...inschrijving,
+    hond_id: inschrijving.hond_id.value,
+    hond_naam: inschrijving.hond_id.label,
+    datum: moment
+      .utc([inschrijving.datum, inschrijving.tijdslot.value].join(" "))
+      .local(),
+  }));
+  return { ...payload, inschrijvingen: new_inschrijvingen };
 };
 
 export const structureDetailsPayload = (payload: any) => {

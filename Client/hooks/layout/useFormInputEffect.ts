@@ -10,7 +10,7 @@ interface FormInputEffectProps {
 const useFormInputEffect = ({labelRef, inputRef, value, hasFocus}: FormInputEffectProps) => {
   useEffect(() => {
     if (labelRef.current !== null && inputRef.current !== null) {
-      if (value !== "" || hasFocus) {
+      if (value > "" || hasFocus) {
         const labelWidth = labelRef.current.offsetWidth + 10;
         labelRef.current.style.left = `-${labelWidth.toString()}px`;
         labelRef.current.style.color = "#40909b";
@@ -18,7 +18,7 @@ const useFormInputEffect = ({labelRef, inputRef, value, hasFocus}: FormInputEffe
         inputRef.current.classList.add("inputActive");
       } else {
         labelRef.current.style.left = "0px";
-        labelRef.current.style.color = "#efefef";
+        labelRef.current.style.color = "#252525";
         inputRef.current.classList.remove("inputActive");
       }
     }

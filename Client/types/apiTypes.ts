@@ -1,15 +1,13 @@
 const ApiTypes = {
-  RASSEN: "ras",
-  REGISTERAPI: "register",
-  LOGINAPI: "login",
-  RESERVATIEAPI: "boekings",
-  KLANT_HONDEN: "klanten/:klantId/honden",
-  LOGOUT: "logout",
-  GET_FUTURE_INSCHRIJVINGS: "inschrijvingen",
-  POST_INSCHRIJVING: "inschrijvings",
-  CONTENT_INDEXAPI: "content/index",
-  CONTENT_HOTELAPI: "content/hotel",
-  CONTENT_TRAININGAPI: "content/training",
+  RASSEN: "/api/ras",
+  REGISTERAPI: "/api/auth/register",
+  LOGINAPI: "/api/auth/login",
+  RESERVATIEAPI: "/api/boekings",
+  KLANT_HONDEN: "/api/klant/honden",
+  LOGOUT: "/api/auth/logout",
+  GET_FUTURE_INSCHRIJVINGS: "/api/inschrijvingen",
+  POST_INSCHRIJVING: "/api/inschrijvingen",
+  TRANSFER: "/api/transfer",
 };
 
 export const {
@@ -21,7 +19,5 @@ export const {
   LOGOUT,
   GET_FUTURE_INSCHRIJVINGS,
   POST_INSCHRIJVING,
-  CONTENT_INDEXAPI,
-  CONTENT_HOTELAPI,
-  CONTENT_TRAININGAPI,
+  TRANSFER,
 } = ApiTypes;

@@ -1,24 +1,21 @@
 import axios from "axios";
+import { toast } from "react-toastify";
 
-const getData = async (endpoint: string, options: any={}) => {
-    const environment = process.env.NODE_ENV;
-    const api = environment === "production" ? process.env.NEXT_PUBLIC_PROD_API : process.env.NEXT_PUBLIC_DEV_API;
-
-    if( endpoint.includes("klantId") ) {
-        const klantId = options.klantId ?? localStorage.getItem("id");
-        endpoint = endpoint.replace(":klantId", klantId);
-    }
-    const route = `${api+endpoint}`
-    try{
-        const {data} = await axios(route, {
-            withCredentials: true
-        });
-        return {data, error: undefined};
-    }
-    catch(error: any) {
-        console.log(error);
-        return {data: [], error};
-    }
-}
+const getData = async (endpoint: string, options: any = {}) => {
+  if (endpoint.includes("klantId")) {
+    const klantId = options.klantId ?? localStorage.getItem("id");
+    endpoint = endpoint.replace(":klantId", klantId);
+  }
+  try {
+    const { data } = await axios(endpoint, {
+      withCredentials: true,
+    });
+    return { data, error: undefined };
+  } catch (error: any) {
+    process.env.NODE_ENV === "development" && console.log(error);
+    toast.error(error.response.data.message);
+    return { data: [], error };
+  }
+};
 
 export default getData;

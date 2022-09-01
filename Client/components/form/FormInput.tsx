@@ -16,6 +16,7 @@ export interface FormInputProps {
   errors?: any;
   dataid?: string;
   setErrors?: any;
+  onClick?: (e: React.FormEvent<HTMLInputElement>) => void;
 }
 
 const FormInput: React.FC<FormInputProps> = ({
@@ -46,14 +47,14 @@ const FormInput: React.FC<FormInputProps> = ({
       onBlur={() => setHasFocus(false)}
     >
       <label
-        className="absolute pl-2.5 bottom-1 text-right text-gray-100 mr-5 capitalize pointer-events-none"
+        className="absolute pl-2.5 bottom-1 text-right text-green-100 mr-5 capitalize pointer-events-none"
         htmlFor={id}
         ref={labelRef}
       >
         {label}
       </label>
       <input
-        className="block w-full text-xl outline-none border-b-[1px] border-b-gray-100 py-1 px-2.5 text-green-100 bg-grey-300"
+        className="block w-full text-xl outline-none border-b-[1px] border-b-grey-500 py-1 px-2.5 text-black-100"
         type={type}
         id={id}
         name={name}

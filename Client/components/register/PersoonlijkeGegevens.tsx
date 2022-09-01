@@ -2,17 +2,24 @@ import React from "react";
 import FormInput from "../form/FormInput";
 import FormRow from "../form/FormRow";
 import Button from "../buttons/Button";
-import { Controller } from "react-hook-form";
-import { FormStepProps } from "../form/FormTabs";
+import { Control, Controller, FieldValues } from "react-hook-form";
+import { RegisterErrorInterface } from "../../pages/register";
 
-const Step1: React.FC<FormStepProps> = ({
+interface Step1Props {
+  control: Control<FieldValues, any>;
+  setActiveStep: React.Dispatch<React.SetStateAction<number>>;
+  errors: RegisterErrorInterface;
+  setErrors: React.Dispatch<React.SetStateAction<RegisterErrorInterface>>;
+}
+
+const PersoonlijkeGegevens: React.FC<Step1Props> = ({
   control,
-  setActiveTab,
+  setActiveStep,
   errors,
   setErrors,
 }) => {
   return (
-    <div className="mx-auto">
+    <div className="mx-auto px-24">
       <Controller
         name="lnaam"
         control={control}
@@ -26,7 +33,7 @@ const Step1: React.FC<FormStepProps> = ({
             onBlur={onBlur}
             errors={errors}
             setErrors={setErrors}
-            extra="3xs:min-w-2xs"
+            extra="4xs:min-w-2xs"
           />
         )}
       />
@@ -43,7 +50,7 @@ const Step1: React.FC<FormStepProps> = ({
             onBlur={onBlur}
             errors={errors}
             setErrors={setErrors}
-            extra="3xs:min-w-2xs"
+            extra="4xs:min-w-2xs"
           />
         )}
       />
@@ -60,7 +67,7 @@ const Step1: React.FC<FormStepProps> = ({
             onBlur={onBlur}
             errors={errors}
             setErrors={setErrors}
-            extra="3xs:min-w-2xs"
+            extra="4xs:min-w-2xs"
           />
         )}
       />
@@ -73,7 +80,7 @@ const Step1: React.FC<FormStepProps> = ({
               label="straat"
               name="straat"
               id="straat"
-              extra="w-full 3xs:min-w-2xs sm:w-1/2"
+              extra="w-full 4xs:min-w-2xs sm:w-1/2"
               value={value}
               onChange={onChange}
               onBlur={onBlur}
@@ -82,7 +89,7 @@ const Step1: React.FC<FormStepProps> = ({
             />
           )}
         />
-        <FormRow className="w-full 3xs:min-w-2xs sm:w-1/3 gap-5 flex-wrap">
+        <FormRow className="w-full 4xs:min-w-2xs sm:w-1/3 gap-5 flex-wrap">
           <Controller
             name="nr"
             control={control}
@@ -119,7 +126,7 @@ const Step1: React.FC<FormStepProps> = ({
           />
         </FormRow>
       </FormRow>
-      <FormRow className="3xs:min-w-2xs flex-wrap gap-5">
+      <FormRow className="4xs:min-w-2xs flex-wrap gap-5">
         <Controller
           name="gemeente"
           control={control}
@@ -128,7 +135,7 @@ const Step1: React.FC<FormStepProps> = ({
               label="gemeente"
               name="gemeente"
               id="gemeente"
-              extra="w-1/2 3xs:min-w-3xs"
+              extra="w-1/2 4xs:min-w-3xs"
               value={value}
               onChange={onChange}
               onBlur={onBlur}
@@ -163,7 +170,7 @@ const Step1: React.FC<FormStepProps> = ({
             label="telefoon"
             name="gsm"
             id="gsm"
-            extra="w-full 3xs:min-w-2xs"
+            extra="w-full 4xs:min-w-2xs"
             value={value}
             onChange={onChange}
             onBlur={onBlur}
@@ -172,9 +179,42 @@ const Step1: React.FC<FormStepProps> = ({
           />
         )}
       />
-      <Button type="form" label="volgende" onClick={() => setActiveTab(2)} />
+      <FormRow>
+        <Controller
+          name="password"
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <FormInput
+              type="password"
+              name="password"
+              id="wachtwoord"
+              label="wachtwoord"
+              value={value}
+              onChange={onChange}
+              errors={errors}
+              setErrors={setErrors}
+            />
+          )}
+        />
+        <Controller
+          name="password_verification"
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <FormInput
+              type="password"
+              name="password_verification"
+              id="wachtwoord"
+              label="herhaal"
+              value={value}
+              onChange={onChange}
+              errors={errors}
+              setErrors={setErrors}
+            />
+          )}
+        />
+      </FormRow>
     </div>
   );
 };
 
-export default Step1;
+export default PersoonlijkeGegevens;

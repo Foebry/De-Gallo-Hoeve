@@ -8,12 +8,12 @@ module.exports = {
   theme: {
     screens: {
       lg: "1280px",
-      mdl: "1050px",
-      md: "950px",
-      sm: "800px",
+      md: "900px",
+      sm: "750px",
       xs: "625px",
       "2xs": "550px",
-      "3xs": "380px",
+      "3xs": "480px",
+      "4xs": "380px",
     },
     extend: {
       colors: {
@@ -137,6 +137,7 @@ module.exports = {
         "90p": "90%",
         "95p": "95%",
         "98p": "98%",
+        "166p": "166%",
         full: "100%",
         18: "75px",
         25: "100px",
@@ -151,8 +152,8 @@ module.exports = {
         "5vmax": "5vmax",
         "8vmin": "8vmin",
       },
-      lineHeight: {
-        12: "50px",
+      rotate: {
+        135: "135deg",
       },
     },
   },

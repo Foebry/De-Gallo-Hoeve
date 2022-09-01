@@ -3,96 +3,117 @@ import { Body, Link } from "../components/Typography/Typography";
 import Form from "../components/form/Form";
 import FormInput from "../components/form/FormInput";
 import { REGISTER, INDEX } from "../types/linkTypes";
-import { SubmitButton } from "../components/buttons/Button";
+import Button, { SubmitButton } from "../components/buttons/Button";
 import FormRow from "../components/form/FormRow";
 import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
 import useMutation from "../hooks/useMutation";
 import { LOGINAPI } from "../types/apiTypes";
 import { initializeLocalStorage } from "../helpers/localStorage";
+import { GetServerSidePropsContext } from "next";
 import nookies from "nookies";
+import validator, { generateCsrf } from "../handlers/validationHelper";
 
-interface LoginErrorInterface {
-  email?: string;
-  password?: string;
+export interface LoginErrorInterface {
+  email: string;
+  password: string;
 }
 
-const Login: React.FC<{}> = () => {
-  const router = useRouter();
-  const login = useMutation();
+interface LoginPropsInterface {
+  redirect: string;
+  csrf: string;
+}
 
-  const [formErrors, setFormErrors] = useState<LoginErrorInterface>({});
+const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
+  const [formErrors, setFormErrors] = useState<LoginErrorInterface>({
+    email: "",
+    password: "",
+  });
+
+  const router = useRouter();
+  const login = useMutation(formErrors, setFormErrors);
   const { control, handleSubmit } = useForm();
 
   const onSubmit = async (values: any) => {
-    const { data } = await login(LOGINAPI, values, formErrors, setFormErrors);
+    const { data } = await login(LOGINAPI, { ...values, csrf });
     if (data) {
       initializeLocalStorage(data);
-      router.push(INDEX);
+      redirect ? router.push(redirect) : router.back();
     }
   };
 
   return (
-    <section className="bg-grey-700 px-5 py-5">
-      <Form
-        title="Welkom bij de Gallo-hoeve"
-        onSubmit={handleSubmit(onSubmit)}
-        className="mt-20"
-      >
-        <Controller
-          name="username"
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <FormInput
-              label="email"
+    <section>
+      <div className="max-w-xl mx-auto mt-30 mb-48 border-2 rounded">
+        <Form onSubmit={handleSubmit(onSubmit)} className="mb-5">
+          <div className="px-20 py-10">
+            <div className="text-center mb-10">
+              <Body>Login met email en wachtwoord</Body>
+            </div>
+            <Controller
               name="email"
-              id="email"
-              value={value}
-              onChange={onChange}
-              onBlur={onBlur}
-              errors={formErrors}
-              setErrors={setFormErrors}
+              control={control}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <FormInput
+                  label="email"
+                  name="email"
+                  id="email"
+                  value={value}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  errors={formErrors}
+                  setErrors={setFormErrors}
+                />
+              )}
             />
-          )}
-        />
-        <Controller
-          name="password"
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <FormInput
-              label="password"
+            <Controller
               name="password"
-              id="password"
-              type="password"
-              value={value}
-              onChange={onChange}
-              onBlur={onBlur}
-              errors={formErrors}
-              setErrors={setFormErrors}
+              control={control}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <FormInput
+                  label="password"
+                  name="password"
+                  id="password"
+                  type="password"
+                  value={value}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  errors={formErrors}
+                  setErrors={setFormErrors}
+                />
+              )}
             />
-          )}
-        />
-        <FormRow>
-          <Body>
-            Nog geen account?{"	"}
-            <span>
-              <Link to={REGISTER}>registreer</Link>
-            </span>
-          </Body>
-          <SubmitButton label="login" />
+            <FormRow>
+              <Body>
+                Nog geen account?{"	"}
+                <span>
+                  <Link to={REGISTER}>registreer</Link>
+                </span>
+              </Body>
+              <SubmitButton label="login" onClick={handleSubmit(onSubmit)} />
+            </FormRow>
+            <div className="text-center mt-20">
+              <Body>Login met andere app</Body>
+            </div>
+          </div>
+        </Form>
+        <FormRow className="py-5">
+          <Button label="Login with Facebook" className="mx-auto" />
         </FormRow>
-      </Form>
+      </div>
     </section>
   );
 };
 
 export default Login;
 
-export const getServerSideProps = (ctx: any) => {
-  const cookies = nookies.get(ctx);
-  console.log("cookies:", cookies);
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  const redirect = validator.redirect ?? null;
+  const csrf = generateCsrf();
 
-  return {
-    props: {},
-  };
+  const cookies = nookies.get(ctx);
+  console.log({ cookies });
+  return cookies.JWT
+    ? { redirect: { permanent: false, destination: INDEX } }
+    : { props: { redirect, csrf } };
 };
