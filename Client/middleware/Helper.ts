@@ -1,11 +1,3 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import client, { findOneBy } from "./MongoDb";
-import {
-  badRequest,
-  internalServerError,
-  notFound,
-} from "../handlers/ResponseHandler";
-
 interface HelperInterface {
   getDisabledDays: (training: string) => Promise<string[]>;
 }

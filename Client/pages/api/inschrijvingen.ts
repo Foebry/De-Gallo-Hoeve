@@ -14,12 +14,11 @@ const handler = (req: NextApiRequest, res: NextApiResponse<Response>) => {
 };
 
 const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
-  const options = { schema: inschrijvingSchema, message: "Foutieve input" };
-  return secureApi({ req, res }, async () => {
-    return validateCsrfToken({ req, res }, async () => {
-      return validate({ req, res }, options, handleInschrijving);
-    });
-  });
+  secureApi({ req, res });
+  await validateCsrfToken({ req, res });
+  await validate({ req, res }, { schema: inschrijvingSchema });
+
+  return await handleInschrijving({ req, res });
 };
 
 export default handler;

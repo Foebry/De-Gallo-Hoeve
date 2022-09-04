@@ -20,9 +20,10 @@ const handler = (req: NextApiRequest, res: NextApiResponse<Response>) => {
 };
 
 const login = async (req: NextApiRequest, res: NextApiResponse) => {
-  return validateCsrfToken({ req, res }, () => {
-    return validate({ req, res }, { schema: loginSchema }, onLoginSuccess);
-  });
+  await validateCsrfToken({ req, res });
+  await validate({ req, res }, { schema: loginSchema });
+
+  return onLoginSuccess({ req, res });
 };
 
 export default handler;

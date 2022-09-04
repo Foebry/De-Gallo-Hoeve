@@ -1,6 +1,7 @@
 import { MongoClient, ObjectId } from "mongodb";
 import { atob } from "buffer";
-import { Hond, Klant } from "../types/collections";
+import { getAllRassen } from "../controllers/rasController";
+import { getHondenByKlantId } from "../controllers/HondController";
 
 interface Result {
   value: ObjectId;
@@ -17,11 +18,6 @@ interface MongoDbInterface {
     privetraining: string[];
     groepstraining: string[];
   }>;
-  findOneBy: (
-    client: MongoClient,
-    collection: string,
-    filter: object
-  ) => Promise<any | null>;
   getRasOptions: () => Promise<Option[] | null>;
   getHondOptions: (klant_id: ObjectId) => Promise<Option[]>;
   getCollections: (collections: string[]) => any;
@@ -58,59 +54,20 @@ const MongoDb: MongoDbInterface = {
     }
   },
 
-  findOneBy: async (client, collection, filter) => {
-    try {
-      return await client
-        .db("degallohoeve")
-        .collection(collection)
-        .findOne(filter);
-    } catch (e: any) {
-      await client.close();
-      return null;
-    } finally {
-    }
-  },
-
   getRasOptions: async () => {
-    const aggregation = [
-      { $project: { _id: 0, value: "$_id", label: "$naam" } },
-    ];
-    await client.connect();
-    try {
-      const result = (await client
-        .db("degallohoeve")
-        .collection("ras")
-        .aggregate(aggregation)
-        .toArray()) as Result[];
-      return result.map((item: Result) => ({
-        ...item,
-        value: item.value.toString(),
-      })) as Option[];
-    } catch (e: any) {
-      console.log({ error: e.message });
-      return null;
-    } finally {
-      await client.close();
-    }
+    const rassen = await getAllRassen(client);
+    return rassen.map(({ _id: value, naam: label }) => ({
+      value: value.toString(),
+      label,
+    })) as Option[];
   },
 
   getHondOptions: async (klant_id) => {
-    try {
-      await client.connect();
-      const { honden } = (await client
-        .db("degallohoeve")
-        .collection("klant")
-        .findOne({ _id: klant_id })) as Klant;
-      return honden.map((item: Hond) => ({
-        label: item.naam,
-        value: item._id?.toString(),
-      })) as Option[];
-    } catch (e: any) {
-      console.log(e.message);
-    } finally {
-      await client.close();
-    }
-    return [];
+    const honden = await getHondenByKlantId(client, klant_id);
+    return honden.map(({ _id: value, naam: label }) => ({
+      value: value?.toString(),
+      label,
+    })) as Option[];
   },
 
   getCollections: (collections) => {
@@ -169,7 +126,6 @@ const client = new MongoClient(
 export default client;
 export const {
   getIndexData,
-  findOneBy,
   getRasOptions,
   getHondOptions,
   getCollections,

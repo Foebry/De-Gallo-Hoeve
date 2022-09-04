@@ -16,12 +16,11 @@ const handler = (req: NextApiRequest, res: NextApiResponse<Response>) => {
 };
 
 const register = async (req: NextApiRequest, res: NextApiResponse) => {
-  const options = { schema: registerSchema };
-  return await validateCsrfToken({ req, res }, async () => {
-    return await validate({ req, res }, options, async () => {
-      return await handleRegistration({ req, res });
-    });
-  });
+  await validateCsrfToken({ req, res });
+  await validate({ req, res }, { schema: registerSchema });
+  await handleRegistration({ req, res });
+
+  return res.status(201).json({ message: "Registratie succesvol!" });
 };
 
 export default handler;
