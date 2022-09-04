@@ -1,3 +1,4 @@
+import moment from "moment";
 import {
   ClientSession,
   Collection,
@@ -6,233 +7,174 @@ import {
   TransactionOptions,
 } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
-import mailer from "../middleware/Mailer";
-import client, { findOneBy, getCollections } from "../middleware/MongoDb";
-import { GroepTraining, Inschrijving, Klant } from "../types/collections";
 import {
-  badRequest,
-  internalServerError,
-  notFound,
-  unProcessableEntity,
-} from "./ResponseHandler";
-
-interface InschrijvingData {
-  hond_id: string;
-  hond_naam: string;
-  datum: Date;
-  klant_id: string;
-  training: string;
-}
+  createInschrijving,
+  getInschrijvingenByFilter,
+  NewInschrijving,
+} from "../controllers/InschrijvingController";
+import { getKlantById, KlantCollection } from "../controllers/KlantController";
+import {
+  getTrainingByNaam,
+  TrainingType,
+} from "../controllers/TrainingController";
+import mailer from "../middleware/Mailer";
+import client from "../middleware/MongoDb";
+import {
+  ReedsIngeschrevenError,
+  ResourceNotFoundError,
+  TrainingVolzetError,
+} from "../middleware/RequestError";
+import { GroepTraining, Inschrijving } from "../types/collections";
+import { geslachtType } from "../types/formTypes/registerTypes";
 
 interface InschrijvingsHandlerInterface {
   handleInschrijving: (obj: {
     req: NextApiRequest;
     res: NextApiResponse;
   }) => Promise<void>;
-  isPlaatsVrij: (
-    InschrijvingData: InschrijvingData,
-    session: ClientSession
-  ) => Promise<boolean | void>;
-  reedsIngeschreven: (
-    inschrijvingData: InschrijvingData,
-    session: ClientSession
-  ) => Promise<boolean>;
-  createInschrijvingDocument: (data: any) => Promise<Inschrijving>;
-  createInschrijving: (
-    klant_id: string,
-    training: string,
-    inschrijving: Inschrijving,
-    session: ClientSession
-  ) => Promise<boolean>;
+  kanInschrijven: (
+    InschrijvingData: NewInschrijving,
+    klant_id: ObjectId,
+    res: NextApiResponse
+  ) => Promise<void>;
   startTransaction: () => Promise<{
     transactionOptions: TransactionOptions;
     klantCollection: Collection;
     trainingCollection: Collection;
     inschrijvingCollection: Collection;
   }>;
-  trainingEnKlantGevonden: (req: NextApiRequest) => Promise<boolean>;
+  processInschrijving: (
+    inschrijving: any,
+    klant: KlantCollection,
+    training: string,
+    data: any,
+    session: ClientSession,
+    res: NextApiResponse
+  ) => Promise<void>;
+}
+
+interface InschrijvingInterface {
+  inschrijvingen: {
+    datum: Date;
+    hond_id: string;
+    hond_naam: string;
+    hond_geslacht: geslachtType;
+  }[];
+  training: TrainingType;
+  klant_id: string;
 }
 
 const inschrijvingsHandler: InschrijvingsHandlerInterface = {
   handleInschrijving: async ({ req, res }) => {
-    const { klant_id, training, inschrijvingen } = req.body;
-    const { transactionOptions, klantCollection } = await startTransaction();
-    let allChecksPassed = true;
+    const { klant_id, training, inschrijvingen } =
+      req.body as InschrijvingInterface;
+    const { transactionOptions } = await startTransaction();
 
-    if (!trainingEnKlantGevonden(req))
-      return notFound(res, "Probeer later opnieuw.");
+    const Training = await getTrainingByNaam(client, training);
+    const klant = await getKlantById(client, new ObjectId(klant_id));
+    if (!klant) throw new ResourceNotFoundError(res, "klant niet gevonden");
+    if (!Training)
+      throw new ResourceNotFoundError(res, "training niet gevonden");
 
-    const { email } = await findOneBy(client, "klant", {
-      _id: new ObjectId(klant_id),
-    });
+    const email = klant.email;
+
     const data = { email, inschrijvingen: [] as Inschrijving[] };
     const session = client.startSession();
 
     try {
       await session.withTransaction(async () => {
         await Promise.all(
-          inschrijvingen.map(async (item: any, index: number) => {
-            const { hond_id, hond_naam, datum, tijdslot } = item;
-            const inschrijvingData = {
-              hond_id,
-              hond_naam,
-              datum,
-              klant_id,
+          inschrijvingen.map(async (item: any) => {
+            await processInschrijving(
+              item,
+              klant,
               training,
-            };
-
-            const hond = klantCollection.findOne(
-              { _id: klant_id, "honden.id": hond_id },
-              { session }
+              data,
+              session,
+              res
             );
-            if (!hond) {
-              allChecksPassed = false;
-              return badRequest(res, "Probeer later opnieuw");
-            }
-
-            if (!(await isPlaatsVrij(inschrijvingData, session))) {
-              const message =
-                training === "groep"
-                  ? "Training volzet"
-                  : "Dit tijdstip is niet meer vrij";
-              allChecksPassed = false;
-              return unProcessableEntity(res, message);
-            }
-
-            if (await reedsIngeschreven(inschrijvingData, session)) {
-              allChecksPassed = false;
-              return res.status(400).json({
-                [`inschrijvingen[${index}].date`]:
-                  "U bent reeds ingeschreven voor deze training",
-                message: "U bent reeds ingeschreven voor training(en)",
-              });
-            }
-
-            const inschrijving = await createInschrijvingDocument(
-              inschrijvingData
-            );
-            data.inschrijvingen.push(inschrijving);
-            const succes = await createInschrijving(
-              klant_id,
-              training,
-              inschrijving,
-              session
-            );
-            if (!succes) {
-              console.log("not succes");
-              return internalServerError(res);
-            }
-          })
+          }, transactionOptions)
         );
-        if (!allChecksPassed) return session.abortTransaction();
-      }, transactionOptions);
-    } catch (e: any) {
-      console.log("somthing is wrong");
-      client.close();
-      return internalServerError(res);
-    } finally {
+      });
       await client.close();
-    }
-
-    if (allChecksPassed) {
-      mailer.sendMail("inschrijving", data);
-
-      return res.status(201).json({ message: "Inschrijving ontvangen!" });
-    }
-    return;
-  },
-
-  isPlaatsVrij: async (inschrijvingData, session) => {
-    const { datum, training } = inschrijvingData;
-    const { inschrijvingCollection, trainingCollection } = getCollections([
-      "inschrijving",
-      "training",
-    ]);
-    const filter = { training, datum };
-
-    try {
-      if (training === "groep") {
-        const { max_inschrijvingen } = (await trainingCollection.findOne({
-          naam: training,
-        })) as GroepTraining;
-        const inschrijvingenGevonden = await inschrijvingCollection
-          .find(filter, { session })
-          .toArray();
-        if (inschrijvingenGevonden.length >= max_inschrijvingen) return false;
-      }
-      if (training === "prive") {
-        const inschrijvingGevonden = await inschrijvingCollection.findOne({
-          datum,
-          naam: training,
-        });
-        if (inschrijvingGevonden) return false;
-      }
-      return true;
     } catch (e: any) {
-      console.log(e.message);
+      session.abortTransaction();
+      client.close();
+      throw new Error();
     }
+
+    mailer.sendMail("inschrijving", data);
+
+    return res.status(201).json({ message: "Inschrijving ontvangen!" });
   },
 
-  reedsIngeschreven: async (inschrijvingData, session) => {
-    const { training, klant_id, datum } = inschrijvingData;
-    try {
-      const inschrijving = await client
-        .db("degallohoeve")
-        .collection("inschrijving")
-        .findOne(
-          { training, datum: new Date(datum), "klant.id": klant_id },
-          { session }
-        );
-      return inschrijving ? true : false;
-    } catch (e: any) {
-      console.log(e.message);
-    }
-    return false;
-  },
-
-  createInschrijvingDocument: async (inschrijvingData) => {
-    const { datum, hond_id, hond_naam, training, klant_id } = inschrijvingData;
-    const { vnaam, lnaam } = (await findOneBy(client, "klant", {
-      _id: new ObjectId(klant_id),
-    })) as Klant;
-
-    return {
-      datum: new Date(datum),
-      training,
+  processInschrijving: async (
+    inschrijving,
+    klant,
+    training,
+    data,
+    session,
+    res
+  ) => {
+    const { hond_id, hond_naam, datum } = inschrijving;
+    const inschrijvingData = {
       hond: {
-        id: hond_id,
+        id: new ObjectId(hond_id),
         naam: hond_naam,
       },
       klant: {
-        id: klant_id,
-        vnaam,
-        lnaam,
+        id: klant._id,
+        vnaam: klant.vnaam,
+        lnaam: klant.lnaam,
       },
-    } as Inschrijving;
+      datum,
+      training: training as TrainingType,
+    };
+
+    const hond = klant.honden.filter(
+      (hond) => hond._id.toString() === hond_id
+    )[0];
+    if (!hond) throw new ResourceNotFoundError(res, "Hond niet gevonden");
+
+    await kanInschrijven(inschrijvingData, klant._id, res);
+    const newInschrijving = {
+      ...inschrijvingData,
+      created_at: moment().local().format(),
+    };
+
+    data.inschrijvingen.push(newInschrijving);
+
+    await createInschrijving(client, newInschrijving, session);
   },
 
-  createInschrijving: async (klant_id, training, inschrijving, session) => {
-    const { inschrijvingCollection, klantCollection, trainingCollection } =
-      getCollections(["klant", "training", "inschrijving"]);
-    try {
-      const { insertedId } = await inschrijvingCollection.insertOne(
-        inschrijving,
-        { session }
+  kanInschrijven: async (inschrijvingData, klant_id, res) => {
+    const { datum, training } = inschrijvingData;
+    const filter = { training, datum };
+
+    if (training === "groep") {
+      const Training = (await getTrainingByNaam(
+        client,
+        "groep"
+      )) as GroepTraining;
+      const inschrijvingen = await getInschrijvingenByFilter(client, filter);
+
+      const reedsIngeschreven = inschrijvingen.filter(
+        (inschrijving) => inschrijving.klant.id === klant_id
       );
-      await klantCollection.updateOne(
-        { _id: new ObjectId(klant_id) },
-        { $addToSet: { inschrijvingen: insertedId } },
-        { session }
+      if (reedsIngeschreven.length > 0) throw new ReedsIngeschrevenError(res);
+
+      if (inschrijvingen.length >= Training.max_inschrijvingen)
+        throw new TrainingVolzetError(res, "Training volzet");
+    }
+    if (training === "prive") {
+      const inschrijvingen = await getInschrijvingenByFilter(client, filter);
+      const reedsIngeschreven = inschrijvingen.filter(
+        (inschrijving) => inschrijving.klant.id === klant_id
       );
-      await trainingCollection.updateOne(
-        { naam: training },
-        { $addToSet: { inschrijvingen: insertedId } },
-        { session }
-      );
-      return true;
-    } catch (e: any) {
-      console.log(e.message);
-      return false;
+
+      if (reedsIngeschreven.length > 0) throw new ReedsIngeschrevenError(res);
+      if (inschrijvingen.length > 0)
+        throw new TrainingVolzetError(res, "Dit tijdstip is niet meer vrij");
     }
   },
 
@@ -256,27 +198,11 @@ const inschrijvingsHandler: InschrijvingsHandlerInterface = {
       inschrijvingCollection,
     };
   },
-
-  trainingEnKlantGevonden: async (req) => {
-    const { training, klant_id } = req.body;
-    const klantGevonden = await findOneBy(client, "klant", {
-      _id: new ObjectId(klant_id),
-    });
-    const trainingGevonden = await findOneBy(client, "training", {
-      naam: training,
-    });
-
-    if (!klantGevonden && !trainingGevonden) return false;
-    return true;
-  },
 };
 
 export const {
   handleInschrijving,
-  isPlaatsVrij,
-  reedsIngeschreven,
-  createInschrijvingDocument,
-  createInschrijving,
+  kanInschrijven,
   startTransaction,
-  trainingEnKlantGevonden,
+  processInschrijving,
 } = inschrijvingsHandler;

@@ -200,23 +200,29 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const type = "prive";
   if (!type) return { redirect: { permanent: false, destination: INDEX } };
 
-  return securepage(ctx, async (klant_id: ObjectId) => {
-    let honden = klant_id ? await getHondOptions(klant_id) : [];
-    const csrf = generateCsrf();
-    const disabledDays = await getDisabledDays(type as string);
-    const rassen = await getRasOptions();
-    const timeslots = await getFreeTimeSlots();
+  const klant_id = await securepage(ctx);
 
+  if (!klant_id) {
     return {
-      props: {
-        rassen,
-        honden,
-        disabledDays,
-        klant_id: klant_id?.toString() ?? null,
-        csrf,
-        type,
-        timeslots,
-      },
+      redirect: { permanent: false, destination: LOGIN },
     };
-  });
+  }
+
+  const honden = await getHondOptions(klant_id as ObjectId);
+  const csrf = generateCsrf();
+  const disabledDays = await getDisabledDays(type);
+  const rassen = await getRasOptions();
+  const timeslots = await getFreeTimeSlots();
+
+  return {
+    props: {
+      rassen,
+      honden,
+      disabledDays,
+      klant_id: klant_id?.toString() ?? null,
+      csrf,
+      type,
+      timeslots,
+    },
+  };
 };

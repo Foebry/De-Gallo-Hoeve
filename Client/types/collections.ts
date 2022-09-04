@@ -1,4 +1,5 @@
 import { ObjectId } from "mongodb";
+import { HondCollection } from "../controllers/HondController";
 
 export type TrainingType = "prive" | "groep";
 export type geslachtType = "Reu" | "Teef";
@@ -48,7 +49,7 @@ export interface Klant {
   gemeente: string;
   postcode: number;
   verified: boolean;
-  honden: Hond[];
+  honden: HondCollection[];
   inschrijvingen: ObjectId[];
   reservaties: ObjectId[];
 }
@@ -61,18 +62,18 @@ export interface Ras {
 }
 
 export interface GroepTraining {
-  _id?: ObjectId;
+  _id: ObjectId;
   naam: string;
   prijs: number;
   max_inschrijvingen: number;
-  inschrijvingen: Inschrijving[];
+  inschrijvingen: ObjectId[];
 }
 
 export interface PriveTraining {
-  _id?: ObjectId;
+  _id: ObjectId;
   naam: string;
   prijs: number;
-  inschrijvingen: Inschrijving[];
+  inschrijvingen: ObjectId[];
 }
 
 export interface Inschrijving {

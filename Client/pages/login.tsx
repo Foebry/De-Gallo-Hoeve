@@ -44,9 +44,9 @@ const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
 
   return (
     <section>
-      <div className="max-w-xl mx-auto mt-30 mb-48 border-2 rounded">
+      <div className="max-w-lg mx-auto mt-30 mb-48 border-2 rounded">
         <Form onSubmit={handleSubmit(onSubmit)} className="mb-5">
-          <div className="px-20 py-10">
+          <div className="p-10">
             <div className="text-center mb-10">
               <Body>Login met email en wachtwoord</Body>
             </div>

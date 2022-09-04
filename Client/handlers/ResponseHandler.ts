@@ -1,6 +1,5 @@
 import { NextApiResponse } from "next";
 import { destroyCookie } from "nookies";
-import { LOGIN } from "../types/linkTypes";
 
 interface ResponseHandler {
   badRequest: (
