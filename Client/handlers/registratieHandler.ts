@@ -31,10 +31,19 @@ const registratieHandler: RegistratieHandlerInterface = {
     const klant = await getKlantByEmail(client, klantData.email);
     if (klant) throw new EmailOccupiedError(res);
 
-    const { _id, created_at } = await createKlant(client, klantData);
-    const confirm = await createConfirm(client, { klant_id: _id, created_at });
+    const { _id, created_at, email, vnaam } = await createKlant(
+      client,
+      klantData
+    );
+    const { code } = await createConfirm(client, { klant_id: _id, created_at });
 
-    mailer.sendMail("register", { ...klantData, confirmCode: confirm.code });
+    mailer.sendMail("register", {
+      email,
+      vnaam,
+      code,
+    });
+
+    await client.close();
   },
 };
 
