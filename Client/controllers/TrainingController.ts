@@ -1,4 +1,5 @@
-import { Collection, MongoClient, ObjectId } from "mongodb";
+import { Collection, ObjectId } from "mongodb";
+import client from "../middleware/MongoDb";
 import { getInschrijvingCollection } from "./InschrijvingController";
 import {
   getKlantCollection,
@@ -26,15 +27,14 @@ export interface UpdateTraining {
   max_inschrijvingen?: number;
 }
 
-export const getTrainingCollection = (client: MongoClient): Collection => {
+export const getTrainingCollection = (): Collection => {
   return client.db("degallohoeve").collection("training");
 };
 
 export const getTrainingById = async (
-  client: MongoClient,
   _id: ObjectId
 ): Promise<GroepTrainingCollection | PriveTrainingCollection> => {
-  const collection = getTrainingCollection(client);
+  const collection = getTrainingCollection();
 
   return (await collection.findOne({ _id })) as
     | GroepTrainingCollection
@@ -42,10 +42,9 @@ export const getTrainingById = async (
 };
 
 export const getTrainingByNaam = async (
-  client: MongoClient,
   naam: string
 ): Promise<GroepTrainingCollection | PriveTrainingCollection> => {
-  const collection = getTrainingCollection(client);
+  const collection = getTrainingCollection();
 
   return (await collection.findOne({ naam })) as
     | GroepTrainingCollection
@@ -53,32 +52,30 @@ export const getTrainingByNaam = async (
 };
 
 export const updateTraining = async (
-  client: MongoClient,
   _id: ObjectId,
   training: UpdateTraining
 ): Promise<GroepTrainingCollection | PriveTrainingCollection> => {
-  const collection = getTrainingCollection(client);
+  const collection = getTrainingCollection();
   const { upsertedId } = await collection.updateOne({ _id }, training);
 
-  return getTrainingById(client, upsertedId);
+  return getTrainingById(upsertedId);
 };
 
 export const deleteTraining = async (
-  client: MongoClient,
   _id: ObjectId,
   hardDelete = false
 ): Promise<void> => {
-  const collection = getTrainingCollection(client);
-  const training = await getTrainingById(client, _id);
+  const collection = getTrainingCollection();
+  const training = await getTrainingById(_id);
   await collection.deleteOne({ _id: training._id });
 
   if (hardDelete) {
     let updatedInschrijvingen: ObjectId[];
     const inschrijvingen = training.inschrijvingen;
-    const inschrijvingCollection = getInschrijvingCollection(client);
+    const inschrijvingCollection = getInschrijvingCollection();
     await inschrijvingCollection.deleteMany({ _id: { $in: inschrijvingen } });
 
-    const klantCollection = getKlantCollection(client);
+    const klantCollection = getKlantCollection();
     const filter = { inschrijvinge: { $in: inschrijvingen } };
     const klanten = (await klantCollection
       .find({ filter })
@@ -94,7 +91,7 @@ export const deleteTraining = async (
           inschrijvingen: updatedInschrijvingen,
         };
 
-        await updateKlant(client, klant._id as ObjectId, updatedKlant);
+        await updateKlant(klant._id as ObjectId, updatedKlant);
       })
     );
   }

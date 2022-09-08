@@ -1,9 +1,8 @@
 import moment from "moment";
-import { ClientSession, MongoClient, ObjectId } from "mongodb";
+import { ObjectId } from "mongodb";
 import {
   getAllKlanten,
   getKlantById,
-  getKlantCollection,
   UpdateKlant,
   updateKlant,
 } from "./KlantController";
@@ -34,11 +33,10 @@ interface UpdateHond {
 }
 
 export const createNewHondForKlant = async (
-  client: MongoClient,
   klant_id: ObjectId,
   hondData: NewHond
 ): Promise<HondCollection> => {
-  const klant = await getKlantById(client, klant_id);
+  const klant = await getKlantById(klant_id);
   const newHond = {
     ...hondData,
     created_at: moment().local().format(),
@@ -49,7 +47,7 @@ export const createNewHondForKlant = async (
     ...klant,
     honden: [...klant.honden, newHond],
   } as UpdateKlant;
-  const updatedKlant = await updateKlant(client, klant_id, updateKlantData);
+  const updatedKlant = await updateKlant(klant_id, updateKlantData);
 
   const lastHondIndex = updatedKlant.honden.length - 1;
   const hond = updatedKlant.honden[lastHondIndex];
@@ -58,18 +56,15 @@ export const createNewHondForKlant = async (
 };
 
 export const getHondenByKlantId = async (
-  client: MongoClient,
   klant_id: ObjectId
 ): Promise<HondCollection[]> => {
-  const klant = await getKlantById(client, klant_id);
+  const klant = await getKlantById(klant_id);
 
   return klant.honden;
 };
 
-export const getAllHonden = async (
-  client: MongoClient
-): Promise<HondCollection[]> => {
-  const klanten = await getAllKlanten(client);
+export const getAllHonden = async (): Promise<HondCollection[]> => {
+  const klanten = await getAllKlanten();
   const klantHonden = klanten.map((klant) => klant.honden);
   const honden = klantHonden.reduce((prev, curr) => {
     return [...prev, ...curr];
@@ -79,22 +74,20 @@ export const getAllHonden = async (
 };
 
 export const getSpecificHond = async (
-  client: MongoClient,
   klant_id: ObjectId,
   hond_id: ObjectId
 ): Promise<HondCollection> => {
-  const { honden } = await getKlantById(client, klant_id);
+  const { honden } = await getKlantById(klant_id);
 
   return honden.filter((hond) => hond._id === hond_id)[0];
 };
 
 export const updateKlantHond = async (
-  client: MongoClient,
   klant_id: ObjectId,
   hond_id: ObjectId,
   hondData: UpdateHond
 ): Promise<HondCollection> => {
-  const klant = await getKlantById(client, klant_id);
+  const klant = await getKlantById(klant_id);
   const hond = klant.honden.filter((hond) => hond._id === hond_id)[0];
 
   const filteredHonden = klant.honden.filter((hond) => hond._id !== hond_id);
@@ -103,8 +96,8 @@ export const updateKlantHond = async (
   const updatedHonden = [...filteredHonden, updateHond];
   const updatedKlant = { ...klant, honden: updatedHonden };
 
-  await updateKlant(client, klant_id, updatedKlant);
-  const honden = await getHondenByKlantId(client, klant_id);
+  await updateKlant(klant_id, updatedKlant);
+  const honden = await getHondenByKlantId(klant_id);
 
   const updatedHond = honden.filter((hond) => hond._id === hond_id)[0];
 
@@ -112,12 +105,11 @@ export const updateKlantHond = async (
 };
 
 export const removeHondFormKlant = async (
-  client: MongoClient,
   klant_id: ObjectId,
   hond_id: ObjectId
 ): Promise<void> => {
-  const klant = await getKlantById(client, klant_id);
+  const klant = await getKlantById(klant_id);
   const updatedHonden = klant.honden.filter((hond) => hond._id !== hond_id);
   const updatedKlant = { ...klant, honden: updatedHonden };
-  await updateKlant(client, klant_id, updatedKlant);
+  await updateKlant(klant_id, updatedKlant);
 };

@@ -1,4 +1,5 @@
-import { Collection, MongoClient, ObjectId } from "mongodb";
+import { Collection, ObjectId } from "mongodb";
+import client from "../middleware/MongoDb";
 
 export interface ContentCollection {
   _id: ObjectId;
@@ -18,45 +19,38 @@ interface UpdateContent {
   default_content?: string;
 }
 
-export const getContentCollection = (client: MongoClient): Collection => {
+export const getContentCollection = (): Collection => {
   return client.db("degallohoeve").collection("content");
 };
 
-export const findAllContent = async (
-  client: MongoClient
-): Promise<ContentCollection[]> => {
-  const collection = getContentCollection(client);
+export const findAllContent = async (): Promise<ContentCollection[]> => {
+  const collection = getContentCollection();
 
   return (await collection.find().toArray()) as ContentCollection[];
 };
 
 export const getContentById = async (
-  client: MongoClient,
   _id: ObjectId
 ): Promise<ContentCollection> => {
-  const collection = getContentCollection(client);
+  const collection = getContentCollection();
 
   return (await collection.findOne({ _id })) as ContentCollection;
 };
 
 export const updateContentById = async (
-  client: MongoClient,
   _id: ObjectId,
   data: UpdateContent
 ): Promise<ContentCollection> => {
-  const collection = getContentCollection(client);
-  const content = await getContentById(client, _id);
+  const collection = getContentCollection();
+  const content = await getContentById(_id);
   const updatedContent = { ...content, ...data };
   const { upsertedId } = await collection.updateOne({ _id }, updatedContent);
 
-  return await getContentById(client, upsertedId);
+  return await getContentById(upsertedId);
 };
 
-export const deleteContentById = async (
-  client: MongoClient,
-  _id: ObjectId
-): Promise<void> => {
-  const collection = getContentCollection(client);
+export const deleteContentById = async (_id: ObjectId): Promise<void> => {
+  const collection = getContentCollection();
 
   await collection.deleteOne({ _id });
 };

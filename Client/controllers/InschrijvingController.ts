@@ -1,4 +1,5 @@
-import { ClientSession, Collection, MongoClient, ObjectId } from "mongodb";
+import { ClientSession, Collection, ObjectId } from "mongodb";
+import client from "../middleware/MongoDb";
 import { getKlantCollection } from "./KlantController";
 import {
   getTrainingByNaam,
@@ -35,74 +36,70 @@ interface UpdateInschrijving {
   };
 }
 
-export const getInschrijvingCollection = (client: MongoClient): Collection => {
+export const getInschrijvingCollection = (): Collection => {
   return client.db("degallohoeve").collection("inschrijving");
 };
 
 export const createInschrijving = async (
-  client: MongoClient,
   inschrijving: NewInschrijving,
   session?: ClientSession
 ): Promise<InschrijvingCollection> => {
-  const collection = getInschrijvingCollection(client);
+  const collection = getInschrijvingCollection();
   const { insertedId } = await collection.insertOne(inschrijving);
 
-  const klantCollection = getKlantCollection(client);
+  const klantCollection = getKlantCollection();
   await klantCollection.updateOne(
     { _id: inschrijving.klant.id },
     { $addToSet: { inschrijvingen: insertedId } },
     { session }
   );
 
-  const trainingCollection = getTrainingCollection(client);
+  const trainingCollection = getTrainingCollection();
   await trainingCollection.updateOne(
     { naam: inschrijving.training },
     { $addToSet: { inschrijvingen: insertedId } },
     { session }
   );
 
-  return getInschrijvingById(client, insertedId);
+  return getInschrijvingById(insertedId);
 };
 
-export const getInschrijvingen = async (
-  client: MongoClient
-): Promise<InschrijvingCollection[]> => {
-  const collection = getInschrijvingCollection(client);
+export const getInschrijvingen = async (): Promise<
+  InschrijvingCollection[]
+> => {
+  const collection = getInschrijvingCollection();
 
   return (await collection.find().toArray()) as InschrijvingCollection[];
 };
 
 export const getInschrijvingById = async (
-  client: MongoClient,
   _id: ObjectId
 ): Promise<InschrijvingCollection> => {
-  const collection = getInschrijvingCollection(client);
+  const collection = getInschrijvingCollection();
 
   return (await collection.findOne({ _id })) as InschrijvingCollection;
 };
 
 export const getInschrijvingenByFilter = async (
-  client: MongoClient,
   filter: any
 ): Promise<InschrijvingCollection[]> => {
-  const collection = getInschrijvingCollection(client);
+  const collection = getInschrijvingCollection();
 
   return (await collection.find(filter).toArray()) as InschrijvingCollection[];
 };
 
 export const updateInschrijving = async (
-  client: MongoClient,
   _id: ObjectId,
   data: UpdateInschrijving
 ): Promise<InschrijvingCollection> => {
-  const collection = getInschrijvingCollection(client);
-  const { training } = await getInschrijvingById(client, _id);
+  const collection = getInschrijvingCollection();
+  const { training } = await getInschrijvingById(_id);
   const { upsertedId } = await collection.updateOne({ _id }, data);
 
   if (data.training && data.training !== training) {
     let filteredInschrijvingen: ObjectId[];
-    const priveTraining = await getTrainingByNaam(client, "prive");
-    const groepTraining = await getTrainingByNaam(client, "groep");
+    const priveTraining = await getTrainingByNaam("prive");
+    const groepTraining = await getTrainingByNaam("groep");
 
     if (training === "groep") {
       filteredInschrijvingen = groepTraining.inschrijvingen.filter(
@@ -112,13 +109,13 @@ export const updateInschrijving = async (
         ...groepTraining,
         inschrijvingen: filteredInschrijvingen,
       };
-      await updateTraining(client, groepTraining._id, updatedGroepTraining);
+      await updateTraining(groepTraining._id, updatedGroepTraining);
 
       const updatedPriveTraining = {
         ...priveTraining,
         inschrijvingen: [...priveTraining.inschrijvingen, upsertedId],
       };
-      await updateTraining(client, priveTraining._id, updatedPriveTraining);
+      await updateTraining(priveTraining._id, updatedPriveTraining);
     } else if (training === "prive") {
       filteredInschrijvingen = priveTraining.inschrijvingen.filter(
         (inschrijving) => inschrijving !== upsertedId
@@ -127,36 +124,32 @@ export const updateInschrijving = async (
         ...priveTraining,
         inschrijvingen: filteredInschrijvingen,
       };
-      await updateTraining(client, priveTraining._id, updatedPriveTraining);
+      await updateTraining(priveTraining._id, updatedPriveTraining);
 
       const updatedGroepsTraining = {
         ...groepTraining,
         inschrijvingen: [...groepTraining.inschrijvingen, upsertedId],
       };
-      await updateTraining(client, groepTraining._id, updatedGroepsTraining);
+      await updateTraining(groepTraining._id, updatedGroepsTraining);
     }
   }
 
-  return await getInschrijvingById(client, upsertedId);
+  return await getInschrijvingById(upsertedId);
 };
 
-export const deleteInschrijving = async (
-  client: MongoClient,
-  _id: ObjectId
-): Promise<void> => {
-  const collection = getInschrijvingCollection(client);
+export const deleteInschrijving = async (_id: ObjectId): Promise<void> => {
+  const collection = getInschrijvingCollection();
   await collection.deleteOne({ _id });
 };
 
 export const deleteInschrijvingen = async (
-  client: MongoClient,
   inschrijvingen: ObjectId[]
 ): Promise<void> => {
-  const collection = getInschrijvingCollection(client);
+  const collection = getInschrijvingCollection();
   await collection.deleteMany({ _id: { $in: inschrijvingen } });
 
-  const priveTraining = await getTrainingByNaam(client, "prive");
-  const groepsTraining = await getTrainingByNaam(client, "groep");
+  const priveTraining = await getTrainingByNaam("prive");
+  const groepsTraining = await getTrainingByNaam("groep");
   let updatedInschrijvingen: ObjectId[];
 
   const inschrijvingenPriveTraining = priveTraining.inschrijvingen;
@@ -167,11 +160,7 @@ export const deleteInschrijvingen = async (
     ...priveTraining,
     inschrijvingen: updatedInschrijvingen,
   };
-  await updateTraining(
-    client,
-    priveTraining._id as ObjectId,
-    updatedPriveTraining
-  );
+  await updateTraining(priveTraining._id as ObjectId, updatedPriveTraining);
 
   const inschrijvingenGroepsTraining = groepsTraining.inschrijvingen;
   updatedInschrijvingen = inschrijvingenGroepsTraining.filter(
@@ -181,9 +170,5 @@ export const deleteInschrijvingen = async (
     ...groepsTraining,
     inschrijvingen: updatedInschrijvingen,
   };
-  await updateTraining(
-    client,
-    groepsTraining._id as ObjectId,
-    updatedGroepsTraining
-  );
+  await updateTraining(groepsTraining._id as ObjectId, updatedGroepsTraining);
 };

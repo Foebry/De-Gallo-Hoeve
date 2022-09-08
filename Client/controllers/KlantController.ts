@@ -1,8 +1,9 @@
 import moment from "moment";
-import { Collection, MongoClient, ObjectId } from "mongodb";
+import { Collection, ObjectId } from "mongodb";
 import { HondCollection } from "./HondController";
 import { deleteInschrijvingen } from "./InschrijvingController";
 import brcypt from "bcrypt";
+import client from "../middleware/MongoDb";
 
 export interface KlantCollection extends NewKlant {
   _id: ObjectId;
@@ -45,41 +46,32 @@ export interface UpdateKlant {
   reservaties?: ObjectId[];
   verified_at?: string;
 }
-export const getKlantCollection = (client: MongoClient): Collection => {
+export const getKlantCollection = (): Collection => {
   return client.db("degallohoeve").collection("klant");
 };
 
-export const getAllKlanten = async (
-  client: MongoClient
-): Promise<KlantCollection[]> => {
-  const collection = getKlantCollection(client);
+export const getAllKlanten = async (): Promise<KlantCollection[]> => {
+  const collection = getKlantCollection();
 
   return (await collection.find().toArray()) as KlantCollection[];
 };
 
-export const getKlantById = async (
-  client: MongoClient,
-  _id: ObjectId
-): Promise<KlantCollection> => {
-  const collection = getKlantCollection(client);
+export const getKlantById = async (_id: ObjectId): Promise<KlantCollection> => {
+  const collection = getKlantCollection();
 
   return (await collection.findOne({ _id })) as KlantCollection;
 };
 
 export const getKlantByEmail = async (
-  client: MongoClient,
   email: string
 ): Promise<KlantCollection> => {
-  const collection = getKlantCollection(client);
+  const collection = getKlantCollection();
 
   return (await collection.findOne({ email })) as KlantCollection;
 };
 
-export const createKlant = async (
-  client: MongoClient,
-  data: NewKlant
-): Promise<KlantCollection> => {
-  const collection = getKlantCollection(client);
+export const createKlant = async (data: NewKlant): Promise<KlantCollection> => {
+  const collection = getKlantCollection();
   const klantData = {
     ...data,
     password: await brcypt.hash(data.password, 10),
@@ -112,27 +104,28 @@ export const createKlant = async (
 
   const { insertedId: klantId } = await collection.insertOne(klantData);
 
-  return await getKlantById(client, klantId);
+  return await getKlantById(klantId);
 };
 
 export const updateKlant = async (
-  client: MongoClient,
   klant_id: ObjectId,
   data: UpdateKlant
 ): Promise<KlantCollection> => {
-  const collection = getKlantCollection(client);
+  const collection = getKlantCollection();
   const { upsertedId } = await collection.updateOne({ _id: klant_id }, data);
 
-  return await getKlantById(client, upsertedId);
+  return await getKlantById(upsertedId);
 };
 
-export const deleteKlant = async (
-  client: MongoClient,
-  _id: ObjectId
-): Promise<void> => {
-  const { inschrijvingen } = await getKlantById(client, _id);
-  const collection = getKlantCollection(client);
+export const deleteKlant = async (_id: ObjectId): Promise<void> => {
+  const { inschrijvingen } = await getKlantById(_id);
+  const collection = getKlantCollection();
   await collection.deleteOne({ _id });
 
-  await deleteInschrijvingen(client, inschrijvingen);
+  await deleteInschrijvingen(inschrijvingen);
+};
+
+export const setVerified = async (_id: ObjectId) => {
+  const collection = getKlantCollection();
+  await collection.updateOne({ _id }, { $set: { verified: true } });
 };

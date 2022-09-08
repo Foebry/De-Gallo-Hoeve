@@ -1,5 +1,6 @@
-import { Collection, MongoClient, ObjectId } from "mongodb";
+import { Collection, ObjectId } from "mongodb";
 import { nanoid } from "nanoid";
+import client from "../middleware/MongoDb";
 
 export interface ConfirmCollection {
   _id: ObjectId;
@@ -17,71 +18,64 @@ interface updateConfirm {
   code: string;
 }
 
-export const getConfirmCollection = (client: MongoClient): Collection => {
+export const getConfirmCollection = (): Collection => {
   return client.db("degallohoeve").collection("confirm");
 };
 
 export const createConfirm = async (
-  client: MongoClient,
   confirm: NewConfirm
 ): Promise<ConfirmCollection> => {
-  const collection = getConfirmCollection(client);
+  const collection = getConfirmCollection();
   const { insertedId } = await collection.insertOne({
     ...confirm,
     code: nanoid(50),
   });
 
-  return getConfirmById(client, insertedId);
+  return getConfirmById(insertedId);
 };
 
-export const getAllConfirm = async (
-  client: MongoClient
-): Promise<ConfirmCollection[]> => {
-  const collection = getConfirmCollection(client);
+export const getAllConfirm = async (): Promise<ConfirmCollection[]> => {
+  const collection = getConfirmCollection();
 
   return (await collection.find().toArray()) as ConfirmCollection[];
 };
 
 export const getConfirmById = async (
-  client: MongoClient,
   _id: ObjectId
 ): Promise<ConfirmCollection> => {
-  const collection = getConfirmCollection(client);
+  const collection = getConfirmCollection();
 
   return (await collection.findOne({ _id })) as ConfirmCollection;
 };
 
 export const getConfirmByKlantId = async (
-  client: MongoClient,
   klant_id: ObjectId
 ): Promise<ConfirmCollection> => {
-  const collection = getConfirmCollection(client);
+  const collection = getConfirmCollection();
 
   return (await collection.findOne({ klant_id })) as ConfirmCollection;
 };
 
 export const updateConfirmForKlantId = async (
-  client: MongoClient,
   klant_id: ObjectId,
   update: updateConfirm
 ): Promise<ConfirmCollection> => {
-  const collection = getConfirmCollection(client);
-  const confirm = await getConfirmByKlantId(client, klant_id);
+  const collection = getConfirmCollection();
+  const confirm = await getConfirmByKlantId(klant_id);
   const updatedConfirm = { ...confirm, ...update };
   const { upsertedId } = await collection.updateOne(
     { _id: confirm._id },
     updatedConfirm
   );
 
-  return await getConfirmById(client, upsertedId);
+  return await getConfirmById(upsertedId);
 };
 
 export const deleteConfirmByKlantId = async (
-  client: MongoClient,
   klant_id: ObjectId
 ): Promise<void> => {
-  const collection = getConfirmCollection(client);
-  const { _id } = await getConfirmByKlantId(client, klant_id);
+  const collection = getConfirmCollection();
+  const { _id } = await getConfirmByKlantId(klant_id);
 
   await collection.deleteOne({ _id });
 };
