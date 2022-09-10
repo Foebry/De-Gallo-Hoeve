@@ -1,12 +1,10 @@
-import { Collection } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
-import { getCollections } from "../../../middleware/MongoDb";
-import { Confirm, Klant } from "../../../types/collections";
-import baseResponse from "../../../types/responseType";
+import { getConfirmCollection } from "../../../controllers/ConfirmController";
+import { setVerified } from "../../../controllers/KlantController";
+import client from "../../../middleware/MongoDb";
+import { InvalidConfirmCodeError } from "../../../middleware/RequestError";
 
-interface Response extends baseResponse {}
-
-const handler = (req: NextApiRequest, res: NextApiResponse<Response>) => {
+const handler = (req: NextApiRequest, res: NextApiResponse) => {
   req.method === "GET"
     ? confirm(req, res)
     : req.method === "PATCH"
@@ -15,28 +13,22 @@ const handler = (req: NextApiRequest, res: NextApiResponse<Response>) => {
 };
 
 const confirm = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { code } = req.query;
-  const { confirmCollection, klantCollection } = getCollections([
-    "confirm",
-    "klant",
-  ]) as {
-    confirmCollection: Collection<Confirm>;
-    klantCollection: Collection<Klant>;
-  };
+  try {
+    await client.connect();
+    const { code } = req.query;
 
-  const confirm = await confirmCollection.findOne({ code });
-  if (!confirm) {
-    console.log(`code ${code} not found`);
+    const confirmCollection = getConfirmCollection();
+
+    const confirm = await confirmCollection.findOne({ code });
+    if (!confirm) throw new InvalidConfirmCodeError();
+
+    await setVerified(confirm.klant_id);
+    await confirmCollection.deleteOne({ code });
+
+    return res.redirect("/login");
+  } catch (e: any) {
     return res.redirect("/auth/invalid-confirmation-code");
   }
-
-  await klantCollection.updateOne(
-    { _id: confirm.klant_id },
-    { $set: { verified: true } }
-  );
-  await confirmCollection.deleteOne({ code });
-
-  return res.redirect("/login");
 };
 
 const reset = (req: NextApiRequest, res: NextApiResponse) => {};

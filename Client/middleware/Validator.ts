@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { AnySchema } from "yup";
 import { nanoid } from "nanoid";
-import { compare, hash } from "./authenticationHandler";
-import { ValidationError } from "../middleware/RequestError";
+import { compare, hash } from "./Authenticator";
+import { ValidationError } from "./RequestError";
 
 interface OptionsInterface {
   schema: AnySchema;
@@ -36,7 +36,7 @@ const validationHelper: ValidationHelperInterface = {
         const [key, value] = Object.entries(el)[0];
         return { ...prev, [key]: value };
       });
-      throw new ValidationError(res, { ...response, message });
+      throw new ValidationError({ ...response, message });
     }
   },
 
@@ -44,10 +44,10 @@ const validationHelper: ValidationHelperInterface = {
   csrf: undefined,
   salt: undefined,
 
-  validateCsrfToken: async ({ req, res }) => {
+  validateCsrfToken: async ({ req }) => {
     const secret = `${process.env.CSRF_SECRET}`;
     if (!req.body.csrf || !compare(req.body.csrf, secret)) {
-      throw new ValidationError(res, { message: "Ongeldig formulier" });
+      throw new ValidationError({ message: "Probeer later opnieuw..." });
     }
   },
 

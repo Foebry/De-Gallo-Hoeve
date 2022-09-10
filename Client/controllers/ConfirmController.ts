@@ -1,6 +1,11 @@
 import { Collection, ObjectId } from "mongodb";
-import { nanoid } from "nanoid";
 import client from "../middleware/MongoDb";
+import {
+  ConfirmNotFoundError,
+  InternalServerError,
+  KlantNotFoundError,
+} from "../middleware/RequestError";
+import { getKlantCollection } from "./KlantController";
 
 export interface ConfirmCollection {
   _id: ObjectId;
@@ -9,7 +14,7 @@ export interface ConfirmCollection {
   created_at: string;
 }
 
-interface NewConfirm {
+export interface NewConfirm {
   klant_id: ObjectId;
   created_at: string;
 }
@@ -18,64 +23,80 @@ interface updateConfirm {
   code: string;
 }
 
-export const getConfirmCollection = (): Collection => {
-  return client.db("degallohoeve").collection("confirm");
+export const CONFIRM = "ConfirmController";
+
+export interface IsConfirmController {
+  getConfirmCollection: () => Collection;
+  saveConfirm: (confirm: ConfirmCollection) => Promise<ConfirmCollection>;
+  getAllConfirm: () => Promise<ConfirmCollection[]>;
+  getConfirmById: (_id: ObjectId) => Promise<ConfirmCollection | string>;
+  getConfirmByKlantId: (
+    klant_id: ObjectId
+  ) => Promise<ConfirmCollection | null>;
+  editConfirm: (
+    klant_id: ObjectId,
+    editData: updateConfirm
+  ) => Promise<ConfirmCollection>;
+  deleteConfirmByKlantId: (_id: ObjectId) => Promise<void>;
+}
+
+const ConfirmController: IsConfirmController = {
+  getConfirmCollection: () => {
+    return client.db("degallohoeve").collection("confirm");
+  },
+  saveConfirm: async (confirm) => {
+    const { acknowledged } = await getConfirmCollection().insertOne(confirm);
+    if (!acknowledged) throw new InternalServerError();
+    return confirm;
+  },
+  getAllConfirm: async () => {
+    const allConfirms = await getConfirmCollection().find().toArray();
+    return allConfirms as ConfirmCollection[];
+  },
+  getConfirmById: async (_id) => {
+    const confirm = await getConfirmCollection().findOne({ _id });
+    if (!confirm) throw new ConfirmNotFoundError();
+    return confirm as ConfirmCollection;
+  },
+  getConfirmByKlantId: async (klant_id) => {
+    const klant = await getKlantCollection().findOne({ _id: klant_id });
+    if (!klant) throw new KlantNotFoundError();
+
+    const confirm = await getConfirmCollection().findOne({ klant_id });
+    if (!confirm) throw new ConfirmNotFoundError();
+
+    return confirm as ConfirmCollection;
+  },
+  editConfirm: async (klant_id, editData) => {
+    const klant = await getKlantCollection().findOne({ _id: klant_id });
+    if (!klant) throw new KlantNotFoundError();
+
+    const confirm = await getConfirmByKlantId(klant_id);
+    if (!confirm) throw new ConfirmNotFoundError();
+
+    const updatedConfirm = { ...confirm, ...editData };
+    const { modifiedCount } = await getConfirmCollection().updateOne(
+      { _id: confirm._id },
+      updatedConfirm
+    );
+    if (modifiedCount !== 1) throw new InternalServerError();
+
+    return updatedConfirm;
+  },
+  deleteConfirmByKlantId: async (klant_id) => {
+    const klant = await getKlantCollection().findOne({ _id: klant_id });
+    if (!klant) throw new KlantNotFoundError();
+
+    const confirm = await getConfirmByKlantId(klant_id);
+    if (!confirm) throw new ConfirmNotFoundError();
+
+    const { deletedCount } = await getConfirmCollection().deleteOne({
+      _id: confirm._id,
+    });
+    if (deletedCount !== 1) throw new InternalServerError();
+  },
 };
 
-export const createConfirm = async (
-  confirm: NewConfirm
-): Promise<ConfirmCollection> => {
-  const collection = getConfirmCollection();
-  const { insertedId } = await collection.insertOne({
-    ...confirm,
-    code: nanoid(50),
-  });
-
-  return getConfirmById(insertedId);
-};
-
-export const getAllConfirm = async (): Promise<ConfirmCollection[]> => {
-  const collection = getConfirmCollection();
-
-  return (await collection.find().toArray()) as ConfirmCollection[];
-};
-
-export const getConfirmById = async (
-  _id: ObjectId
-): Promise<ConfirmCollection> => {
-  const collection = getConfirmCollection();
-
-  return (await collection.findOne({ _id })) as ConfirmCollection;
-};
-
-export const getConfirmByKlantId = async (
-  klant_id: ObjectId
-): Promise<ConfirmCollection> => {
-  const collection = getConfirmCollection();
-
-  return (await collection.findOne({ klant_id })) as ConfirmCollection;
-};
-
-export const updateConfirmForKlantId = async (
-  klant_id: ObjectId,
-  update: updateConfirm
-): Promise<ConfirmCollection> => {
-  const collection = getConfirmCollection();
-  const confirm = await getConfirmByKlantId(klant_id);
-  const updatedConfirm = { ...confirm, ...update };
-  const { upsertedId } = await collection.updateOne(
-    { _id: confirm._id },
-    updatedConfirm
-  );
-
-  return await getConfirmById(upsertedId);
-};
-
-export const deleteConfirmByKlantId = async (
-  klant_id: ObjectId
-): Promise<void> => {
-  const collection = getConfirmCollection();
-  const { _id } = await getConfirmByKlantId(klant_id);
-
-  await collection.deleteOne({ _id });
-};
+export default ConfirmController;
+export const { getConfirmCollection, getConfirmById, getConfirmByKlantId } =
+  ConfirmController;

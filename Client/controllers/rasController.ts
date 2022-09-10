@@ -1,11 +1,13 @@
-import moment from "moment";
 import { Collection, ObjectId } from "mongodb";
 import client from "../middleware/MongoDb";
+import {
+  InternalServerError,
+  RasNotFoundError,
+} from "../middleware/RequestError";
 
 interface NewRas {
   naam: string;
   soort: string;
-  avatar: string;
 }
 
 export interface RasCollection extends NewRas {
@@ -15,46 +17,48 @@ export interface RasCollection extends NewRas {
 
 interface UpdateRas {
   naam?: string;
-  soort: string;
-  avatar: string;
+  soort?: string;
 }
 
-export const getRasCollection = (): Collection => {
-  return client.db("degallohoeve").collection("ras");
+export interface IsRasController {
+  getRasCollection: () => Collection;
+  save: (ras: RasCollection) => Promise<RasCollection>;
+  getAllRassen: () => Promise<RasCollection[]>;
+  getRasById: (_id: ObjectId, breakEarly?: boolean) => Promise<RasCollection>;
+  update: (_id: ObjectId, updateRas: UpdateRas) => Promise<RasCollection>;
+  delete: (ras: ObjectId) => Promise<void>;
+}
+
+const RasController: IsRasController = {
+  getRasCollection: () => client.db("degallohoeve").collection("ras"),
+  save: async (ras) => {
+    const { insertedId } = await getRasCollection().insertOne(ras);
+    if (!insertedId) throw new InternalServerError();
+
+    return await getRasById(insertedId);
+  },
+  getRasById: async (_id, breakEarly = true) => {
+    const ras = await getRasCollection().findOne({ _id });
+    if (!ras && breakEarly) throw new RasNotFoundError();
+    return ras as RasCollection;
+  },
+  getAllRassen: async () => {
+    return (await getRasCollection().find().toArray()) as RasCollection[];
+  },
+  update: async (_id, updateRas) => {
+    await getRasById(_id);
+    const collection = getRasCollection();
+    const { upsertedCount } = await collection.updateOne({ _id }, updateRas);
+    if (upsertedCount !== 1) throw new InternalServerError();
+    return await getRasById(_id);
+  },
+  delete: async (_id) => {
+    const ras = await getRasById(_id);
+    const { deletedCount } = await getRasCollection().deleteOne(ras);
+    if (deletedCount !== 1) throw new InternalServerError();
+  },
 };
 
-export const CreateRas = async (data: NewRas): Promise<RasCollection> => {
-  const collection = getRasCollection();
-  const rasData = { ...data, created_at: moment().local().toString() };
-  const { insertedId } = await collection.insertOne(rasData);
-
-  return await getRasById(insertedId);
-};
-
-export const getAllRassen = async (): Promise<RasCollection[]> => {
-  const collection = getRasCollection();
-
-  return (await collection.find().toArray()) as RasCollection[];
-};
-
-export const getRasById = async (_id: ObjectId): Promise<RasCollection> => {
-  const collection = getRasCollection();
-
-  return (await collection.findOne({ _id })) as RasCollection;
-};
-
-export const updateRas = async (
-  _id: string,
-  updateData: UpdateRas
-): Promise<RasCollection> => {
-  const collection = getRasCollection();
-  const { upsertedId } = await collection.updateOne({ _id }, updateData);
-
-  return await getRasById(upsertedId);
-};
-
-export const deleteRas = async (_id: ObjectId): Promise<void> => {
-  const collection = getRasCollection();
-
-  await collection.deleteOne({ _id });
-};
+export default RasController;
+export const RAS = "RasController";
+export const { getRasCollection, getRasById, getAllRassen } = RasController;

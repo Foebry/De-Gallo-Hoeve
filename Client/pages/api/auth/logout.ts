@@ -1,11 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import baseResponse from "../../../types/responseType";
 import { destroyCookie } from "nookies";
-import { INDEX } from "../../../types/linkTypes";
 
-interface Response extends baseResponse {}
-
-const handler = (req: NextApiRequest, res: NextApiResponse<Response>) => {
+const handler = (req: NextApiRequest, res: NextApiResponse) => {
   return req.method === "DELETE"
     ? logout(res)
     : res.status(405).json({ code: 405, message: "Not Allowed" });
