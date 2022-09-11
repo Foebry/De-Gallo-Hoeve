@@ -61,6 +61,7 @@ const MongoDb: MongoDbInterface = {
   },
 
   getRasOptions: async () => {
+    await client.connect();
     const rassen = await getAllRassen();
     return rassen.map(({ _id: value, naam: label }) => ({
       value: value.toString(),

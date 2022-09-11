@@ -4,21 +4,7 @@ import {
   InternalServerError,
   RasNotFoundError,
 } from "../middleware/RequestError";
-
-interface NewRas {
-  naam: string;
-  soort: string;
-}
-
-export interface RasCollection extends NewRas {
-  _id: ObjectId;
-  created_at: Date;
-}
-
-interface UpdateRas {
-  naam?: string;
-  soort?: string;
-}
+import { RasCollection, UpdateRas } from "../types/EntityTpes/RasTypes";
 
 export interface IsRasController {
   getRasCollection: () => Collection;

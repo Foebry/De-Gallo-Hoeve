@@ -13,10 +13,7 @@ import {
 import { getKlantById } from "../../controllers/KlantController";
 import client, { startTransaction } from "../../middleware/MongoDb";
 import mailer from "../../middleware/Mailer";
-import {
-  InschrijvingBodyInterface,
-  saveInschrijving,
-} from "../../controllers/InschrijvingController";
+import { saveInschrijving } from "../../controllers/InschrijvingController";
 import { ObjectId } from "mongodb";
 import { getKlantHond } from "../../controllers/HondController";
 import {
@@ -25,6 +22,7 @@ import {
   trainingVolzet,
 } from "../../controllers/TrainingController";
 import Factory from "../../middleware/Factory";
+import { IsInschrijvingBody } from "../../types/requestTypes";
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   return req.method === "POST"
@@ -40,7 +38,7 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
     await validate({ req, res }, { schema: inschrijvingSchema });
 
     const { klant_id, training, inschrijvingen } =
-      req.body as InschrijvingBodyInterface;
+      req.body as IsInschrijvingBody;
 
     const klant = await getKlantById(new ObjectId(klant_id));
     if (!klant) throw new KlantNotFoundError();

@@ -7,10 +7,10 @@ import bcrypt from "bcrypt";
 import {
   InvalidEmailError,
   InvalidPasswordError,
-  KlantNotFoundError,
   NotAllowedError,
 } from "../../../middleware/RequestError";
 import { createJWT, setClientCookie } from "../../../middleware/Authenticator";
+import { IsLoginBody } from "../../../types/requestTypes";
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") return login(req, res);
@@ -23,7 +23,7 @@ const login = async (req: NextApiRequest, res: NextApiResponse) => {
     await validateCsrfToken({ req, res });
     await validate({ req, res }, { schema: loginSchema });
 
-    const { email, password } = req.body;
+    const { email, password } = req.body as IsLoginBody;
     const klant = await getKlantByEmail(email.toLowerCase());
     if (!klant) throw new InvalidEmailError();
 

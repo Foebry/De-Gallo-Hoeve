@@ -4,24 +4,10 @@ import {
   ContentNotFoundError,
   InternalServerError,
 } from "../middleware/RequestError";
-
-export interface ContentCollection {
-  _id: ObjectId;
-  subtitle: string;
-  content: string;
-  default_content: string;
-  image: string;
-  created_at: Date;
-  updated_at: Date;
-  updated_by: string;
-}
-
-interface EditContent {
-  subtitle?: string;
-  content?: string;
-  image?: string;
-  default_content?: string;
-}
+import {
+  ContentCollection,
+  EditContent,
+} from "../types/EntityTpes/ContentTypes";
 
 export interface IsContentController {
   getContentCollection: () => Collection;

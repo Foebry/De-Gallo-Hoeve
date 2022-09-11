@@ -1,29 +1,14 @@
+import moment from "moment";
 import { Collection, ObjectId } from "mongodb";
+import { createRandomConfirmCode } from "../middleware/Helper";
 import client from "../middleware/MongoDb";
 import {
   ConfirmNotFoundError,
   InternalServerError,
   KlantNotFoundError,
 } from "../middleware/RequestError";
+import { ConfirmCollection } from "../types/EntityTpes/ConfirmTypes";
 import { getKlantCollection } from "./KlantController";
-
-export interface ConfirmCollection {
-  _id: ObjectId;
-  code: string;
-  klant_id: ObjectId;
-  created_at: string;
-}
-
-export interface NewConfirm {
-  klant_id: ObjectId;
-  created_at: string;
-}
-
-interface updateConfirm {
-  code: string;
-}
-
-export const CONFIRM = "ConfirmController";
 
 export interface IsConfirmController {
   getConfirmCollection: () => Collection;
@@ -33,10 +18,7 @@ export interface IsConfirmController {
   getConfirmByKlantId: (
     klant_id: ObjectId
   ) => Promise<ConfirmCollection | null>;
-  editConfirm: (
-    klant_id: ObjectId,
-    editData: updateConfirm
-  ) => Promise<ConfirmCollection>;
+  editConfirm: (klant_id: ObjectId) => Promise<ConfirmCollection>;
   deleteConfirmByKlantId: (_id: ObjectId) => Promise<void>;
 }
 
@@ -67,14 +49,18 @@ const ConfirmController: IsConfirmController = {
 
     return confirm as ConfirmCollection;
   },
-  editConfirm: async (klant_id, editData) => {
+  editConfirm: async (klant_id) => {
     const klant = await getKlantCollection().findOne({ _id: klant_id });
     if (!klant) throw new KlantNotFoundError();
 
     const confirm = await getConfirmByKlantId(klant_id);
     if (!confirm) throw new ConfirmNotFoundError();
 
-    const updatedConfirm = { ...confirm, ...editData };
+    const updatedConfirm = {
+      ...confirm,
+      code: createRandomConfirmCode(),
+      valid_to: moment().add(1, "day").local().format(),
+    };
     const { modifiedCount } = await getConfirmCollection().updateOne(
       { _id: confirm._id },
       updatedConfirm

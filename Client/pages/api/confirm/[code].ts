@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getConfirmCollection } from "../../../controllers/ConfirmController";
-import { setVerified } from "../../../controllers/KlantController";
+import Factory from "../../../middleware/Factory";
 import client from "../../../middleware/MongoDb";
 import { InvalidConfirmCodeError } from "../../../middleware/RequestError";
+import { CONFIRM } from "../../../types/EntityTpes/ConfirmTypes";
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   req.method === "GET"
@@ -22,7 +23,8 @@ const confirm = async (req: NextApiRequest, res: NextApiResponse) => {
     const confirm = await confirmCollection.findOne({ code });
     if (!confirm) throw new InvalidConfirmCodeError();
 
-    await setVerified(confirm.klant_id);
+    await Factory.getController(CONFIRM).editConfirm(confirm.klant_id);
+    // (confirm.klant_id);
     await confirmCollection.deleteOne({ code });
 
     return res.redirect("/login");

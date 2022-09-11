@@ -14,7 +14,7 @@ import nookies from "nookies";
 import { toast } from "react-toastify";
 import FormRow from "../components/form/FormRow";
 import Button, { SubmitButton } from "../components/buttons/Button";
-import { getRasOptions } from "../middleware/MongoDb";
+import client, { getRasOptions } from "../middleware/MongoDb";
 import { generateCsrf } from "../middleware/Validator";
 
 export interface RegisterHondErrorInterface {
@@ -162,6 +162,7 @@ export default Register;
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const csrf = generateCsrf();
   const rassen = await getRasOptions();
+  await client.close();
 
   return nookies.get(ctx).JWT
     ? { redirect: { permanent: false, destination: INDEX } }

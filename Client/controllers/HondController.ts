@@ -4,36 +4,12 @@ import {
   HondNotFoundError,
   InternalServerError,
 } from "../middleware/RequestError";
+import { HondCollection, UpdateHond } from "../types/EntityTpes/HondTypes";
 import {
   getAllKlanten,
   getKlantById,
   getKlantCollection,
 } from "./KlantController";
-
-export type Geslacht = "Teef" | "Reu";
-
-export interface HondCollection {
-  _id: ObjectId;
-  geslacht: Geslacht;
-  geboortedatum: Date;
-  naam: string;
-  ras: string;
-  created_at: Date;
-}
-
-interface NewHond {
-  geslacht: Geslacht;
-  geboortedatum: Date;
-  naam: string;
-  ras: string;
-}
-
-interface UpdateHond {
-  geslacht?: Geslacht;
-  geboortedatum?: Date;
-  naam?: string;
-  ras?: string;
-}
 
 export interface IsHondController {
   saveHondForKlant: (

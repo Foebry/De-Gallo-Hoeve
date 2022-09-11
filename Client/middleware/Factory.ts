@@ -1,10 +1,7 @@
 import moment from "moment";
 import { ObjectId } from "mongodb";
 import ConfirmController, {
-  CONFIRM,
-  ConfirmCollection,
   IsConfirmController,
-  NewConfirm,
 } from "../controllers/ConfirmController";
 import ContentController, {
   CONTENT,
@@ -12,19 +9,14 @@ import ContentController, {
 } from "../controllers/ContentController";
 import HondController, {
   HOND,
-  HondCollection,
   IsHondController,
 } from "../controllers/HondController";
 import InschrijvingController, {
-  InschrijvingCollection,
-  IsInschrijving,
   IsInschrijvingController,
 } from "../controllers/InschrijvingController";
 import KlantController, {
   IsKlantController,
   KLANT,
-  KlantCollection,
-  NewKlant,
 } from "../controllers/KlantController";
 import RasController, {
   IsRasController,
@@ -33,9 +25,25 @@ import RasController, {
 import TrainingController, {
   IsTrainingController,
   TRAINING,
-  TrainingType,
 } from "../controllers/TrainingController";
+import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 import { INSCHRIJVING } from "../types/linkTypes";
+import { IsNewKlantData } from "../types/requestTypes";
+import brcypt from "bcrypt";
+import { capitalize, createRandomConfirmCode } from "./Helper";
+import { HondCollection, NewHond } from "../types/EntityTpes/HondTypes";
+import {
+  CONFIRM,
+  ConfirmCollection,
+  NewConfirm,
+} from "../types/EntityTpes/ConfirmTypes";
+import {
+  InschrijvingCollection,
+  IsInschrijving,
+} from "../types/EntityTpes/InschrijvingTypes";
+import inschrijving from "../pages/inschrijving";
+import { TrainingType } from "../types/EntityTpes/TrainingType";
+import { NewRas, RasCollection } from "../types/EntityTpes/RasTypes";
 
 export type CONFIRM = "ConfirmController";
 export type CONTENT = "ContentController";
@@ -50,32 +58,58 @@ const Factory = {
   createInschrijving: (
     inschrijving: IsInschrijving,
     training: TrainingType,
-    klant: KlantCollection,
+    klant: IsKlantCollection,
     hond: HondCollection
   ): InschrijvingCollection => ({
-    ...inschrijving,
+    datum: moment(inschrijving.datum).local().format(),
     training,
     klant: { id: klant._id, lnaam: klant.lnaam, vnaam: klant.vnaam },
     hond: { id: hond._id, naam: hond.naam },
     _id: new ObjectId(),
     created_at: moment().local().format(),
+    updated_at: moment().local().format(),
   }),
   createConfirm: (confirm: NewConfirm): ConfirmCollection => ({
     ...confirm,
     _id: new ObjectId(),
-    code: Math.random().toString(32).substring(2),
+    code: createRandomConfirmCode(),
+    valid_to: moment(confirm.created_at).local().add(1, "day").format(),
   }),
-  createHond: () => {},
-  createKlant: (klant: NewKlant): KlantCollection => ({
-    ...klant,
+  createHond: (hond: NewHond) => ({
     _id: new ObjectId(),
-    roles: "[]",
+    naam: capitalize(hond.naam),
+    geslacht: hond.geslacht,
+    geboortedatum: moment().local().format(),
+    ras: hond.ras,
     created_at: moment().local().format(),
+  }),
+  createKlant: async (klant: IsNewKlantData): Promise<IsKlantCollection> => ({
+    _id: new ObjectId(),
+    roles: "",
+    verified: false,
     inschrijvingen: [],
     reservaties: [],
-    verified: false,
+    created_at: moment().local().format(),
+    updated_at: moment().local().format(),
+    email: klant.email.toLowerCase(),
+    password: await brcypt.hash(klant.password, 10),
+    vnaam: capitalize(klant.vnaam),
+    lnaam: capitalize(klant.lnaam),
+    gsm: klant.gsm,
+    straat: capitalize(klant.straat),
+    nr: 0,
+    bus: klant.bus,
+    gemeente: capitalize(klant.gemeente),
+    postcode: 0,
+    honden: klant.honden.map((hond) => createHond(hond)),
   }),
-  createRas: () => {},
+  createRas: (ras: NewRas): RasCollection => ({
+    _id: new ObjectId(),
+    naam: ras.naam,
+    soort: ras.soort,
+    created_at: moment().local().format(),
+    updated_at: moment().local().format(),
+  }),
 };
 
 function getController(type: CONFIRM): IsConfirmController;
@@ -111,3 +145,4 @@ const cascadeOptions = {
   CASCADETRAINING: "CASCADETRAINING",
 };
 export const { CASCADEFULL, CASCADEKLANT, CASCADETRAINING } = cascadeOptions;
+export const { createHond } = Factory;

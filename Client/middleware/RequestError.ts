@@ -8,6 +8,14 @@ export class HttpError extends Error {
   }
 }
 
+export class TransactionError extends HttpError {
+  code: number;
+  constructor(name: string, code: number, message: string, response: any) {
+    super(name, message, response);
+    this.code = code;
+  }
+}
+
 export class BadRequestError extends HttpError {
   code: number;
   constructor(name: string, message: string, response: any) {
