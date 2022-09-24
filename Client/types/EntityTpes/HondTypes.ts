@@ -9,6 +9,7 @@ export interface HondCollection {
   naam: string;
   ras: string;
   created_at: string;
+  updated_at: string;
 }
 
 export interface NewHond {
@@ -16,11 +17,4 @@ export interface NewHond {
   geboortedatum: string;
   naam: string;
   ras: string;
-}
-
-export interface UpdateHond {
-  geslacht?: Geslacht;
-  geboortedatum?: Date;
-  naam?: string;
-  ras?: string;
 }

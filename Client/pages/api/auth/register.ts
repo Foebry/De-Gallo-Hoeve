@@ -4,6 +4,7 @@ import mailer from "../../../middleware/Mailer";
 import client, { startTransaction } from "../../../middleware/MongoDb";
 import {
   EmailOccupiedError,
+  NotAllowedError,
   TransactionError,
 } from "../../../middleware/RequestError";
 import { registerSchema } from "../../../types/schemas";
@@ -12,10 +13,9 @@ import { getKlantByEmail, KLANT } from "../../../controllers/KlantController";
 import { IsRegisterBody } from "../../../types/requestTypes";
 import { CONFIRM } from "../../../types/EntityTpes/ConfirmTypes";
 
-const handler = (req: NextApiRequest, res: NextApiResponse) => {
-  req.method === "POST"
-    ? register(req, res)
-    : res.status(405).json({ code: 405, message: "Not Allowed" });
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  if (req.method === "POST") return register(req, res);
+  throw new NotAllowedError();
 };
 
 const register = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -34,26 +34,34 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
       const session = client.startSession();
       const transactionOptions = startTransaction();
       await session.withTransaction(async () => {
-        const { created_at, email, vnaam } = await Factory.getController(
-          KLANT
-        ).save(klant);
+        const savedKlant = await Factory.getController(KLANT).save(klant);
         const confirm = Factory.createConfirm({
           klant_id: klant._id,
-          created_at,
+          created_at: savedKlant.created_at,
         });
         const { code } = await Factory.getController(CONFIRM).saveConfirm(
           confirm
         );
 
-        mailer.sendMail("register", { email, vnaam, code });
+        if (process.env.NODE_ENV === "production") {
+          mailer.sendMail("register", {
+            email: savedKlant.email,
+            vnaam: savedKlant.vnaam,
+            code,
+          });
+        }
       }, transactionOptions);
+      const returnKlant = await Factory.getController(KLANT).getKlantByEmail(
+        klantData.email
+      );
+      return res
+        .status(201)
+        .json({ ...returnKlant, message: "Registratie succesvol!" });
     } catch (e: any) {
-      throw new TransactionError(e.name, e.code, e.message, e.response);
+      throw new TransactionError(e.name, e.code, e.response);
     }
-
-    return res.status(201).json({ message: "Registratie succesvol!" });
   } catch (e: any) {
-    res.status(e.code).json(e.response);
+    return res.status(e.code).json(e.response);
   } finally {
     await client.close();
   }

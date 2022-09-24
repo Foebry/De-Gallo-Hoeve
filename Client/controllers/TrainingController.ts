@@ -42,10 +42,14 @@ export interface IsTrainingController {
     inschrijving: IsInschrijving
   ) => Promise<boolean>;
   trainingVolzet: (training: TrainingType, datum: string) => Promise<boolean>;
+  deleteAll: () => Promise<void>;
 }
 
 const TrainingController: IsTrainingController = {
-  getTrainingCollection: () => client.db("degallohoeve").collection("training"),
+  getTrainingCollection: () => {
+    const database = process.env.MONGODB_DATABASE;
+    return client.db(database).collection("training");
+  },
   getTrainingById,
   getTrainingByName,
   updateTraining,
@@ -53,7 +57,7 @@ const TrainingController: IsTrainingController = {
     await getTrainingByName(training);
     const { modifiedCount } = await getTrainingCollection().updateOne(
       { naam: training },
-      { $addToSet: { inschrijvingen: inschrijving } },
+      { $addToSet: { inschrijvingen: inschrijving._id } },
       { session }
     );
     if (modifiedCount !== 1) throw new InternalServerError();
@@ -83,7 +87,7 @@ const TrainingController: IsTrainingController = {
     const inschrijvingFound = await getInschrijvingCollection().findOne({
       datum: moment(inschrijving.datum).local().format(),
       training,
-      klant: { _id: klant._id },
+      "klant.id": klant._id,
     });
     return inschrijvingFound ? true : false;
   },
@@ -92,7 +96,15 @@ const TrainingController: IsTrainingController = {
     const inschrijvingen = await getInschrijvingCollection()
       .find({ datum: moment(datum).local().format() })
       .toArray();
-    return inschrijvingen.length >= Training.max_inschrijvingen;
+    if (training === "groep")
+      return inschrijvingen.length >= Training.max_inschrijvingen;
+    return inschrijvingen.length > 0;
+  },
+  deleteAll: async () => {
+    const ids = (await getTrainingCollection().find().toArray()).map(
+      (item) => item._id
+    );
+    await getTrainingCollection().deleteMany({ _id: { $in: [...ids] } });
   },
 };
 
@@ -114,8 +126,9 @@ export async function getTrainingByName(
 ): Promise<PriveTrainingCollection>;
 export async function getTrainingByName(naam: string) {
   const training = await getTrainingCollection().findOne({ naam });
-  if (naam === "groep") return training as GroepTrainingCollection;
-  else if (naam === "prive") return training as PriveTrainingCollection;
+  if (training && naam === "groep") return training as GroepTrainingCollection;
+  else if (training && naam === "prive")
+    return training as PriveTrainingCollection;
 }
 
 export async function getTrainingById(

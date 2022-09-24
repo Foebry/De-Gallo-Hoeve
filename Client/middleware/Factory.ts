@@ -12,6 +12,8 @@ import HondController, {
   IsHondController,
 } from "../controllers/HondController";
 import InschrijvingController, {
+  getInschrijvingCollection,
+  INSCHRIJVING,
   IsInschrijvingController,
 } from "../controllers/InschrijvingController";
 import KlantController, {
@@ -23,11 +25,11 @@ import RasController, {
   RAS,
 } from "../controllers/rasController";
 import TrainingController, {
+  getTrainingCollection,
   IsTrainingController,
   TRAINING,
 } from "../controllers/TrainingController";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
-import { INSCHRIJVING } from "../types/linkTypes";
 import { IsNewKlantData } from "../types/requestTypes";
 import brcypt from "bcrypt";
 import { capitalize, createRandomConfirmCode } from "./Helper";
@@ -41,9 +43,14 @@ import {
   InschrijvingCollection,
   IsInschrijving,
 } from "../types/EntityTpes/InschrijvingTypes";
-import inschrijving from "../pages/inschrijving";
-import { TrainingType } from "../types/EntityTpes/TrainingType";
+import {
+  PriveTrainingCollection,
+  TrainingType,
+} from "../types/EntityTpes/TrainingType";
 import { NewRas, RasCollection } from "../types/EntityTpes/RasTypes";
+import axios from "axios";
+import { IsRegisterPayload } from "../tests/auth/types";
+import client from "./MongoDb";
 
 export type CONFIRM = "ConfirmController";
 export type CONTENT = "ContentController";
@@ -82,6 +89,7 @@ const Factory = {
     geboortedatum: moment().local().format(),
     ras: hond.ras,
     created_at: moment().local().format(),
+    updated_at: moment().local().format(),
   }),
   createKlant: async (klant: IsNewKlantData): Promise<IsKlantCollection> => ({
     _id: new ObjectId(),
@@ -110,6 +118,105 @@ const Factory = {
     created_at: moment().local().format(),
     updated_at: moment().local().format(),
   }),
+  createRandomKlant: async (options?: any): Promise<IsRegisterPayload> => {
+    await process.nextTick(() => {});
+    const { data } = await axios.get(
+      "https://www.randomuser.me/api/?format=json&nat=fr"
+    );
+    const randomKlant = {
+      _id: new ObjectId(),
+      roles: "",
+      created_at: moment().local().format(),
+      email: data.results[0].email,
+      gemeente: data.results[0].location.city,
+      gsm: data.results[0].phone,
+      honden: [],
+      inschrijvingen: [],
+      lnaam: data.results[0].name.last,
+      nr: data.results[0].location.street.number,
+      password: "aBcDeFgH1!",
+      postcode: Math.floor(Math.random() * 100000),
+      reservaties: [],
+      straat: data.results[0].location.street.name,
+      updated_at: moment().local().format(),
+      verified: false,
+      vnaam: data.results[0].name.first,
+      bus: data.results[0].location.street.bus ?? null,
+      ...options,
+    };
+    return {
+      ...randomKlant,
+      save: async (): Promise<IsKlantCollection> => {
+        await client.connect();
+        const klant = {
+          ...randomKlant,
+          password: await brcypt.hash(randomKlant.password, 10),
+        };
+        const savedKlant = await Factory.getController(KLANT).save(klant);
+        await client.close();
+        return savedKlant;
+      },
+    };
+  },
+  createRandomHond: async (): Promise<HondCollection> => {
+    await process.nextTick(() => {});
+    const { data } = await axios.get(
+      "https://www.randomuser.me/api/?format=json&nat=fr"
+    );
+    const now = moment().local().format();
+    return {
+      geslacht: data.results[0].gender === "female" ? "Teef" : "Reu",
+      geboortedatum: data.results[0].dob.date,
+      naam: data.results[0].name.first,
+      ras: "labrador retriever",
+      _id: new ObjectId(),
+      created_at: now,
+      updated_at: now,
+    };
+  },
+
+  createRandomInschrijving: (
+    klant: IsKlantCollection,
+    hond: HondCollection
+  ): RandomInschrijving => {
+    const randomInschrijving = {
+      _id: new ObjectId(),
+      created_at: moment().local().format(),
+      datum: moment("2022-09-24").local().format(),
+      hond: { id: hond._id, naam: hond.naam },
+      klant: { id: klant._id, vnaam: klant.vnaam, lnaam: klant.lnaam },
+      training: "prive" as TrainingType,
+      updated_at: moment().local().format(),
+    };
+    return {
+      ...randomInschrijving,
+      save: async () => {
+        await client.connect();
+        await getInschrijvingCollection().insertOne(randomInschrijving);
+        await client.close();
+        return randomInschrijving;
+      },
+    };
+  },
+
+  createRandomTraining: (naam: string): RandomTraining => {
+    const randomTraining = {
+      _id: new ObjectId(),
+      naam: naam as TrainingType,
+      prijs: Math.round(Math.random() * 20),
+      inschrijvingen: [] as ObjectId[],
+    };
+    return {
+      ...randomTraining,
+      save: async () => {
+        await process.nextTick(() => {});
+        await client.connect();
+        await getTrainingCollection().insertOne(randomTraining);
+        await client.close();
+        return randomTraining;
+      },
+    };
+  },
 };
 
 function getController(type: CONFIRM): IsConfirmController;
@@ -146,3 +253,10 @@ const cascadeOptions = {
 };
 export const { CASCADEFULL, CASCADEKLANT, CASCADETRAINING } = cascadeOptions;
 export const { createHond } = Factory;
+
+interface RandomInschrijving extends InschrijvingCollection {
+  save: () => Promise<InschrijvingCollection>;
+}
+interface RandomTraining extends PriveTrainingCollection {
+  save: () => Promise<PriveTrainingCollection>;
+}

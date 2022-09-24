@@ -9,7 +9,12 @@ import { ObjectId } from "mongodb";
 import { INSCHRIJVING } from "../types/linkTypes";
 import validationHelper from "./Validator";
 import base64 from "base-64";
-import { EmailNotVerifiedError, UnauthorizedAccessError } from "./RequestError";
+import {
+  EmailNotVerifiedError,
+  NotLoggedInError,
+  UnauthorizedAccessError,
+} from "./RequestError";
+import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 
 interface AuthenticationHandlerInterface {
   createJWT: (res: NextApiResponse, klantData: any) => void;
@@ -19,6 +24,7 @@ interface AuthenticationHandlerInterface {
   securepage: (ctx: GetServerSidePropsContext) => Promise<ObjectId | void>;
   hash: (value: string | object, secret: string) => string;
   compare: (value: string, secret: string) => boolean;
+  createBearer: (klant: IsKlantCollection) => string;
 }
 
 const secret = process.env.JWT_SECRET;
@@ -51,17 +57,12 @@ const authenticationHandler: AuthenticationHandlerInterface = {
 
   secureApi: ({ req, res }) => {
     const cookies = parseCookies({ req });
-    const token = cookies.JWT;
-    if (!token) throw new UnauthorizedAccessError();
-
+    const token = cookies.JWT ?? req.headers.authorization?.split(" ")[1];
+    if (!token) throw new NotLoggedInError();
     const verifiedToken = jwt.verify(token, `${secret}`, {
       algorithms: ["RS256", "HS256"],
     });
-    const {
-      payload: { verified },
-    } = JSON.parse(JSON.stringify(verifiedToken));
     if (!verifiedToken) throw new UnauthorizedAccessError();
-    if (!verified) throw new EmailNotVerifiedError();
   },
 
   redirectToLogin: (ctx) => {
@@ -107,6 +108,16 @@ const authenticationHandler: AuthenticationHandlerInterface = {
       return false;
     }
   },
+
+  createBearer: (klant) => {
+    const payload = {
+      honden: klant.honden,
+      roles: klant.roles,
+      _id: klant._id,
+    };
+    const token = jwt.sign({ payload }, `${secret}`);
+    return token;
+  },
 };
 
 export const {
@@ -117,4 +128,5 @@ export const {
   securepage,
   hash,
   compare,
+  createBearer,
 } = authenticationHandler;

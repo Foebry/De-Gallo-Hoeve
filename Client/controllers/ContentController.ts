@@ -18,11 +18,13 @@ export interface IsContentController {
     editData: EditContent
   ) => Promise<ContentCollection>;
   deleteContent: (_id: ObjectId) => Promise<void>;
+  deleteAll: () => Promise<void>;
 }
 
 const ContentController: IsContentController = {
   getContentCollection: () => {
-    return client.db("degallohoeve").collection("content");
+    const database = process.env.MONGODB_DATABASE;
+    return client.db(database).collection("content");
   },
   findAllContent: async () => {
     const collections = await getContentCollection().find().toArray();
@@ -49,6 +51,12 @@ const ContentController: IsContentController = {
     await getContentById(_id);
     const { deletedCount } = await getContentCollection().deleteOne({ _id });
     if (deletedCount !== 1) throw new InternalServerError();
+  },
+  deleteAll: async () => {
+    const ids = (await getContentCollection().find().toArray()).map(
+      (item) => item._id
+    );
+    await getContentCollection().deleteMany({ _id: { $in: [...ids] } });
   },
 };
 

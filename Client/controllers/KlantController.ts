@@ -1,11 +1,12 @@
 import moment from "moment";
-import { ClientSession, Collection, ObjectId } from "mongodb";
+import { ClientSession, Collection, Db, MongoClient, ObjectId } from "mongodb";
 import {
   deleteInschrijvingen,
   getInschrijvingById,
 } from "./InschrijvingController";
 import client from "../middleware/MongoDb";
 import {
+  InschrijvingNotFoundError,
   InternalServerError,
   KlantNotFoundError,
 } from "../middleware/RequestError";
@@ -16,8 +17,11 @@ import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
 export interface IsKlantController {
   getKlantCollection: () => Collection;
   getAllKlanten: () => Promise<IsKlantCollection[]>;
-  getKlantById: (_id: ObjectId) => Promise<IsKlantCollection>;
-  getKlantByEmail: (email: string) => Promise<IsKlantCollection | null>;
+  getKlantById: (_id: ObjectId) => Promise<IsKlantCollection | null>;
+  getKlantByEmail: (
+    email: string,
+    db?: any
+  ) => Promise<IsKlantCollection | null>;
   save: (klant: IsKlantCollection) => Promise<IsKlantCollection>;
   update: (
     _id: ObjectId,
@@ -29,22 +33,25 @@ export interface IsKlantController {
     session: ClientSession
   ) => Promise<void>;
   delete: (klant: IsKlantCollection) => Promise<void>;
-  setVerified: (_id: ObjectId) => Promise<void>;
+  setVerified: (klant: IsKlantCollection) => Promise<IsKlantCollection>;
   removeInschrijving: (
     _id: ObjectId,
     inschrijving_id: ObjectId,
     session?: ClientSession
   ) => Promise<void>;
+  deleteAll: () => Promise<void>;
 }
 
 const KlantController: IsKlantController = {
-  getKlantCollection: () => client.db("degallohoeve").collection("klant"),
+  getKlantCollection: () => {
+    const database = process.env.MONGODB_DATABASE;
+    return client.db(database).collection("klant");
+  },
   getAllKlanten: async () => {
     return (await getKlantCollection().find().toArray()) as IsKlantCollection[];
   },
   getKlantById: async (_id) => {
     const klant = await getKlantCollection().findOne({ _id });
-    if (!klant) throw new KlantNotFoundError();
     return klant as IsKlantCollection;
   },
   getKlantByEmail: async (email) => {
@@ -53,27 +60,25 @@ const KlantController: IsKlantController = {
   save: async (klant) => {
     const { insertedId } = await getKlantCollection().insertOne(klant);
     if (!insertedId) throw new InternalServerError();
-    return await getKlantById(insertedId);
+    return { ...klant, _id: insertedId };
   },
   update: async (_id, updateKlant) => {
-    await getKlantById(_id);
     const { upsertedCount } = await getKlantCollection().updateOne(
       { _id },
       updateKlant
     );
     if (upsertedCount !== 1) throw new InternalServerError();
-    return await getKlantById(_id);
+    return updateKlant;
   },
   addKlantInschrijving: async (_id, inschrijving, session) => {
     await getKlantById(_id);
     const { modifiedCount } = await getKlantCollection().updateOne(
       { _id },
-      { $addToSet: { inschrijvingen: inschrijving } }
+      { $addToSet: { inschrijvingen: inschrijving._id } }
     );
     if (modifiedCount !== 1) throw new InternalServerError();
   },
   delete: async (klant) => {
-    await getKlantById(klant._id);
     const { deletedCount } = await getKlantCollection().deleteOne(klant);
     if (deletedCount !== 1) throw new InternalServerError();
     const inschrijvingen = await Promise.all(
@@ -83,20 +88,38 @@ const KlantController: IsKlantController = {
     );
     await deleteInschrijvingen(inschrijvingen, CASCADETRAINING);
   },
-  setVerified: async (_id) => {
-    const klant = await getKlantById(_id);
-    klant.verified = true;
-    klant.verified_at = moment().local().format();
-    await updateKlant(_id, klant);
+  setVerified: async (klant) => {
+    const verified = true;
+    const verified_at = moment().local().format();
+
+    const { modifiedCount } = await getKlantCollection().updateOne(
+      { _id: klant._id },
+      { $set: { verified, verified_at } }
+    );
+    if (modifiedCount !== 1) throw new InternalServerError();
+
+    return { ...klant, verified, verified_at };
   },
+
   removeInschrijving: async (_id, inschrijving_id, session) => {
-    await getKlantById(_id);
-    await getInschrijvingById(inschrijving_id);
-    await getKlantCollection().updateOne(
+    const klant = await getKlantById(_id);
+    if (!klant) throw new KlantNotFoundError();
+
+    const inschrijving = await getInschrijvingById(inschrijving_id);
+    if (!inschrijving) throw new InschrijvingNotFoundError();
+
+    const { modifiedCount } = await getKlantCollection().updateOne(
       { _id },
       { $pull: { inschrijvingen: inschrijving_id } },
       { session }
     );
+    if (modifiedCount !== 1) throw new InternalServerError();
+  },
+  deleteAll: async () => {
+    const ids = (await getKlantCollection().find().toArray()).map(
+      (item) => item._id
+    );
+    await getKlantCollection().deleteMany({ _id: { $in: [...ids] } });
   },
 };
 

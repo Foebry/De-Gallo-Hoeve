@@ -3,8 +3,10 @@ import { ObjectId } from "mongodb";
 import {
   HondNotFoundError,
   InternalServerError,
+  KlantNotFoundError,
 } from "../middleware/RequestError";
-import { HondCollection, UpdateHond } from "../types/EntityTpes/HondTypes";
+import { HondCollection } from "../types/EntityTpes/HondTypes";
+import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 import {
   getAllKlanten,
   getKlantById,
@@ -19,15 +21,15 @@ export interface IsHondController {
   getHondenByKlantId: (klant_id: ObjectId) => Promise<HondCollection[]>;
   getAllHonden: () => Promise<HondCollection[]>;
   getKlantHond: (
-    klant_id: ObjectId,
+    klant: IsKlantCollection,
     hond_id: ObjectId
   ) => Promise<HondCollection>;
   update: (
-    klant_id: ObjectId,
+    klant: IsKlantCollection,
     _id: ObjectId,
-    hondData: UpdateHond
+    hondData: HondCollection
   ) => Promise<HondCollection>;
-  delete: (klant_id: ObjectId, _id: ObjectId) => Promise<void>;
+  delete: (klant: IsKlantCollection, _id: ObjectId) => Promise<void>;
 }
 
 const HondController: IsHondController = {
@@ -49,36 +51,36 @@ const HondController: IsHondController = {
   },
   getHondenByKlantId: async (klant_id) => {
     const klant = await getKlantById(klant_id);
+    if (!klant) throw new KlantNotFoundError();
     return klant.honden;
   },
-  getKlantHond: async (klant_id, _id) => {
-    const klant = await getKlantById(klant_id);
-    const hond = klant.honden.find((hond) => hond._id === _id);
-    if (!hond) throw new HondNotFoundError();
+  getKlantHond: async (klant, _id) => {
+    const klantHond = klant.honden.find(
+      (hond) => hond._id.toString() === _id.toString()
+    );
+    if (!klantHond) throw new HondNotFoundError();
 
-    return hond;
+    return klantHond;
   },
-  update: async (klant_id, _id, hondData) => {
-    const hond = await getKlantHond(klant_id, _id);
+  update: async (klant, _id, hondData) => {
     const updateHond = {
-      ...hond,
-      hondData,
+      ...hondData,
       updated_at: moment().local().format(),
     };
 
     const { upsertedCount } = await getKlantCollection().updateOne(
-      { _id: klant_id, honden: { $elemMatch: { _id } } },
+      { _id: klant._id, honden: { $elemMatch: { _id } } },
       { updateHond }
     );
     if (upsertedCount !== 1) throw new InternalServerError();
 
-    return await getKlantHond(klant_id, hond._id);
+    return updateHond;
   },
-  delete: async (klant_id, _id) => {
-    const hond = await getKlantHond(klant_id, _id);
+  delete: async (klant, _id) => {
+    const hond = await getKlantHond(klant, _id);
 
     const { modifiedCount } = await getKlantCollection().updateOne(
-      { _id: klant_id },
+      { _id: klant._id },
       { $pull: { honden: hond } }
     );
     if (modifiedCount !== 1) throw new InternalServerError();

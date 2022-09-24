@@ -4,35 +4,41 @@ export class HttpError extends Error {
     super(name);
     this.name = name;
     this.message = message;
-    this.response = { ...response, message } ?? { message };
+    this.response = { message, ...response } ?? { message };
   }
 }
 
 export class TransactionError extends HttpError {
   code: number;
-  constructor(name: string, code: number, message: string, response: any) {
-    super(name, message, response);
+  constructor(name: string, code: number, response: any) {
+    super(name, "", response);
     this.code = code;
   }
 }
 
 export class BadRequestError extends HttpError {
   code: number;
-  constructor(name: string, message: string, response: any) {
+  constructor(name: string, message: string, response?: any) {
     super(name, message, response);
     this.code = 400;
   }
 }
 
 export class ValidationError extends BadRequestError {
-  constructor(response: any) {
-    super("ValidationError", "Kan verzoek niet verwerken", response);
+  constructor(message?: any, response?: any) {
+    super("ValidationError", message, response);
   }
 }
 
 export class InschrijvingKlantChangedError extends BadRequestError {
   constructor(response?: any) {
     super("InschrijvingKlantChangedError", "Kan klant niet wijzigen", response);
+  }
+}
+
+export class InvalidCsrfError extends BadRequestError {
+  constructor() {
+    super("InvalidCsrfError", "Probeer later opnieuw...");
   }
 }
 
@@ -89,6 +95,12 @@ export class InschrijvingNotFoundError extends EntityNotFoundError {
 export class RasNotFoundError extends EntityNotFoundError {
   constructor() {
     super("RasNotFoundError", "Ras niet gevonden");
+  }
+}
+
+export class ExpiredConfirmCodeError extends EntityNotFoundError {
+  constructor() {
+    super("ExpiredConfirmCodeError", "Confirm code expired");
   }
 }
 
@@ -156,6 +168,7 @@ export class UnauthorizedAccessError extends AuthorizationError {
 export class EmailNotVerifiedError extends AuthorizationError {
   constructor() {
     super("EmailNotVerifiedError", "Gelieve uw email te verifiëren");
+    this.code = 403;
   }
 }
 
@@ -163,13 +176,7 @@ export class NotLoggedInError extends AuthorizationError {
   constructor() {
     super("NotLoggedInError", "Not Logged In");
     this.code = 403;
-    // destroyCookie({ res }, "Client", {
-    //   httpOnly: false,
-    //   maxAge: 3600,
-    //   secure: false,
-    //   sameSite: "strict",
-    //   path: "/",
-    // });
+
     // res.status(401).json({ code: 401, message: "Unauthorized Access" });
   }
 }

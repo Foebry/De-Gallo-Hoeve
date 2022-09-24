@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { validate, validateCsrfToken } from "../../../middleware/Validator";
 import { loginSchema } from "../../../types/schemas";
-import client from "../../../middleware/MongoDb";
 import { getKlantByEmail } from "../../../controllers/KlantController";
 import bcrypt from "bcrypt";
 import {
@@ -10,7 +9,7 @@ import {
   NotAllowedError,
 } from "../../../middleware/RequestError";
 import { createJWT, setClientCookie } from "../../../middleware/Authenticator";
-import { IsLoginBody } from "../../../types/requestTypes";
+import client from "../../../middleware/MongoDb";
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") return login(req, res);
@@ -23,7 +22,8 @@ const login = async (req: NextApiRequest, res: NextApiResponse) => {
     await validateCsrfToken({ req, res });
     await validate({ req, res }, { schema: loginSchema });
 
-    const { email, password } = req.body as IsLoginBody;
+    const { email, password } = req.body;
+
     const klant = await getKlantByEmail(email.toLowerCase());
     if (!klant) throw new InvalidEmailError();
 
@@ -32,6 +32,8 @@ const login = async (req: NextApiRequest, res: NextApiResponse) => {
 
     createJWT(res, klant);
     setClientCookie(res, klant);
+
+    await client.close();
 
     return res.send({});
   } catch (e: any) {

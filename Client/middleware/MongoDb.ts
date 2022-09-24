@@ -5,8 +5,15 @@ import {
   TransactionOptions,
 } from "mongodb";
 import { atob } from "buffer";
-import { getAllRassen } from "../controllers/rasController";
+import { getAllRassen, RAS } from "../controllers/rasController";
 import { getHondenByKlantId } from "../controllers/HondController";
+import { getConfirmCollection } from "../controllers/ConfirmController";
+import Factory from "./Factory";
+import { KLANT } from "../controllers/KlantController";
+import { CONFIRM } from "../types/EntityTpes/ConfirmTypes";
+import { CONTENT } from "../controllers/ContentController";
+import { INSCHRIJVING } from "../controllers/InschrijvingController";
+import { TRAINING } from "../controllers/TrainingController";
 
 interface Result {
   value: ObjectId;
@@ -28,6 +35,7 @@ interface MongoDbInterface {
   getCollections: (collections: string[]) => any;
   getFreeTimeSlots: () => Promise<any>;
   startTransaction: () => TransactionOptions;
+  clearAllData: () => Promise<void>;
 }
 
 const MongoDb: MongoDbInterface = {
@@ -134,6 +142,25 @@ const MongoDb: MongoDbInterface = {
 
     return transactionOptions;
   },
+  clearAllData: async () => {
+    if (process.env.NODE_ENV === "test") {
+      await process.nextTick(() => {});
+      await client.connect();
+      await process.nextTick(() => {});
+      await Factory.getController(CONFIRM).deleteAll();
+      await process.nextTick(() => {});
+      await Factory.getController(KLANT).deleteAll();
+      await process.nextTick(() => {});
+      await Factory.getController(CONTENT).deleteAll();
+      await process.nextTick(() => {});
+      await Factory.getController(INSCHRIJVING).deleteAll();
+      await process.nextTick(() => {});
+      await Factory.getController(RAS).deleteAll();
+      await process.nextTick(() => {});
+      await Factory.getController(TRAINING).deleteAll();
+      await client.close();
+    }
+  },
 };
 
 const client = new MongoClient(
@@ -147,4 +174,5 @@ export const {
   getCollections,
   getFreeTimeSlots,
   startTransaction,
+  clearAllData,
 } = MongoDb;

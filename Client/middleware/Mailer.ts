@@ -31,6 +31,7 @@ const mailer: Mailer = {
         ...templateData,
       },
     };
+
     sgMail
       .send(msg)
       .then(() => {

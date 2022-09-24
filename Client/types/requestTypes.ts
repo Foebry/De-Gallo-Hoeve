@@ -47,6 +47,10 @@ export interface IsUpdateInschrijvingBody {
   hond_id: string;
 }
 
+export interface IsConfirmQuery {
+  code: string;
+}
+
 interface GetKlantenParams {}
 interface GetHondenParams {}
 interface GetInschrijvingenParams {}

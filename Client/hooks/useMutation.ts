@@ -62,7 +62,6 @@ export const structureHondenPayload = (payload: any) => {
 
 export const structureInschrijvingenPayload = (payload: any) => {
   const inschrijvingen = payload?.inschrijvingen ?? [];
-  console.log({ inschrijvingen });
   const new_inschrijvingen = inschrijvingen.map((inschrijving: any) => ({
     ...inschrijving,
     hond_id: inschrijving.hond_id.value,

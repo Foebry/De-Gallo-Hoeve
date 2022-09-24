@@ -7,12 +7,16 @@ import {
 } from "../middleware/Factory";
 import client, { startTransaction } from "../middleware/MongoDb";
 import {
+  HondNotFoundError,
   InschrijvingKlantChangedError,
   InschrijvingNotFoundError,
   InternalServerError,
+  KlantNotFoundError,
+  TrainingNotFoundError,
   TransactionError,
 } from "../middleware/RequestError";
 import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
+import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 import { IsUpdateInschrijvingBody } from "../types/requestTypes";
 import { getKlantHond } from "./HondController";
 import {
@@ -25,6 +29,8 @@ import {
   deleteInschrijving,
   getTrainingByName,
 } from "./TrainingController";
+
+export const INSCHRIJVING = "InschrijvingController";
 
 export interface IsInschrijvingController {
   getInschrijvingCollection: () => Collection;
@@ -40,6 +46,7 @@ export interface IsInschrijvingController {
   getInschrijvingenByFilter: (filter: any) => Promise<InschrijvingCollection[]>;
   updateInschrijving: (
     _id: ObjectId,
+    klant: IsKlantCollection,
     inschrijving: IsUpdateInschrijvingBody
   ) => Promise<InschrijvingCollection>;
   deleteInschrijving: (_id: ObjectId, cascade: string) => Promise<void>;
@@ -47,26 +54,27 @@ export interface IsInschrijvingController {
     inschrijvingen: InschrijvingCollection[],
     cascade: string
   ) => Promise<void>;
+  deleteAll: () => Promise<void>;
 }
 
 const InschrijvingController: IsInschrijvingController = {
-  getInschrijvingCollection: () =>
-    client.db("degallohoeve").collection("inschrijving"),
+  getInschrijvingCollection: () => {
+    const database = process.env.MONGODB_DATABASE;
+    return client.db(database).collection("inschrijving");
+  },
   saveInschrijving: async (inschrijving, session) => {
-    const klant = await getKlantById(inschrijving.klant.id);
-    const training = await getTrainingByName(inschrijving.training);
-    await getKlantHond(klant._id, inschrijving.hond.id);
-
+    const klant_id = inschrijving.klant.id;
+    const training = inschrijving.training;
     const { insertedId } = await getInschrijvingCollection().insertOne(
       inschrijving,
       { session }
     );
     if (!insertedId) throw new InternalServerError();
 
-    await addKlantInschrijving(klant._id, inschrijving, session);
-    await addTrainingInschrijving(training.naam, inschrijving, session);
+    await addKlantInschrijving(klant_id, inschrijving, session);
+    await addTrainingInschrijving(training, inschrijving, session);
 
-    return getInschrijvingById(inschrijving._id);
+    return getInschrijvingById(insertedId);
   },
   getAllInschrijvingen: async () => {
     return (await getInschrijvingCollection()
@@ -77,7 +85,6 @@ const InschrijvingController: IsInschrijvingController = {
     const inschrijving = (await getInschrijvingCollection().findOne({
       _id,
     })) as InschrijvingCollection;
-    if (!inschrijving && breakEarly) throw new InschrijvingNotFoundError();
     return inschrijving;
   },
   getInschrijvingenByFilter: async (filter) => {
@@ -85,13 +92,10 @@ const InschrijvingController: IsInschrijvingController = {
       .find(filter)
       .toArray()) as InschrijvingCollection[];
   },
-  updateInschrijving: async (_id, updateData) => {
+  updateInschrijving: async (_id, klant, updateData) => {
     const inschrijving = await getInschrijvingById(_id);
     const collection = getInschrijvingCollection();
-    const hond = await getKlantHond(
-      new ObjectId(updateData.klant_id),
-      new ObjectId(updateData.hond_id)
-    );
+    const hond = await getKlantHond(klant, new ObjectId(updateData.hond_id));
     await getTrainingByName(updateData.training);
 
     if (inschrijving.klant.id.toString() !== updateData.klant_id)
@@ -122,8 +126,8 @@ const InschrijvingController: IsInschrijvingController = {
         }
       }, transactionOptions);
     } catch (e: any) {
-      await session.abortTransaction();
-      throw new TransactionError(e.name, e.code, e.message, e.respose);
+      // await session.abortTransaction();
+      throw new TransactionError(e.name, e.code, e.respose);
     }
 
     return await getInschrijvingById(_id);
@@ -148,8 +152,8 @@ const InschrijvingController: IsInschrijvingController = {
           deleteInschrijving(training, _id, session);
       }, transactionOptions);
     } catch (e: any) {
-      session.abortTransaction();
-      throw new InternalServerError();
+      // session.abortTransaction();
+      throw new TransactionError(e.name, e.code, e.response);
     }
   },
   deleteInschrijvingen: async (inschrijvingen, cascade = CASCADEFULL) => {
@@ -169,9 +173,15 @@ const InschrijvingController: IsInschrijvingController = {
         );
       }, transactionOptions);
     } catch (e: any) {
-      session.abortTransaction();
-      throw new InternalServerError();
+      // session.abortTransaction();
+      throw new TransactionError(e.name, e.code, e.response);
     }
+  },
+  deleteAll: async () => {
+    const ids = (await getInschrijvingCollection().find().toArray()).map(
+      (item) => item._id
+    );
+    await getInschrijvingCollection().deleteMany({ _id: { $in: [...ids] } });
   },
 };
 

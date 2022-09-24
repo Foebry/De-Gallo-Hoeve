@@ -13,10 +13,15 @@ export interface IsRasController {
   getRasById: (_id: ObjectId, breakEarly?: boolean) => Promise<RasCollection>;
   update: (_id: ObjectId, updateRas: UpdateRas) => Promise<RasCollection>;
   delete: (ras: ObjectId) => Promise<void>;
+  deleteAll: () => Promise<void>;
+  getRandomRasNaam: () => Promise<string>;
 }
 
 const RasController: IsRasController = {
-  getRasCollection: () => client.db("degallohoeve").collection("ras"),
+  getRasCollection: () => {
+    const database = process.env.MONGODB_DATABASE;
+    return client.db(database).collection("ras");
+  },
   save: async (ras) => {
     const { insertedId } = await getRasCollection().insertOne(ras);
     if (!insertedId) throw new InternalServerError();
@@ -43,8 +48,20 @@ const RasController: IsRasController = {
     const { deletedCount } = await getRasCollection().deleteOne(ras);
     if (deletedCount !== 1) throw new InternalServerError();
   },
+  deleteAll: async () => {
+    const ids = (await getRasCollection().find().toArray()).map(
+      (item) => item._id
+    );
+    await getRasCollection().deleteMany({ _id: { $in: [...ids] } });
+  },
+  getRandomRasNaam: async () => {
+    const rassen = await getAllRassen();
+    const random = Math.floor(Math.random() * rassen.length);
+    return rassen[random].naam;
+  },
 };
 
 export default RasController;
 export const RAS = "RasController";
-export const { getRasCollection, getRasById, getAllRassen } = RasController;
+export const { getRasCollection, getRasById, getAllRassen, getRandomRasNaam } =
+  RasController;
