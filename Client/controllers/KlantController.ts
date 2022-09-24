@@ -1,138 +1,136 @@
 import moment from "moment";
-import { Collection, MongoClient, ObjectId } from "mongodb";
-import { HondCollection } from "./HondController";
-import { deleteInschrijvingen } from "./InschrijvingController";
-import brcypt from "bcrypt";
+import { ClientSession, Collection, Db, MongoClient, ObjectId } from "mongodb";
+import {
+  deleteInschrijvingen,
+  getInschrijvingById,
+} from "./InschrijvingController";
+import client from "../middleware/MongoDb";
+import {
+  InschrijvingNotFoundError,
+  InternalServerError,
+  KlantNotFoundError,
+} from "../middleware/RequestError";
+import { CASCADETRAINING } from "../middleware/Factory";
+import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
+import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
 
-export interface KlantCollection extends NewKlant {
-  _id: ObjectId;
-  roles: string;
-  verified: boolean;
-  inschrijvingen: ObjectId[];
-  reservaties: ObjectId[];
-  created_at: string;
-  verified_at?: string;
+export interface IsKlantController {
+  getKlantCollection: () => Collection;
+  getAllKlanten: () => Promise<IsKlantCollection[]>;
+  getKlantById: (_id: ObjectId) => Promise<IsKlantCollection | null>;
+  getKlantByEmail: (
+    email: string,
+    db?: any
+  ) => Promise<IsKlantCollection | null>;
+  save: (klant: IsKlantCollection) => Promise<IsKlantCollection>;
+  update: (
+    _id: ObjectId,
+    klant: IsKlantCollection
+  ) => Promise<IsKlantCollection>;
+  addKlantInschrijving: (
+    _id: ObjectId,
+    inschrijving: InschrijvingCollection,
+    session: ClientSession
+  ) => Promise<void>;
+  delete: (klant: IsKlantCollection) => Promise<void>;
+  setVerified: (klant: IsKlantCollection) => Promise<IsKlantCollection>;
+  removeInschrijving: (
+    _id: ObjectId,
+    inschrijving_id: ObjectId,
+    session?: ClientSession
+  ) => Promise<void>;
+  deleteAll: () => Promise<void>;
 }
 
-export interface NewKlant {
-  email: string;
-  password: string;
-  vnaam: string;
-  lnaam: string;
-  gsm: string;
-  straat: string;
-  nr: number;
-  bus?: string;
-  gemeente: string;
-  postcode: number;
-  honden: HondCollection[];
-}
+const KlantController: IsKlantController = {
+  getKlantCollection: () => {
+    const database = process.env.MONGODB_DATABASE;
+    return client.db(database).collection("klant");
+  },
+  getAllKlanten: async () => {
+    return (await getKlantCollection().find().toArray()) as IsKlantCollection[];
+  },
+  getKlantById: async (_id) => {
+    const klant = await getKlantCollection().findOne({ _id });
+    return klant as IsKlantCollection;
+  },
+  getKlantByEmail: async (email) => {
+    return (await getKlantCollection().findOne({ email })) as IsKlantCollection;
+  },
+  save: async (klant) => {
+    const { insertedId } = await getKlantCollection().insertOne(klant);
+    if (!insertedId) throw new InternalServerError();
+    return { ...klant, _id: insertedId };
+  },
+  update: async (_id, updateKlant) => {
+    const { upsertedCount } = await getKlantCollection().updateOne(
+      { _id },
+      updateKlant
+    );
+    if (upsertedCount !== 1) throw new InternalServerError();
+    return updateKlant;
+  },
+  addKlantInschrijving: async (_id, inschrijving, session) => {
+    await getKlantById(_id);
+    const { modifiedCount } = await getKlantCollection().updateOne(
+      { _id },
+      { $addToSet: { inschrijvingen: inschrijving._id } }
+    );
+    if (modifiedCount !== 1) throw new InternalServerError();
+  },
+  delete: async (klant) => {
+    const { deletedCount } = await getKlantCollection().deleteOne(klant);
+    if (deletedCount !== 1) throw new InternalServerError();
+    const inschrijvingen = await Promise.all(
+      klant.inschrijvingen.map(
+        async (_id) => await getInschrijvingById(_id, false)
+      )
+    );
+    await deleteInschrijvingen(inschrijvingen, CASCADETRAINING);
+  },
+  setVerified: async (klant) => {
+    const verified = true;
+    const verified_at = moment().local().format();
 
-export interface UpdateKlant {
-  roles?: string;
-  email?: string;
-  password?: string;
-  vnaam?: string;
-  lnaam?: string;
-  gsm?: string;
-  straat?: string;
-  nr?: number;
-  gemeente?: string;
-  postcode?: number;
-  verified?: boolean;
-  honden?: HondCollection[];
-  inschrijvingen?: ObjectId[];
-  reservaties?: ObjectId[];
-  verified_at?: string;
-}
-export const getKlantCollection = (client: MongoClient): Collection => {
-  return client.db("degallohoeve").collection("klant");
+    const { modifiedCount } = await getKlantCollection().updateOne(
+      { _id: klant._id },
+      { $set: { verified, verified_at } }
+    );
+    if (modifiedCount !== 1) throw new InternalServerError();
+
+    return { ...klant, verified, verified_at };
+  },
+
+  removeInschrijving: async (_id, inschrijving_id, session) => {
+    const klant = await getKlantById(_id);
+    if (!klant) throw new KlantNotFoundError();
+
+    const inschrijving = await getInschrijvingById(inschrijving_id);
+    if (!inschrijving) throw new InschrijvingNotFoundError();
+
+    const { modifiedCount } = await getKlantCollection().updateOne(
+      { _id },
+      { $pull: { inschrijvingen: inschrijving_id } },
+      { session }
+    );
+    if (modifiedCount !== 1) throw new InternalServerError();
+  },
+  deleteAll: async () => {
+    const ids = (await getKlantCollection().find().toArray()).map(
+      (item) => item._id
+    );
+    await getKlantCollection().deleteMany({ _id: { $in: [...ids] } });
+  },
 };
 
-export const getAllKlanten = async (
-  client: MongoClient
-): Promise<KlantCollection[]> => {
-  const collection = getKlantCollection(client);
-
-  return (await collection.find().toArray()) as KlantCollection[];
-};
-
-export const getKlantById = async (
-  client: MongoClient,
-  _id: ObjectId
-): Promise<KlantCollection> => {
-  const collection = getKlantCollection(client);
-
-  return (await collection.findOne({ _id })) as KlantCollection;
-};
-
-export const getKlantByEmail = async (
-  client: MongoClient,
-  email: string
-): Promise<KlantCollection> => {
-  const collection = getKlantCollection(client);
-
-  return (await collection.findOne({ email })) as KlantCollection;
-};
-
-export const createKlant = async (
-  client: MongoClient,
-  data: NewKlant
-): Promise<KlantCollection> => {
-  const collection = getKlantCollection(client);
-  const klantData = {
-    ...data,
-    password: await brcypt.hash(data.password, 10),
-    honden: data.honden.map((hond) => ({
-      ...hond,
-      _id: new ObjectId(),
-      naam:
-        hond.naam.substring(0, 1).toUpperCase() +
-        hond.naam.substring(1).toLocaleLowerCase(),
-    })),
-    roles: "[]",
-    verified: false,
-    email: data.email.toLowerCase(),
-    inschrijvingen: [],
-    reservaties: [],
-    created_at: moment().local().toString(),
-    vnaam:
-      data.vnaam.substring(0, 1).toUpperCase() +
-      data.vnaam.substring(1).toLocaleLowerCase(),
-    lnaam:
-      data.lnaam.substring(0, 1).toUpperCase() +
-      data.lnaam.substring(1).toLocaleLowerCase(),
-    gemeente:
-      data.gemeente.substring(0, 1).toUpperCase() +
-      data.gemeente.substring(1).toLocaleLowerCase(),
-    straat:
-      data.straat.substring(0, 1).toUpperCase() +
-      data.straat.substring(1).toLocaleLowerCase(),
-  };
-
-  const { insertedId: klantId } = await collection.insertOne(klantData);
-
-  return await getKlantById(client, klantId);
-};
-
-export const updateKlant = async (
-  client: MongoClient,
-  klant_id: ObjectId,
-  data: UpdateKlant
-): Promise<KlantCollection> => {
-  const collection = getKlantCollection(client);
-  const { upsertedId } = await collection.updateOne({ _id: klant_id }, data);
-
-  return await getKlantById(client, upsertedId);
-};
-
-export const deleteKlant = async (
-  client: MongoClient,
-  _id: ObjectId
-): Promise<void> => {
-  const { inschrijvingen } = await getKlantById(client, _id);
-  const collection = getKlantCollection(client);
-  await collection.deleteOne({ _id });
-
-  await deleteInschrijvingen(client, inschrijvingen);
-};
+export default KlantController;
+export const KLANT = "KlantController";
+export const {
+  getKlantCollection,
+  getKlantById,
+  getKlantByEmail,
+  getAllKlanten,
+  update: updateKlant,
+  addKlantInschrijving,
+  removeInschrijving: removeKlantInschrijving,
+} = KlantController;

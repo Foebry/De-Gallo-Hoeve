@@ -19,15 +19,15 @@ import { toast } from "react-toastify";
 import { OptionsOrGroups } from "react-select";
 import { optionInterface } from "../components/register/HondGegevens";
 import HondGegevens from "../components/inschrijving/HondGegevens";
-import {
+import client, {
   getFreeTimeSlots,
   getHondOptions,
   getRasOptions,
 } from "../middleware/MongoDb";
 import { ObjectId } from "mongodb";
 import { getDisabledDays } from "../middleware/Helper";
-import { generateCsrf } from "../handlers/validationHelper";
-import { securepage } from "../handlers/authenticationHandler";
+import { generateCsrf } from "../middleware/Validator";
+import { securepage } from "../middleware/Authenticator";
 
 type TrainingType = "prive" | "groep";
 
@@ -207,12 +207,13 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       redirect: { permanent: false, destination: LOGIN },
     };
   }
-
+  await client.connect();
   const honden = await getHondOptions(klant_id as ObjectId);
   const csrf = generateCsrf();
   const disabledDays = await getDisabledDays(type);
   const rassen = await getRasOptions();
   const timeslots = await getFreeTimeSlots();
+  await client.close();
 
   return {
     props: {

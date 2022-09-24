@@ -3,14 +3,18 @@ import {
   NextApiRequest,
   NextApiResponse,
 } from "next";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import nookies, { parseCookies, setCookie } from "nookies";
-import { badRequest, unauthorizedAccess } from "./ResponseHandler";
 import { ObjectId } from "mongodb";
-import { INSCHRIJVING, LOGIN } from "../types/linkTypes";
-import validationHelper from "./validationHelper";
+import { INSCHRIJVING } from "../types/linkTypes";
+import validationHelper from "./Validator";
 import base64 from "base-64";
-import { NotLoggedInError } from "../middleware/RequestError";
+import {
+  EmailNotVerifiedError,
+  NotLoggedInError,
+  UnauthorizedAccessError,
+} from "./RequestError";
+import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 
 interface AuthenticationHandlerInterface {
   createJWT: (res: NextApiResponse, klantData: any) => void;
@@ -20,14 +24,15 @@ interface AuthenticationHandlerInterface {
   securepage: (ctx: GetServerSidePropsContext) => Promise<ObjectId | void>;
   hash: (value: string | object, secret: string) => string;
   compare: (value: string, secret: string) => boolean;
+  createBearer: (klant: IsKlantCollection) => string;
 }
 
 const secret = process.env.JWT_SECRET;
 const cookieSecret = process.env.NEXT_PUBLIC_COOKIE_SECRET;
 
 const authenticationHandler: AuthenticationHandlerInterface = {
-  createJWT: (res, klantData) => {
-    const payload = { ...klantData, password: undefined };
+  createJWT: (res, { verified, honden, roles, _id }) => {
+    const payload = { verified, honden, roles, _id };
     const token = jwt.sign({ payload }, `${secret}`);
     setCookie({ res }, "JWT", token, {
       httpOnly: true,
@@ -52,17 +57,12 @@ const authenticationHandler: AuthenticationHandlerInterface = {
 
   secureApi: ({ req, res }) => {
     const cookies = parseCookies({ req });
-    const token = cookies.JWT;
-    if (!token) throw UnauthorizedAccessError(res);
-
+    const token = cookies.JWT ?? req.headers.authorization?.split(" ")[1];
+    if (!token) throw new NotLoggedInError();
     const verifiedToken = jwt.verify(token, `${secret}`, {
       algorithms: ["RS256", "HS256"],
     });
-    const {
-      payload: { verified },
-    } = JSON.parse(JSON.stringify(verifiedToken));
-    if (!verifiedToken) return unauthorizedAccess(res);
-    if (!verified) return badRequest(res, "Gelieve uw email te verifiëren");
+    if (!verifiedToken) throw new UnauthorizedAccessError();
   },
 
   redirectToLogin: (ctx) => {
@@ -108,6 +108,16 @@ const authenticationHandler: AuthenticationHandlerInterface = {
       return false;
     }
   },
+
+  createBearer: (klant) => {
+    const payload = {
+      honden: klant.honden,
+      roles: klant.roles,
+      _id: klant._id,
+    };
+    const token = jwt.sign({ payload }, `${secret}`);
+    return token;
+  },
 };
 
 export const {
@@ -118,7 +128,5 @@ export const {
   securepage,
   hash,
   compare,
+  createBearer,
 } = authenticationHandler;
-function UnauthorizedAccessError(res: NextApiResponse<any>) {
-  throw new Error("Function not implemented.");
-}

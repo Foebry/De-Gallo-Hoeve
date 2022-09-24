@@ -1,8 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { AnySchema } from "yup";
-import { nanoid } from "nanoid";
-import { compare, hash } from "./authenticationHandler";
-import { ValidationError } from "../middleware/RequestError";
+import { compare, hash } from "./Authenticator";
+import { InvalidCsrfError, ValidationError } from "./RequestError";
 
 interface OptionsInterface {
   schema: AnySchema;
@@ -28,7 +27,7 @@ const validationHelper: ValidationHelperInterface = {
   validate: async ({ req, res }, options) => {
     const { message, schema } = options;
     const payload = req.body;
-    const validationOptions = { abortEarly: false, stripUnknown: true };
+    const validationOptions = { abortEarly: false, stripUnknown: false };
     try {
       req.body = await schema.validate(payload, validationOptions);
     } catch (error: any) {
@@ -36,7 +35,7 @@ const validationHelper: ValidationHelperInterface = {
         const [key, value] = Object.entries(el)[0];
         return { ...prev, [key]: value };
       });
-      throw new ValidationError(res, { ...response, message });
+      throw new ValidationError(undefined, { ...response, message });
     }
   },
 
@@ -44,16 +43,17 @@ const validationHelper: ValidationHelperInterface = {
   csrf: undefined,
   salt: undefined,
 
-  validateCsrfToken: async ({ req, res }) => {
-    const secret = `${process.env.CSRF_SECRET}`;
+  validateCsrfToken: async ({ req }) => {
+    const secret = "DEF";
     if (!req.body.csrf || !compare(req.body.csrf, secret)) {
-      throw new ValidationError(res, { message: "Ongeldig formulier" });
+      throw new InvalidCsrfError();
     }
   },
 
   generateCsrf: () => {
-    const secret = `${process.env.CSRF_SECRET}`;
-    return hash(nanoid(20), secret);
+    // const secret = `${process.env.CSRF_SECRET}`;
+    const secret = "DEF";
+    return hash(Math.random().toString(32).substring(2), secret);
   },
 };
 

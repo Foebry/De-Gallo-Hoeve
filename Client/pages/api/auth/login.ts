@@ -1,29 +1,44 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import baseResponse from "../../../types/responseType";
-import { notAllowed } from "../../../handlers/ResponseHandler";
-import {
-  validate,
-  validateCsrfToken,
-} from "../../../handlers/validationHelper";
+import { validate, validateCsrfToken } from "../../../middleware/Validator";
 import { loginSchema } from "../../../types/schemas";
-import { onLoginSuccess } from "../../../handlers/loginHandler";
+import { getKlantByEmail } from "../../../controllers/KlantController";
+import bcrypt from "bcrypt";
+import {
+  InvalidEmailError,
+  InvalidPasswordError,
+  NotAllowedError,
+} from "../../../middleware/RequestError";
+import { createJWT, setClientCookie } from "../../../middleware/Authenticator";
+import client from "../../../middleware/MongoDb";
 
-interface Response extends baseResponse {}
-
-const handler = (req: NextApiRequest, res: NextApiResponse<Response>) => {
-  switch (req.method) {
-    case "POST":
-      return login(req, res);
-    default:
-      return notAllowed(res);
-  }
+const handler = (req: NextApiRequest, res: NextApiResponse) => {
+  if (req.method === "POST") return login(req, res);
+  else throw new NotAllowedError();
 };
 
 const login = async (req: NextApiRequest, res: NextApiResponse) => {
-  await validateCsrfToken({ req, res });
-  await validate({ req, res }, { schema: loginSchema });
+  try {
+    await client.connect();
+    await validateCsrfToken({ req, res });
+    await validate({ req, res }, { schema: loginSchema });
 
-  return onLoginSuccess({ req, res });
+    const { email, password } = req.body;
+
+    const klant = await getKlantByEmail(email.toLowerCase());
+    if (!klant) throw new InvalidEmailError();
+
+    const match = await bcrypt.compare(password, klant.password);
+    if (!match) throw new InvalidPasswordError();
+
+    createJWT(res, klant);
+    setClientCookie(res, klant);
+
+    await client.close();
+
+    return res.send({});
+  } catch (e: any) {
+    res.status(e.code).json(e.response);
+  }
 };
 
 export default handler;

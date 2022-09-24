@@ -1,189 +1,194 @@
-import { ClientSession, Collection, MongoClient, ObjectId } from "mongodb";
-import { getKlantCollection } from "./KlantController";
+import moment from "moment";
+import { ClientSession, Collection, ObjectId } from "mongodb";
 import {
-  getTrainingByNaam,
-  getTrainingCollection,
-  TrainingType,
-  updateTraining,
+  CASCADEFULL,
+  CASCADEKLANT,
+  CASCADETRAINING,
+} from "../middleware/Factory";
+import client, { startTransaction } from "../middleware/MongoDb";
+import {
+  HondNotFoundError,
+  InschrijvingKlantChangedError,
+  InschrijvingNotFoundError,
+  InternalServerError,
+  KlantNotFoundError,
+  TrainingNotFoundError,
+  TransactionError,
+} from "../middleware/RequestError";
+import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
+import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
+import { IsUpdateInschrijvingBody } from "../types/requestTypes";
+import { getKlantHond } from "./HondController";
+import {
+  addKlantInschrijving,
+  getKlantById,
+  removeKlantInschrijving,
+} from "./KlantController";
+import {
+  addTrainingInschrijving,
+  deleteInschrijving,
+  getTrainingByName,
 } from "./TrainingController";
 
-export interface NewInschrijving {
-  datum: Date;
-  training: TrainingType;
-  hond: {
-    id: ObjectId;
-    naam: string;
-  };
-  klant: {
-    id: ObjectId;
-    vnaam: string;
-    lnaam: string;
-  };
+export const INSCHRIJVING = "InschrijvingController";
+
+export interface IsInschrijvingController {
+  getInschrijvingCollection: () => Collection;
+  saveInschrijving: (
+    inschrijving: InschrijvingCollection,
+    session: ClientSession
+  ) => Promise<InschrijvingCollection>;
+  getAllInschrijvingen: () => Promise<InschrijvingCollection[]>;
+  getInschrijvingById: (
+    _id: ObjectId,
+    breakEarly?: boolean
+  ) => Promise<InschrijvingCollection>;
+  getInschrijvingenByFilter: (filter: any) => Promise<InschrijvingCollection[]>;
+  updateInschrijving: (
+    _id: ObjectId,
+    klant: IsKlantCollection,
+    inschrijving: IsUpdateInschrijvingBody
+  ) => Promise<InschrijvingCollection>;
+  deleteInschrijving: (_id: ObjectId, cascade: string) => Promise<void>;
+  deleteInschrijvingen: (
+    inschrijvingen: InschrijvingCollection[],
+    cascade: string
+  ) => Promise<void>;
+  deleteAll: () => Promise<void>;
 }
 
-export interface InschrijvingCollection extends NewInschrijving {
-  _id: ObjectId;
-  created_at: Date;
-}
+const InschrijvingController: IsInschrijvingController = {
+  getInschrijvingCollection: () => {
+    const database = process.env.MONGODB_DATABASE;
+    return client.db(database).collection("inschrijving");
+  },
+  saveInschrijving: async (inschrijving, session) => {
+    const klant_id = inschrijving.klant.id;
+    const training = inschrijving.training;
+    const { insertedId } = await getInschrijvingCollection().insertOne(
+      inschrijving,
+      { session }
+    );
+    if (!insertedId) throw new InternalServerError();
 
-interface UpdateInschrijving {
-  datum?: Date;
-  training?: TrainingType;
-  hond?: {
-    id: ObjectId;
-    naam: string;
-  };
-}
+    await addKlantInschrijving(klant_id, inschrijving, session);
+    await addTrainingInschrijving(training, inschrijving, session);
 
-export const getInschrijvingCollection = (client: MongoClient): Collection => {
-  return client.db("degallohoeve").collection("inschrijving");
-};
+    return getInschrijvingById(insertedId);
+  },
+  getAllInschrijvingen: async () => {
+    return (await getInschrijvingCollection()
+      .find()
+      .toArray()) as InschrijvingCollection[];
+  },
+  getInschrijvingById: async (_id, breakEarly = true) => {
+    const inschrijving = (await getInschrijvingCollection().findOne({
+      _id,
+    })) as InschrijvingCollection;
+    return inschrijving;
+  },
+  getInschrijvingenByFilter: async (filter) => {
+    return (await getInschrijvingCollection()
+      .find(filter)
+      .toArray()) as InschrijvingCollection[];
+  },
+  updateInschrijving: async (_id, klant, updateData) => {
+    const inschrijving = await getInschrijvingById(_id);
+    const collection = getInschrijvingCollection();
+    const hond = await getKlantHond(klant, new ObjectId(updateData.hond_id));
+    await getTrainingByName(updateData.training);
 
-export const createInschrijving = async (
-  client: MongoClient,
-  inschrijving: NewInschrijving,
-  session?: ClientSession
-): Promise<InschrijvingCollection> => {
-  const collection = getInschrijvingCollection(client);
-  const { insertedId } = await collection.insertOne(inschrijving);
+    if (inschrijving.klant.id.toString() !== updateData.klant_id)
+      throw new InschrijvingKlantChangedError();
 
-  const klantCollection = getKlantCollection(client);
-  await klantCollection.updateOne(
-    { _id: inschrijving.klant.id },
-    { $addToSet: { inschrijvingen: insertedId } },
-    { session }
-  );
+    const updateInschrijving = {
+      ...inschrijving,
+      datum: updateData.datum,
+      updated_at: moment().local().format(),
+      hond: {
+        id: hond._id,
+        naam: hond.naam,
+      },
+    };
+    const session = client.startSession();
+    const transactionOptions = startTransaction();
+    try {
+      await session.withTransaction(async () => {
+        const { upsertedCount } = await collection.updateOne(
+          { _id },
+          updateInschrijving
+        );
+        if (upsertedCount !== 1) throw new InternalServerError();
 
-  const trainingCollection = getTrainingCollection(client);
-  await trainingCollection.updateOne(
-    { naam: inschrijving.training },
-    { $addToSet: { inschrijvingen: insertedId } },
-    { session }
-  );
-
-  return getInschrijvingById(client, insertedId);
-};
-
-export const getInschrijvingen = async (
-  client: MongoClient
-): Promise<InschrijvingCollection[]> => {
-  const collection = getInschrijvingCollection(client);
-
-  return (await collection.find().toArray()) as InschrijvingCollection[];
-};
-
-export const getInschrijvingById = async (
-  client: MongoClient,
-  _id: ObjectId
-): Promise<InschrijvingCollection> => {
-  const collection = getInschrijvingCollection(client);
-
-  return (await collection.findOne({ _id })) as InschrijvingCollection;
-};
-
-export const getInschrijvingenByFilter = async (
-  client: MongoClient,
-  filter: any
-): Promise<InschrijvingCollection[]> => {
-  const collection = getInschrijvingCollection(client);
-
-  return (await collection.find(filter).toArray()) as InschrijvingCollection[];
-};
-
-export const updateInschrijving = async (
-  client: MongoClient,
-  _id: ObjectId,
-  data: UpdateInschrijving
-): Promise<InschrijvingCollection> => {
-  const collection = getInschrijvingCollection(client);
-  const { training } = await getInschrijvingById(client, _id);
-  const { upsertedId } = await collection.updateOne({ _id }, data);
-
-  if (data.training && data.training !== training) {
-    let filteredInschrijvingen: ObjectId[];
-    const priveTraining = await getTrainingByNaam(client, "prive");
-    const groepTraining = await getTrainingByNaam(client, "groep");
-
-    if (training === "groep") {
-      filteredInschrijvingen = groepTraining.inschrijvingen.filter(
-        (inschrijving) => inschrijving !== upsertedId
-      );
-      const updatedGroepTraining = {
-        ...groepTraining,
-        inschrijvingen: filteredInschrijvingen,
-      };
-      await updateTraining(client, groepTraining._id, updatedGroepTraining);
-
-      const updatedPriveTraining = {
-        ...priveTraining,
-        inschrijvingen: [...priveTraining.inschrijvingen, upsertedId],
-      };
-      await updateTraining(client, priveTraining._id, updatedPriveTraining);
-    } else if (training === "prive") {
-      filteredInschrijvingen = priveTraining.inschrijvingen.filter(
-        (inschrijving) => inschrijving !== upsertedId
-      );
-      const updatedPriveTraining = {
-        ...priveTraining,
-        inschrijvingen: filteredInschrijvingen,
-      };
-      await updateTraining(client, priveTraining._id, updatedPriveTraining);
-
-      const updatedGroepsTraining = {
-        ...groepTraining,
-        inschrijvingen: [...groepTraining.inschrijvingen, upsertedId],
-      };
-      await updateTraining(client, groepTraining._id, updatedGroepsTraining);
+        if (inschrijving.training !== updateData.training) {
+          deleteInschrijving(inschrijving.training, inschrijving._id);
+          addTrainingInschrijving(updateData.training, inschrijving);
+        }
+      }, transactionOptions);
+    } catch (e: any) {
+      // await session.abortTransaction();
+      throw new TransactionError(e.name, e.code, e.respose);
     }
-  }
 
-  return await getInschrijvingById(client, upsertedId);
+    return await getInschrijvingById(_id);
+  },
+  deleteInschrijving: async (_id, cascade = "full") => {
+    const inschrijving = await getInschrijvingById(_id);
+    const transactionOptions = startTransaction();
+    const session = client.startSession();
+
+    try {
+      await session.withTransaction(async () => {
+        const collection = getInschrijvingCollection();
+        const klant_id = inschrijving.klant.id;
+        const training = inschrijving.training;
+        const { deletedCount } = await collection.deleteOne({ _id });
+
+        if (deletedCount !== 1) throw new InternalServerError();
+
+        if ([CASCADEKLANT, CASCADEFULL].includes(cascade))
+          removeKlantInschrijving(klant_id, _id, session);
+        if ([CASCADETRAINING, CASCADEFULL].includes(cascade))
+          deleteInschrijving(training, _id, session);
+      }, transactionOptions);
+    } catch (e: any) {
+      // session.abortTransaction();
+      throw new TransactionError(e.name, e.code, e.response);
+    }
+  },
+  deleteInschrijvingen: async (inschrijvingen, cascade = CASCADEFULL) => {
+    const transactionOptions = startTransaction();
+    const session = client.startSession();
+
+    try {
+      await session.withTransaction(async () => {
+        await getInschrijvingCollection().deleteMany(inschrijvingen);
+        await Promise.all(
+          inschrijvingen.map(({ _id, training, klant: { id: klant_id } }) => {
+            if ([CASCADEKLANT, CASCADEFULL].includes(cascade))
+              removeKlantInschrijving(klant_id, _id, session);
+            if ([CASCADETRAINING, CASCADEFULL].includes(cascade))
+              deleteInschrijving(training, _id, session);
+          })
+        );
+      }, transactionOptions);
+    } catch (e: any) {
+      // session.abortTransaction();
+      throw new TransactionError(e.name, e.code, e.response);
+    }
+  },
+  deleteAll: async () => {
+    const ids = (await getInschrijvingCollection().find().toArray()).map(
+      (item) => item._id
+    );
+    await getInschrijvingCollection().deleteMany({ _id: { $in: [...ids] } });
+  },
 };
 
-export const deleteInschrijving = async (
-  client: MongoClient,
-  _id: ObjectId
-): Promise<void> => {
-  const collection = getInschrijvingCollection(client);
-  await collection.deleteOne({ _id });
-};
-
-export const deleteInschrijvingen = async (
-  client: MongoClient,
-  inschrijvingen: ObjectId[]
-): Promise<void> => {
-  const collection = getInschrijvingCollection(client);
-  await collection.deleteMany({ _id: { $in: inschrijvingen } });
-
-  const priveTraining = await getTrainingByNaam(client, "prive");
-  const groepsTraining = await getTrainingByNaam(client, "groep");
-  let updatedInschrijvingen: ObjectId[];
-
-  const inschrijvingenPriveTraining = priveTraining.inschrijvingen;
-  updatedInschrijvingen = inschrijvingenPriveTraining.filter(
-    (id) => !inschrijvingen.includes(id)
-  );
-  const updatedPriveTraining = {
-    ...priveTraining,
-    inschrijvingen: updatedInschrijvingen,
-  };
-  await updateTraining(
-    client,
-    priveTraining._id as ObjectId,
-    updatedPriveTraining
-  );
-
-  const inschrijvingenGroepsTraining = groepsTraining.inschrijvingen;
-  updatedInschrijvingen = inschrijvingenGroepsTraining.filter(
-    (id) => !inschrijvingen.includes(id)
-  );
-  const updatedGroepsTraining = {
-    ...groepsTraining,
-    inschrijvingen: updatedInschrijvingen,
-  };
-  await updateTraining(
-    client,
-    groepsTraining._id as ObjectId,
-    updatedGroepsTraining
-  );
-};
+export default InschrijvingController;
+export const {
+  getInschrijvingCollection,
+  getInschrijvingById,
+  deleteInschrijvingen,
+  saveInschrijving,
+} = InschrijvingController;

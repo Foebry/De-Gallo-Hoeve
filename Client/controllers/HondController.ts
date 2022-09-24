@@ -1,123 +1,92 @@
 import moment from "moment";
-import { ClientSession, MongoClient, ObjectId } from "mongodb";
+import { ObjectId } from "mongodb";
+import {
+  HondNotFoundError,
+  InternalServerError,
+  KlantNotFoundError,
+} from "../middleware/RequestError";
+import { HondCollection } from "../types/EntityTpes/HondTypes";
+import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 import {
   getAllKlanten,
   getKlantById,
   getKlantCollection,
-  UpdateKlant,
-  updateKlant,
 } from "./KlantController";
 
-export type Geslacht = "Teef" | "Reu";
-
-export interface HondCollection {
-  _id: ObjectId;
-  geslacht: Geslacht;
-  geboortedatum: Date;
-  naam: string;
-  ras: string;
-  created_at: Date;
+export interface IsHondController {
+  saveHondForKlant: (
+    klant_id: ObjectId,
+    hond: HondCollection
+  ) => Promise<HondCollection>;
+  getHondenByKlantId: (klant_id: ObjectId) => Promise<HondCollection[]>;
+  getAllHonden: () => Promise<HondCollection[]>;
+  getKlantHond: (
+    klant: IsKlantCollection,
+    hond_id: ObjectId
+  ) => Promise<HondCollection>;
+  update: (
+    klant: IsKlantCollection,
+    _id: ObjectId,
+    hondData: HondCollection
+  ) => Promise<HondCollection>;
+  delete: (klant: IsKlantCollection, _id: ObjectId) => Promise<void>;
 }
 
-interface NewHond {
-  geslacht: Geslacht;
-  geboortedatum: Date;
-  naam: string;
-  ras: string;
-}
+const HondController: IsHondController = {
+  saveHondForKlant: async (klant_id: ObjectId, hond: HondCollection) => {
+    await getKlantById(klant_id);
+    const { modifiedCount } = await getKlantCollection().updateOne(
+      { _id: klant_id },
+      { $addToSet: { honden: hond } }
+    );
+    if (modifiedCount !== 1) throw new InternalServerError();
 
-interface UpdateHond {
-  geslacht?: Geslacht;
-  geboortedatum?: Date;
-  naam?: string;
-  ras?: string;
-}
+    return hond;
+  },
+  getAllHonden: async () => {
+    const klanten = await getAllKlanten();
+    return klanten
+      .map((klant) => klant.honden)
+      .reduce((honden, hond) => [...honden, ...hond], []);
+  },
+  getHondenByKlantId: async (klant_id) => {
+    const klant = await getKlantById(klant_id);
+    if (!klant) throw new KlantNotFoundError();
+    return klant.honden;
+  },
+  getKlantHond: async (klant, _id) => {
+    const klantHond = klant.honden.find(
+      (hond) => hond._id.toString() === _id.toString()
+    );
+    if (!klantHond) throw new HondNotFoundError();
 
-export const createNewHondForKlant = async (
-  client: MongoClient,
-  klant_id: ObjectId,
-  hondData: NewHond
-): Promise<HondCollection> => {
-  const klant = await getKlantById(client, klant_id);
-  const newHond = {
-    ...hondData,
-    created_at: moment().local().format(),
-    _id: new ObjectId(),
-  };
+    return klantHond;
+  },
+  update: async (klant, _id, hondData) => {
+    const updateHond = {
+      ...hondData,
+      updated_at: moment().local().format(),
+    };
 
-  const updateKlantData = {
-    ...klant,
-    honden: [...klant.honden, newHond],
-  } as UpdateKlant;
-  const updatedKlant = await updateKlant(client, klant_id, updateKlantData);
+    const { upsertedCount } = await getKlantCollection().updateOne(
+      { _id: klant._id, honden: { $elemMatch: { _id } } },
+      { updateHond }
+    );
+    if (upsertedCount !== 1) throw new InternalServerError();
 
-  const lastHondIndex = updatedKlant.honden.length - 1;
-  const hond = updatedKlant.honden[lastHondIndex];
+    return updateHond;
+  },
+  delete: async (klant, _id) => {
+    const hond = await getKlantHond(klant, _id);
 
-  return hond;
+    const { modifiedCount } = await getKlantCollection().updateOne(
+      { _id: klant._id },
+      { $pull: { honden: hond } }
+    );
+    if (modifiedCount !== 1) throw new InternalServerError();
+  },
 };
 
-export const getHondenByKlantId = async (
-  client: MongoClient,
-  klant_id: ObjectId
-): Promise<HondCollection[]> => {
-  const klant = await getKlantById(client, klant_id);
-
-  return klant.honden;
-};
-
-export const getAllHonden = async (
-  client: MongoClient
-): Promise<HondCollection[]> => {
-  const klanten = await getAllKlanten(client);
-  const klantHonden = klanten.map((klant) => klant.honden);
-  const honden = klantHonden.reduce((prev, curr) => {
-    return [...prev, ...curr];
-  }, []);
-
-  return honden;
-};
-
-export const getSpecificHond = async (
-  client: MongoClient,
-  klant_id: ObjectId,
-  hond_id: ObjectId
-): Promise<HondCollection> => {
-  const { honden } = await getKlantById(client, klant_id);
-
-  return honden.filter((hond) => hond._id === hond_id)[0];
-};
-
-export const updateKlantHond = async (
-  client: MongoClient,
-  klant_id: ObjectId,
-  hond_id: ObjectId,
-  hondData: UpdateHond
-): Promise<HondCollection> => {
-  const klant = await getKlantById(client, klant_id);
-  const hond = klant.honden.filter((hond) => hond._id === hond_id)[0];
-
-  const filteredHonden = klant.honden.filter((hond) => hond._id !== hond_id);
-  const updateHond = { ...hond, ...hondData } as HondCollection;
-
-  const updatedHonden = [...filteredHonden, updateHond];
-  const updatedKlant = { ...klant, honden: updatedHonden };
-
-  await updateKlant(client, klant_id, updatedKlant);
-  const honden = await getHondenByKlantId(client, klant_id);
-
-  const updatedHond = honden.filter((hond) => hond._id === hond_id)[0];
-
-  return updatedHond;
-};
-
-export const removeHondFormKlant = async (
-  client: MongoClient,
-  klant_id: ObjectId,
-  hond_id: ObjectId
-): Promise<void> => {
-  const klant = await getKlantById(client, klant_id);
-  const updatedHonden = klant.honden.filter((hond) => hond._id !== hond_id);
-  const updatedKlant = { ...klant, honden: updatedHonden };
-  await updateKlant(client, klant_id, updatedKlant);
-};
+export default HondController;
+export const { getKlantHond, getHondenByKlantId } = HondController;
+export const HOND = "HondController";

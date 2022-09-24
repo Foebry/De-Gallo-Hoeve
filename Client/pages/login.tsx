@@ -12,7 +12,7 @@ import { LOGINAPI } from "../types/apiTypes";
 import { initializeLocalStorage } from "../helpers/localStorage";
 import { GetServerSidePropsContext } from "next";
 import nookies from "nookies";
-import validator, { generateCsrf } from "../handlers/validationHelper";
+import validator, { generateCsrf } from "../middleware/Validator";
 
 export interface LoginErrorInterface {
   email: string;
@@ -112,7 +112,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const csrf = generateCsrf();
 
   const cookies = nookies.get(ctx);
-  console.log({ cookies });
+
   return cookies.JWT
     ? { redirect: { permanent: false, destination: INDEX } }
     : { props: { redirect, csrf } };

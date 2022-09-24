@@ -1,71 +1,67 @@
-import moment from "moment";
-import { Collection, MongoClient, ObjectId } from "mongodb";
+import { Collection, ObjectId } from "mongodb";
+import client from "../middleware/MongoDb";
+import {
+  InternalServerError,
+  RasNotFoundError,
+} from "../middleware/RequestError";
+import { RasCollection, UpdateRas } from "../types/EntityTpes/RasTypes";
 
-interface NewRas {
-  naam: string;
-  soort: string;
-  avatar: string;
+export interface IsRasController {
+  getRasCollection: () => Collection;
+  save: (ras: RasCollection) => Promise<RasCollection>;
+  getAllRassen: () => Promise<RasCollection[]>;
+  getRasById: (_id: ObjectId, breakEarly?: boolean) => Promise<RasCollection>;
+  update: (_id: ObjectId, updateRas: UpdateRas) => Promise<RasCollection>;
+  delete: (ras: ObjectId) => Promise<void>;
+  deleteAll: () => Promise<void>;
+  getRandomRasNaam: () => Promise<string>;
 }
 
-export interface RasCollection extends NewRas {
-  _id: ObjectId;
-  created_at: Date;
-}
+const RasController: IsRasController = {
+  getRasCollection: () => {
+    const database = process.env.MONGODB_DATABASE;
+    return client.db(database).collection("ras");
+  },
+  save: async (ras) => {
+    const { insertedId } = await getRasCollection().insertOne(ras);
+    if (!insertedId) throw new InternalServerError();
 
-interface UpdateRas {
-  naam?: string;
-  soort: string;
-  avatar: string;
-}
-
-export const getRasCollection = (client: MongoClient): Collection => {
-  return client.db("degallohoeve").collection("ras");
+    return await getRasById(insertedId);
+  },
+  getRasById: async (_id, breakEarly = true) => {
+    const ras = await getRasCollection().findOne({ _id });
+    if (!ras && breakEarly) throw new RasNotFoundError();
+    return ras as RasCollection;
+  },
+  getAllRassen: async () => {
+    return (await getRasCollection().find().toArray()) as RasCollection[];
+  },
+  update: async (_id, updateRas) => {
+    await getRasById(_id);
+    const collection = getRasCollection();
+    const { upsertedCount } = await collection.updateOne({ _id }, updateRas);
+    if (upsertedCount !== 1) throw new InternalServerError();
+    return await getRasById(_id);
+  },
+  delete: async (_id) => {
+    const ras = await getRasById(_id);
+    const { deletedCount } = await getRasCollection().deleteOne(ras);
+    if (deletedCount !== 1) throw new InternalServerError();
+  },
+  deleteAll: async () => {
+    const ids = (await getRasCollection().find().toArray()).map(
+      (item) => item._id
+    );
+    await getRasCollection().deleteMany({ _id: { $in: [...ids] } });
+  },
+  getRandomRasNaam: async () => {
+    const rassen = await getAllRassen();
+    const random = Math.floor(Math.random() * rassen.length);
+    return rassen[random].naam;
+  },
 };
 
-export const CreateRas = async (
-  client: MongoClient,
-  data: NewRas
-): Promise<RasCollection> => {
-  const collection = getRasCollection(client);
-  const rasData = { ...data, created_at: moment().local().toString() };
-  const { insertedId } = await collection.insertOne(rasData);
-
-  return await getRasById(client, insertedId);
-};
-
-export const getAllRassen = async (
-  client: MongoClient
-): Promise<RasCollection[]> => {
-  const collection = getRasCollection(client);
-
-  return (await collection.find().toArray()) as RasCollection[];
-};
-
-export const getRasById = async (
-  client: MongoClient,
-  _id: ObjectId
-): Promise<RasCollection> => {
-  const collection = getRasCollection(client);
-
-  return (await collection.findOne({ _id })) as RasCollection;
-};
-
-export const updateRas = async (
-  client: MongoClient,
-  _id: string,
-  updateData: UpdateRas
-): Promise<RasCollection> => {
-  const collection = getRasCollection(client);
-  const { upsertedId } = await collection.updateOne({ _id }, updateData);
-
-  return await getRasById(client, upsertedId);
-};
-
-export const deleteRas = async (
-  client: MongoClient,
-  _id: ObjectId
-): Promise<void> => {
-  const collection = getRasCollection(client);
-
-  await collection.deleteOne({ _id });
-};
+export default RasController;
+export const RAS = "RasController";
+export const { getRasCollection, getRasById, getAllRassen, getRandomRasNaam } =
+  RasController;

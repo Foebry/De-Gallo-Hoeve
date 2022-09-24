@@ -1,7 +1,19 @@
-import { MongoClient, ObjectId } from "mongodb";
+import {
+  MongoClient,
+  ObjectId,
+  ReadPreference,
+  TransactionOptions,
+} from "mongodb";
 import { atob } from "buffer";
-import { getAllRassen } from "../controllers/rasController";
+import { getAllRassen, RAS } from "../controllers/rasController";
 import { getHondenByKlantId } from "../controllers/HondController";
+import { getConfirmCollection } from "../controllers/ConfirmController";
+import Factory from "./Factory";
+import { KLANT } from "../controllers/KlantController";
+import { CONFIRM } from "../types/EntityTpes/ConfirmTypes";
+import { CONTENT } from "../controllers/ContentController";
+import { INSCHRIJVING } from "../controllers/InschrijvingController";
+import { TRAINING } from "../controllers/TrainingController";
 
 interface Result {
   value: ObjectId;
@@ -22,6 +34,8 @@ interface MongoDbInterface {
   getHondOptions: (klant_id: ObjectId) => Promise<Option[]>;
   getCollections: (collections: string[]) => any;
   getFreeTimeSlots: () => Promise<any>;
+  startTransaction: () => TransactionOptions;
+  clearAllData: () => Promise<void>;
 }
 
 const MongoDb: MongoDbInterface = {
@@ -55,7 +69,8 @@ const MongoDb: MongoDbInterface = {
   },
 
   getRasOptions: async () => {
-    const rassen = await getAllRassen(client);
+    await client.connect();
+    const rassen = await getAllRassen();
     return rassen.map(({ _id: value, naam: label }) => ({
       value: value.toString(),
       label,
@@ -63,7 +78,7 @@ const MongoDb: MongoDbInterface = {
   },
 
   getHondOptions: async (klant_id) => {
-    const honden = await getHondenByKlantId(client, klant_id);
+    const honden = await getHondenByKlantId(klant_id);
     return honden.map(({ _id: value, naam: label }) => ({
       value: value?.toString(),
       label,
@@ -118,6 +133,34 @@ const MongoDb: MongoDbInterface = {
       default: all,
     };
   },
+  startTransaction: () => {
+    const transactionOptions = {
+      readPreference: ReadPreference.primary,
+      readConcern: { level: "local" },
+      writeConcern: { w: "majority" },
+    } as TransactionOptions;
+
+    return transactionOptions;
+  },
+  clearAllData: async () => {
+    if (process.env.NODE_ENV === "test") {
+      await process.nextTick(() => {});
+      await client.connect();
+      await process.nextTick(() => {});
+      await Factory.getController(CONFIRM).deleteAll();
+      await process.nextTick(() => {});
+      await Factory.getController(KLANT).deleteAll();
+      await process.nextTick(() => {});
+      await Factory.getController(CONTENT).deleteAll();
+      await process.nextTick(() => {});
+      await Factory.getController(INSCHRIJVING).deleteAll();
+      await process.nextTick(() => {});
+      await Factory.getController(RAS).deleteAll();
+      await process.nextTick(() => {});
+      await Factory.getController(TRAINING).deleteAll();
+      await client.close();
+    }
+  },
 };
 
 const client = new MongoClient(
@@ -130,4 +173,6 @@ export const {
   getHondOptions,
   getCollections,
   getFreeTimeSlots,
+  startTransaction,
+  clearAllData,
 } = MongoDb;
