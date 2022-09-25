@@ -1,5 +1,5 @@
 import moment from "moment";
-import { ClientSession, Collection, Db, MongoClient, ObjectId } from "mongodb";
+import { ClientSession, Collection, ObjectId } from "mongodb";
 import {
   deleteInschrijvingen,
   getInschrijvingById,

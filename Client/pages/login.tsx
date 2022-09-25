@@ -25,6 +25,7 @@ interface LoginPropsInterface {
 }
 
 const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
+  const [disabled, setDisabled] = useState<boolean>(false);
   const [formErrors, setFormErrors] = useState<LoginErrorInterface>({
     email: "",
     password: "",
@@ -35,11 +36,17 @@ const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
   const { control, handleSubmit } = useForm();
 
   const onSubmit = async (values: any) => {
-    const { data } = await login(LOGINAPI, { ...values, csrf });
+    let data;
+    if (!disabled) {
+      setDisabled(() => true);
+      const { data: response } = await login(LOGINAPI, { ...values, csrf });
+      data = response;
+    }
+
     if (data) {
-      initializeLocalStorage(data);
       redirect ? router.push(redirect) : router.back();
     }
+    setDisabled(() => false);
   };
 
   return (
@@ -90,7 +97,11 @@ const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
                   <Link to={REGISTER}>registreer</Link>
                 </span>
               </Body>
-              <SubmitButton label="login" onClick={handleSubmit(onSubmit)} />
+              <SubmitButton
+                label="login"
+                onClick={handleSubmit(onSubmit)}
+                disabled={disabled}
+              />
             </FormRow>
             <div className="text-center mt-20">
               <Body>Login met andere app</Body>

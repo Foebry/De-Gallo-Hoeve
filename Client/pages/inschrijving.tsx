@@ -66,6 +66,7 @@ const Groepslessen: React.FC<LessenProps> = ({
   const [activeStep, setActiveStep] = useState<number>(0);
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
+  const [disabled, setDisabled] = useState<boolean>(false);
 
   const router = useRouter();
   const { handleSubmit, control, getValues, register, setValue } = useForm();
@@ -93,16 +94,20 @@ const Groepslessen: React.FC<LessenProps> = ({
 
   const onSubmit = async (values: FieldValues) => {
     const payload = structureInschrijvingenPayload(values);
-    const { data, error } = await inschrijving(POST_INSCHRIJVING, {
-      ...payload,
-      csrf,
-      klant_id,
-      training: type,
-    });
-    if (error?.code === 401) router.push(LOGIN);
-    if (data) {
-      toast.success(data.message);
-      router.push(INDEX);
+    if (!disabled) {
+      setDisabled(() => true);
+      const { data, error } = await inschrijving(POST_INSCHRIJVING, {
+        ...payload,
+        csrf,
+        klant_id,
+        training: type,
+      });
+      if (error?.code === 401) router.push(LOGIN);
+      if (data) {
+        toast.success(data.message);
+        router.push(INDEX);
+      }
+      setDisabled(() => false);
     }
   };
 
