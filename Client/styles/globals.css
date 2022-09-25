@@ -59,12 +59,7 @@ header h1 {
     width: 50%;
   }
 }
-/* .inputActive:before {
-  height: 35px;
-  border-right: 2px solid #40909b;
-  transition: height 0.5s ease;
-  transition-delay: 0.5s;
-} */
+
 .formstep_bullet {
   content: "";
   width: 25px;
@@ -103,9 +98,6 @@ header h1 {
 .formstep.active .formstep_bullet {
   border-color: #40909b;
   background-color: #40909b;
-}
-.formstep.error {
-  color: red;
 }
 .images .image {
   width: 166%;

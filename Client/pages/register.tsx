@@ -12,7 +12,6 @@ import FormSteps from "../components/form/FormSteps";
 import { GetServerSidePropsContext } from "next";
 import nookies from "nookies";
 import { toast } from "react-toastify";
-import FormRow from "../components/form/FormRow";
 import Button, { SubmitButton } from "../components/buttons/Button";
 import { generateCsrf } from "../middleware/Validator";
 import { useAppContext } from "../context/appContext";
@@ -71,17 +70,23 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
     "postcode",
     "telefoon",
   ];
-  const step2 = ["naam", "ras_id", "gelacht", "chip_nr", "geboortedatum"];
+  const step2 = [
+    "naam",
+    "ras_id",
+    "gelacht",
+    "chip_nr",
+    "geboortedatum",
+    "honden",
+  ];
 
   const setErrors = (step: number) => {
-    setErrorSteps((prev) => [...prev, step]);
-    setActiveStep(Math.min(...errorSteps));
+    setErrorSteps([...errorSteps, step]);
+    if (activeStep > step) setActiveStep(step);
   };
   const handleErrors = (error: any) => {
     if (Object.keys(error).some((r) => step1.indexOf(r) >= 0)) setErrors(0);
     else if (Object.keys(error).some((r) => step2.indexOf(r) >= 1))
       setErrors(1);
-    else if (Object.keys(error).includes("honden")) setErrors(2);
   };
 
   const validatePassword = (
@@ -126,6 +131,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
         toast.success(data.message);
         router.push(LOGIN);
       }
+      if (error) handleErrors(error);
       setDisabled(() => false);
     }
   };
@@ -142,7 +148,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
       <div className="max-w-7xl mx-auto">
         <FormSteps
           activeStep={activeStep}
-          errorSteps={[]}
+          errorSteps={errorSteps}
           setActiveStep={setActiveStep}
           steps={["Persoonlijke gegevens", "Honden gegevens"]}
         />
@@ -178,7 +184,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
             ) : null}
           </div>
         </Form>
-        {activeStep > 0 && (
+        {activeStep === 1 && (
           <div className="absolute left-10 top-20">
             <Button
               label="vorige"

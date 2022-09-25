@@ -1,4 +1,9 @@
-import React, { ButtonHTMLAttributes } from "react";
+import React, {
+  ButtonHTMLAttributes,
+  FormEvent,
+  useEffect,
+  useState,
+} from "react";
 import {
   Control,
   Controller,
@@ -11,7 +16,7 @@ import FormInput from "../form/FormInput";
 import Select, { OptionsOrGroups } from "react-select";
 import { optionInterface } from "../register/HondGegevens";
 import { geslachten } from "./HondCard";
-import { Body } from "../Typography/Typography";
+import { Body, FormError } from "../Typography/Typography";
 import { RiDeleteBin6Line } from "react-icons/ri";
 
 type TrainingType = "prive" | "groep";
@@ -28,6 +33,8 @@ interface DayCardProps {
   handleDelete: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   error?: boolean;
   timeslots: any;
+  errors: any;
+  setErrors: any;
 }
 
 const DayCard: React.FC<DayCardProps> = ({
@@ -38,15 +45,37 @@ const DayCard: React.FC<DayCardProps> = ({
   register,
   honden,
   type,
+  errors,
+  setErrors,
   handleDelete,
   error = false,
   timeslots,
 }) => {
+  const [errorState, setErrorState] = useState<boolean>(false);
+  useEffect(() => {
+    const hond =
+      errors[`inschrijvingen[${index}][hond]`] &&
+      errors[`inschrijvingen[${index}][hond]`] !== null;
+    const timeslot =
+      errors[`inschrijvingen[${index}][timeslot]`] &&
+      errors[`inschrijvingen[${index}][timeslot]`] !== null;
+    if (hond || timeslot) {
+      setErrorState(true);
+    }
+  }, [errors]);
+
+  const handleChange = (index: number, key: string) => {
+    setErrors({ ...errors, [`inschrijvingen[${index}][${key}]`]: undefined });
+  };
   return (
-    <div className="4xs:flex border-2 rounded justify-between 4xs:pr-5 max-w-lg mx-auto mb-2 relative items-center">
+    <div
+      className={`4xs:flex border-2  ${
+        errorState && "border-red-800"
+      } rounded justify-between 4xs:pr-5 max-w-lg mx-auto mb-2 relative items-center`}
+    >
       <div
         className={`border-r-2 rounded-l p-10 flex flex-col gap-1 items-center ${
-          error ? "bg-red-900" : "bg-green-200"
+          errorState ? "bg-red-800" : "bg-green-200"
         }`}
       >
         <input
@@ -65,29 +94,55 @@ const DayCard: React.FC<DayCardProps> = ({
       </div>
       <div className="py-2 my-auto w-full pl-5">
         {honden && honden.length > 0 ? (
-          <div className="flex flex-col gap-2">
-            <Controller
-              control={control}
-              name={`inschrijvingen[${index}].hond_id`}
-              render={({ field: { value, onChange } }) => (
-                <Select
-                  options={honden}
-                  value={value ?? { label: "Selecteer hond", key: 0 }}
-                  onChange={onChange}
+          <div className="flex flex-col gap-4">
+            <div className="relative">
+              <>
+                <Controller
+                  control={control}
+                  name={`inschrijvingen[${index}].hond_id`}
+                  render={({ field: { value, onChange } }) => (
+                    <Select
+                      options={honden}
+                      value={value ?? { label: "Selecteer hond", key: 0 }}
+                      onChange={(e) => {
+                        handleChange(index, "hond");
+                        onChange(e);
+                      }}
+                      // onChange={(e) => {
+                      //   setErrors({
+                      //     ...errors,
+                      //     [`inschrijvingen[${index}][hond]`]: undefined,
+                      //   });
+                      //   onChange(e);
+                      // }}
+                    />
+                  )}
                 />
-              )}
-            />
-            <Controller
-              control={control}
-              name={`inschrijvingen[${index}].tijdslot`}
-              render={({ field: { value, onChange } }) => (
-                <Select
-                  options={timeslots}
-                  value={value ?? { label: "Selecteer tijdstip", key: 0 }}
-                  onChange={onChange}
-                />
-              )}
-            />
+                {console.log({ "errors in dayCard": errors })}
+                <FormError>
+                  {errors[`inschrijvingen[${index}][hond]`]}
+                </FormError>
+              </>
+            </div>
+            <div className="relative">
+              <Controller
+                control={control}
+                name={`inschrijvingen[${index}].tijdslot`}
+                render={({ field: { value, onChange } }) => (
+                  <Select
+                    options={timeslots}
+                    value={value ?? { label: "Selecteer tijdstip", key: 0 }}
+                    onChange={(e) => {
+                      handleChange(index, "timeslot");
+                      onChange(e);
+                    }}
+                  />
+                )}
+              />
+              <FormError>
+                {errors[`inschrijvingen[${index}][timeslot]`]}
+              </FormError>
+            </div>
           </div>
         ) : (
           <>

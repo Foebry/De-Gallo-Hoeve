@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Controller, FieldValues, useForm } from "react-hook-form";
 import useMutation, {
   structureInschrijvingenPayload,
@@ -9,9 +9,6 @@ import { POST_INSCHRIJVING } from "../types/apiTypes";
 import { INDEX, LOGIN } from "../types/linkTypes";
 import FormSteps from "../components/form/FormSteps";
 import Form from "../components/form/Form";
-import { Body } from "../components/Typography/Typography";
-import Link from "next/link";
-import FormRow from "../components/form/FormRow";
 import Button, { SubmitButton } from "../components/buttons/Button";
 import { DatePicker } from "react-trip-date";
 import Contactgegevens from "../components/inschrijving/Contactgegevens";
@@ -102,16 +99,22 @@ const Groepslessen: React.FC<LessenProps> = ({
   };
 
   const onSubmit = async (values: FieldValues) => {
-    const payload = structureInschrijvingenPayload(values);
+    const [payload, newErrors] = structureInschrijvingenPayload(values);
     if (!disabled) {
       setDisabled(() => true);
+      if (Object.keys(newErrors).length > 0) {
+        setDisabled(false);
+        return setErrors(newErrors);
+      }
       const { data, error } = await inschrijving(POST_INSCHRIJVING, {
         ...payload,
         csrf,
         klant_id,
         training: type,
       });
-      if (error?.code === 401) router.push(LOGIN);
+      if (error) {
+        if (error.code === 401) router.push(LOGIN);
+      }
       if (data) {
         toast.success(data.message);
         router.push(INDEX);

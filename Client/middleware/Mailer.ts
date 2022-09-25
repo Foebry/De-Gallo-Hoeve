@@ -7,7 +7,6 @@ const send = (msg: any) => {
   // using Twilio SendGrid's v3 Node.js Library
   // https://github.com/sendgrid/sendgrid-nodejs
   const sgMail = require("@sendgrid/mail");
-  console.log(process.env.SENDGRID_API_KEY);
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   sgMail
     .send(msg)
