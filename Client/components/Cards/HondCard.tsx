@@ -42,7 +42,6 @@ const HondCard: React.FC<HondCardProps> = ({
   remove,
 }) => {
   const [open, setOpen] = useState<boolean>(true);
-  console.log({ rassen });
   return (
     <>
       {open ? (

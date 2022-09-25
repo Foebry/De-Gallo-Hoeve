@@ -12,7 +12,7 @@ import { LOGINAPI } from "../types/apiTypes";
 import { initializeLocalStorage } from "../helpers/localStorage";
 import { GetServerSidePropsContext } from "next";
 import nookies from "nookies";
-import validator, { generateCsrf } from "../middleware/Validator";
+import validator, { generateCsrf } from "../handlers/validationHelper";
 
 export interface LoginErrorInterface {
   email: string;
@@ -44,9 +44,9 @@ const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
 
   return (
     <section>
-      <div className="max-w-lg mx-auto mt-30 mb-48 border-2 rounded">
+      <div className="max-w-xl mx-auto mt-30 mb-48 border-2 rounded">
         <Form onSubmit={handleSubmit(onSubmit)} className="mb-5">
-          <div className="p-10">
+          <div className="px-20 py-10">
             <div className="text-center mb-10">
               <Body>Login met email en wachtwoord</Body>
             </div>
@@ -112,7 +112,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const csrf = generateCsrf();
 
   const cookies = nookies.get(ctx);
-
+  console.log({ cookies });
   return cookies.JWT
     ? { redirect: { permanent: false, destination: INDEX } }
     : { props: { redirect, csrf } };

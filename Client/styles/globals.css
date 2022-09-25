@@ -33,6 +33,7 @@ header h1 {
 .formInput:after {
   display: block;
   position: absolute;
+  height: 1px;
   content: "";
   border-bottom: 2px solid #40909b;
   bottom: 0;
@@ -42,29 +43,9 @@ header h1 {
 
 .inputActive:before,
 .inputActive:after {
-  -webkit-animation: testing 0.5s ease;
-  animation-fill-mode: forwards;
+  width: 50%;
+  transition: all 0.5s ease;
 }
-.inputActive:after {
-  border-left: 2px solid #40909b;
-}
-.inputActive::before {
-  border-right: 2px solid #40909b;
-}
-@keyframes testing {
-  0% {
-    width: 0;
-  }
-  100% {
-    width: 50%;
-  }
-}
-/* .inputActive:before {
-  height: 35px;
-  border-right: 2px solid #40909b;
-  transition: height 0.5s ease;
-  transition-delay: 0.5s;
-} */
 .formstep_bullet {
   content: "";
   width: 25px;

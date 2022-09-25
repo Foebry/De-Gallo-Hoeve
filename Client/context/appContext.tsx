@@ -1,58 +1,32 @@
 import React, {
   createContext,
   Dispatch,
+  ReactNode,
   SetStateAction,
-  useContext,
   useState,
 } from "react";
-import { OptionsOrGroups } from "react-select";
-import { optionInterface } from "../components/register/HondGegevens";
-import getData from "../hooks/useApi";
-import { RASSEN } from "../types/apiTypes";
 
-type appContextType = {
-  rassen: OptionsOrGroups<any, optionInterface>[];
-  retrieveRassen: () => Promise<OptionsOrGroups<any, optionInterface>[]>;
-  setRassen: Dispatch<SetStateAction<OptionsOrGroups<any, optionInterface>[]>>;
-};
-
-const appContextDefaultValues: appContextType = {
-  retrieveRassen: async () => {
-    const { data } = await getData(RASSEN);
-    return data.rassen;
-  },
-  rassen: [],
-  setRassen: () => {},
-};
-
-export const AppContext = createContext<AppContextInterface>(
-  appContextDefaultValues
-);
+export const AppContext = createContext<AppContextInterface | null>(null);
 
 export interface AppContextInterface {
-  rassen: OptionsOrGroups<any, optionInterface>[];
-  retrieveRassen: () => Promise<OptionsOrGroups<any, optionInterface>[]>;
-  setRassen: Dispatch<SetStateAction<OptionsOrGroups<any, optionInterface>[]>>;
+  children?: ReactNode;
+  requiresUpdate: boolean;
+  setRequiresUpdate: Dispatch<SetStateAction<boolean>>;
+  klantId: number | undefined;
+  setKlantId: Dispatch<SetStateAction<number | undefined>>;
 }
 
 const AppProvider: React.FC<{ children: any }> = ({ children }) => {
-  const [rassen, setRassen] = useState<OptionsOrGroups<any, optionInterface>[]>(
-    []
-  );
-  const retrieveRassen = async () => {
-    console.log({ rassenProvider: rassen });
-    if (rassen.length > 0) return rassen;
-    const { data } = await getData(RASSEN);
-    setRassen(data.rassen);
-    return data.rassen;
-  };
+  const [requiresUpdate, setRequiresUpdate] = useState<boolean>(false);
+  const [klantId, setKlantId] = useState<number>();
 
   return (
     <AppContext.Provider
       value={{
-        rassen,
-        retrieveRassen,
-        setRassen,
+        requiresUpdate,
+        setRequiresUpdate,
+        klantId,
+        setKlantId,
       }}
     >
       {children}
@@ -61,5 +35,3 @@ const AppProvider: React.FC<{ children: any }> = ({ children }) => {
 };
 
 export default AppProvider;
-
-export const useAppContext = () => useContext(AppContext);

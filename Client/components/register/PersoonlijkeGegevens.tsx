@@ -193,7 +193,6 @@ const PersoonlijkeGegevens: React.FC<Step1Props> = ({
               onChange={onChange}
               errors={errors}
               setErrors={setErrors}
-              info="1 cijfer, hoofdletter en speciaal teken vereist"
             />
           )}
         />

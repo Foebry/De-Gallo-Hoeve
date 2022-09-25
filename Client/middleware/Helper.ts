@@ -1,7 +1,13 @@
+import { NextApiRequest, NextApiResponse } from "next";
+import client, { findOneBy } from "./MongoDb";
+import {
+  badRequest,
+  internalServerError,
+  notFound,
+} from "../handlers/ResponseHandler";
+
 interface HelperInterface {
   getDisabledDays: (training: string) => Promise<string[]>;
-  capitalize: (string: string) => string;
-  createRandomConfirmCode: () => string;
 }
 
 const helper: HelperInterface = {
@@ -28,16 +34,6 @@ const helper: HelperInterface = {
       if (newDate.getTime() > enddate.getTime()) return disabledDays;
     }
   },
-  capitalize: (string) => {
-    const words = string.split(" ");
-    return words
-      .map(
-        (word) =>
-          word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase()
-      )
-      .join(" ");
-  },
-  createRandomConfirmCode: () => Math.random().toString(36).substring(2),
 };
 
-export const { getDisabledDays, capitalize, createRandomConfirmCode } = helper;
+export const { getDisabledDays } = helper;

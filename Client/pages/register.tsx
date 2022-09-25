@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import Form from "../components/form/Form";
 import { useRouter } from "next/router";
 import { INDEX, LOGIN } from "../types/linkTypes";
@@ -14,8 +14,8 @@ import nookies from "nookies";
 import { toast } from "react-toastify";
 import FormRow from "../components/form/FormRow";
 import Button, { SubmitButton } from "../components/buttons/Button";
-import { generateCsrf } from "../middleware/Validator";
-import { useAppContext } from "../context/appContext";
+import { getRasOptions } from "../middleware/MongoDb";
+import { generateCsrf } from "../handlers/validationHelper";
 
 export interface RegisterHondErrorInterface {
   naam?: string;
@@ -41,11 +41,11 @@ export interface RegisterErrorInterface {
 }
 
 interface RegisterProps {
+  rassen: OptionsOrGroups<any, optionInterface>[];
   csrf: string;
 }
 
-const Register: React.FC<RegisterProps> = ({ csrf }) => {
-  const { retrieveRassen } = useAppContext();
+const Register: React.FC<RegisterProps> = ({ rassen, csrf }) => {
   const [formErrors, setFormErrors] = useState<RegisterErrorInterface>({});
   const router = useRouter();
   const register = useMutation(formErrors, setFormErrors);
@@ -56,9 +56,6 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
   });
   const [activeStep, setActiveStep] = useState<number>(0);
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
-  const [rassen, setRassen] = useState<OptionsOrGroups<any, optionInterface>[]>(
-    []
-  );
   const step1 = [
     "vnaam",
     "lnaam",
@@ -99,13 +96,6 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
       router.push(LOGIN);
     }
   };
-
-  useEffect(() => {
-    (async () => {
-      const data = await retrieveRassen!();
-      setRassen(data);
-    })();
-  }, []);
 
   return (
     <section className="mb-48 md:px-5 mt-20">
@@ -171,8 +161,9 @@ export default Register;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const csrf = generateCsrf();
+  const rassen = await getRasOptions();
 
   return nookies.get(ctx).JWT
     ? { redirect: { permanent: false, destination: INDEX } }
-    : { props: { csrf } };
+    : { props: { rassen, csrf } };
 };
