@@ -1,10 +1,4 @@
-import {
-  Title1,
-  Title2,
-  Title3,
-  FootNote,
-  Body,
-} from "./Typography/Typography";
+import { Title1, Body } from "./Typography/Typography";
 import {
   IoLogoFacebook,
   IoLogoInstagram,
@@ -15,9 +9,42 @@ import Form from "./form/Form";
 import FormInput from "./form/FormInput";
 import { Controller, useForm } from "react-hook-form";
 import Link from "next/link";
+import { toast } from "react-toastify";
+import { useState } from "react";
+import useMutation from "../hooks/useMutation";
+import { CONTACTAPI } from "../types/apiTypes";
+import { FormTextBox } from "./form/FormTextBox";
 
-const Footer = () => {
-  const { control, handleSubmit } = useForm();
+interface Props {}
+
+export interface ContactErrorInterface {
+  naam?: string;
+  email?: string;
+  bericht?: string;
+}
+
+const Footer: React.FC<Props> = ({}) => {
+  const { control, handleSubmit, setValue } = useForm();
+
+  const [disabled, setDisabled] = useState<boolean>(false);
+  const [formErrors, setFormErrors] = useState<ContactErrorInterface>({});
+
+  const contact = useMutation(formErrors, setFormErrors);
+
+  const onSubmit = async (values: any) => {
+    const payload = values;
+    if (!disabled) {
+      setDisabled(() => true);
+      const { data, error } = await contact(CONTACTAPI, { ...payload });
+      if (data) {
+        toast.success(data.message);
+        setValue("naam", "");
+        setValue("email", "");
+        setValue("bericht", "");
+      }
+      setDisabled(() => false);
+    }
+  };
 
   return (
     <footer className="mx-auto relative">
@@ -27,18 +54,18 @@ const Footer = () => {
           <div>
             <Body className="flex gap-2 items-center">
               <IoMdPhonePortrait className="text-green-200 text-2xl" />
-              <a href="tel:+32000000000">+32000000000</a>
+              <a href="tel:+32472381346">+324 72 38 13 46</a>
             </Body>
             <Body className="flex gap-2 items-center">
               <IoMdMail className="text-green-200 text-2xl" />
               <Link href="mailto:info@degallohoeve.be">
-                info@degalohoeve.be
+                info@degallohoeve.be
               </Link>
             </Body>
-            <Body className="flex gap-2 items-center">
+            {/* <Body className="flex gap-2 items-center">
               <IoLogoFacebook className="text-green-200 text-2xl" />
               Facebook
-            </Body>
+            </Body> */}
             <Body className="flex gap-2 items-center">
               <IoLogoInstagram className="text-green-200 text-2xl" />
               <a
@@ -51,8 +78,8 @@ const Footer = () => {
             </Body>
           </div>
           <div className="border-2 rounded">
-            <Form onSubmit={() => {}} action="verzend">
-              <div className="4xs:px-20">
+            <Form onSubmit={handleSubmit(onSubmit)} action="verzend">
+              <div className="4xs:px-10 py-10 md:min-w-s">
                 <Controller
                   name="naam"
                   control={control}
@@ -63,6 +90,8 @@ const Footer = () => {
                       id="naam"
                       value={value}
                       onChange={onChange}
+                      errors={formErrors}
+                      setErrors={setFormErrors}
                     />
                   )}
                 />
@@ -76,10 +105,12 @@ const Footer = () => {
                       id="email"
                       value={value}
                       onChange={onChange}
+                      errors={formErrors}
+                      setErrors={setFormErrors}
                     />
                   )}
                 />
-                <Controller
+                {/* <Controller
                   name="telefoon"
                   control={control}
                   render={({ field: { value, onChange } }) => (
@@ -91,17 +122,19 @@ const Footer = () => {
                       onChange={onChange}
                     />
                   )}
-                />
+                /> */}
                 <Controller
                   name="bericht"
                   control={control}
                   render={({ field: { value, onChange } }) => (
-                    <FormInput
+                    <FormTextBox
                       label="bericht"
                       name="bericht"
                       id="bericht"
                       value={value}
                       onChange={onChange}
+                      errors={formErrors}
+                      setErrors={setFormErrors}
                     />
                   )}
                 />

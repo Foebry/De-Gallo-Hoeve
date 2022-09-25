@@ -1,48 +1,36 @@
-import React, { FormEventHandler, useMemo, useState } from "react";
-import { useRef } from "react";
+import React, { Dispatch, SetStateAction, useRef, useState } from "react";
 import useFormInputEffect from "../../hooks/layout/useFormInputEffect";
-import { Body, FormError } from "../Typography/Typography";
-import { BsInfoCircle } from "react-icons/bs";
+import { ContactErrorInterface } from "../Footer";
+import TextAreaAutoSize from "react-textarea-autosize";
 
-export interface FormInputProps {
+export interface FormTextBoxProps {
   label: string;
   name: string;
   id: string;
-  type?: string;
-  placeholder?: string;
   value: string;
-  extra?: string;
-  onChange: any;
-  onBlur?: (e: any) => void;
-  errors?: any;
-  dataid?: string;
-  setErrors?: any;
-  onClick?: (e: React.FormEvent<HTMLInputElement>) => void;
+  onChange: (e: React.FormEvent<HTMLTextAreaElement>) => void;
+  errors: ContactErrorInterface;
+  setErrors: Dispatch<SetStateAction<ContactErrorInterface>>;
 }
 
-const FormInput: React.FC<FormInputProps> = ({
+export const FormTextBox: React.FC<FormTextBoxProps> = ({
   label,
   name,
   id,
-  type = "text",
-  placeholder,
   value,
   onChange,
   errors,
-  extra = "",
-  dataid = "",
   setErrors,
 }) => {
   const labelRef = useRef<HTMLLabelElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [hasFocus, setHasFocus] = useState(false);
+  const [hasFocus, setHasFocus] = useState<boolean>(false);
   const fieldName = name;
 
   useFormInputEffect({ labelRef, inputRef, value, hasFocus });
-
   return (
     <div
-      className={`mb-12 relative ${extra} formInput`}
+      className={`mb-12 relative formInput`}
       ref={inputRef}
       onFocus={() => setHasFocus(true)}
       onBlur={() => setHasFocus(false)}
@@ -54,23 +42,17 @@ const FormInput: React.FC<FormInputProps> = ({
       >
         {label}
       </label>
-      <input
+      <TextAreaAutoSize
         className="block w-full text-xl outline-none border-b-[1px] border-b-grey-500 py-1 px-2.5 text-black-100"
-        type={type}
         id={id}
         name={name}
-        placeholder={placeholder}
         onChange={(e) => {
           setErrors?.(() => ({ ...errors, [fieldName]: undefined }));
           onChange(e);
         }}
         value={value}
         autoComplete="off"
-        data-id={`${dataid}`}
-      />
-      <FormError>{errors?.[fieldName]}</FormError>
+      ></TextAreaAutoSize>
     </div>
   );
 };
-
-export default FormInput;

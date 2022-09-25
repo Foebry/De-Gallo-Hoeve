@@ -82,7 +82,7 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
     } catch (e: any) {
       throw new TransactionError(e.name, e.code, e.response);
     }
-    if (process.env.NODE_ENV === "production") {
+    if (process.env.NODE_ENV !== "test") {
       mailer.sendMail("inschrijving", data);
     }
 
