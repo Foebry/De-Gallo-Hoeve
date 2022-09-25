@@ -43,7 +43,7 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
           confirm
         );
 
-        if (process.env.NODE_ENV === "production") {
+        if (process.env.NODE_ENV !== "test") {
           mailer.sendMail("register", {
             email: savedKlant.email,
             vnaam: savedKlant.vnaam,

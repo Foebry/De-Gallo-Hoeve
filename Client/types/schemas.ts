@@ -115,12 +115,23 @@ const boeking = object({
   ).required({ details: "Gelieve minstens 1 hond op te geven" }),
 });
 
+const contact = object({
+  naam: string().required({ naam: "verplicht" }),
+  email: string()
+    .email({ email: "Ongeldige email" })
+    .required({ email: "verplicht" }),
+  bericht: string()
+    .required({ bericht: "verplicht" })
+    .min(5, { bericht: "Bericht te kort" }),
+});
+
 const schemas = {
   login,
   register,
   inschrijving,
   boeking,
   anoniemeInschrijving,
+  contact,
 };
 
 export const {
@@ -129,4 +140,5 @@ export const {
   inschrijving: inschrijvingSchema,
   anoniemeInschrijving: anoniemeInschrijvingSchema,
   boeking: boekingSchema,
+  contact: contactSchema,
 } = schemas;

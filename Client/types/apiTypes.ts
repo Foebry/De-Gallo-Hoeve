@@ -8,6 +8,7 @@ const ApiTypes = {
   GET_FUTURE_INSCHRIJVINGS: "/api/inschrijvingen",
   POST_INSCHRIJVING: "/api/inschrijvingen",
   TRANSFER: "/api/transfer",
+  CONTACTAPI: "/api/contact",
 };
 
 export const {
@@ -20,4 +21,5 @@ export const {
   GET_FUTURE_INSCHRIJVINGS,
   POST_INSCHRIJVING,
   TRANSFER,
+  CONTACTAPI,
 } = ApiTypes;
