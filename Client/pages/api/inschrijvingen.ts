@@ -57,7 +57,7 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       await session.withTransaction(async () => {
         await Promise.all(
-          inschrijvingen.map(async (inschrijving) => {
+          inschrijvingen.map(async (inschrijving, index) => {
             const hond = await getKlantHond(
               klant,
               new ObjectId(inschrijving.hond_id)
@@ -65,7 +65,10 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
             if (!hond) throw new HondNotFoundError();
 
             if (await klantReedsIngeschreven(klant, training, inschrijving))
-              throw new ReedsIngeschrevenError();
+              throw new ReedsIngeschrevenError({
+                [`inschrijvingen[${index}][timeslot]`]:
+                  "U bent reeds ingeschreven voor deze training",
+              });
             if (await trainingVolzet(training, inschrijving.datum))
               throw new TrainingVolzetError("Dit tijdstip is niet meer vrij");
 

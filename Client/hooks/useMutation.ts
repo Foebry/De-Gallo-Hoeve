@@ -61,16 +61,36 @@ export const structureHondenPayload = (payload: any) => {
 };
 
 export const structureInschrijvingenPayload = (payload: any) => {
+  let errors = {};
   const inschrijvingen = payload?.inschrijvingen ?? [];
-  const new_inschrijvingen = inschrijvingen.map((inschrijving: any) => ({
-    ...inschrijving,
-    hond_id: inschrijving.hond_id.value,
-    hond_naam: inschrijving.hond_id.label,
-    datum: moment
-      .utc([inschrijving.datum, inschrijving.tijdslot.value].join(" "))
-      .local(),
-  }));
-  return { ...payload, inschrijvingen: new_inschrijvingen };
+  const new_inschrijvingen = inschrijvingen.map(
+    (inschrijving: any, index: number) => {
+      if (inschrijving.hond_id === undefined)
+        errors = {
+          ...errors,
+          [`inschrijvingen[${index}][hond]`]: "Gelieve een hond aan te duiden",
+        };
+      if (!inschrijving.tijdslot)
+        errors = {
+          ...errors,
+          [`inschrijvingen[${index}][timeslot]`]:
+            "Gelieve een tijdstip aan te duiden",
+        };
+
+      if (inschrijving.hond_id && inschrijving.tijdslot && inschrijving.datum) {
+        return {
+          ...inschrijving,
+          hond_id: inschrijving.hond_id.value,
+          hond_naam: inschrijving.hond_id.label,
+          datum: moment
+            .utc([inschrijving.datum, inschrijving.tijdslot.value].join(" "))
+            .local(),
+        };
+      }
+      return {};
+    }
+  );
+  return [{ ...payload, inschrijvingen: new_inschrijvingen }, errors];
 };
 
 export const structureDetailsPayload = (payload: any) => {
