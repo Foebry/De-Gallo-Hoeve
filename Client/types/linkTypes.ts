@@ -9,7 +9,21 @@ const linkTypes = {
   INSCHRIJVING: "/inschrijving",
   INSCHRIJVING_GROEP: "/inschrijving/groepslessen",
   INSCHRIJVING_PRIVE: "/inschrijving/privelessen",
-  
-}
+  ADMIN: "/admin",
+  PERSONAL: "/persoonlijke-pagina",
+};
 
-export const {INDEX, HOTEL, TRAINING, CONTACT, LOGIN, REGISTER, RESERVATIE, INSCHRIJVING, INSCHRIJVING_GROEP, INSCHRIJVING_PRIVE} = linkTypes;
+export const {
+  INDEX,
+  HOTEL,
+  TRAINING,
+  CONTACT,
+  LOGIN,
+  REGISTER,
+  RESERVATIE,
+  INSCHRIJVING,
+  INSCHRIJVING_GROEP,
+  INSCHRIJVING_PRIVE,
+  ADMIN,
+  PERSONAL,
+} = linkTypes;
