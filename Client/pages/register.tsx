@@ -54,6 +54,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
     control,
     name: "honden",
   });
+  const [disabled, setDisabled] = useState<boolean>(false);
   const [activeStep, setActiveStep] = useState<number>(0);
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
   const [rassen, setRassen] = useState<OptionsOrGroups<any, optionInterface>[]>(
@@ -118,10 +119,14 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
       return;
     }
 
-    const { data, error } = await register(REGISTERAPI, { ...payload, csrf });
-    if (data) {
-      toast.success(data.message);
-      router.push(LOGIN);
+    if (!disabled) {
+      setDisabled(() => true);
+      const { data, error } = await register(REGISTERAPI, { ...payload, csrf });
+      if (data) {
+        toast.success(data.message);
+        router.push(LOGIN);
+      }
+      setDisabled(() => false);
     }
   };
 
