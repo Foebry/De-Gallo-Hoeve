@@ -19,15 +19,15 @@ import { toast } from "react-toastify";
 import { OptionsOrGroups } from "react-select";
 import { optionInterface } from "../components/register/HondGegevens";
 import HondGegevens from "../components/inschrijving/HondGegevens";
-import {
+import client, {
   getFreeTimeSlots,
   getHondOptions,
   getRasOptions,
 } from "../middleware/MongoDb";
 import { ObjectId } from "mongodb";
 import { getDisabledDays } from "../middleware/Helper";
-import { generateCsrf } from "../handlers/validationHelper";
-import { securepage } from "../handlers/authenticationHandler";
+import { generateCsrf } from "../middleware/Validator";
+import { securepage } from "../middleware/Authenticator";
 
 type TrainingType = "prive" | "groep";
 
@@ -200,23 +200,30 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const type = "prive";
   if (!type) return { redirect: { permanent: false, destination: INDEX } };
 
-  return securepage(ctx, async (klant_id: ObjectId) => {
-    let honden = klant_id ? await getHondOptions(klant_id) : [];
-    const csrf = generateCsrf();
-    const disabledDays = await getDisabledDays(type as string);
-    const rassen = await getRasOptions();
-    const timeslots = await getFreeTimeSlots();
+  const klant_id = await securepage(ctx);
 
+  if (!klant_id) {
     return {
-      props: {
-        rassen,
-        honden,
-        disabledDays,
-        klant_id: klant_id?.toString() ?? null,
-        csrf,
-        type,
-        timeslots,
-      },
+      redirect: { permanent: false, destination: LOGIN },
     };
-  });
+  }
+  await client.connect();
+  const honden = await getHondOptions(klant_id as ObjectId);
+  const csrf = generateCsrf();
+  const disabledDays = await getDisabledDays(type);
+  const rassen = await getRasOptions();
+  const timeslots = await getFreeTimeSlots();
+  await client.close();
+
+  return {
+    props: {
+      rassen,
+      honden,
+      disabledDays,
+      klant_id: klant_id?.toString() ?? null,
+      csrf,
+      type,
+      timeslots,
+    },
+  };
 };

@@ -3,39 +3,36 @@ import {
   NextApiRequest,
   NextApiResponse,
 } from "next";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import nookies, { parseCookies, setCookie } from "nookies";
-import { badRequest, unauthorizedAccess } from "./ResponseHandler";
 import { ObjectId } from "mongodb";
-import { INSCHRIJVING, LOGIN } from "../types/linkTypes";
-import validationHelper from "./validationHelper";
+import { INSCHRIJVING } from "../types/linkTypes";
+import validationHelper from "./Validator";
 import base64 from "base-64";
+import {
+  EmailNotVerifiedError,
+  NotLoggedInError,
+  UnauthorizedAccessError,
+} from "./RequestError";
+import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 
 interface AuthenticationHandlerInterface {
   createJWT: (res: NextApiResponse, klantData: any) => void;
   setClientCookie: (res: NextApiResponse, payload: any) => void;
-  secureApi: (
-    obj: {
-      req: NextApiRequest;
-      res: NextApiResponse;
-    },
-    callback: () => Promise<void>
-  ) => void | string | JwtPayload;
+  secureApi: (obj: { req: NextApiRequest; res: NextApiResponse }) => void;
   redirectToLogin: (ctx: GetServerSidePropsContext, redirect?: string) => void;
-  securepage: (
-    ctx: GetServerSidePropsContext,
-    callback: (klant_id: ObjectId) => any
-  ) => Promise<void>;
+  securepage: (ctx: GetServerSidePropsContext) => Promise<ObjectId | void>;
   hash: (value: string | object, secret: string) => string;
   compare: (value: string, secret: string) => boolean;
+  createBearer: (klant: IsKlantCollection) => string;
 }
 
 const secret = process.env.JWT_SECRET;
 const cookieSecret = process.env.NEXT_PUBLIC_COOKIE_SECRET;
 
 const authenticationHandler: AuthenticationHandlerInterface = {
-  createJWT: (res, klantData) => {
-    const payload = { ...klantData, password: undefined };
+  createJWT: (res, { verified, honden, roles, _id }) => {
+    const payload = { verified, honden, roles, _id };
     const token = jwt.sign({ payload }, `${secret}`);
     setCookie({ res }, "JWT", token, {
       httpOnly: true,
@@ -58,20 +55,14 @@ const authenticationHandler: AuthenticationHandlerInterface = {
     });
   },
 
-  secureApi: ({ req, res }, callback) => {
+  secureApi: ({ req, res }) => {
     const cookies = parseCookies({ req });
-    const token = cookies.JWT;
-    if (!token) return unauthorizedAccess(res);
-
+    const token = cookies.JWT ?? req.headers.authorization?.split(" ")[1];
+    if (!token) throw new NotLoggedInError();
     const verifiedToken = jwt.verify(token, `${secret}`, {
       algorithms: ["RS256", "HS256"],
     });
-    const {
-      payload: { verified },
-    } = JSON.parse(JSON.stringify(verifiedToken));
-    if (!verifiedToken) return unauthorizedAccess(res);
-    if (!verified) return badRequest(res, "Gelieve uw email te verifiëren");
-    return callback();
+    if (!verifiedToken) throw new UnauthorizedAccessError();
   },
 
   redirectToLogin: (ctx) => {
@@ -79,7 +70,7 @@ const authenticationHandler: AuthenticationHandlerInterface = {
     ctx.res.statusCode = 302;
   },
 
-  securepage: async ({ req, res }, callback) => {
+  securepage: async ({ req, res }) => {
     const token = nookies.get({ req }).JWT;
     if (token) {
       const verifiedToken = jwt.verify(token, `${secret}`, {
@@ -88,12 +79,14 @@ const authenticationHandler: AuthenticationHandlerInterface = {
       const { _id: klant_id } = JSON.parse(
         JSON.stringify(verifiedToken)
       ).payload;
-      return await callback(new ObjectId(klant_id));
+      return new ObjectId(klant_id);
     }
     validationHelper.redirect = INSCHRIJVING;
-    return {
-      redirect: { permanent: false, destination: LOGIN },
-    };
+
+    // throw new NotLoggedInError(res, null);
+    // return {
+    //   redirect: { permanent: false, destination: LOGIN },
+    // };
   },
 
   hash: (value, secret) => {
@@ -115,6 +108,16 @@ const authenticationHandler: AuthenticationHandlerInterface = {
       return false;
     }
   },
+
+  createBearer: (klant) => {
+    const payload = {
+      honden: klant.honden,
+      roles: klant.roles,
+      _id: klant._id,
+    };
+    const token = jwt.sign({ payload }, `${secret}`);
+    return token;
+  },
 };
 
 export const {
@@ -125,4 +128,5 @@ export const {
   securepage,
   hash,
   compare,
+  createBearer,
 } = authenticationHandler;

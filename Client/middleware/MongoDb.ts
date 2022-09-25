@@ -1,6 +1,19 @@
-import { MongoClient, ObjectId } from "mongodb";
+import {
+  MongoClient,
+  ObjectId,
+  ReadPreference,
+  TransactionOptions,
+} from "mongodb";
 import { atob } from "buffer";
-import { Hond, Klant } from "../types/collections";
+import { getAllRassen, RAS } from "../controllers/rasController";
+import { getHondenByKlantId } from "../controllers/HondController";
+import { getConfirmCollection } from "../controllers/ConfirmController";
+import Factory from "./Factory";
+import { KLANT } from "../controllers/KlantController";
+import { CONFIRM } from "../types/EntityTpes/ConfirmTypes";
+import { CONTENT } from "../controllers/ContentController";
+import { INSCHRIJVING } from "../controllers/InschrijvingController";
+import { TRAINING } from "../controllers/TrainingController";
 
 interface Result {
   value: ObjectId;
@@ -17,15 +30,12 @@ interface MongoDbInterface {
     privetraining: string[];
     groepstraining: string[];
   }>;
-  findOneBy: (
-    client: MongoClient,
-    collection: string,
-    filter: object
-  ) => Promise<any | null>;
   getRasOptions: () => Promise<Option[] | null>;
   getHondOptions: (klant_id: ObjectId) => Promise<Option[]>;
   getCollections: (collections: string[]) => any;
   getFreeTimeSlots: () => Promise<any>;
+  startTransaction: () => TransactionOptions;
+  clearAllData: () => Promise<void>;
 }
 
 const MongoDb: MongoDbInterface = {
@@ -58,59 +68,21 @@ const MongoDb: MongoDbInterface = {
     }
   },
 
-  findOneBy: async (client, collection, filter) => {
-    try {
-      return await client
-        .db("degallohoeve")
-        .collection(collection)
-        .findOne(filter);
-    } catch (e: any) {
-      await client.close();
-      return null;
-    } finally {
-    }
-  },
-
   getRasOptions: async () => {
-    const aggregation = [
-      { $project: { _id: 0, value: "$_id", label: "$naam" } },
-    ];
     await client.connect();
-    try {
-      const result = (await client
-        .db("degallohoeve")
-        .collection("ras")
-        .aggregate(aggregation)
-        .toArray()) as Result[];
-      return result.map((item: Result) => ({
-        ...item,
-        value: item.value.toString(),
-      })) as Option[];
-    } catch (e: any) {
-      console.log({ error: e.message });
-      return null;
-    } finally {
-      await client.close();
-    }
+    const rassen = await getAllRassen();
+    return rassen.map(({ _id: value, naam: label }) => ({
+      value: value.toString(),
+      label,
+    })) as Option[];
   },
 
   getHondOptions: async (klant_id) => {
-    try {
-      await client.connect();
-      const { honden } = (await client
-        .db("degallohoeve")
-        .collection("klant")
-        .findOne({ _id: klant_id })) as Klant;
-      return honden.map((item: Hond) => ({
-        label: item.naam,
-        value: item._id?.toString(),
-      })) as Option[];
-    } catch (e: any) {
-      console.log(e.message);
-    } finally {
-      await client.close();
-    }
-    return [];
+    const honden = await getHondenByKlantId(klant_id);
+    return honden.map(({ _id: value, naam: label }) => ({
+      value: value?.toString(),
+      label,
+    })) as Option[];
   },
 
   getCollections: (collections) => {
@@ -161,6 +133,34 @@ const MongoDb: MongoDbInterface = {
       default: all,
     };
   },
+  startTransaction: () => {
+    const transactionOptions = {
+      readPreference: ReadPreference.primary,
+      readConcern: { level: "local" },
+      writeConcern: { w: "majority" },
+    } as TransactionOptions;
+
+    return transactionOptions;
+  },
+  clearAllData: async () => {
+    if (process.env.NODE_ENV === "test") {
+      await process.nextTick(() => {});
+      await client.connect();
+      await process.nextTick(() => {});
+      await Factory.getController(CONFIRM).deleteAll();
+      await process.nextTick(() => {});
+      await Factory.getController(KLANT).deleteAll();
+      await process.nextTick(() => {});
+      await Factory.getController(CONTENT).deleteAll();
+      await process.nextTick(() => {});
+      await Factory.getController(INSCHRIJVING).deleteAll();
+      await process.nextTick(() => {});
+      await Factory.getController(RAS).deleteAll();
+      await process.nextTick(() => {});
+      await Factory.getController(TRAINING).deleteAll();
+      await client.close();
+    }
+  },
 };
 
 const client = new MongoClient(
@@ -169,9 +169,10 @@ const client = new MongoClient(
 export default client;
 export const {
   getIndexData,
-  findOneBy,
   getRasOptions,
   getHondOptions,
   getCollections,
   getFreeTimeSlots,
+  startTransaction,
+  clearAllData,
 } = MongoDb;
