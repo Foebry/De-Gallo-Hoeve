@@ -78,6 +78,15 @@ const Groepslessen: React.FC<LessenProps> = ({
       : ["Selecteer datum(s)", "Gegevens hond", "Contactgegevens"];
   }, [klant_id]);
 
+  const handleNextPageClick = () => {
+    const hasDatesSelected = getValues().dates && getValues().dates.length > 0;
+    if (hasDatesSelected && activeStep === 0) {
+      setActiveStep(activeStep + 1);
+    } else if (activeStep === 0 && !hasDatesSelected) {
+      toast.error("Gelieve minstens 1 datum te kiezen");
+    }
+  };
+
   const handleDelete = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     const index = parseInt(e.currentTarget.dataset.id ?? "-1");
     if (index >= 0) {
@@ -112,18 +121,7 @@ const Groepslessen: React.FC<LessenProps> = ({
   };
 
   return (
-    <section className="mx-5 pb-24 md:mx-auto">
-      {!klant_id && (
-        <div className="max-w-7xl mx-auto mt-14 mb-20 border-2 rounded border-green-300 py-2 px-5 bg-green-200">
-          <Body className="text-center text-gray-200">
-            Wist u dat u op een eenvoudigere manier zich kan inschrijven door
-            eerst{" "}
-            <span className="cursor-pointer underline">
-              <Link href={LOGIN}>in te loggen</Link>
-            </span>
-          </Body>
-        </div>
-      )}
+    <section className="mb-48 md:px-5 mt-20">
       <div className="max-w-7xl mx-auto">
         <FormSteps
           steps={steps}
@@ -177,22 +175,25 @@ const Groepslessen: React.FC<LessenProps> = ({
               <Contactgegevens control={control} />
             ) : null}
           </div>
-          <FormRow className="max-w-3xl mx-auto">
+        </Form>
+        {activeStep > 0 && (
+          <div className="absolute left-10 top-20">
             <Button
               label="vorige"
               onClick={() => setActiveStep(activeStep - 1)}
-              disabled={activeStep === 0}
             />
-            {(activeStep === 1 && klant_id) || activeStep === 2 ? (
-              <SubmitButton label="inschrijven" />
-            ) : (
-              <Button
-                label="volgende"
-                onClick={() => setActiveStep(activeStep + 1)}
-              />
-            )}
-          </FormRow>
-        </Form>
+          </div>
+        )}
+        <div className="absolute right-10 top-20">
+          {activeStep === 1 ? (
+            <SubmitButton
+              label="verzend"
+              onClick={() => onSubmit(getValues())}
+            />
+          ) : (
+            <Button label="volgende" onClick={handleNextPageClick} />
+          )}
+        </div>
       </div>
     </section>
   );
