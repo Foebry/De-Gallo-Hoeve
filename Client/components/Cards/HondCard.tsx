@@ -42,7 +42,6 @@ const HondCard: React.FC<HondCardProps> = ({
   remove,
 }) => {
   const [open, setOpen] = useState<boolean>(true);
-  console.log({ rassen });
   return (
     <>
       {open ? (
@@ -104,7 +103,6 @@ const HondCard: React.FC<HondCardProps> = ({
                   <DatePicker
                     onChange={(e) => {
                       onChange(e);
-                      console.log(value);
                     }}
                     selected={value}
                     dateFormat="dd/MM/yyyy"

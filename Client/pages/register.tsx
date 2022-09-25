@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, useEffect, useState } from "react";
 import Form from "../components/form/Form";
 import { useRouter } from "next/router";
 import { INDEX, LOGIN } from "../types/linkTypes";
@@ -83,6 +83,31 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
     else if (Object.keys(error).includes("honden")) setErrors(2);
   };
 
+  const validatePassword = (
+    password: string,
+    setFormErrors: Dispatch<React.SetStateAction<RegisterErrorInterface>>
+  ) => {
+    if (!password.match(/[a-z]+/))
+      setFormErrors({
+        ...formErrors,
+        password: "Minstens 1 kleine letter",
+      });
+    else if (!password.match(/[A-Z]+/))
+      setFormErrors({
+        ...formErrors,
+        password: "Minstens 1 hoofdletter",
+      });
+    else if (!password.match(/[&é@#§è!çà$£µ%ù?./<>°}{"'^*+-=~},;]+/))
+      setFormErrors({
+        ...formErrors,
+        password: "Minstens 1 speciaal teken",
+      });
+    else if (!password.match(/[0-9]+/))
+      setFormErrors({ ...formErrors, password: "Minstens 1 cijfer" });
+    else if (password.length < 8)
+      setFormErrors({ ...formErrors, password: "Minstens 8 characters" });
+  };
+
   const onSubmit = async (values: any) => {
     let payload = structureHondenPayload(values);
     if (values.password !== values.password_verification) {
@@ -131,6 +156,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
                 setActiveStep={setActiveStep}
                 errors={formErrors}
                 setErrors={setFormErrors}
+                validatePassword={validatePassword}
               />
             ) : activeStep === 1 ? (
               <Step2

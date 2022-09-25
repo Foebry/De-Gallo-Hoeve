@@ -40,7 +40,6 @@ const AppProvider: React.FC<{ children: any }> = ({ children }) => {
     []
   );
   const retrieveRassen = async () => {
-    console.log({ rassenProvider: rassen });
     if (rassen.length > 0) return rassen;
     const { data } = await getData(RASSEN);
     setRassen(data.rassen);
