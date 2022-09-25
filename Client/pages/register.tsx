@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Dispatch, useEffect, useState } from "react";
 import Form from "../components/form/Form";
 import { useRouter } from "next/router";
 import { INDEX, LOGIN } from "../types/linkTypes";
@@ -14,8 +14,8 @@ import nookies from "nookies";
 import { toast } from "react-toastify";
 import FormRow from "../components/form/FormRow";
 import Button, { SubmitButton } from "../components/buttons/Button";
-import client, { getRasOptions } from "../middleware/MongoDb";
 import { generateCsrf } from "../middleware/Validator";
+import { useAppContext } from "../context/appContext";
 
 export interface RegisterHondErrorInterface {
   naam?: string;
@@ -41,11 +41,11 @@ export interface RegisterErrorInterface {
 }
 
 interface RegisterProps {
-  rassen: OptionsOrGroups<any, optionInterface>[];
   csrf: string;
 }
 
-const Register: React.FC<RegisterProps> = ({ rassen, csrf }) => {
+const Register: React.FC<RegisterProps> = ({ csrf }) => {
+  const { retrieveRassen } = useAppContext();
   const [formErrors, setFormErrors] = useState<RegisterErrorInterface>({});
   const router = useRouter();
   const register = useMutation(formErrors, setFormErrors);
@@ -56,6 +56,9 @@ const Register: React.FC<RegisterProps> = ({ rassen, csrf }) => {
   });
   const [activeStep, setActiveStep] = useState<number>(0);
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
+  const [rassen, setRassen] = useState<OptionsOrGroups<any, optionInterface>[]>(
+    []
+  );
   const step1 = [
     "vnaam",
     "lnaam",
@@ -80,6 +83,31 @@ const Register: React.FC<RegisterProps> = ({ rassen, csrf }) => {
     else if (Object.keys(error).includes("honden")) setErrors(2);
   };
 
+  const validatePassword = (
+    password: string,
+    setFormErrors: Dispatch<React.SetStateAction<RegisterErrorInterface>>
+  ) => {
+    if (!password.match(/[a-z]+/))
+      setFormErrors({
+        ...formErrors,
+        password: "Minstens 1 kleine letter",
+      });
+    else if (!password.match(/[A-Z]+/))
+      setFormErrors({
+        ...formErrors,
+        password: "Minstens 1 hoofdletter",
+      });
+    else if (!password.match(/[&é@#§è!çà$£µ%ù?./<>°}{"'^*+-=~},;]+/))
+      setFormErrors({
+        ...formErrors,
+        password: "Minstens 1 speciaal teken",
+      });
+    else if (!password.match(/[0-9]+/))
+      setFormErrors({ ...formErrors, password: "Minstens 1 cijfer" });
+    else if (password.length < 8)
+      setFormErrors({ ...formErrors, password: "Minstens 8 characters" });
+  };
+
   const onSubmit = async (values: any) => {
     let payload = structureHondenPayload(values);
     if (values.password !== values.password_verification) {
@@ -96,6 +124,13 @@ const Register: React.FC<RegisterProps> = ({ rassen, csrf }) => {
       router.push(LOGIN);
     }
   };
+
+  useEffect(() => {
+    (async () => {
+      const data = await retrieveRassen!();
+      setRassen(data);
+    })();
+  }, []);
 
   return (
     <section className="mb-48 md:px-5 mt-20">
@@ -121,6 +156,7 @@ const Register: React.FC<RegisterProps> = ({ rassen, csrf }) => {
                 setActiveStep={setActiveStep}
                 errors={formErrors}
                 setErrors={setFormErrors}
+                validatePassword={validatePassword}
               />
             ) : activeStep === 1 ? (
               <Step2
@@ -161,10 +197,8 @@ export default Register;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const csrf = generateCsrf();
-  const rassen = await getRasOptions();
-  await client.close();
 
   return nookies.get(ctx).JWT
     ? { redirect: { permanent: false, destination: INDEX } }
-    : { props: { rassen, csrf } };
+    : { props: { csrf } };
 };

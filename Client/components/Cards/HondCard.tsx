@@ -103,7 +103,6 @@ const HondCard: React.FC<HondCardProps> = ({
                   <DatePicker
                     onChange={(e) => {
                       onChange(e);
-                      console.log(value);
                     }}
                     selected={value}
                     dateFormat="dd/MM/yyyy"

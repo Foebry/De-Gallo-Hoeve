@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Dispatch } from "react";
 import FormInput from "../form/FormInput";
 import FormRow from "../form/FormRow";
 import Button from "../buttons/Button";
@@ -10,6 +10,10 @@ interface Step1Props {
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
   errors: RegisterErrorInterface;
   setErrors: React.Dispatch<React.SetStateAction<RegisterErrorInterface>>;
+  validatePassword: (
+    password: string,
+    setFormErrors: Dispatch<React.SetStateAction<RegisterErrorInterface>>
+  ) => void;
 }
 
 const PersoonlijkeGegevens: React.FC<Step1Props> = ({
@@ -17,6 +21,7 @@ const PersoonlijkeGegevens: React.FC<Step1Props> = ({
   setActiveStep,
   errors,
   setErrors,
+  validatePassword,
 }) => {
   return (
     <div className="mx-auto px-24">
@@ -190,7 +195,10 @@ const PersoonlijkeGegevens: React.FC<Step1Props> = ({
               id="wachtwoord"
               label="wachtwoord"
               value={value}
-              onChange={onChange}
+              onChange={(e: React.FormEvent<HTMLInputElement>) => {
+                validatePassword(e.currentTarget.value, setErrors);
+                onChange(e);
+              }}
               errors={errors}
               setErrors={setErrors}
               info="1 cijfer, hoofdletter en speciaal teken vereist"

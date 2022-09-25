@@ -2,20 +2,30 @@ import { Body, Title1 } from "../components/Typography/Typography";
 import TrainingCard from "../components/Cards/TrainingCard";
 import { nanoid } from "nanoid";
 import Image from "next/image";
-import { getIndexData } from "../middleware/MongoDb";
+import client, { getIndexData, getRasOptions } from "../middleware/MongoDb";
+import { OptionsOrGroups } from "react-select";
+import { optionInterface } from "../components/register/HondGegevens";
+import { useAppContext } from "../context/appContext";
+import { useEffect } from "react";
 
 interface IndexProps {
   privetraining: string[];
   groepstraining: string[];
   wie: string[];
   image: { image: string };
+  rassen: OptionsOrGroups<any, optionInterface>[];
 }
 
 const Index: React.FC<IndexProps> = ({
   privetraining,
   groepstraining,
   wie,
+  rassen,
 }) => {
+  const { setRassen } = useAppContext();
+  useEffect(() => {
+    setRassen(rassen);
+  }, []);
   return (
     <>
       <section className="mb-40 block flex-wrap mt-10 items-center max-w-7xl justify-between mx-auto md:flex md:px-5">
@@ -111,12 +121,16 @@ const Index: React.FC<IndexProps> = ({
 export default Index;
 
 export const getStaticProps = async () => {
+  await client.connect();
   const { wie, privetraining, groepstraining } = await getIndexData();
+  const rassen = await getRasOptions();
+  await client.close();
 
   return {
     props: {
       wie,
       privetraining,
+      rassen,
       // groepstraining,
     },
     revalidate: 3600,
