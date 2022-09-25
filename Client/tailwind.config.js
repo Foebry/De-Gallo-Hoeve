@@ -91,6 +91,9 @@ module.exports = {
           800: "#bfc618",
           900: "#c7c918",
         },
+        white: {
+          900: "#ffffff",
+        },
       },
       aspectRatio: {
         "3/2": "3/2",

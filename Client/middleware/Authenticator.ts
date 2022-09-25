@@ -44,8 +44,8 @@ const authenticationHandler: AuthenticationHandlerInterface = {
   },
 
   setClientCookie: (res, klantData) => {
-    const { vnaam: name } = klantData;
-    const token = jwt.sign({ name }, `${cookieSecret}`);
+    const { vnaam: name, roles } = klantData;
+    const token = jwt.sign({ name, roles }, `${cookieSecret}`);
     setCookie({ res }, "Client", token, {
       httpOnly: false,
       maxAge: 3600,
