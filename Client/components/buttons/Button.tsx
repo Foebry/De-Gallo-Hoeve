@@ -31,9 +31,12 @@ const Button: React.FC<ButtonProps> = ({
 
 export default Button;
 
-export const SubmitButton: React.FC<ButtonProps> = ({ label }) => {
+export const SubmitButton: React.FC<ButtonProps> = ({ label, onClick }) => {
   return (
-    <button className="capitalize tracking-wide border border-solid rounded-md py-1 px-1.5 text-gray-100 bg-green-100 border-green-200 hover:cursor-pointer">
+    <button
+      className="capitalize tracking-wide border border-solid rounded-md py-1 px-1.5 text-gray-100 bg-green-100 border-green-200 hover:cursor-pointer"
+      onClick={onClick}
+    >
       {label}
     </button>
   );

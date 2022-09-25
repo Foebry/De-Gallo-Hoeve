@@ -177,22 +177,28 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
               />
             ) : null}
           </div>
-          <FormRow className="max-w-3xl mx-auto">
+        </Form>
+        {activeStep > 0 && (
+          <div className="absolute left-10 top-20">
             <Button
               label="vorige"
               onClick={() => setActiveStep(activeStep - 1)}
-              disabled={activeStep === 0}
             />
-            {activeStep === 1 ? (
-              <SubmitButton label="verzend" />
-            ) : (
-              <Button
-                label="volgende"
-                onClick={() => setActiveStep(activeStep + 1)}
-              />
-            )}
-          </FormRow>
-        </Form>
+          </div>
+        )}
+        <div className="absolute right-10 top-20">
+          {activeStep === 1 ? (
+            <SubmitButton
+              label="verzend"
+              onClick={() => onSubmit(getValues())}
+            />
+          ) : (
+            <Button
+              label="volgende"
+              onClick={() => setActiveStep(activeStep + 1)}
+            />
+          )}
+        </div>
       </div>
     </section>
   );
