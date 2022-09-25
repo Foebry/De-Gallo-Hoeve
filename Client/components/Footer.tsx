@@ -14,11 +14,8 @@ import { useState } from "react";
 import useMutation from "../hooks/useMutation";
 import { CONTACTAPI } from "../types/apiTypes";
 import { FormTextBox } from "./form/FormTextBox";
-import TextAreaAutoSize from "react-textarea-autosize";
 
-interface Props {
-  csrf: string;
-}
+interface Props {}
 
 export interface ContactErrorInterface {
   naam?: string;
@@ -26,7 +23,7 @@ export interface ContactErrorInterface {
   bericht?: string;
 }
 
-const Footer: React.FC<Props> = ({ csrf }) => {
+const Footer: React.FC<Props> = ({}) => {
   const { control, handleSubmit, setValue } = useForm();
 
   const [disabled, setDisabled] = useState<boolean>(false);
@@ -38,7 +35,7 @@ const Footer: React.FC<Props> = ({ csrf }) => {
     const payload = values;
     if (!disabled) {
       setDisabled(() => true);
-      const { data, error } = await contact(CONTACTAPI, { ...payload, csrf });
+      const { data, error } = await contact(CONTACTAPI, { ...payload });
       if (data) {
         toast.success(data.message);
         setValue("naam", "");
@@ -82,7 +79,7 @@ const Footer: React.FC<Props> = ({ csrf }) => {
           </div>
           <div className="border-2 rounded">
             <Form onSubmit={handleSubmit(onSubmit)} action="verzend">
-              <div className="4xs:px-10 py-10">
+              <div className="4xs:px-10 py-10 md:min-w-s">
                 <Controller
                   name="naam"
                   control={control}

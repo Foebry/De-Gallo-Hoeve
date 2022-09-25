@@ -113,6 +113,8 @@ module.exports = {
         "4xs": "75px",
         "3xs": "135px",
         "2xs": "200px",
+        xs: "350px",
+        s: "400px",
       },
       minHeight: {
         xs: "350px",
