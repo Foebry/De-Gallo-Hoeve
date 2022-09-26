@@ -12,8 +12,12 @@ import Factory from "./Factory";
 import { KLANT } from "../controllers/KlantController";
 import { CONFIRM } from "../types/EntityTpes/ConfirmTypes";
 import { CONTENT } from "../controllers/ContentController";
-import { INSCHRIJVING } from "../controllers/InschrijvingController";
+import {
+  getInschrijvingCollection,
+  INSCHRIJVING,
+} from "../controllers/InschrijvingController";
 import { TRAINING } from "../controllers/TrainingController";
+import moment from "moment";
 
 interface Result {
   value: ObjectId;
@@ -106,11 +110,10 @@ const MongoDb: MongoDbInterface = {
       "17:00",
     ].map((el) => ({ label: el, value: el }));
     await client.connect();
-    const inschrijvingen = await client
-      .db("degallohoeve")
-      .collection("inschrijving")
+    const inschrijvingen = await getInschrijvingCollection()
       .find({ training: "prive", datum: { $gt: new Date() } })
       .toArray();
+    console.log({ inschrijvingen });
     await client.close();
     const timeSlots = inschrijvingen.reduce((prev, curr) => {
       const [date, time] = curr.datum.toISOString().split("T");

@@ -2,9 +2,9 @@ import { ObjectId } from "mongodb";
 
 export interface ContentCollection extends EditContent {
   _id: ObjectId;
-  created_at: string;
-  updated_at: string;
-  updated_by: string;
+  created_at: Date;
+  updated_at: Date;
+  updated_by: Date;
 }
 
 export interface EditContent {

@@ -68,6 +68,7 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
               throw new ReedsIngeschrevenError({
                 [`inschrijvingen[${index}][timeslot]`]:
                   "U bent reeds ingeschreven voor deze training",
+                message: "Inschrijving niet verwerkt",
               });
             if (await trainingVolzet(training, inschrijving.datum))
               throw new TrainingVolzetError("Dit tijdstip is niet meer vrij");

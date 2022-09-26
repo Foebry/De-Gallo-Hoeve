@@ -65,7 +65,7 @@ const ConfirmController: IsConfirmController = {
 
     const newConfirm = Factory.createConfirm({
       klant_id: confirm.klant_id,
-      created_at: moment().local().format(),
+      created_at: moment().local().toDate(),
     });
     const { insertedId: _id } = await getConfirmCollection().insertOne(
       newConfirm

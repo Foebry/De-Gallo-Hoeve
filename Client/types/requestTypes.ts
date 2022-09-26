@@ -32,12 +32,13 @@ export interface IsInschrijvingBody {
   csrf: string;
   klant_id: string;
   training: TrainingType;
-  inschrijvingen: {
-    datum: string;
-    hond_id: string;
-    hond_naam: string;
-    hond_geslacht: Geslacht;
-  }[];
+  inschrijvingen: IsInschrijvingBodyInschrijving[];
+}
+export interface IsInschrijvingBodyInschrijving {
+  datum: string;
+  hond_id: string;
+  hond_naam: string;
+  hond_geslacht: Geslacht;
 }
 export interface IsUpdateInschrijvingBody {
   csrf: string;

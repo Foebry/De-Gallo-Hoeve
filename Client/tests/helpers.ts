@@ -1,3 +1,4 @@
+import moment from "moment";
 import {
   getKlantByEmail,
   getKlantCollection,
@@ -20,7 +21,7 @@ export const generateRegisterResponseBodyFromPayload = async (
     verified: false,
     inschrijvingen: [],
     reservaties: [],
-    created_at: klant!.created_at,
+    created_at: moment(klant!.created_at).local().toDate(),
     updated_at: klant!.updated_at,
     email: klant!.email,
     vnaam: klant!.vnaam,
@@ -32,7 +33,6 @@ export const generateRegisterResponseBodyFromPayload = async (
     postcode: klant!.postcode,
     password: klant!.password,
     honden: klant!.honden,
-    message: "Registratie succesvol!" as string,
     _id: klant!._id,
     bus: klant!.bus,
   };
@@ -42,5 +42,9 @@ export const generateRegisterResponseBodyFromPayload = async (
 export const generateRegisterPayloadFromKlantData = (
   payload: IsRegisterPayload
 ) => {
-  return { ...payload, csrf: generateCsrf() };
+  return {
+    ...payload,
+    created_at: payload.created_at,
+    csrf: generateCsrf(),
+  };
 };

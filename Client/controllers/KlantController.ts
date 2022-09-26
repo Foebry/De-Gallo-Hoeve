@@ -90,7 +90,7 @@ const KlantController: IsKlantController = {
   },
   setVerified: async (klant) => {
     const verified = true;
-    const verified_at = moment().local().format();
+    const verified_at = moment().local().toDate();
 
     const { modifiedCount } = await getKlantCollection().updateOne(
       { _id: klant._id },

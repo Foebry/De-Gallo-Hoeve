@@ -2,8 +2,7 @@ import { ObjectId } from "mongodb";
 import { Geslacht } from "./HondTypes";
 import { TrainingType } from "./TrainingType";
 
-export interface NewInschrijving {
-  datum: string;
+export interface BaseInschrijving {
   training: TrainingType;
   hond: {
     id: ObjectId;
@@ -15,14 +14,19 @@ export interface NewInschrijving {
     lnaam: string;
   };
 }
-export interface InschrijvingCollection extends NewInschrijving {
+
+export interface NewInschrijving extends BaseInschrijving {
+  datum: string;
+}
+export interface InschrijvingCollection extends BaseInschrijving {
+  datum: Date;
   _id: ObjectId;
-  created_at: string;
-  updated_at: string;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface IsInschrijving {
-  datum: string;
+  datum: Date;
   hond_id: string;
   hond_naam: string;
   hond_geslacht: Geslacht;
