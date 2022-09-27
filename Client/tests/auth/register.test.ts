@@ -10,6 +10,7 @@ import {
   generateRegisterPayloadFromKlantData,
   generateRegisterResponseBodyFromPayload,
 } from "../../tests/helpers";
+import moment from "moment";
 
 describe("/register", () => {
   beforeEach(async () => {
@@ -85,6 +86,7 @@ describe("/register", () => {
     expect(response.statusCode).toBe(400);
     expect(response.body).toStrictEqual({
       email: "ongeldige email",
+      message: "Registratie niet verwerkt",
     });
   });
 });

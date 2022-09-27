@@ -111,7 +111,7 @@ describe("/confirm", () => {
     it("should throw KlantNotFoundError", async () => {
       const confirm = Factory.createConfirm({
         klant_id: new ObjectId(),
-        created_at: moment().format(),
+        created_at: moment().toDate(),
       });
       confirm.code = code;
       await process.nextTick(() => {});

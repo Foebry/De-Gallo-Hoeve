@@ -222,6 +222,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const disabledDays = await getDisabledDays(type);
   const rassen = await getRasOptions();
   const timeslots = await getFreeTimeSlots();
+  console.log({ timeslots });
   await client.close();
 
   return {

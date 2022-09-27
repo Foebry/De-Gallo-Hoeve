@@ -18,6 +18,7 @@ import { optionInterface } from "../register/HondGegevens";
 import { geslachten } from "./HondCard";
 import { Body, FormError } from "../Typography/Typography";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { MySelect } from "../MySelect";
 
 type TrainingType = "prive" | "groep";
 

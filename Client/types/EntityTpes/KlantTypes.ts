@@ -1,3 +1,4 @@
+import { Moment } from "moment";
 import { ObjectId } from "mongodb";
 import { HondCollection } from "./HondTypes";
 
@@ -21,9 +22,9 @@ export interface IsKlantCollection extends IsNewKlant {
   verified: boolean;
   inschrijvingen: ObjectId[];
   reservaties: ObjectId[];
-  created_at: string;
-  verified_at?: string;
-  updated_at: string;
+  created_at: Date;
+  verified_at?: Date;
+  updated_at: Date;
 }
 
 export interface IsUpdateKlantBody {
