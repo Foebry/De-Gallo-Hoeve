@@ -33,50 +33,14 @@ export const Hamburger: React.FC<Props> = ({ children, roles }) => {
         {open ? <MdClose /> : <GiHamburgerMenu />}
       </span>
       {open && (
-        <ul className="absolute top-12 right-0 bg-green-200 rounded min-w-3xs">
-          {roles > 1 && (
-            <MenuItem label="admin" link={ADMIN} setOpen={setOpen} />
-          )}
-          {roles === 0 && (
-            <MenuItem
-              label="persoonlijke pagina"
-              link={PERSONAL}
-              setOpen={setOpen}
-            />
-          )}
-          <MenuItem label="logout" setOpen={setOpen} onClick={onLogout} />
+        <ul
+          className="absolute top-12 right-0 bg-green-200 rounded min-w-3xs text-center"
+          onClick={handleClick}
+          onBlur={() => setOpen(false)}
+        >
+          {children}
         </ul>
       )}
     </div>
-  );
-};
-
-interface MenuItemProps {
-  label: string;
-  link?: string;
-  onClick?: any;
-  setOpen: Dispatch<SetStateAction<boolean>>;
-}
-
-const MenuItem: React.FC<MenuItemProps> = ({
-  label,
-  link,
-  onClick,
-  setOpen,
-}) => {
-  const router = useRouter();
-  const handleClick = () => {
-    if (link) router.push(link);
-    else onClick();
-    setOpen(false);
-  };
-  return (
-    <li
-      key={nanoid(5)}
-      className="text-center bg-green-200 cursor-pointer text-gray-100 hover:text-green-200 hover:bg-gray-100 rounded py-1"
-      onClick={handleClick}
-    >
-      <span className="uppercase text-md font-medium">{label}</span>
-    </li>
   );
 };
