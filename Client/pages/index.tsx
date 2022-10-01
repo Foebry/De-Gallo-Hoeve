@@ -7,6 +7,7 @@ import { OptionsOrGroups } from "react-select";
 import { optionInterface } from "../components/register/HondGegevens";
 import { useAppContext } from "../context/appContext";
 import { useEffect } from "react";
+import { createRandomConfirmCode } from "../middleware/Helper";
 
 interface IndexProps {
   privetraining: string[];
@@ -122,6 +123,7 @@ export default Index;
 
 export const getStaticProps = async () => {
   await client.connect();
+  console.log(createRandomConfirmCode());
   const { wie, privetraining, groepstraining } = await getIndexData();
   const rassen = await getRasOptions();
   await client.close();

@@ -1,8 +1,8 @@
 import moment from "moment";
-import { Collection, ObjectId } from "mongodb";
+import { Collection, MongoClient, ObjectId } from "mongodb";
 import Factory from "../middleware/Factory";
 import { createRandomConfirmCode } from "../middleware/Helper";
-import client from "../middleware/MongoDb";
+import client, { MongoDb } from "../middleware/MongoDb";
 import {
   ConfirmNotFoundError,
   InternalServerError,
@@ -34,7 +34,9 @@ const ConfirmController: IsConfirmController = {
     return client.db(database).collection("confirm");
   },
   saveConfirm: async (confirm) => {
-    const { acknowledged } = await getConfirmCollection().insertOne(confirm);
+    const { acknowledged } = await (
+      await getConfirmCollection()
+    ).insertOne(confirm);
     if (!acknowledged) throw new InternalServerError();
     return confirm;
   },
