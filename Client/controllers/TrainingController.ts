@@ -23,6 +23,7 @@ import {
 
 export interface IsTrainingController {
   getTrainingCollection: () => Collection;
+  getTrainingDaysCollection: () => Collection;
   getTrainingById: typeof getTrainingById;
   getTrainingByName: typeof getTrainingByName;
   updateTraining: typeof updateTraining;
@@ -50,6 +51,10 @@ const TrainingController: IsTrainingController = {
   getTrainingCollection: () => {
     const database = process.env.MONGODB_DATABASE;
     return client.db(database).collection("training");
+  },
+  getTrainingDaysCollection: () => {
+    const database = process.env.MONGODB_DATABASE;
+    return client.db(database).collection("trainingDays");
   },
   getTrainingById,
   getTrainingByName,
@@ -113,6 +118,7 @@ export default TrainingController;
 export const TRAINING = "TrainingController";
 export const {
   getTrainingCollection,
+  getTrainingDaysCollection,
   deleteInschrijving,
   addTrainingInschrijving,
   klantReedsIngeschreven,

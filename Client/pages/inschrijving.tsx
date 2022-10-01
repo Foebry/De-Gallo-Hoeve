@@ -156,6 +156,9 @@ const Groepslessen: React.FC<LessenProps> = ({
                       startOfWeek={1}
                       disabledDays={disabledDays}
                       selectedDays={selectedDates}
+                      disabledAfterDate={
+                        disabledDays?.[disabledDays?.length - 1]
+                      }
                     />
                   )}
                 />

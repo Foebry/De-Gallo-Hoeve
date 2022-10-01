@@ -9,6 +9,11 @@ export interface PriveTrainingCollection {
   inschrijvingen: ObjectId[];
 }
 
+export interface TrainingDaysCollection {
+  _id: ObjectId;
+  date: Date;
+}
+
 export interface GroepTrainingCollection extends PriveTrainingCollection {
   max_inschrijvingen: number;
 }

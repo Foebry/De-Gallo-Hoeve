@@ -7,7 +7,6 @@ import {
 import { atob } from "buffer";
 import { getAllRassen, RAS } from "../controllers/rasController";
 import { getHondenByKlantId } from "../controllers/HondController";
-import { getConfirmCollection } from "../controllers/ConfirmController";
 import Factory from "./Factory";
 import { KLANT } from "../controllers/KlantController";
 import { CONFIRM } from "../types/EntityTpes/ConfirmTypes";
@@ -19,10 +18,6 @@ import {
 import { TRAINING } from "../controllers/TrainingController";
 import moment from "moment";
 
-interface Result {
-  value: ObjectId;
-  label: string;
-}
 export interface Option {
   value: string;
   label: string;
@@ -36,13 +31,13 @@ interface MongoDbInterface {
   }>;
   getRasOptions: () => Promise<Option[] | null>;
   getHondOptions: (klant_id: ObjectId) => Promise<Option[]>;
-  getCollections: (collections: string[]) => any;
   getFreeTimeSlots: () => Promise<any>;
   startTransaction: () => TransactionOptions;
   clearAllData: () => Promise<void>;
+  status: "open" | "closed";
 }
 
-const MongoDb: MongoDbInterface = {
+export const MongoDb: MongoDbInterface = {
   getIndexData: async () => {
     try {
       await client.connect();
@@ -89,15 +84,6 @@ const MongoDb: MongoDbInterface = {
     })) as Option[];
   },
 
-  getCollections: (collections) => {
-    return collections.reduce((prev, curr) => {
-      return {
-        ...prev,
-        [curr + "Collection"]: client.db("degallohoeve").collection(curr),
-      };
-    }, {});
-  },
-
   getFreeTimeSlots: async () => {
     const all = [
       "10:00",
@@ -113,8 +99,8 @@ const MongoDb: MongoDbInterface = {
     const inschrijvingen = await getInschrijvingCollection()
       .find({ training: "prive", datum: { $gt: new Date() } })
       .toArray();
-    console.log({ inschrijvingen });
     await client.close();
+
     const timeSlots = inschrijvingen.reduce((prev, curr) => {
       const [date, time] = curr.datum.toISOString().split("T");
       const keys = Object.keys(prev);
@@ -164,17 +150,21 @@ const MongoDb: MongoDbInterface = {
       await client.close();
     }
   },
+  status: "closed",
 };
 
 const client = new MongoClient(
   `mongodb+srv://degallohoeve:${process.env.MONGODB_PASSWORD}@cluster0.poasnun.mongodb.net/?retryWrites=true&w=majority`
 );
+
+client.on("open", () => (MongoDb.status = "open"));
+client.on("connectionClosed", () => (MongoDb.status = "closed"));
+
 export default client;
 export const {
   getIndexData,
   getRasOptions,
   getHondOptions,
-  getCollections,
   getFreeTimeSlots,
   startTransaction,
   clearAllData,
