@@ -13,6 +13,7 @@ import { initializeLocalStorage } from "../helpers/localStorage";
 import { GetServerSidePropsContext } from "next";
 import nookies from "nookies";
 import validator, { generateCsrf } from "../middleware/Validator";
+import Skeleton from "../components/website/skeleton";
 
 export interface LoginErrorInterface {
   email: string;
@@ -50,69 +51,71 @@ const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
   };
 
   return (
-    <section>
-      <div className="max-w-lg mx-auto mt-30 mb-48 border-2 rounded">
-        <Form onSubmit={handleSubmit(onSubmit)} className="mb-5">
-          <div className="p-10">
-            <div className="text-center mb-10">
-              <Body>Login met email en wachtwoord</Body>
-            </div>
-            <Controller
-              name="email"
-              control={control}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <FormInput
-                  label="email"
-                  name="email"
-                  id="email"
-                  value={value}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  errors={formErrors}
-                  setErrors={setFormErrors}
-                />
-              )}
-            />
-            <Controller
-              name="password"
-              control={control}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <FormInput
-                  label="password"
-                  name="password"
-                  id="password"
-                  type="password"
-                  value={value}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  errors={formErrors}
-                  setErrors={setFormErrors}
-                />
-              )}
-            />
-            <FormRow>
-              <Body>
-                Nog geen account?{"	"}
-                <span>
-                  <Link to={REGISTER}>registreer</Link>
-                </span>
-              </Body>
-              <SubmitButton
-                label="login"
-                onClick={handleSubmit(onSubmit)}
-                disabled={disabled}
+    <Skeleton>
+      <section>
+        <div className="max-w-lg mx-auto mt-30 mb-48 border-2 rounded">
+          <Form onSubmit={handleSubmit(onSubmit)} className="mb-5">
+            <div className="p-10">
+              <div className="text-center mb-10">
+                <Body>Login met email en wachtwoord</Body>
+              </div>
+              <Controller
+                name="email"
+                control={control}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <FormInput
+                    label="email"
+                    name="email"
+                    id="email"
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    errors={formErrors}
+                    setErrors={setFormErrors}
+                  />
+                )}
               />
-            </FormRow>
-            <div className="text-center mt-20">
-              <Body>Login met andere app</Body>
+              <Controller
+                name="password"
+                control={control}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <FormInput
+                    label="password"
+                    name="password"
+                    id="password"
+                    type="password"
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    errors={formErrors}
+                    setErrors={setFormErrors}
+                  />
+                )}
+              />
+              <FormRow>
+                <Body>
+                  Nog geen account?{"	"}
+                  <span>
+                    <Link to={REGISTER}>registreer</Link>
+                  </span>
+                </Body>
+                <SubmitButton
+                  label="login"
+                  onClick={handleSubmit(onSubmit)}
+                  disabled={disabled}
+                />
+              </FormRow>
+              <div className="text-center mt-20">
+                <Body>Login met andere app</Body>
+              </div>
             </div>
-          </div>
-        </Form>
-        <FormRow className="py-5">
-          <Button label="Login with Facebook" className="mx-auto" />
-        </FormRow>
-      </div>
-    </section>
+          </Form>
+          <FormRow className="py-5">
+            <Button label="Login with Facebook" className="mx-auto" />
+          </FormRow>
+        </div>
+      </section>
+    </Skeleton>
   );
 };
 

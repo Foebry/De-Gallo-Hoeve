@@ -7,6 +7,11 @@ export interface PriveTrainingCollection {
   naam: TrainingType;
   prijs: number;
   inschrijvingen: ObjectId[];
+  content: string;
+  default_content: string[];
+  bullets: string[];
+  image: string;
+  subtitle: string;
 }
 
 export interface TrainingDaysCollection {

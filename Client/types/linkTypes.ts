@@ -11,6 +11,13 @@ const linkTypes = {
   INSCHRIJVING_PRIVE: "/inschrijving/privelessen",
   ADMIN: "/admin",
   PERSONAL: "/persoonlijke-pagina",
+  ADMINEDITINDEX: "/admin/edit",
+  ADMINEDITTRAININGDAYS: "/admin/edit/trainingdagen",
+  ADMINLISTUSERS: "/admin/klanten",
+  ADMINLISTSUBSCRIPTIONS: "/admin/inschrijvingen",
+  ADMINLISTDOGS: "/admin/honden/",
+  ADMINLISTBREEDS: "/admin/rassen",
+  ADMINLISTTRAININGS: "/admin/trainingen",
 };
 
 export const {
@@ -26,4 +33,11 @@ export const {
   INSCHRIJVING_PRIVE,
   ADMIN,
   PERSONAL,
+  ADMINEDITINDEX,
+  ADMINEDITTRAININGDAYS,
+  ADMINLISTBREEDS,
+  ADMINLISTDOGS,
+  ADMINLISTSUBSCRIPTIONS,
+  ADMINLISTTRAININGS,
+  ADMINLISTUSERS,
 } = linkTypes;

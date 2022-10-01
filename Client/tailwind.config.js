@@ -102,6 +102,7 @@ module.exports = {
         "3x": "3/1",
       },
       maxWidth: {
+        "3xs": "200px",
         "2xs": "300px",
         "8xl": "88rem",
         "1/5": "20%",
@@ -121,7 +122,9 @@ module.exports = {
       },
       minHeight: {
         xs: "350px",
+        s: "380px",
         "50vh": "50vh",
+        full: "100vh",
       },
       borderRadius: {
         "4xl": "38px",
