@@ -5,7 +5,7 @@ import client, { MongoDb } from "./MongoDb";
 interface HelperInterface {
   getDisabledDays: (training: string) => Promise<string[]>;
   capitalize: (string: string) => string;
-  createRandomConfirmCode: () => Promise<String>;
+  createRandomConfirmCode: () => string;
 }
 
 const helper: HelperInterface = {
@@ -45,12 +45,7 @@ const helper: HelperInterface = {
       )
       .join(" ");
   },
-  createRandomConfirmCode: async (length: number = 50) => {
-    console.log(MongoDb.status);
-    await client.connect();
-    console.log(MongoDb.status);
-    await client.close();
-    console.log(MongoDb.status);
+  createRandomConfirmCode: (length: number = 50) => {
     const options = "abcdefghijklmnopqrstuvwxyz0123456789";
     const code = new Array(length).fill(0).map((_) => {
       const index = Math.floor(Math.random() * options.length);
