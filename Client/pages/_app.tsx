@@ -9,10 +9,8 @@ import AppProvider from "../context/appContext";
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <AppProvider>
-      <Nav />
       <ToastContainer position="top-right" />
       <Component {...pageProps} />
-      <Footer />
     </AppProvider>
   );
 }

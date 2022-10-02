@@ -209,7 +209,12 @@ const Factory = {
       naam: naam as TrainingType,
       prijs: Math.round(Math.random() * 20),
       inschrijvingen: [] as ObjectId[],
-    };
+      bullets: [],
+      content: "",
+      default_content: [],
+      image: "",
+      subtitle: "Random training",
+    } as PriveTrainingCollection;
     return {
       ...randomTraining,
       save: async () => {

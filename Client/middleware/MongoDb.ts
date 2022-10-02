@@ -10,13 +10,20 @@ import { getHondenByKlantId } from "../controllers/HondController";
 import Factory from "./Factory";
 import { KLANT } from "../controllers/KlantController";
 import { CONFIRM } from "../types/EntityTpes/ConfirmTypes";
-import { CONTENT } from "../controllers/ContentController";
+import {
+  CONTENT,
+  getContentCollection,
+} from "../controllers/ContentController";
 import {
   getInschrijvingCollection,
   INSCHRIJVING,
 } from "../controllers/InschrijvingController";
-import { TRAINING } from "../controllers/TrainingController";
+import {
+  getTrainingCollection,
+  TRAINING,
+} from "../controllers/TrainingController";
 import moment from "moment";
+import { PriveTrainingCollection } from "../types/EntityTpes/TrainingType";
 
 export interface Option {
   value: string;
@@ -25,9 +32,17 @@ export interface Option {
 
 interface MongoDbInterface {
   getIndexData: () => Promise<{
-    wie: string[];
-    privetraining: string[];
-    groepstraining: string[];
+    intro: { subtitle: string; content: string[] };
+    diensten: { subtitle: string; content: string[] };
+    trainingen: {
+      subtitle: string;
+      content: string[];
+      bullets: string[];
+      image: string;
+    }[];
+    // wie: string[];
+    // privetraining: string[];
+    // groepstraining: string[];
   }>;
   getRasOptions: () => Promise<Option[] | null>;
   getHondOptions: (klant_id: ObjectId) => Promise<Option[]>;
@@ -41,27 +56,64 @@ export const MongoDb: MongoDbInterface = {
   getIndexData: async () => {
     try {
       await client.connect();
-      const data = await client
-        .db("degallohoeve")
-        .collection("content")
+      const data = await getContentCollection()
         .find({
           _id: {
             $in: [
               new ObjectId("62fa1f25bacc03711136ad59"),
-              new ObjectId("62fa1f25bacc03711136ad5e"),
-              new ObjectId("62fa1f25bacc03711136ad5d"),
+              new ObjectId("633862b5fbcc3a3006dcda52"),
             ],
           },
         })
         .toArray();
+      const trainingen = (await getTrainingCollection()
+        .find()
+        .toArray()) as PriveTrainingCollection[];
+      console.log({ bullets: trainingen[0].bullets });
+      console.log({
+        bullets: trainingen[0].bullets.map((bullet) => bullet),
+      });
       return {
-        wie: atob(data[0].content).split("\n"),
-        privetraining: atob(data[1].content).split("\n"),
-        groepstraining: atob(data[2].content).split("\n"),
+        intro: {
+          subtitle: atob(data[0].subtitle),
+          content: atob(data[0].content).split("\n"),
+        },
+        diensten: {
+          subtitle: atob(data[1].subtitle),
+          content: atob(data[1].content).split("\n"),
+        },
+        trainingen: trainingen.map((training) => {
+          return {
+            subtitle: atob(training.subtitle),
+            content: atob(training.content).split("\n"),
+            bullets: [...training.bullets, `€ ${training.prijs} excl btw.`],
+            image: training.image,
+            _id: training._id.toString(),
+          };
+          // subtitle: atob(training.subtitle),
+          // content: atob(training.content).split("\n"),
+          // bullets: training.bullets.map((bullet) => atob(bullet)),
+          // image: training.image,
+        }),
+        // trainingen: [
+        //   {
+        //     subtitle: atob(data[1].subtitle),
+        //     content: atob(data[1].content).split("\n"),
+        //     bullets: [],
+        //     image: data[2].image,
+        //   },
+        // ],
+        // wie: atob(data[0].content).split("\n"),
+        // privetraining: atob(data[1].content).split("\n"),
+        // groepstraining: atob(data[2].content).split("\n"),
       };
     } catch (e: any) {
       console.error(e.message);
-      return { wie: [], privetraining: [], groepstraining: [] };
+      return {
+        intro: { subtitle: "", content: [] },
+        diensten: { subtitle: "", content: [] },
+        trainingen: [],
+      };
     } finally {
       await client.close();
     }

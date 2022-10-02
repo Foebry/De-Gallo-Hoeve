@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import { useRouter } from "next/router";
-import React, { ReactNode } from "react";
-import { INSCHRIJVING, INSCHRIJVING_PRIVE } from "../../types/linkTypes";
+import React from "react";
+import { INSCHRIJVING } from "../../types/linkTypes";
 import Button from "../buttons/Button";
 import FormRow from "../form/FormRow";
 import { Body } from "../Typography/Typography";
@@ -38,7 +38,7 @@ const TrainingCard: React.FC<TrainingProps> = ({
         <div className="mb-5">
           <Image src={image} width="448" height="262" />
         </div>
-        {body.slice(0, 1).map((paragraph) => (
+        {body.map((paragraph) => (
           <Body key={nanoid(5)} className="px-2">
             {paragraph}
           </Body>

@@ -7,20 +7,26 @@ import { OptionsOrGroups } from "react-select";
 import { optionInterface } from "../components/register/HondGegevens";
 import { useAppContext } from "../context/appContext";
 import { useEffect } from "react";
-import { createRandomConfirmCode } from "../middleware/Helper";
+import Skeleton from "../components/website/skeleton";
 
 interface IndexProps {
-  privetraining: string[];
-  groepstraining: string[];
-  wie: string[];
-  image: { image: string };
+  diensten: { subtitle: string; content: string[] };
+  intro: { subtitle: string; content: string[] };
+  trainingen: {
+    subtitle: string;
+    content: string[];
+    bullets: string[];
+    image: string;
+    price: number;
+    _id: string;
+  }[];
   rassen: OptionsOrGroups<any, optionInterface>[];
 }
 
 const Index: React.FC<IndexProps> = ({
-  privetraining,
-  groepstraining,
-  wie,
+  intro,
+  diensten,
+  trainingen,
   rassen,
 }) => {
   const { setRassen } = useAppContext();
@@ -28,7 +34,7 @@ const Index: React.FC<IndexProps> = ({
     setRassen(rassen);
   }, []);
   return (
-    <>
+    <Skeleton>
       <section className="mb-40 block flex-wrap mt-10 items-center max-w-7xl justify-between mx-auto md:flex md:px-5">
         <div className="mx-auto w-1/2 relative flex flex-wrap rotate-135 gap-5 self-center md:w-4/12 md:mx-0 md:self-end">
           <div className="w-5/12 max-w-sm aspect-square border-4 border-green-200 overflow-hidden relative images">
@@ -69,8 +75,8 @@ const Index: React.FC<IndexProps> = ({
           </div>
         </div>
         <div className="px-5 mx-auto md:mx-0 md:w-7/12 md:px-0">
-          <Title1 className="text-green-200">De Gallo-hoeve</Title1>
-          {wie.map((paragraph) => (
+          <Title1 className="text-green-200">{intro.subtitle}</Title1>
+          {intro.content.map((paragraph) => (
             <Body key={nanoid(5)} className="max-w-7xl px-2 md:mx-auto">
               {paragraph}
             </Body>
@@ -79,8 +85,8 @@ const Index: React.FC<IndexProps> = ({
       </section>
       <section className="bg-white pb-2 mx-auto md:px-5">
         <div className="px-5 mx-auto  max-w-7xl md:px-0">
-          <Title1 className="text-green-200">Onze diensten</Title1>
-          {privetraining.slice(0, 1).map((paragraph) => (
+          <Title1 className="text-green-200">{diensten.subtitle}</Title1>
+          {diensten.content.map((paragraph) => (
             <Body key={nanoid(5)} className="px-2 md:mx-auto">
               {paragraph}
             </Body>
@@ -88,53 +94,39 @@ const Index: React.FC<IndexProps> = ({
         </div>
         <div className="px-5 max-w-7xl py-24 relative md:mx-auto md:px-0">
           <div className="flex gap-10 justify-center flex-wrap sm:flex-nowrap max-w-7xl md:mx-auto py-24 relative ">
-            {/* <TrainingCard
-              title="Groepstrainingen"
-              body={groepstraining}
-              type="groep"
-              items={[
-                "1 hond per inschrijving",
-                "max 10 inschrijvingen per training",
-                "Training op Zondag",
-                "€ 15,00",
-              ]}
-              image="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656189950/De-Gallo-Hoeve/content/hondenschool-740x433_hove6a.jpg"
-            /> */}
-            <TrainingCard
-              title="Privétrainingen"
-              body={privetraining}
-              type="prive"
-              items={[
-                "1 hond per inschrijving",
-                "Bij u thuis of op locatie",
-                "Woensdag, Vrijdag en Zaterdag",
-                "€ 25,00",
-              ]}
-              image="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656188984/De-Gallo-Hoeve/content/pexels-blue-bird-7210258_m74qdh.jpg"
-            />
+            {trainingen.map((training) => (
+              <TrainingCard
+                key={training._id}
+                title={training.subtitle}
+                body={training.content}
+                type="prive"
+                items={training.bullets}
+                image={training.image}
+              />
+            ))}
           </div>
         </div>
       </section>
-    </>
+    </Skeleton>
   );
 };
 
 export default Index;
 
-export const getStaticProps = async () => {
+export const getServerSideProps = async () => {
   await client.connect();
-  console.log(createRandomConfirmCode());
-  const { wie, privetraining, groepstraining } = await getIndexData();
+  const { intro, diensten, trainingen } = await getIndexData();
   const rassen = await getRasOptions();
   await client.close();
 
   return {
     props: {
-      wie,
-      privetraining,
+      intro,
+      diensten,
+      trainingen,
       rassen,
       // groepstraining,
     },
-    revalidate: 3600,
+    // revalidate: 3600,
   };
 };
