@@ -127,6 +127,6 @@ export const getStaticProps = async () => {
       rassen,
       // groepstraining,
     },
-    revalidate: 3600,
+    // revalidate: 3600,
   };
 };
