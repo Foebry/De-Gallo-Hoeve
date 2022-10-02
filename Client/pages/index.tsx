@@ -113,7 +113,7 @@ const Index: React.FC<IndexProps> = ({
 
 export default Index;
 
-export const getStaticProps = async () => {
+export const getServerSideProps = async () => {
   await client.connect();
   const { intro, diensten, trainingen } = await getIndexData();
   const rassen = await getRasOptions();
