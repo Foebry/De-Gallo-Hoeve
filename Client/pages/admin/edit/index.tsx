@@ -28,16 +28,22 @@ export interface ContentStates {
   };
 }
 
-const index = () => {
+interface Props {}
+
+const Index: React.FC<Props> = ({}) => {
   const saveContent = useMutation();
   const [edit, setEdit] = useState<boolean>(false);
+  const getContent = useGetContent();
   const [content, setContent] = useState<ContentStates>({
     intro: { subtitle: "", content: [], image: "" },
     diensten: { subtitle: "", content: [], image: "" },
     trainingen: { content: [], bullets: [], image: "", subtitle: "", price: 0 },
   });
   useEffect(() => {
-    useGetContent(setContent);
+    (async () => {
+      const data = await getContent();
+      setContent(data);
+    })();
   }, []);
 
   const handleChange = (e: any) => {
@@ -111,4 +117,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;

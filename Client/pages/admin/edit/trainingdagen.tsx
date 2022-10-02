@@ -15,7 +15,7 @@ import { toast } from "react-toastify";
 
 interface Props {}
 
-const trainingdagen: React.FC<Props> = ({}) => {
+const Trainingdagen: React.FC<Props> = ({}) => {
   const { control, getValues, setValue } = useForm();
   const save = useMutation();
   useEffect(() => {
@@ -72,4 +72,4 @@ const trainingdagen: React.FC<Props> = ({}) => {
   );
 };
 
-export default trainingdagen;
+export default Trainingdagen;
