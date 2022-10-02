@@ -11,7 +11,7 @@ const ApiTypes = {
   CONTACTAPI: "/api/contact",
   CONTENTINTRO: "/api/content/62fa1f25bacc03711136ad59",
   CONTENTDIENSTEN: "/api/content/633862b5fbcc3a3006dcda52",
-  CONTENTPRIVETRAINING: "/api/content/62fa1f25bacc03711136ad5e",
+  CONTENTPRIVETRAINING: "/api/trainingen/62fa1f25bacc03711136ad5f",
 };
 
 export const {

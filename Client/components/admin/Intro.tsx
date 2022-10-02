@@ -16,40 +16,19 @@ export interface EditStates {
 }
 
 interface Props {
-  handleSave: (endpoint: string, key: string) => Promise<void>;
   content: { subtitle: string; content: string[]; image: string };
   setContent: React.Dispatch<React.SetStateAction<ContentStates>>;
   handleChange: (e: any) => void;
   allContent: ContentStates;
+  edit: boolean;
 }
 const Intro: React.FC<Props> = ({
-  handleSave,
   content,
   setContent,
   handleChange,
   allContent,
+  edit,
 }) => {
-  const [edit, setEdit] = useState<EditStates>({
-    title: { shown: false, edit: false },
-    content: { shown: false, edit: false },
-  });
-
-  const handleHover = (state: boolean, item: string) => {
-    setEdit({
-      ...edit,
-      [item]: { ...edit[item as keyof typeof edit], shown: state },
-    });
-  };
-
-  const handleToggle = (item: string) => {
-    setEdit({
-      ...edit,
-      [item]: {
-        ...edit[item as keyof typeof edit],
-        edit: !edit[item as keyof typeof edit].edit,
-      },
-    });
-  };
   return (
     <section className="mb-40 block flex-wrap mt-10 items-center max-w-7xl justify-between mx-auto md:flex md:px-5">
       <div className="mx-auto w-1/2 relative flex flex-wrap rotate-135 gap-5 self-center md:w-4/12 md:mx-0 md:self-end">
@@ -91,51 +70,32 @@ const Intro: React.FC<Props> = ({
         </div>
       </div>
       <div className="px-5 mx-auto md:mx-0 md:w-7/12 md:px-0">
-        <div className="flex flex-row-reverse">
-          <Button
-            label="save"
-            onClick={() => handleSave(CONTENTINTRO, "intro")}
-          />
-        </div>
-
-        <div
-          className={`relative`}
-          onMouseEnter={() => handleHover(true, "title")}
-          onMouseLeave={() => handleHover(false, "title")}
-        >
-          {edit.title.edit ? (
-            <div>
+        <div className={`relative`}>
+          {edit ? (
+            <h1 className="my-18">
               <input
                 data-name="intro"
                 data-subName="subtitle"
                 value={content.subtitle}
-                className="text-green-200 text-6xl text-center my-18"
+                className="text-green-200 text-6xl text-center border-2 border-green-200 rounded outline-none"
                 onChange={handleChange}
+                autoFocus
               />
-            </div>
+            </h1>
           ) : (
-            <Title1
-              className={`${
-                edit.title.edit ? "text-red-200" : "text-green-200"
-              }`}
-            >
+            <Title1 className={`${edit ? "text-red-200" : "text-green-200"}`}>
               {content.subtitle}
             </Title1>
           )}
-
-          <Edit items={edit} item="title" toggle={handleToggle} />
         </div>
-        <div
-          className="relative"
-          onMouseEnter={() => handleHover(true, "content")}
-          onMouseLeave={() => handleHover(false, "content")}
-        >
-          {edit.content.edit ? (
+        <div className="relative">
+          {edit ? (
             <textarea
               data-name="intro"
               data-subName="content"
               value={content.content.map((paragraph) => paragraph).join("\n\n")}
-              className="w-full px-2 min-h-s text-base"
+              className="w-full px-2 min-h-s text-base border-green-200 border-2 rounded outline-none"
+              autoFocus={true}
               onChange={(e: any) => {
                 const name = e.target.dataset.name;
                 const subName = e.target.dataset.subname;
@@ -158,8 +118,6 @@ const Intro: React.FC<Props> = ({
               ))}
             </>
           )}
-
-          <Edit item="content" items={edit} toggle={handleToggle} />
         </div>
       </div>
     </section>

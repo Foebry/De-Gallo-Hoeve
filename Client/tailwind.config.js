@@ -102,6 +102,7 @@ module.exports = {
         "3x": "3/1",
       },
       maxWidth: {
+        "5xs": "50px",
         "3xs": "200px",
         "2xs": "300px",
         "8xl": "88rem",
@@ -112,6 +113,7 @@ module.exports = {
         "1/2": "50%",
         "2/3": "66%",
         "15p": "15%",
+        fit: "fit-content",
       },
       minWidth: {
         "4xs": "75px",
@@ -125,6 +127,7 @@ module.exports = {
         s: "380px",
         "50vh": "50vh",
         full: "100vh",
+        max: "max-content",
       },
       borderRadius: {
         "4xl": "38px",
