@@ -9,19 +9,17 @@ import { GiCheckMark } from "react-icons/gi";
 import Image from "next/image";
 
 interface TrainingProps {
-  title: string;
-  body: string[];
-  items?: string[];
-  image: string;
   type: string;
+  price: number;
+  kmHeffing: number;
+  gratisVerplaatsingBinnen: number;
 }
 
 const TrainingCard: React.FC<TrainingProps> = ({
-  body,
-  title,
-  items = [],
-  image,
   type,
+  price,
+  kmHeffing,
+  gratisVerplaatsingBinnen,
 }) => {
   const router = useRouter();
   return (
@@ -32,24 +30,60 @@ const TrainingCard: React.FC<TrainingProps> = ({
       }
     >
       <div className="bg-green-200 text-center text-2xl py-8 text-gray-50 rounded-t-lg">
-        {title}
+        Privé training
       </div>
       <div className="pb-2">
         <div className="mb-5">
-          <Image src={image} width="448" height="262" />
+          <Image
+            src="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656188984/De-Gallo-Hoeve/content/pexels-blue-bird-7210258_m74qdh.jpg"
+            width="448"
+            height="262"
+            alt="degallohoeve hondenschool border-collie training prive"
+          />
         </div>
-        {body.map((paragraph) => (
-          <Body key={nanoid(5)} className="px-2">
-            {paragraph}
+        <div className="px-2 flex flex-col gap-2">
+          <Body>
+            Heeft u een nieuwe pup en wilt u ondesteuning bij de puppytraining?
           </Body>
-        ))}
+          <Body>Wilt u wat meer oefening op clicker training?</Body>
+          <Body>
+            Graag wat hulp bij de training voor basis commando's (zitten,
+            liggen, rechtstaan, ...)
+          </Body>
+          <Body>Wandelt uw hond niet correct aan de lijn?</Body>
+          <Body>
+            Eeder op zoek naar gevorderde trainingen voor bewaking, politie of
+            defensie? (blaffen en stil zijn op commando, leren bijten en lossen,
+            ...)
+          </Body>
+          <Body>
+            Vertoond uw hond gedragsproblemen, ook hiermee kunnen wij u helpen
+          </Body>
+          <Body>En nog zoveel meer ...</Body>
+        </div>
         <ul className="pl-5 md:pl-20 mt-10">
-          {items.map((item) => (
-            <Body key={nanoid(5)} className="flex gap-2">
-              <GiCheckMark />
-              {item}
+          <li className="flex gap-2">
+            <GiCheckMark />
+            <Body>1 hond per inschrijving</Body>
+          </li>
+          <li className="flex gap-2">
+            <GiCheckMark />
+            <Body>Bij u thuis</Body>
+          </li>
+          <li className="flex gap-2">
+            <GiCheckMark />
+            <Body>€ {kmHeffing} / kilometer</Body>
+          </li>
+          <li className="flex gap-2">
+            <GiCheckMark />
+            <Body>
+              gratis verplaatsing binnen {gratisVerplaatsingBinnen} kilometer
             </Body>
-          ))}
+          </li>
+          <li className="flex gap-2">
+            <GiCheckMark />
+            <Body>€ {price} excl.btw</Body>
+          </li>
         </ul>
       </div>
       <FormRow className="mt-10">
