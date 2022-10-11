@@ -72,7 +72,7 @@ const authenticationHandler: AuthenticationHandlerInterface = {
     if (!token) throw new NotLoggedInError();
     const verifiedToken = jwt.verify(token, `${secret}`, {
       algorithms: ["RS256", "HS256"],
-    });
+    }) as jwt.JwtPayload;
     if (!verifiedToken) throw new UnauthorizedAccessError();
     return verifiedToken.payload;
   },

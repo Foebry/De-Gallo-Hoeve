@@ -47,7 +47,7 @@ const TrainingCard: React.FC<TrainingProps> = ({
           </Body>
           <Body>Wilt u wat meer oefening op clicker training?</Body>
           <Body>
-            Graag wat hulp bij de training voor basis commando's (zitten,
+            Graag wat hulp bij de training voor basis commando&apos;s (zitten,
             liggen, rechtstaan, ...)
           </Body>
           <Body>Wandelt uw hond niet correct aan de lijn?</Body>
