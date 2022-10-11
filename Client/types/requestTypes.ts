@@ -33,6 +33,8 @@ export interface IsInschrijvingBody {
   klant_id: string;
   training: TrainingType;
   inschrijvingen: IsInschrijvingBodyInschrijving[];
+  prijs: number;
+  isFirstInschrijving: boolean;
 }
 export interface IsInschrijvingBodyInschrijving {
   datum: string;
@@ -52,7 +54,7 @@ export interface IsConfirmQuery {
   code: string;
 }
 
-interface GetKlantenParams {}
-interface GetHondenParams {}
-interface GetInschrijvingenParams {}
-interface GetRassenParams {}
+interface GetKlantenQuery {}
+interface GetHondenQuery {}
+interface GetInschrijvingenQuery {}
+interface GetRassenQuery {}

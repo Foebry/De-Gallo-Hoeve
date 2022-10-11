@@ -5,7 +5,9 @@ export type TrainingType = "prive" | "groep";
 export interface PriveTrainingCollection {
   _id: ObjectId;
   naam: TrainingType;
-  prijs: number;
+  prijsExcl: number;
+  gratisVerplaatsingBinnen: number;
+  kmHeffing: number;
   inschrijvingen: ObjectId[];
   content: string;
   default_content: string[];

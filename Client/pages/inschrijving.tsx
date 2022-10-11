@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Controller, FieldValues, useForm } from "react-hook-form";
 import useMutation, {
   structureInschrijvingenPayload,
@@ -26,6 +26,8 @@ import { getDisabledDays } from "../middleware/Helper";
 import { generateCsrf } from "../middleware/Validator";
 import { securepage } from "../middleware/Authenticator";
 import Skeleton from "../components/website/skeleton";
+import { getPriveTraining } from "../controllers/TrainingController";
+import getData from "../hooks/useApi";
 
 type TrainingType = "prive" | "groep";
 
@@ -37,6 +39,7 @@ interface LessenProps {
   csrf: string;
   type: TrainingType;
   timeslots: any;
+  prijsExcl: number;
 }
 
 export interface InschrijvingErrorInterface {
@@ -59,16 +62,31 @@ const Groepslessen: React.FC<LessenProps> = ({
   csrf,
   type,
   timeslots,
+  prijsExcl,
 }) => {
   const [errors, setErrors] = useState<InschrijvingErrorInterface>({});
   const [activeStep, setActiveStep] = useState<number>(0);
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
   const [disabled, setDisabled] = useState<boolean>(false);
+  const [isFirstInschrijving, setIsFirstInschrijving] = useState<boolean>(true);
 
   const router = useRouter();
   const { handleSubmit, control, getValues, register, setValue } = useForm();
   const inschrijving = useMutation(errors, setErrors);
+
+  useEffect(() => {
+    (async () => {
+      const { data: mijnInschrijvingen } = await getData("/api/inschrijvingen");
+      if (!mijnInschrijvingen) {
+        setIsFirstInschrijving(true);
+        return;
+      } else {
+        if (mijnInschrijvingen.length > 0) setIsFirstInschrijving(false);
+        else setIsFirstInschrijving(true);
+      }
+    })();
+  }, []);
 
   const steps = useMemo(() => {
     return klant_id
@@ -112,6 +130,8 @@ const Groepslessen: React.FC<LessenProps> = ({
         csrf,
         klant_id,
         training: type,
+        prijs: prijsExcl,
+        isFirstInschrijving,
       });
       if (error) {
         if (error.code === 401) router.push(LOGIN);
@@ -228,7 +248,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const disabledDays = await getDisabledDays(type);
   const rassen = await getRasOptions();
   const timeslots = await getFreeTimeSlots();
-  console.log({ timeslots });
+  const { prijsExcl } = await getPriveTraining();
   await client.close();
 
   return {
@@ -240,6 +260,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       csrf,
       type,
       timeslots,
+      prijsExcl,
     },
   };
 };

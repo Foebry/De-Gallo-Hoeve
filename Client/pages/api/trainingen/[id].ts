@@ -23,7 +23,7 @@ const getTrainingData = async (req: NextApiRequest, res: NextApiResponse) => {
     subtitle: atob(data.subtitle),
     content: atob(data.content).split("\n"),
     image: data.image,
-    price: data.prijs,
+    prijsExcl: data.prijsExcl,
     bullets: data.bullets,
   };
 

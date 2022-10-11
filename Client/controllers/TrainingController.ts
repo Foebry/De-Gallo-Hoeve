@@ -138,6 +138,12 @@ export async function getTrainingByName(naam: string) {
     return training as PriveTrainingCollection;
 }
 
+export const getPriveTraining = async () => {
+  return getTrainingCollection().findOne({
+    naam: "prive",
+  }) as Promise<PriveTrainingCollection>;
+};
+
 export async function getTrainingById(
   _id: ObjectId
 ): Promise<PriveTrainingCollection>;

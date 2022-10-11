@@ -4,16 +4,12 @@ import {
   ReadPreference,
   TransactionOptions,
 } from "mongodb";
-import { atob } from "buffer";
 import { getAllRassen, RAS } from "../controllers/rasController";
 import { getHondenByKlantId } from "../controllers/HondController";
 import Factory from "./Factory";
 import { KLANT } from "../controllers/KlantController";
 import { CONFIRM } from "../types/EntityTpes/ConfirmTypes";
-import {
-  CONTENT,
-  getContentCollection,
-} from "../controllers/ContentController";
+import { CONTENT } from "../controllers/ContentController";
 import {
   getInschrijvingCollection,
   INSCHRIJVING,
@@ -22,7 +18,6 @@ import {
   getTrainingCollection,
   TRAINING,
 } from "../controllers/TrainingController";
-import moment from "moment";
 import { PriveTrainingCollection } from "../types/EntityTpes/TrainingType";
 
 export interface Option {
@@ -32,17 +27,10 @@ export interface Option {
 
 interface MongoDbInterface {
   getIndexData: () => Promise<{
-    intro: { subtitle: string; content: string[] };
-    diensten: { subtitle: string; content: string[] };
     trainingen: {
-      subtitle: string;
-      content: string[];
-      bullets: string[];
       image: string;
+      price: number;
     }[];
-    // wie: string[];
-    // privetraining: string[];
-    // groepstraining: string[];
   }>;
   getRasOptions: () => Promise<Option[] | null>;
   getHondOptions: (klant_id: ObjectId) => Promise<Option[]>;
@@ -56,56 +44,17 @@ export const MongoDb: MongoDbInterface = {
   getIndexData: async () => {
     try {
       await client.connect();
-      const data = await getContentCollection()
-        .find({
-          _id: {
-            $in: [
-              new ObjectId("62fa1f25bacc03711136ad59"),
-              new ObjectId("633862b5fbcc3a3006dcda52"),
-            ],
-          },
-        })
-        .toArray();
       const trainingen = (await getTrainingCollection()
         .find()
         .toArray()) as PriveTrainingCollection[];
-      console.log({ bullets: trainingen[0].bullets });
-      console.log({
-        bullets: trainingen[0].bullets.map((bullet) => bullet),
-      });
       return {
-        intro: {
-          subtitle: atob(data[0].subtitle),
-          content: atob(data[0].content).split("\n"),
-        },
-        diensten: {
-          subtitle: atob(data[1].subtitle),
-          content: atob(data[1].content).split("\n"),
-        },
         trainingen: trainingen.map((training) => {
           return {
-            subtitle: atob(training.subtitle),
-            content: atob(training.content).split("\n"),
-            bullets: [...training.bullets, `€ ${training.prijs} excl btw.`],
             image: training.image,
             _id: training._id.toString(),
+            price: training.prijsExcl,
           };
-          // subtitle: atob(training.subtitle),
-          // content: atob(training.content).split("\n"),
-          // bullets: training.bullets.map((bullet) => atob(bullet)),
-          // image: training.image,
         }),
-        // trainingen: [
-        //   {
-        //     subtitle: atob(data[1].subtitle),
-        //     content: atob(data[1].content).split("\n"),
-        //     bullets: [],
-        //     image: data[2].image,
-        //   },
-        // ],
-        // wie: atob(data[0].content).split("\n"),
-        // privetraining: atob(data[1].content).split("\n"),
-        // groepstraining: atob(data[2].content).split("\n"),
       };
     } catch (e: any) {
       console.error(e.message);
@@ -120,7 +69,6 @@ export const MongoDb: MongoDbInterface = {
   },
 
   getRasOptions: async () => {
-    await client.connect();
     const rassen = await getAllRassen();
     return rassen.map(({ _id: value, naam: label }) => ({
       value: value.toString(),
@@ -147,11 +95,9 @@ export const MongoDb: MongoDbInterface = {
       "16:00",
       "17:00",
     ].map((el) => ({ label: el, value: el }));
-    await client.connect();
     const inschrijvingen = await getInschrijvingCollection()
       .find({ training: "prive", datum: { $gt: new Date() } })
       .toArray();
-    await client.close();
 
     const timeSlots = inschrijvingen.reduce((prev, curr) => {
       const [date, time] = curr.datum.toISOString().split("T");

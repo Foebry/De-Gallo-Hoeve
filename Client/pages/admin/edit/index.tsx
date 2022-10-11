@@ -62,17 +62,19 @@ const Index: React.FC<Props> = ({}) => {
 
   const handleSave = async () => {
     const payload = content;
-    const { data, error } = await saveContent("/api/admin/content", payload, {
-      method: "PUT",
-    });
-    if (data) {
-      setEdit(false);
-      toast.success("save successvol");
-      setContent(data);
-    }
-    if (error) {
-      toast.error(error);
-    }
+    setEdit(false);
+    setContent(content);
+    // const { data, error } = await saveContent("/api/admin/content", payload, {
+    //   method: "PUT",
+    // });
+    // if (data) {
+    //   setEdit(false);
+    //   toast.success("save successvol");
+    //   setContent(data);
+    // }
+    // if (error) {
+    //   toast.error(error);
+    // }
   };
 
   const handleBulletChange = (e: any, index: number) => {

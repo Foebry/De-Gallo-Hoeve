@@ -54,7 +54,7 @@ const Footer: React.FC<Props> = ({}) => {
           <div>
             <Body className="flex gap-2 items-center">
               <IoMdPhonePortrait className="text-green-200 text-2xl" />
-              <a href="tel:+32472381346">+324 72 38 13 46</a>
+              <a href="tel:+32456552678">+324 56 55 26 78</a>
             </Body>
             <Body className="flex gap-2 items-center">
               <IoMdMail className="text-green-200 text-2xl" />
@@ -62,10 +62,6 @@ const Footer: React.FC<Props> = ({}) => {
                 info@degallohoeve.be
               </Link>
             </Body>
-            {/* <Body className="flex gap-2 items-center">
-              <IoLogoFacebook className="text-green-200 text-2xl" />
-              Facebook
-            </Body> */}
             <Body className="flex gap-2 items-center">
               <IoLogoInstagram className="text-green-200 text-2xl" />
               <a
@@ -73,7 +69,7 @@ const Footer: React.FC<Props> = ({}) => {
                 target="_blank"
                 rel="noreferrer"
               >
-                @degallohoeve
+                degallohoeve
               </a>
             </Body>
           </div>
@@ -110,19 +106,6 @@ const Footer: React.FC<Props> = ({}) => {
                     />
                   )}
                 />
-                {/* <Controller
-                  name="telefoon"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <FormInput
-                      label="telefoon"
-                      name="telefoon"
-                      id="telefoon"
-                      value={value}
-                      onChange={onChange}
-                    />
-                  )}
-                /> */}
                 <Controller
                   name="bericht"
                   control={control}

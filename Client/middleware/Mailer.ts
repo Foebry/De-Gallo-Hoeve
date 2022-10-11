@@ -19,19 +19,28 @@ const send = (msg: any) => {
 };
 
 export const getTemplateId = (type: string): string => {
-  let templateId: string;
-  switch (type) {
-    case "register":
-      templateId = "d-749bfb287b074dc68c8de14ac73ae240";
-      break;
-    case "contact":
-      templateId = "a";
-    default:
-      templateId = "";
-      break;
-  }
+  return type === "register"
+    ? "d-749bfb287b074dc68c8de14ac73ae240"
+    : type === "inschrijving"
+    ? "d-454de7c4904a4e11a3583562345443b1"
+    : "";
+  // let templateId: string;
+  // switch (type) {
+  //   case "register":
+  //     templateId = "d-749bfb287b074dc68c8de14ac73ae240";
+  //     break;
+  //   case "contact":
+  //     templateId = "a";
+  //     break;
+  //   case "inschrijving":
+  //     templateId = "d-454de7c4904a4e11a3583562345443b1 ";
+  //     break;
+  //   default:
+  //     templateId = "";
+  //     break;
+  // }
 
-  return templateId;
+  // return templateId;
 };
 
 const mailer: Mailer = {

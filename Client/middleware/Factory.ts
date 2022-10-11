@@ -214,6 +214,9 @@ const Factory = {
       default_content: [],
       image: "",
       subtitle: "Random training",
+      prijsExcl: 20.66,
+      gratisVerplaatsingBinnen: 10,
+      kmHeffing: 0.3,
     } as PriveTrainingCollection;
     return {
       ...randomTraining,

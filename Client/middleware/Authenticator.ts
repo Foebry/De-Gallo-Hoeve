@@ -3,7 +3,7 @@ import {
   NextApiRequest,
   NextApiResponse,
 } from "next";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import nookies, { parseCookies, setCookie } from "nookies";
 import { ObjectId } from "mongodb";
 import { INSCHRIJVING } from "../types/linkTypes";
@@ -15,11 +15,22 @@ import {
   UnauthorizedAccessError,
 } from "./RequestError";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
+import { HondCollection } from "../types/EntityTpes/HondTypes";
+
+interface VerifiedToken {
+  verified: boolean;
+  honden: HondCollection[];
+  roles: number;
+  _id: string;
+}
 
 interface AuthenticationHandlerInterface {
   createJWT: (res: NextApiResponse, klantData: any) => void;
   setClientCookie: (res: NextApiResponse, payload: any) => void;
-  secureApi: (obj: { req: NextApiRequest; res: NextApiResponse }) => void;
+  secureApi: (obj: {
+    req: NextApiRequest;
+    res: NextApiResponse;
+  }) => VerifiedToken;
   redirectToLogin: (ctx: GetServerSidePropsContext, redirect?: string) => void;
   securepage: (ctx: GetServerSidePropsContext) => Promise<ObjectId | void>;
   hash: (value: string | object, secret: string) => string;
@@ -61,8 +72,9 @@ const authenticationHandler: AuthenticationHandlerInterface = {
     if (!token) throw new NotLoggedInError();
     const verifiedToken = jwt.verify(token, `${secret}`, {
       algorithms: ["RS256", "HS256"],
-    });
+    }) as jwt.JwtPayload;
     if (!verifiedToken) throw new UnauthorizedAccessError();
+    return verifiedToken.payload;
   },
 
   redirectToLogin: (ctx) => {
