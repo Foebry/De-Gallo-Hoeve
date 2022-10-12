@@ -14,6 +14,7 @@ import {
   TrainingType,
   UpdateTraining,
 } from "../types/EntityTpes/TrainingType";
+import { IsInschrijvingBodyInschrijving } from "../types/requestTypes";
 import {
   deleteInschrijvingen,
   getInschrijvingById,
@@ -22,6 +23,7 @@ import {
 
 export interface IsTrainingController {
   getTrainingCollection: () => Collection;
+  getTrainingDaysCollection: () => Collection;
   getTrainingById: typeof getTrainingById;
   getTrainingByName: typeof getTrainingByName;
   updateTraining: typeof updateTraining;
@@ -39,7 +41,7 @@ export interface IsTrainingController {
   klantReedsIngeschreven: (
     klant: IsKlantCollection,
     training: TrainingType,
-    inschrijving: IsInschrijving
+    inschrijving: IsInschrijvingBodyInschrijving
   ) => Promise<boolean>;
   trainingVolzet: (training: TrainingType, datum: string) => Promise<boolean>;
   deleteAll: () => Promise<void>;
@@ -49,6 +51,10 @@ const TrainingController: IsTrainingController = {
   getTrainingCollection: () => {
     const database = process.env.MONGODB_DATABASE;
     return client.db(database).collection("training");
+  },
+  getTrainingDaysCollection: () => {
+    const database = process.env.MONGODB_DATABASE;
+    return client.db(database).collection("trainingDays");
   },
   getTrainingById,
   getTrainingByName,
@@ -85,7 +91,7 @@ const TrainingController: IsTrainingController = {
   },
   klantReedsIngeschreven: async (klant, training, inschrijving) => {
     const inschrijvingFound = await getInschrijvingCollection().findOne({
-      datum: moment(inschrijving.datum).local().format(),
+      datum: moment(inschrijving.datum).local().toDate(),
       training,
       "klant.id": klant._id,
     });
@@ -94,7 +100,7 @@ const TrainingController: IsTrainingController = {
   trainingVolzet: async (training, datum) => {
     const Training = await getTrainingByName(training);
     const inschrijvingen = await getInschrijvingCollection()
-      .find({ datum: moment(datum).local().format() })
+      .find({ datum: moment(datum).local().toDate() })
       .toArray();
     if (training === "groep")
       return inschrijvingen.length >= Training.max_inschrijvingen;
@@ -112,6 +118,7 @@ export default TrainingController;
 export const TRAINING = "TrainingController";
 export const {
   getTrainingCollection,
+  getTrainingDaysCollection,
   deleteInschrijving,
   addTrainingInschrijving,
   klantReedsIngeschreven,
@@ -130,6 +137,12 @@ export async function getTrainingByName(naam: string) {
   else if (training && naam === "prive")
     return training as PriveTrainingCollection;
 }
+
+export const getPriveTraining = async () => {
+  return getTrainingCollection().findOne({
+    naam: "prive",
+  }) as Promise<PriveTrainingCollection>;
+};
 
 export async function getTrainingById(
   _id: ObjectId

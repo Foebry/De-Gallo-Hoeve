@@ -202,7 +202,7 @@ describe("/inschrijving", () => {
         .send(payload)
         .expect(422);
 
-      expect(body.message).toBe("U bent reeds ingeschreven voor deze training");
+      expect(body.message).toBe("Inschrijving niet verwerkt");
     });
     it("Should throw TrainingVolzetError when klant tries to subscribe to a training which has already a subscription at a chose time", async () => {
       const training = await Factory.createRandomTraining("prive").save();

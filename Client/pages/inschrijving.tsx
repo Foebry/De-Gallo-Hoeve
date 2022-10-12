@@ -9,9 +9,6 @@ import { POST_INSCHRIJVING } from "../types/apiTypes";
 import { INDEX, LOGIN } from "../types/linkTypes";
 import FormSteps from "../components/form/FormSteps";
 import Form from "../components/form/Form";
-import { Body } from "../components/Typography/Typography";
-import Link from "next/link";
-import FormRow from "../components/form/FormRow";
 import Button, { SubmitButton } from "../components/buttons/Button";
 import { DatePicker } from "react-trip-date";
 import Contactgegevens from "../components/inschrijving/Contactgegevens";
@@ -28,6 +25,9 @@ import { ObjectId } from "mongodb";
 import { getDisabledDays } from "../middleware/Helper";
 import { generateCsrf } from "../middleware/Validator";
 import { securepage } from "../middleware/Authenticator";
+import Skeleton from "../components/website/skeleton";
+import { getPriveTraining } from "../controllers/TrainingController";
+import getData from "../hooks/useApi";
 
 type TrainingType = "prive" | "groep";
 
@@ -39,6 +39,7 @@ interface LessenProps {
   csrf: string;
   type: TrainingType;
   timeslots: any;
+  prijsExcl: number;
 }
 
 export interface InschrijvingErrorInterface {
@@ -61,21 +62,46 @@ const Groepslessen: React.FC<LessenProps> = ({
   csrf,
   type,
   timeslots,
+  prijsExcl,
 }) => {
   const [errors, setErrors] = useState<InschrijvingErrorInterface>({});
   const [activeStep, setActiveStep] = useState<number>(0);
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
+  const [disabled, setDisabled] = useState<boolean>(false);
+  const [isFirstInschrijving, setIsFirstInschrijving] = useState<boolean>(true);
 
   const router = useRouter();
   const { handleSubmit, control, getValues, register, setValue } = useForm();
   const inschrijving = useMutation(errors, setErrors);
+
+  useEffect(() => {
+    (async () => {
+      const { data: mijnInschrijvingen } = await getData("/api/inschrijvingen");
+      if (!mijnInschrijvingen) {
+        setIsFirstInschrijving(true);
+        return;
+      } else {
+        if (mijnInschrijvingen.length > 0) setIsFirstInschrijving(false);
+        else setIsFirstInschrijving(true);
+      }
+    })();
+  }, []);
 
   const steps = useMemo(() => {
     return klant_id
       ? ["Selecteer datum(s)", "Selecteer hond"]
       : ["Selecteer datum(s)", "Gegevens hond", "Contactgegevens"];
   }, [klant_id]);
+
+  const handleNextPageClick = () => {
+    const hasDatesSelected = getValues().dates && getValues().dates.length > 0;
+    if (hasDatesSelected && activeStep === 0) {
+      setActiveStep(activeStep + 1);
+    } else if (activeStep === 0 && !hasDatesSelected) {
+      toast.error("Gelieve minstens 1 datum te kiezen");
+    }
+  };
 
   const handleDelete = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     const index = parseInt(e.currentTarget.dataset.id ?? "-1");
@@ -92,104 +118,113 @@ const Groepslessen: React.FC<LessenProps> = ({
   };
 
   const onSubmit = async (values: FieldValues) => {
-    const payload = structureInschrijvingenPayload(values);
-    const { data, error } = await inschrijving(POST_INSCHRIJVING, {
-      ...payload,
-      csrf,
-      klant_id,
-      training: type,
-    });
-    if (error?.code === 401) router.push(LOGIN);
-    if (data) {
-      toast.success(data.message);
-      router.push(INDEX);
+    const [payload, newErrors] = structureInschrijvingenPayload(values);
+    if (!disabled) {
+      setDisabled(() => true);
+      if (Object.keys(newErrors).length > 0) {
+        setDisabled(false);
+        return setErrors(newErrors);
+      }
+      const { data, error } = await inschrijving(POST_INSCHRIJVING, {
+        ...payload,
+        csrf,
+        klant_id,
+        training: type,
+        prijs: prijsExcl,
+        isFirstInschrijving,
+      });
+      if (error) {
+        if (error.code === 401) router.push(LOGIN);
+      }
+      if (data) {
+        toast.success(data.message);
+        router.push(INDEX);
+      }
+      setDisabled(() => false);
     }
   };
 
   return (
-    <section className="mx-5 pb-24 md:mx-auto">
-      {!klant_id && (
-        <div className="max-w-7xl mx-auto mt-14 mb-20 border-2 rounded border-green-300 py-2 px-5 bg-green-200">
-          <Body className="text-center text-gray-200">
-            Wist u dat u op een eenvoudigere manier zich kan inschrijven door
-            eerst{" "}
-            <span className="cursor-pointer underline">
-              <Link href={LOGIN}>in te loggen</Link>
-            </span>
-          </Body>
-        </div>
-      )}
-      <div className="max-w-7xl mx-auto">
-        <FormSteps
-          steps={steps}
-          activeStep={activeStep}
-          errorSteps={errorSteps}
-          setActiveStep={setActiveStep}
-        />
-        <Form onSubmit={handleSubmit(onSubmit)}>
-          <div className="max-w-3xl mx-0 md:mx-auto mt-20 mb-30">
-            {activeStep === 0 ? (
-              <>
-                <Controller
-                  name="dates"
+    <Skeleton>
+      <section className="mb-48 md:px-5 mt-20">
+        <div className="max-w-7xl mx-auto">
+          <FormSteps
+            steps={steps}
+            activeStep={activeStep}
+            errorSteps={errorSteps}
+            setActiveStep={setActiveStep}
+          />
+          <Form onSubmit={handleSubmit(onSubmit)}>
+            <div className="max-w-3xl mx-0 md:mx-auto mt-20 mb-30">
+              {activeStep === 0 ? (
+                <>
+                  <Controller
+                    name="dates"
+                    control={control}
+                    render={({ field: { onChange } }) => (
+                      <DatePicker
+                        onChange={(e) => {
+                          onChange(e);
+                          setSelectedDates(
+                            getValues().dates.sort(
+                              (a: string, b: string) =>
+                                new Date(a).getTime() - new Date(b).getTime()
+                            )
+                          );
+                          setValue("inschrijvingen", []);
+                        }}
+                        disabledBeforeToday={true}
+                        numberOfSelectableDays={5}
+                        startOfWeek={1}
+                        disabledDays={disabledDays}
+                        selectedDays={selectedDates}
+                        disabledAfterDate={
+                          disabledDays?.[disabledDays?.length - 1]
+                        }
+                      />
+                    )}
+                  />
+                </>
+              ) : activeStep === 1 ? (
+                <HondGegevens
                   control={control}
-                  render={({ field: { onChange } }) => (
-                    <DatePicker
-                      onChange={(e) => {
-                        onChange(e);
-                        setSelectedDates(
-                          getValues().dates.sort(
-                            (a: string, b: string) =>
-                              new Date(a).getTime() - new Date(b).getTime()
-                          )
-                        );
-                        setValue("inschrijvingen", []);
-                      }}
-                      disabledBeforeToday={true}
-                      numberOfSelectableDays={5}
-                      startOfWeek={1}
-                      disabledDays={disabledDays}
-                      selectedDays={selectedDates}
-                    />
-                  )}
+                  register={register}
+                  rassen={rassen}
+                  values={getValues}
+                  errors={errors}
+                  setErrors={setErrors}
+                  selectedDates={selectedDates}
+                  honden={honden}
+                  type={type}
+                  handleDelete={handleDelete}
+                  timeslots={timeslots}
                 />
-              </>
-            ) : activeStep === 1 ? (
-              <HondGegevens
-                control={control}
-                register={register}
-                rassen={rassen}
-                values={getValues}
-                errors={errors}
-                setErrors={setErrors}
-                selectedDates={selectedDates}
-                honden={honden}
-                type={type}
-                handleDelete={handleDelete}
-                timeslots={timeslots}
-              />
-            ) : activeStep === 2 ? (
-              <Contactgegevens control={control} />
-            ) : null}
-          </div>
-          <FormRow className="max-w-3xl mx-auto">
-            <Button
-              label="vorige"
-              onClick={() => setActiveStep(activeStep - 1)}
-              disabled={activeStep === 0}
-            />
-            {(activeStep === 1 && klant_id) || activeStep === 2 ? (
-              <SubmitButton label="inschrijven" />
-            ) : (
+              ) : activeStep === 2 ? (
+                <Contactgegevens control={control} />
+              ) : null}
+            </div>
+          </Form>
+          {activeStep > 0 && (
+            <div className="absolute left-10 top-20">
               <Button
-                label="volgende"
-                onClick={() => setActiveStep(activeStep + 1)}
+                label="vorige"
+                onClick={() => setActiveStep(activeStep - 1)}
               />
+            </div>
+          )}
+          <div className="absolute right-10 top-20">
+            {activeStep === 1 ? (
+              <SubmitButton
+                label="verzend"
+                onClick={() => onSubmit(getValues())}
+              />
+            ) : (
+              <Button label="volgende" onClick={handleNextPageClick} />
             )}
-          </FormRow>
-        </Form>
-      </div>
-    </section>
+          </div>
+        </div>
+      </section>
+    </Skeleton>
   );
 };
 
@@ -213,6 +248,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const disabledDays = await getDisabledDays(type);
   const rassen = await getRasOptions();
   const timeslots = await getFreeTimeSlots();
+  const { prijsExcl } = await getPriveTraining();
   await client.close();
 
   return {
@@ -224,6 +260,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       csrf,
       type,
       timeslots,
+      prijsExcl,
     },
   };
 };

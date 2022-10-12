@@ -5,7 +5,7 @@ import { createServer, IncomingMessage, RequestListener } from "http";
 import request from "supertest";
 import { apiResolver } from "next/dist/server/api-utils/node";
 import handler from "../../pages/api/auth/login";
-import client, { clearAllData } from "../../middleware/MongoDb";
+import { clearAllData } from "../../middleware/MongoDb";
 import Factory from "../../middleware/Factory";
 
 describe("login", () => {

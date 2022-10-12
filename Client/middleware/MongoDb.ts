@@ -4,21 +4,22 @@ import {
   ReadPreference,
   TransactionOptions,
 } from "mongodb";
-import { atob } from "buffer";
 import { getAllRassen, RAS } from "../controllers/rasController";
 import { getHondenByKlantId } from "../controllers/HondController";
-import { getConfirmCollection } from "../controllers/ConfirmController";
 import Factory from "./Factory";
 import { KLANT } from "../controllers/KlantController";
 import { CONFIRM } from "../types/EntityTpes/ConfirmTypes";
 import { CONTENT } from "../controllers/ContentController";
-import { INSCHRIJVING } from "../controllers/InschrijvingController";
-import { TRAINING } from "../controllers/TrainingController";
+import {
+  getInschrijvingCollection,
+  INSCHRIJVING,
+} from "../controllers/InschrijvingController";
+import {
+  getTrainingCollection,
+  TRAINING,
+} from "../controllers/TrainingController";
+import { PriveTrainingCollection } from "../types/EntityTpes/TrainingType";
 
-interface Result {
-  value: ObjectId;
-  label: string;
-}
 export interface Option {
   value: string;
   label: string;
@@ -26,50 +27,48 @@ export interface Option {
 
 interface MongoDbInterface {
   getIndexData: () => Promise<{
-    wie: string[];
-    privetraining: string[];
-    groepstraining: string[];
+    trainingen: {
+      image: string;
+      price: number;
+    }[];
   }>;
   getRasOptions: () => Promise<Option[] | null>;
   getHondOptions: (klant_id: ObjectId) => Promise<Option[]>;
-  getCollections: (collections: string[]) => any;
   getFreeTimeSlots: () => Promise<any>;
   startTransaction: () => TransactionOptions;
   clearAllData: () => Promise<void>;
+  status: "open" | "closed";
 }
 
-const MongoDb: MongoDbInterface = {
+export const MongoDb: MongoDbInterface = {
   getIndexData: async () => {
     try {
       await client.connect();
-      const data = await client
-        .db("degallohoeve")
-        .collection("content")
-        .find({
-          _id: {
-            $in: [
-              new ObjectId("62fa1f25bacc03711136ad59"),
-              new ObjectId("62fa1f25bacc03711136ad5e"),
-              new ObjectId("62fa1f25bacc03711136ad5d"),
-            ],
-          },
-        })
-        .toArray();
+      const trainingen = (await getTrainingCollection()
+        .find()
+        .toArray()) as PriveTrainingCollection[];
       return {
-        wie: atob(data[0].content).split("\n"),
-        privetraining: atob(data[1].content).split("\n"),
-        groepstraining: atob(data[2].content).split("\n"),
+        trainingen: trainingen.map((training) => {
+          return {
+            image: training.image,
+            _id: training._id.toString(),
+            price: training.prijsExcl,
+          };
+        }),
       };
     } catch (e: any) {
       console.error(e.message);
-      return { wie: [], privetraining: [], groepstraining: [] };
+      return {
+        intro: { subtitle: "", content: [] },
+        diensten: { subtitle: "", content: [] },
+        trainingen: [],
+      };
     } finally {
       await client.close();
     }
   },
 
   getRasOptions: async () => {
-    await client.connect();
     const rassen = await getAllRassen();
     return rassen.map(({ _id: value, naam: label }) => ({
       value: value.toString(),
@@ -85,15 +84,6 @@ const MongoDb: MongoDbInterface = {
     })) as Option[];
   },
 
-  getCollections: (collections) => {
-    return collections.reduce((prev, curr) => {
-      return {
-        ...prev,
-        [curr + "Collection"]: client.db("degallohoeve").collection(curr),
-      };
-    }, {});
-  },
-
   getFreeTimeSlots: async () => {
     const all = [
       "10:00",
@@ -105,13 +95,10 @@ const MongoDb: MongoDbInterface = {
       "16:00",
       "17:00",
     ].map((el) => ({ label: el, value: el }));
-    await client.connect();
-    const inschrijvingen = await client
-      .db("degallohoeve")
-      .collection("inschrijving")
+    const inschrijvingen = await getInschrijvingCollection()
       .find({ training: "prive", datum: { $gt: new Date() } })
       .toArray();
-    await client.close();
+
     const timeSlots = inschrijvingen.reduce((prev, curr) => {
       const [date, time] = curr.datum.toISOString().split("T");
       const keys = Object.keys(prev);
@@ -161,17 +148,21 @@ const MongoDb: MongoDbInterface = {
       await client.close();
     }
   },
+  status: "closed",
 };
 
 const client = new MongoClient(
   `mongodb+srv://degallohoeve:${process.env.MONGODB_PASSWORD}@cluster0.poasnun.mongodb.net/?retryWrites=true&w=majority`
 );
+
+client.on("open", () => (MongoDb.status = "open"));
+client.on("connectionClosed", () => (MongoDb.status = "closed"));
+
 export default client;
 export const {
   getIndexData,
   getRasOptions,
   getHondOptions,
-  getCollections,
   getFreeTimeSlots,
   startTransaction,
   clearAllData,

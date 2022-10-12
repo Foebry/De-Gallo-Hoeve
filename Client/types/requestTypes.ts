@@ -32,12 +32,15 @@ export interface IsInschrijvingBody {
   csrf: string;
   klant_id: string;
   training: TrainingType;
-  inschrijvingen: {
-    datum: string;
-    hond_id: string;
-    hond_naam: string;
-    hond_geslacht: Geslacht;
-  }[];
+  inschrijvingen: IsInschrijvingBodyInschrijving[];
+  prijs: number;
+  isFirstInschrijving: boolean;
+}
+export interface IsInschrijvingBodyInschrijving {
+  datum: string;
+  hond_id: string;
+  hond_naam: string;
+  hond_geslacht: Geslacht;
 }
 export interface IsUpdateInschrijvingBody {
   csrf: string;
@@ -51,7 +54,7 @@ export interface IsConfirmQuery {
   code: string;
 }
 
-interface GetKlantenParams {}
-interface GetHondenParams {}
-interface GetInschrijvingenParams {}
-interface GetRassenParams {}
+interface GetKlantenQuery {}
+interface GetHondenQuery {}
+interface GetInschrijvingenQuery {}
+interface GetRassenQuery {}

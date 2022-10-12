@@ -30,7 +30,10 @@ import TrainingController, {
   TRAINING,
 } from "../controllers/TrainingController";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
-import { IsNewKlantData } from "../types/requestTypes";
+import {
+  IsInschrijvingBodyInschrijving,
+  IsNewKlantData,
+} from "../types/requestTypes";
 import brcypt from "bcrypt";
 import { capitalize, createRandomConfirmCode } from "./Helper";
 import { HondCollection, NewHond } from "../types/EntityTpes/HondTypes";
@@ -63,33 +66,33 @@ export type TRAINING = "TrainingController";
 const Factory = {
   getController,
   createInschrijving: (
-    inschrijving: IsInschrijving,
+    inschrijving: IsInschrijvingBodyInschrijving,
     training: TrainingType,
     klant: IsKlantCollection,
     hond: HondCollection
   ): InschrijvingCollection => ({
-    datum: moment(inschrijving.datum).local().format(),
+    datum: new Date(inschrijving.datum),
     training,
     klant: { id: klant._id, lnaam: klant.lnaam, vnaam: klant.vnaam },
     hond: { id: hond._id, naam: hond.naam },
     _id: new ObjectId(),
-    created_at: moment().local().format(),
-    updated_at: moment().local().format(),
+    created_at: moment().local().toDate(),
+    updated_at: moment().local().toDate(),
   }),
   createConfirm: (confirm: NewConfirm): ConfirmCollection => ({
     ...confirm,
     _id: new ObjectId(),
     code: createRandomConfirmCode(),
-    valid_to: moment(confirm.created_at).local().add(1, "day").format(),
+    valid_to: moment(confirm.created_at).local().add(1, "day").toDate(),
   }),
   createHond: (hond: NewHond) => ({
     _id: new ObjectId(),
     naam: capitalize(hond.naam),
     geslacht: hond.geslacht,
-    geboortedatum: moment().local().format(),
+    geboortedatum: moment().local().toDate(),
     ras: hond.ras,
-    created_at: moment().local().format(),
-    updated_at: moment().local().format(),
+    created_at: moment().local().toDate(),
+    updated_at: moment().local().toDate(),
   }),
   createKlant: async (klant: IsNewKlantData): Promise<IsKlantCollection> => ({
     _id: new ObjectId(),
@@ -97,8 +100,8 @@ const Factory = {
     verified: false,
     inschrijvingen: [],
     reservaties: [],
-    created_at: moment().local().format(),
-    updated_at: moment().local().format(),
+    created_at: moment().local().toDate(),
+    updated_at: moment().local().toDate(),
     email: klant.email.toLowerCase(),
     password: await brcypt.hash(klant.password, 10),
     vnaam: capitalize(klant.vnaam),
@@ -115,8 +118,8 @@ const Factory = {
     _id: new ObjectId(),
     naam: ras.naam,
     soort: ras.soort,
-    created_at: moment().local().format(),
-    updated_at: moment().local().format(),
+    created_at: moment().local().toDate(),
+    updated_at: moment().local().toDate(),
   }),
   createRandomKlant: async (options?: any): Promise<IsRegisterPayload> => {
     await process.nextTick(() => {});
@@ -163,7 +166,7 @@ const Factory = {
     const { data } = await axios.get(
       "https://www.randomuser.me/api/?format=json&nat=fr"
     );
-    const now = moment().local().format();
+    const now = moment().local().toDate();
     return {
       geslacht: data.results[0].gender === "female" ? "Teef" : "Reu",
       geboortedatum: data.results[0].dob.date,
@@ -179,14 +182,15 @@ const Factory = {
     klant: IsKlantCollection,
     hond: HondCollection
   ): RandomInschrijving => {
+    const now = moment().local().toDate();
     const randomInschrijving = {
       _id: new ObjectId(),
-      created_at: moment().local().format(),
-      datum: moment("2022-09-24").local().format(),
+      created_at: now,
+      datum: moment("2022-09-24").local().toDate(),
       hond: { id: hond._id, naam: hond.naam },
       klant: { id: klant._id, vnaam: klant.vnaam, lnaam: klant.lnaam },
       training: "prive" as TrainingType,
-      updated_at: moment().local().format(),
+      updated_at: now,
     };
     return {
       ...randomInschrijving,
@@ -205,7 +209,15 @@ const Factory = {
       naam: naam as TrainingType,
       prijs: Math.round(Math.random() * 20),
       inschrijvingen: [] as ObjectId[],
-    };
+      bullets: [],
+      content: "",
+      default_content: [],
+      image: "",
+      subtitle: "Random training",
+      prijsExcl: 20.66,
+      gratisVerplaatsingBinnen: 10,
+      kmHeffing: 0.3,
+    } as PriveTrainingCollection;
     return {
       ...randomTraining,
       save: async () => {

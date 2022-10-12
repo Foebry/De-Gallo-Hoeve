@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import {
   Control,
   Controller,
@@ -12,9 +12,11 @@ import Button from "../buttons/Button";
 import FormInput from "../form/FormInput";
 import FormRow from "../form/FormRow";
 import { optionInterface } from "../register/HondGegevens";
-import { Body, Title3 } from "../Typography/Typography";
+import { Body, FormError, Title3 } from "../Typography/Typography";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { MyDatePicker } from "../MyDatePicker";
+import { MySelect } from "../MySelect";
 
 interface HondCardProps {
   control: Control<FieldValues, any>;
@@ -42,72 +44,122 @@ const HondCard: React.FC<HondCardProps> = ({
   remove,
 }) => {
   const [open, setOpen] = useState<boolean>(true);
-  console.log({ rassen });
+  const [errorState, setErrorState] = useState<boolean>(false);
+
+  const handleChange = (key: string) => {
+    setErrors({ ...errors, [`honden[${index}].${key}`]: undefined });
+  };
+
+  useEffect(() => {
+    const naam =
+      Object.keys(errors).includes(`honden[${index}].naam`) &&
+      errors[`honden[${index}].naam` as keyof typeof errors] !== undefined;
+    const ras =
+      Object.keys(errors).includes(`honden[${index}].ras`) &&
+      errors[`honden[${index}].ras` as keyof typeof errors] !== undefined;
+    const geboortedatum =
+      Object.keys(errors).includes(`honden[${index}].geboortedatum`) &&
+      errors[`honden[${index}].geboortedatum` as keyof typeof errors] !==
+        undefined;
+    const geslacht =
+      Object.keys(errors).includes(`honden[${index}].geslacht`) &&
+      errors[`honden[${index}].geslacht` as keyof typeof errors] !== undefined;
+    if (naam || ras || geboortedatum || geslacht) setErrorState(true);
+    else setErrorState(false);
+  }, [errors]);
   return (
     <>
       {open ? (
-        <div className="border-2 rounded px-2 md:px-20 relative max-w-xl mx-auto">
+        <div
+          className={`border-2 rounded px-2 ${
+            errorState && "border-red-800"
+          }  md:px-20 relative max-w-xl mx-auto`}
+        >
           <div className="absolute right-1 top-2 z-10">
             <Button label="-" onClick={() => setOpen(!open)} />
           </div>
           <div className="mt-5">
-            <Controller
-              name={`honden.${index}.naam`}
-              control={control}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <FormInput
-                  label="naam"
-                  name={`honden.${index}.naam`}
-                  id={`honden.${index}.naam`}
-                  value={value}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  errors={errors}
-                  setErrors={setErrors}
-                />
-              )}
-            />
+            <div>
+              <Controller
+                name={`honden.${index}.naam`}
+                control={control}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <FormInput
+                    label="naam"
+                    name={`honden[${index}].naam`}
+                    id={`honden.${index}.naam`}
+                    value={value}
+                    onChange={(e: FormEvent<HTMLInputElement>) => {
+                      handleChange("naam");
+                      onChange(e);
+                    }}
+                    onBlur={onBlur}
+                    errors={errors}
+                    setErrors={setErrors}
+                  />
+                )}
+              />
+            </div>
             <FormRow className="mt-5 flex-wrap gap-5 mb-3">
-              <div className="w-1/3 min-w-fit">
+              <div className="w-1/3 min-w-fit relative">
                 <Controller
                   name={`honden.${index}.geslacht`}
                   control={control}
                   render={({ field: { onChange, value } }) => (
-                    <Select
+                    <MySelect
                       options={geslachten}
-                      onChange={onChange}
-                      value={value ?? { label: "Geslacht *", value: undefined }}
+                      onChange={(e: any) => {
+                        handleChange("geslacht");
+                        onChange(e);
+                      }}
+                      value={
+                        value ?? {
+                          label: "Geslacht",
+                          value: undefined,
+                        }
+                      }
+                      errors={errors}
+                      name={`honden[${index}].geslacht`}
                     />
                   )}
                 />
               </div>
-              <div className="w-5/12 min-w-fit">
+              <div className="w-5/12 min-w-fit relative">
                 <Controller
                   name={`honden.${index}.ras`}
                   control={control}
                   render={({ field: { onChange, value } }) => (
-                    <Select
+                    <MySelect
                       options={rassen}
-                      onChange={onChange}
-                      value={value ?? { label: "Ras", value: undefined }}
+                      onChange={(e: any) => {
+                        handleChange("ras");
+                        onChange(e);
+                      }}
+                      errors={errors}
+                      name={`honden[${index}].ras`}
+                      value={
+                        value ?? { label: "Selecteer ras", value: undefined }
+                      }
                     />
                   )}
                 />
               </div>
             </FormRow>
             <Body>Geboortedatum</Body>
-            <div className="max-w-fit border-2 rounded mb-5 px-2">
+            <div className="max-w-fit border-2 rounded mb-5 px-2 relative">
               <Controller
                 name={`honden.${index}.geboortedatum`}
                 control={control}
                 render={({ field: { value, onChange } }) => (
-                  <DatePicker
+                  <MyDatePicker
                     onChange={(e) => {
+                      handleChange("geboortedatum");
                       onChange(e);
-                      console.log(value);
                     }}
                     selected={value}
-                    dateFormat="dd/MM/yyyy"
+                    dateFormat="dd/MM/yyy"
+                    errors={errors}
+                    name={`honden[${index}].geboortedatum`}
                   />
                 )}
               />

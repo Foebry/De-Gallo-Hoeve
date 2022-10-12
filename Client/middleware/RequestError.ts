@@ -137,11 +137,8 @@ export class InvalidPasswordError extends UnprocessablePayloadError {
 }
 
 export class ReedsIngeschrevenError extends UnprocessablePayloadError {
-  constructor() {
-    super(
-      "ReedsIngeschrevenError",
-      "U bent reeds ingeschreven voor deze training"
-    );
+  constructor(response: any) {
+    super("ReedsIngeschrevenError", "Inschrijving niet verwerkt", response);
   }
 }
 

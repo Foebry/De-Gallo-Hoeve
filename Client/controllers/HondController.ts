@@ -65,7 +65,7 @@ const HondController: IsHondController = {
   update: async (klant, _id, hondData) => {
     const updateHond = {
       ...hondData,
-      updated_at: moment().local().format(),
+      updated_at: moment().local().toDate(),
     };
 
     const { upsertedCount } = await getKlantCollection().updateOne(

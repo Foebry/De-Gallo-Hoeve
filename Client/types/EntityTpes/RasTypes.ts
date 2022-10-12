@@ -7,8 +7,8 @@ export interface NewRas {
 
 export interface RasCollection extends NewRas {
   _id: ObjectId;
-  created_at: string;
-  updated_at: string;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface UpdateRas {

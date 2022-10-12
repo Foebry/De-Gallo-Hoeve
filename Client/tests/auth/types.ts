@@ -6,6 +6,4 @@ export interface IsRegisterPayload extends IsKlantCollection {
   save: () => Promise<IsKlantCollection>;
 }
 
-export interface IsRegisterResponseBody extends IsKlantCollection {
-  message: string;
-}
+export interface IsRegisterResponseBody extends IsKlantCollection {}

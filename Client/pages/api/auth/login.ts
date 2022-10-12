@@ -30,6 +30,7 @@ const login = async (req: NextApiRequest, res: NextApiResponse) => {
     const match = await bcrypt.compare(password, klant.password);
     if (!match) throw new InvalidPasswordError();
 
+    console.log({ klant });
     createJWT(res, klant);
     setClientCookie(res, klant);
 

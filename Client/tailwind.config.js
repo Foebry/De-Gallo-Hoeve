@@ -91,6 +91,9 @@ module.exports = {
           800: "#bfc618",
           900: "#c7c918",
         },
+        white: {
+          900: "#ffffff",
+        },
       },
       aspectRatio: {
         "3/2": "3/2",
@@ -99,6 +102,8 @@ module.exports = {
         "3x": "3/1",
       },
       maxWidth: {
+        "5xs": "50px",
+        "3xs": "200px",
         "2xs": "300px",
         "8xl": "88rem",
         "1/5": "20%",
@@ -108,15 +113,21 @@ module.exports = {
         "1/2": "50%",
         "2/3": "66%",
         "15p": "15%",
+        fit: "fit-content",
       },
       minWidth: {
         "4xs": "75px",
         "3xs": "135px",
         "2xs": "200px",
+        xs: "350px",
+        s: "400px",
       },
       minHeight: {
         xs: "350px",
+        s: "380px",
         "50vh": "50vh",
+        full: "100vh",
+        max: "max-content",
       },
       borderRadius: {
         "4xl": "38px",

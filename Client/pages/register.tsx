@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, useEffect, useState } from "react";
 import Form from "../components/form/Form";
 import { useRouter } from "next/router";
 import { INDEX, LOGIN } from "../types/linkTypes";
@@ -12,10 +12,10 @@ import FormSteps from "../components/form/FormSteps";
 import { GetServerSidePropsContext } from "next";
 import nookies from "nookies";
 import { toast } from "react-toastify";
-import FormRow from "../components/form/FormRow";
 import Button, { SubmitButton } from "../components/buttons/Button";
 import { generateCsrf } from "../middleware/Validator";
 import { useAppContext } from "../context/appContext";
+import Skeleton from "../components/website/skeleton";
 
 export interface RegisterHondErrorInterface {
   naam?: string;
@@ -54,6 +54,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
     control,
     name: "honden",
   });
+  const [disabled, setDisabled] = useState<boolean>(false);
   const [activeStep, setActiveStep] = useState<number>(0);
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
   const [rassen, setRassen] = useState<OptionsOrGroups<any, optionInterface>[]>(
@@ -70,17 +71,48 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
     "postcode",
     "telefoon",
   ];
-  const step2 = ["naam", "ras_id", "gelacht", "chip_nr", "geboortedatum"];
+  const step2 = [
+    "naam",
+    "ras_id",
+    "gelacht",
+    "chip_nr",
+    "geboortedatum",
+    "honden",
+  ];
 
   const setErrors = (step: number) => {
-    setErrorSteps((prev) => [...prev, step]);
-    setActiveStep(Math.min(...errorSteps));
+    setErrorSteps([...errorSteps, step]);
+    if (activeStep > step) setActiveStep(step);
   };
   const handleErrors = (error: any) => {
     if (Object.keys(error).some((r) => step1.indexOf(r) >= 0)) setErrors(0);
     else if (Object.keys(error).some((r) => step2.indexOf(r) >= 1))
       setErrors(1);
-    else if (Object.keys(error).includes("honden")) setErrors(2);
+  };
+
+  const validatePassword = (
+    password: string,
+    setFormErrors: Dispatch<React.SetStateAction<RegisterErrorInterface>>
+  ) => {
+    if (!password.match(/[a-z]+/))
+      setFormErrors({
+        ...formErrors,
+        password: "Minstens 1 kleine letter",
+      });
+    else if (!password.match(/[A-Z]+/))
+      setFormErrors({
+        ...formErrors,
+        password: "Minstens 1 hoofdletter",
+      });
+    else if (!password.match(/[&é@#§è!çà$£µ%ù?./<>°}{"'^*+-=~},;]+/))
+      setFormErrors({
+        ...formErrors,
+        password: "Minstens 1 speciaal teken",
+      });
+    else if (!password.match(/[0-9]+/))
+      setFormErrors({ ...formErrors, password: "Minstens 1 cijfer" });
+    else if (password.length < 8)
+      setFormErrors({ ...formErrors, password: "Minstens 8 characters" });
   };
 
   const onSubmit = async (values: any) => {
@@ -93,10 +125,15 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
       return;
     }
 
-    const { data, error } = await register(REGISTERAPI, { ...payload, csrf });
-    if (data) {
-      toast.success(data.message);
-      router.push(LOGIN);
+    if (!disabled) {
+      setDisabled(() => true);
+      const { data, error } = await register(REGISTERAPI, { ...payload, csrf });
+      if (data) {
+        toast.success(data.message);
+        router.push(LOGIN);
+      }
+      if (error) handleErrors(error);
+      setDisabled(() => false);
     }
   };
 
@@ -108,62 +145,71 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
   }, []);
 
   return (
-    <section className="mb-48 md:px-5 mt-20">
-      <div className="max-w-7xl mx-auto">
-        <FormSteps
-          activeStep={activeStep}
-          errorSteps={[]}
-          setActiveStep={setActiveStep}
-          steps={["Persoonlijke gegevens", "Honden gegevens"]}
-        />
-      </div>
-      <div>
-        <Form
-          onSubmit={handleSubmit(onSubmit)}
-          activeStep={activeStep}
-          errorSteps={errorSteps}
-          setActiveStep={setActiveStep}
-        >
-          <div className="max-w-4xl mx-auto mt-20 py-10">
-            {activeStep === 0 ? (
-              <PersoonlijkeGegevens
-                control={control}
-                setActiveStep={setActiveStep}
-                errors={formErrors}
-                setErrors={setFormErrors}
+    <Skeleton>
+      <section className="mb-48 md:px-5 mt-20">
+        <div className="max-w-7xl mx-auto">
+          <FormSteps
+            activeStep={activeStep}
+            errorSteps={errorSteps}
+            setActiveStep={setActiveStep}
+            steps={["Persoonlijke gegevens", "Honden gegevens"]}
+          />
+        </div>
+        <div>
+          <Form
+            onSubmit={handleSubmit(onSubmit)}
+            activeStep={activeStep}
+            errorSteps={errorSteps}
+            setActiveStep={setActiveStep}
+          >
+            <div className="max-w-4xl mx-auto mt-20 py-10">
+              {activeStep === 0 ? (
+                <PersoonlijkeGegevens
+                  control={control}
+                  setActiveStep={setActiveStep}
+                  errors={formErrors}
+                  setErrors={setFormErrors}
+                  validatePassword={validatePassword}
+                />
+              ) : activeStep === 1 ? (
+                <Step2
+                  control={control}
+                  setActiveStep={setActiveStep}
+                  fields={fields}
+                  append={append}
+                  remove={remove}
+                  options={rassen}
+                  errors={formErrors}
+                  setErrors={setFormErrors}
+                  values={getValues}
+                />
+              ) : null}
+            </div>
+          </Form>
+          {activeStep === 1 && (
+            <div className="absolute left-10 top-20">
+              <Button
+                label="vorige"
+                onClick={() => setActiveStep(activeStep - 1)}
               />
-            ) : activeStep === 1 ? (
-              <Step2
-                control={control}
-                setActiveStep={setActiveStep}
-                fields={fields}
-                append={append}
-                remove={remove}
-                options={rassen}
-                errors={formErrors}
-                setErrors={setFormErrors}
-                values={getValues}
-              />
-            ) : null}
-          </div>
-          <FormRow className="max-w-3xl mx-auto">
-            <Button
-              label="vorige"
-              onClick={() => setActiveStep(activeStep - 1)}
-              disabled={activeStep === 0}
-            />
+            </div>
+          )}
+          <div className="absolute right-10 top-20">
             {activeStep === 1 ? (
-              <SubmitButton label="verzend" />
+              <SubmitButton
+                label="verzend"
+                onClick={() => onSubmit(getValues())}
+              />
             ) : (
               <Button
                 label="volgende"
                 onClick={() => setActiveStep(activeStep + 1)}
               />
             )}
-          </FormRow>
-        </Form>
-      </div>
-    </section>
+          </div>
+        </div>
+      </section>
+    </Skeleton>
   );
 };
 

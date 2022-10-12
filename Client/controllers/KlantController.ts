@@ -1,5 +1,5 @@
 import moment from "moment";
-import { ClientSession, Collection, Db, MongoClient, ObjectId } from "mongodb";
+import { ClientSession, Collection, ObjectId } from "mongodb";
 import {
   deleteInschrijvingen,
   getInschrijvingById,
@@ -90,7 +90,7 @@ const KlantController: IsKlantController = {
   },
   setVerified: async (klant) => {
     const verified = true;
-    const verified_at = moment().local().format();
+    const verified_at = moment().local().toDate();
 
     const { modifiedCount } = await getKlantCollection().updateOne(
       { _id: klant._id },

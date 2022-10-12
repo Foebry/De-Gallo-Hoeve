@@ -12,6 +12,7 @@ import Factory from "../../../middleware/Factory";
 import { getKlantByEmail, KLANT } from "../../../controllers/KlantController";
 import { IsRegisterBody } from "../../../types/requestTypes";
 import { CONFIRM } from "../../../types/EntityTpes/ConfirmTypes";
+import moment from "moment";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") return register(req, res);
@@ -22,7 +23,10 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     await client.connect();
     await validateCsrfToken({ req, res });
-    await validate({ req, res }, { schema: registerSchema });
+    await validate(
+      { req, res },
+      { schema: registerSchema, message: "Registratie niet verwerkt" }
+    );
 
     const { csrf, ...klantData } = req.body as IsRegisterBody;
     const existingKlant = await getKlantByEmail(klantData.email);
@@ -37,13 +41,13 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
         const savedKlant = await Factory.getController(KLANT).save(klant);
         const confirm = Factory.createConfirm({
           klant_id: klant._id,
-          created_at: savedKlant.created_at,
+          created_at: moment(savedKlant.created_at).local().toDate(),
         });
         const { code } = await Factory.getController(CONFIRM).saveConfirm(
           confirm
         );
 
-        if (process.env.NODE_ENV === "production") {
+        if (process.env.NODE_ENV !== "test") {
           mailer.sendMail("register", {
             email: savedKlant.email,
             vnaam: savedKlant.vnaam,
@@ -51,12 +55,11 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
           });
         }
       }, transactionOptions);
+      // const result = createKlantDto(klant);
       const returnKlant = await Factory.getController(KLANT).getKlantByEmail(
         klantData.email
       );
-      return res
-        .status(201)
-        .json({ ...returnKlant, message: "Registratie succesvol!" });
+      return res.status(201).send(klant);
     } catch (e: any) {
       throw new TransactionError(e.name, e.code, e.response);
     }

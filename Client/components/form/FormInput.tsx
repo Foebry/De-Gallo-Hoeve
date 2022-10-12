@@ -18,7 +18,6 @@ export interface FormInputProps {
   dataid?: string;
   setErrors?: any;
   onClick?: (e: React.FormEvent<HTMLInputElement>) => void;
-  info?: string;
 }
 
 const FormInput: React.FC<FormInputProps> = ({
@@ -33,23 +32,13 @@ const FormInput: React.FC<FormInputProps> = ({
   extra = "",
   dataid = "",
   setErrors,
-  info,
 }) => {
   const labelRef = useRef<HTMLLabelElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [hasFocus, setHasFocus] = useState(false);
-  const [infoShown, setInfoShown] = useState(false);
   const fieldName = name;
-  const infoColor = useMemo(() => {
-    return inputRef.current !== null ? "" : "";
-  }, [inputRef.current]);
 
   useFormInputEffect({ labelRef, inputRef, value, hasFocus });
-
-  const handleShowInputInfo = (e: React.MouseEvent<SVGElement, MouseEvent>) => {
-    e.preventDefault();
-    setInfoShown(!infoShown);
-  };
 
   return (
     <div
@@ -64,20 +53,7 @@ const FormInput: React.FC<FormInputProps> = ({
         ref={labelRef}
       >
         {label}
-        {info && (
-          <div className="relative text-xs">
-            <BsInfoCircle
-              className="pointer-events-auto cursor-pointer"
-              onClick={handleShowInputInfo}
-            />
-          </div>
-        )}
       </label>
-      {infoShown && (
-        <div className="absolute border-2 rounded px-1 -bottom-6 right-0 text-xs">
-          {info}
-        </div>
-      )}
       <input
         className="block w-full text-xl outline-none border-b-[1px] border-b-grey-500 py-1 px-2.5 text-black-100"
         type={type}

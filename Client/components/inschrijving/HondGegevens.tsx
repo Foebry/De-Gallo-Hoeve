@@ -38,6 +38,8 @@ const HondGegevens: React.FC<Props> = ({
   type,
   handleDelete,
   timeslots,
+  errors,
+  setErrors,
 }) => {
   return (
     <>
@@ -54,6 +56,8 @@ const HondGegevens: React.FC<Props> = ({
               index={index}
               honden={honden}
               type={type}
+              errors={errors}
+              setErrors={setErrors}
               handleDelete={handleDelete}
               timeslots={timeslots[date] ?? timeslots.default}
             />

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Body, Link } from "../components/Typography/Typography";
+import { Body } from "../components/Typography/Typography";
 import Form from "../components/form/Form";
 import FormInput from "../components/form/FormInput";
 import { REGISTER, INDEX } from "../types/linkTypes";
@@ -13,6 +13,8 @@ import { initializeLocalStorage } from "../helpers/localStorage";
 import { GetServerSidePropsContext } from "next";
 import nookies from "nookies";
 import validator, { generateCsrf } from "../middleware/Validator";
+import Skeleton from "../components/website/skeleton";
+import Link from "next/link";
 
 export interface LoginErrorInterface {
   email: string;
@@ -25,6 +27,7 @@ interface LoginPropsInterface {
 }
 
 const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
+  const [disabled, setDisabled] = useState<boolean>(false);
   const [formErrors, setFormErrors] = useState<LoginErrorInterface>({
     email: "",
     password: "",
@@ -35,73 +38,85 @@ const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
   const { control, handleSubmit } = useForm();
 
   const onSubmit = async (values: any) => {
-    const { data } = await login(LOGINAPI, { ...values, csrf });
+    let data;
+    if (!disabled) {
+      setDisabled(() => true);
+      const { data: response } = await login(LOGINAPI, { ...values, csrf });
+      data = response;
+    }
+
     if (data) {
-      initializeLocalStorage(data);
       redirect ? router.push(redirect) : router.back();
     }
+    setDisabled(() => false);
   };
 
   return (
-    <section>
-      <div className="max-w-lg mx-auto mt-30 mb-48 border-2 rounded">
-        <Form onSubmit={handleSubmit(onSubmit)} className="mb-5">
-          <div className="p-10">
-            <div className="text-center mb-10">
-              <Body>Login met email en wachtwoord</Body>
-            </div>
-            <Controller
-              name="email"
-              control={control}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <FormInput
-                  label="email"
-                  name="email"
-                  id="email"
-                  value={value}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  errors={formErrors}
-                  setErrors={setFormErrors}
+    <Skeleton>
+      <section>
+        <div className="max-w-lg mx-auto mt-30 mb-48 border-2 rounded">
+          <Form onSubmit={handleSubmit(onSubmit)} className="mb-5">
+            <div className="p-10">
+              <div className="text-center mb-10">
+                <Body>Login met email en wachtwoord</Body>
+              </div>
+              <Controller
+                name="email"
+                control={control}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <FormInput
+                    label="email"
+                    name="email"
+                    id="email"
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    errors={formErrors}
+                    setErrors={setFormErrors}
+                  />
+                )}
+              />
+              <Controller
+                name="password"
+                control={control}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <FormInput
+                    label="password"
+                    name="password"
+                    id="password"
+                    type="password"
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    errors={formErrors}
+                    setErrors={setFormErrors}
+                  />
+                )}
+              />
+              <FormRow>
+                <Body>
+                  Nog geen account?{"	"}
+                  <span className="text-green-200 underline">
+                    <Link href={REGISTER}>registreer</Link>
+                  </span>
+                </Body>
+                <SubmitButton
+                  label="login"
+                  onClick={handleSubmit(onSubmit)}
+                  disabled={disabled}
                 />
-              )}
-            />
-            <Controller
-              name="password"
-              control={control}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <FormInput
-                  label="password"
-                  name="password"
-                  id="password"
-                  type="password"
-                  value={value}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  errors={formErrors}
-                  setErrors={setFormErrors}
-                />
-              )}
-            />
-            <FormRow>
-              <Body>
-                Nog geen account?{"	"}
-                <span>
-                  <Link to={REGISTER}>registreer</Link>
-                </span>
-              </Body>
-              <SubmitButton label="login" onClick={handleSubmit(onSubmit)} />
-            </FormRow>
-            <div className="text-center mt-20">
-              <Body>Login met andere app</Body>
+              </FormRow>
+              <div className="text-center mt-20">
+                {/* <Body>Login met andere app</Body> */}
+              </div>
             </div>
-          </div>
-        </Form>
-        <FormRow className="py-5">
-          <Button label="Login with Facebook" className="mx-auto" />
-        </FormRow>
-      </div>
-    </section>
+          </Form>
+          <FormRow className="py-5">
+            {/* <Button label="Login with Facebook" className="mx-auto" /> */}
+          </FormRow>
+        </div>
+      </section>
+    </Skeleton>
   );
 };
 

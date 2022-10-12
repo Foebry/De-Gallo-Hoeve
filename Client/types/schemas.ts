@@ -48,18 +48,51 @@ const register = object({
   postcode: number().required({ postcode: "verplicht veld" }),
   honden: array(
     object({
-      ras: string().required({ ras: "Gelieve een ras te selecteren" }),
-      naam: string()
-        .required({ naam: "Naam is required" })
-        .matches(/^[a-z ,.'-éëèçêïü]+$/i, {
-          message: { honden: "Kan enkel letters bevatten" },
-        }),
-      geboortedatum: date().required({
-        geboortedatum: "Geboortedatum is required",
+      ras: string().test("is-set", "${path} verplicht", function (item) {
+        return item
+          ? true
+          : this.createError({
+              path: `${this.path}`,
+              message: { [this.path]: "verplicht" },
+            });
       }),
+      naam: string().test("matches", "${path} matches", function (item) {
+        if (!item)
+          return this.createError({
+            path: `${this.path}`,
+            message: { [this.path]: "verplicht" },
+          });
+        if (item.match(/[0-9&|@"#()§^!{}°$[\]%£´`+=~/:;.?,><\\]/))
+          return this.createError({
+            path: `${this.path}`,
+            message: { [this.path]: "enkel letters" },
+          });
+        return true;
+      }),
+      // .required({ naam: "Naam is required" })
+      // .matches(/^[a-z ,.'-éëèçêïü]+$/i, {
+      //   message: { honden: "Kan enkel letters bevatten" },
+      // }),
+      geboortedatum: date().test(
+        "is-set",
+        "${path} verplicht",
+        function (item) {
+          return item
+            ? true
+            : this.createError({
+                path: `${this.path}`,
+                message: { [this.path]: "verplicht" },
+              });
+        }
+      ),
       // chip_nr: string().optional().default(""),
-      geslacht: string().required({
-        geslacht: "Gelieve een geslacht aan te duiden",
+      geslacht: string().test("is-set", "${path} verplicht", function (item) {
+        return item
+          ? true
+          : this.createError({
+              path: `${this.path}`,
+              message: { [this.path]: "verplicht" },
+            });
       }),
     })
   ),
@@ -115,12 +148,23 @@ const boeking = object({
   ).required({ details: "Gelieve minstens 1 hond op te geven" }),
 });
 
+const contact = object({
+  naam: string().required({ naam: "verplicht" }),
+  email: string()
+    .email({ email: "Ongeldige email" })
+    .required({ email: "verplicht" }),
+  bericht: string()
+    .required({ bericht: "verplicht" })
+    .min(5, { bericht: "Bericht te kort" }),
+});
+
 const schemas = {
   login,
   register,
   inschrijving,
   boeking,
   anoniemeInschrijving,
+  contact,
 };
 
 export const {
@@ -129,4 +173,5 @@ export const {
   inschrijving: inschrijvingSchema,
   anoniemeInschrijving: anoniemeInschrijvingSchema,
   boeking: boekingSchema,
+  contact: contactSchema,
 } = schemas;
