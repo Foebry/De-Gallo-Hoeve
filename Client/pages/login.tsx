@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Body, Link } from "../components/Typography/Typography";
+import { Body } from "../components/Typography/Typography";
 import Form from "../components/form/Form";
 import FormInput from "../components/form/FormInput";
 import { REGISTER, INDEX } from "../types/linkTypes";
@@ -14,6 +14,7 @@ import { GetServerSidePropsContext } from "next";
 import nookies from "nookies";
 import validator, { generateCsrf } from "../middleware/Validator";
 import Skeleton from "../components/website/skeleton";
+import Link from "next/link";
 
 export interface LoginErrorInterface {
   email: string;
@@ -95,8 +96,8 @@ const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
               <FormRow>
                 <Body>
                   Nog geen account?{"	"}
-                  <span>
-                    <Link to={REGISTER}>registreer</Link>
+                  <span className="text-green-200 underline">
+                    <Link href={REGISTER}>registreer</Link>
                   </span>
                 </Body>
                 <SubmitButton
@@ -106,12 +107,12 @@ const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
                 />
               </FormRow>
               <div className="text-center mt-20">
-                <Body>Login met andere app</Body>
+                {/* <Body>Login met andere app</Body> */}
               </div>
             </div>
           </Form>
           <FormRow className="py-5">
-            <Button label="Login with Facebook" className="mx-auto" />
+            {/* <Button label="Login with Facebook" className="mx-auto" /> */}
           </FormRow>
         </div>
       </section>
