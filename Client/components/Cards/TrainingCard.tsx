@@ -43,16 +43,16 @@ const TrainingCard: React.FC<TrainingProps> = ({
         </div>
         <div className="px-2 flex flex-col gap-2">
           <Body>
-            Heeft u een nieuwe pup en wilt u ondesteuning bij de puppytraining?
+            Heeft u een nieuwe pup en wil u ondersteuning bij de puppytraining?
           </Body>
-          <Body>Wilt u wat meer oefening op clicker training?</Body>
+          <Body>Wil u wat meer oefening op clicker training?</Body>
           <Body>
             Graag wat hulp bij de training voor basis commando&apos;s (zitten,
             liggen, rechtstaan, ...)
           </Body>
           <Body>Wandelt uw hond niet correct aan de lijn?</Body>
           <Body>
-            Eeder op zoek naar gevorderde trainingen voor bewaking, politie of
+            Eerder op zoek naar gevorderde trainingen voor bewaking, politie of
             defensie? (blaffen en stil zijn op commando, leren bijten en lossen,
             ...)
           </Body>

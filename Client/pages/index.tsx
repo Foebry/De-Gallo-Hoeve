@@ -76,8 +76,8 @@ const Index: React.FC<IndexProps> = ({
             mijn droom geweest.
           </Body>
           <Body>
-            Sinds ik met mijn eigen hond ben beginnen trainen en werken, kreeg
-            ik steeds meer inspiratie om andere mensen te helpen door hun bij te
+            Sinds ik met mijn eigen hond begon te trainen en werken, kreeg ik
+            steeds meer inspiratie om andere mensen te helpen door hun bij te
             leren wat ikzelf geleerd heb.
           </Body>
         </div>
