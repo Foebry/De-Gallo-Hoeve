@@ -1,16 +1,16 @@
 interface Mailer {
-  sendMail: (type: string, data: any) => void;
+  sendMail: (type: string, data: any) => Promise<void>;
   contact: (data: { naam: string; email: string; bericht: string }) => void;
 }
 
-const send = (msg: any) => {
+const send = async (msg: any) => {
   // using Twilio SendGrid's v3 Node.js Library
   // https://github.com/sendgrid/sendgrid-nodejs
   const sgMail = require("@sendgrid/mail");
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   console.log("about to send email");
   console.log(msg);
-  sgMail
+  await sgMail
     .send(msg)
     .then(() => {
       console.log("Email sent");
@@ -46,9 +46,9 @@ export const getTemplateId = (type: string): string => {
 };
 
 const mailer: Mailer = {
-  sendMail: (type, { email, ...templateData }) => {
+  sendMail: async (type, { email, ...templateData }) => {
     console.log({ email, templateData });
-    send({
+    await send({
       to: email,
       from: "info@degallohoeve.be",
       templateId: getTemplateId(type),
