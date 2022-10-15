@@ -17,7 +17,7 @@ export const generateRegisterResponseBodyFromPayload = async (
   await client.connect();
   const klant = await getKlantByEmail(payload.email);
   const response = {
-    roles: "",
+    roles: klant!.roles,
     verified: false,
     inschrijvingen: [],
     reservaties: [],
