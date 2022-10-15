@@ -10,14 +10,19 @@ const send = async (msg: any) => {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   console.log("about to send email");
   console.log(msg);
-  await sgMail
-    .send(msg)
-    .then(() => {
-      console.log("Email sent");
-    })
-    .catch((error: any) => {
-      console.log(error);
-    });
+  try {
+    await sgMail
+      .send(msg)
+      .then(() => {
+        console.log("Email sent");
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
+    console.log("email sent");
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 export const getTemplateId = (type: string): string => {
