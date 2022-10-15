@@ -108,10 +108,10 @@ const Factory = {
     lnaam: capitalize(klant.lnaam),
     gsm: klant.gsm,
     straat: capitalize(klant.straat),
-    nr: 0,
+    nr: klant.nr,
     bus: klant.bus,
     gemeente: capitalize(klant.gemeente),
-    postcode: 0,
+    postcode: klant.postcode,
     honden: klant.honden.map((hond) => createHond(hond)),
   }),
   createRas: (ras: NewRas): RasCollection => ({
