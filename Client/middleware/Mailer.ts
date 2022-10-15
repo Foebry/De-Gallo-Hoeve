@@ -8,21 +8,15 @@ const send = async (msg: any) => {
   // https://github.com/sendgrid/sendgrid-nodejs
   const sgMail = require("@sendgrid/mail");
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-  console.log("about to send email");
-  console.log(msg);
-  try {
-    await sgMail
-      .send(msg)
-      .then(() => {
-        console.log("Email sent");
-      })
-      .catch((error: any) => {
-        console.log(error);
-      });
-    console.log("email sent");
-  } catch (e) {
-    console.log(e);
-  }
+  await sgMail
+    .send(msg)
+    .then(() => {
+      console.log("Email sent");
+    })
+    .catch((error: any) => {
+      console.log(error);
+    });
+  console.log("email sent");
 };
 
 export const getTemplateId = (type: string): string => {
