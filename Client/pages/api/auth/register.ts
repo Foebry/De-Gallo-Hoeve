@@ -48,6 +48,7 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
         );
 
         if (process.env.NODE_ENV !== "test") {
+          console.log("trying to send email");
           mailer.sendMail("register", {
             email: savedKlant.email,
             vnaam: savedKlant.vnaam,
