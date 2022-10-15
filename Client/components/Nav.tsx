@@ -68,7 +68,7 @@ export const Nav = () => {
               <span className="block xs:hidden capitalize border rounded py-1 px-1.5 text-gray-100 bg-green-100 cursor-pointer w-full hover:text-green-200 hover:bg-gray-100 text-md font-medium">
                 Hallo {userName}
               </span>
-              {roles && roles > 0 && (
+              {roles! > 0 && (
                 <NavLink
                   href={ADMIN}
                   label="admin"
@@ -98,7 +98,7 @@ export const Nav = () => {
                 />
                 <NavLink
                   href={REGISTER}
-                  label="register"
+                  label="registreer"
                   className="hover:text-green-200 hover:bg-gray-100 uppercase text-md font-medium"
                 />
               </Hamburger>

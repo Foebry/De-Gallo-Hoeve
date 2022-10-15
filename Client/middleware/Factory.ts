@@ -89,10 +89,10 @@ const Factory = {
     _id: new ObjectId(),
     naam: capitalize(hond.naam),
     geslacht: hond.geslacht,
-    geboortedatum: moment().local().toDate(),
+    geboortedatum: moment(hond.geboortedatum).local().format(),
     ras: hond.ras,
-    created_at: moment().local().toDate(),
-    updated_at: moment().local().toDate(),
+    created_at: moment().local().format(),
+    updated_at: moment().local().format(),
   }),
   createKlant: async (klant: IsNewKlantData): Promise<IsKlantCollection> => ({
     _id: new ObjectId(),
@@ -166,7 +166,7 @@ const Factory = {
     const { data } = await axios.get(
       "https://www.randomuser.me/api/?format=json&nat=fr"
     );
-    const now = moment().local().toDate();
+    const now = moment().local().format();
     return {
       geslacht: data.results[0].gender === "female" ? "Teef" : "Reu",
       geboortedatum: data.results[0].dob.date,

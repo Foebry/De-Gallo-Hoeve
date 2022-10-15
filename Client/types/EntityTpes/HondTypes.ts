@@ -5,11 +5,11 @@ export type Geslacht = "Teef" | "Reu";
 export interface HondCollection {
   _id: ObjectId;
   geslacht: Geslacht;
-  geboortedatum: Date;
+  geboortedatum: string;
   naam: string;
   ras: string;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface NewHond {
