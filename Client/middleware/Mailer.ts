@@ -8,6 +8,7 @@ const send = (msg: any) => {
   // https://github.com/sendgrid/sendgrid-nodejs
   const sgMail = require("@sendgrid/mail");
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  console.log("about to send email");
   sgMail
     .send(msg)
     .then(() => {
@@ -45,6 +46,7 @@ export const getTemplateId = (type: string): string => {
 
 const mailer: Mailer = {
   sendMail: (type, { email, ...templateData }) => {
+    console.log({ email, templateData });
     send({
       to: email,
       from: "info@degallohoeve.be",
