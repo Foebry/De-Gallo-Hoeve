@@ -9,6 +9,7 @@ const send = (msg: any) => {
   const sgMail = require("@sendgrid/mail");
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   console.log("about to send email");
+  console.log(msg);
   sgMail
     .send(msg)
     .then(() => {
