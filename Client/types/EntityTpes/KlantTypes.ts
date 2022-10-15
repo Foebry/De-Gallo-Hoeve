@@ -18,7 +18,7 @@ export interface IsNewKlant {
 
 export interface IsKlantCollection extends IsNewKlant {
   _id: ObjectId;
-  roles: string;
+  roles: number;
   verified: boolean;
   inschrijvingen: ObjectId[];
   reservaties: ObjectId[];

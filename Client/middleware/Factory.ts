@@ -96,7 +96,7 @@ const Factory = {
   }),
   createKlant: async (klant: IsNewKlantData): Promise<IsKlantCollection> => ({
     _id: new ObjectId(),
-    roles: "",
+    roles: 0,
     verified: false,
     inschrijvingen: [],
     reservaties: [],
