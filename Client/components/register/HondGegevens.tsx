@@ -45,10 +45,6 @@ const HondGegevens: React.FC<Props> = ({
     geslacht: undefined,
     chipNr: undefined,
   };
-  const formValues = values();
-  const sorted = useMemo(() => {
-    return values().honden.reverse();
-  }, [formValues]);
 
   useEffect(() => {
     values().honden.length === 0 && append(emptyHond);
@@ -57,7 +53,7 @@ const HondGegevens: React.FC<Props> = ({
   return (
     <div className="md:px-5">
       <ul className="mb-20">
-        {sorted.map((item: any, index: any) => (
+        {fields.map((item: any, index: any) => (
           <li key={item.id} className="relative mb-5">
             <HondCard
               control={control}
