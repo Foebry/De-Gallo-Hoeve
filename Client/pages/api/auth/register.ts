@@ -48,7 +48,7 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
         );
 
         if (process.env.NODE_ENV !== "test") {
-          mailer.sendMail("register", {
+          await mailer.sendMail("register", {
             email: savedKlant.email,
             vnaam: savedKlant.vnaam,
             code,

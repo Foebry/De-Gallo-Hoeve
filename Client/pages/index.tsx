@@ -88,7 +88,7 @@ const Index: React.FC<IndexProps> = ({
           <div className="text-center flex flex-col gap-3">
             <Body>
               Onze diensten binnen de Gallo-hoeve zijn uitsluitend privé
-              traingen aan huis.
+              trainingen aan huis.
             </Body>
             <Body>Waarom aan huis?</Body>
             <Body>
