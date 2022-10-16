@@ -53,6 +53,9 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
             vnaam: savedKlant.vnaam,
             code,
           });
+          await mailer.sendMail("register-headsup", {
+            email: "info@degallohoeve.be",
+          });
         }
       }, transactionOptions);
       // const result = createKlantDto(klant);

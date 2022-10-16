@@ -16,7 +16,6 @@ const getAvailableDays = async (req: NextApiRequest, res: NextApiResponse) => {
   const data = (await getTrainingDaysCollection()
     .find({ date: { $gt: new Date() } })
     .toArray()) as TrainingDaysCollection[];
-  console.log({ data });
 
   const result = data.map((day) => day.date.toISOString().split("T")[0]);
   return res.status(200).send(result);

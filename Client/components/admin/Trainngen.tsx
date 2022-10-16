@@ -33,20 +33,6 @@ const Trainngen: React.FC<Props> = ({
   edit,
   handleBulletChange,
 }) => {
-  // const handleBulletChange = (e: any, index: number) => {
-  //   const trainingen = allContent.trainingen;
-  //   const bullets = trainingen.bullets;
-  //   const value = e.target.value;
-  //   bullets[index] = value;
-  //   console.log(bullets);
-  //   // bullets[index] = value;
-  //   // const newBullets = bullets;
-  //   setContent({
-  //     ...allContent,
-  //     trainingen: { ...allContent.trainingen, bullets: [...bullets] },
-  //   });
-  // };
-
   const handleDeleteBullet = (index: number, bullets: string[]) => {
     const newBullets = bullets.filter((_, idx) => idx !== index);
     setContent({

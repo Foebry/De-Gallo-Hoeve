@@ -15,8 +15,6 @@ const send = async (msg: any) => {
     })
     .catch((error: any) => {
       console.log(error);
-      console.log({ sendGripAPIKey: process.env.SENDGRID_API_KEY });
-      console.log("error occured");
     });
 };
 

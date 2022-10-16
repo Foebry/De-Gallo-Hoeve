@@ -122,7 +122,6 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
               : Math.round(prijs * 1.21).toFixed(2),
         }))
         .reduce((prev, curr) => ({ ...prev, ...curr }), {});
-      console.log({ data });
       mailer.sendMail("inschrijving", { naam, email, ...data });
     }
 

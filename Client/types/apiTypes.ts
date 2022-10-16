@@ -12,6 +12,7 @@ const ApiTypes = {
   CONTENTINTRO: "/api/content/62fa1f25bacc03711136ad59",
   CONTENTDIENSTEN: "/api/content/633862b5fbcc3a3006dcda52",
   CONTENTPRIVETRAINING: "/api/trainingen/62fa1f25bacc03711136ad5f",
+  ADMIN_KLANTEN_OVERVIEW: "/api/admin/klanten",
 };
 
 export const {
@@ -28,4 +29,5 @@ export const {
   CONTENTPRIVETRAINING,
   CONTENTINTRO,
   CONTENTDIENSTEN,
+  ADMIN_KLANTEN_OVERVIEW,
 } = ApiTypes;

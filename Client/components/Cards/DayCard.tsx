@@ -119,7 +119,6 @@ const DayCard: React.FC<DayCardProps> = ({
                     />
                   )}
                 />
-                {console.log({ "errors in dayCard": errors })}
                 <FormError>
                   {errors[`inschrijvingen[${index}][hond]`]}
                 </FormError>
