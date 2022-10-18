@@ -118,18 +118,16 @@ const Klanten = () => {
 
   return (
     <Dashboard>
-      <div className="w-10/12 mx-auto py-10">
-        <FormRow className="flex-row-reverse">
-          <FormSearch api="/api/admin/klanten?search=" onSearch={onSearch} />
-        </FormRow>
-        <Table
-          rows={klanten}
-          columns={headers}
-          colWidths={["15", "25", "22.5", "15", "12.5", "10"]}
-          pagination={apiData.pagination}
-          onPaginationClick={onPaginationClick}
-        />
-      </div>
+      <FormRow className="flex-row-reverse">
+        <FormSearch api="/api/admin/klanten?search=" onSearch={onSearch} />
+      </FormRow>
+      <Table
+        rows={klanten}
+        columns={headers}
+        colWidths={["15", "25", "22.5", "15", "12.5", "10"]}
+        pagination={apiData.pagination}
+        onPaginationClick={onPaginationClick}
+      />
     </Dashboard>
   );
 };
