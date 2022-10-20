@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { mapToAdminKlantenOverviewResult } from "../../../../middleware/mappers";
+import { mapToAdminKlantenOverviewResult } from "../../../../middleware/mappers/klanten";
 import { getPaginatedKlanten } from "../../../../middleware/repositories/klanten";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

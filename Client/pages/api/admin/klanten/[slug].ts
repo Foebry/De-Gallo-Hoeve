@@ -1,7 +1,8 @@
 import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
+import { getInschrijvingenByIds } from "../../../../controllers/InschrijvingController";
 import { getKlantById } from "../../../../controllers/KlantController";
-import { mapToKlantDetail } from "../../../../middleware/mappers";
+import { mapToKlantDetail } from "../../../../middleware/mappers/klanten";
 import client from "../../../../middleware/MongoDb";
 import { KlantNotFoundError } from "../../../../middleware/RequestError";
 
@@ -14,7 +15,12 @@ interface RequestQuery {
   slug?: string;
 }
 
-const getKlantDetail = async (req: NextApiRequest, res: NextApiResponse) => {
+type KlantDetailResponse = {};
+
+const getKlantDetail = async (
+  req: NextApiRequest,
+  res: NextApiResponse<KlantDetailResponse>
+) => {
   const { slug: _id } = req.query as RequestQuery;
 
   await client.connect();
@@ -22,7 +28,11 @@ const getKlantDetail = async (req: NextApiRequest, res: NextApiResponse) => {
   const klant = await getKlantById(new ObjectId(_id));
   if (!klant) throw new KlantNotFoundError();
 
-  const result = mapToKlantDetail(klant);
+  const inschrijvingen = await getInschrijvingenByIds(klant.inschrijvingen);
+
+  const result = mapToKlantDetail(klant, inschrijvingen);
+
+  await client.close();
 
   return res.status(200).send(result);
 };

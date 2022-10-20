@@ -18,6 +18,7 @@ export interface FormInputProps {
   dataid?: string;
   setErrors?: any;
   onClick?: (e: React.FormEvent<HTMLInputElement>) => void;
+  disabled?: boolean;
 }
 
 const FormInput: React.FC<FormInputProps> = ({
@@ -32,6 +33,7 @@ const FormInput: React.FC<FormInputProps> = ({
   extra = "",
   dataid = "",
   setErrors,
+  disabled = false,
 }) => {
   const labelRef = useRef<HTMLLabelElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -48,14 +50,19 @@ const FormInput: React.FC<FormInputProps> = ({
       onBlur={() => setHasFocus(false)}
     >
       <label
-        className="absolute pl-2.5 bottom-1 text-green-100 mr-5 capitalize pointer-events-none flex items-center gap-1 w-full"
+        className={`absolute pl-2.5 bottom-1 mr-5 capitalize pointer-events-none flex items-center gap-1 w-full ${
+          disabled ? "disabled text-black-100" : "text-green-100"
+        }`}
         htmlFor={id}
         ref={labelRef}
       >
         {label}
       </label>
       <input
-        className="block w-full text-xl outline-none border-b-[1px] border-b-grey-500 py-1 px-2.5 text-black-100"
+        className={`block w-full text-xl outline-none border-b-[1px] py-1 px-2.5 text-black-100 ${
+          disabled ? "bg-grey-100 rounded" : undefined
+        }`}
+        disabled={disabled}
         type={type}
         id={id}
         name={name}

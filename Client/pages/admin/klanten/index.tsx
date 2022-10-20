@@ -61,7 +61,7 @@ const Klanten = () => {
       );
       const verified = <Verified verified={klant.verified} />;
       const registered = klant.created_at
-        ? moment(klant.created_at).format("DD-MM-yyyy hh:mm:ss")
+        ? moment(klant.created_at).local().format("DD-MM-yyyy hh:mm:ss")
         : "";
       const address = [
         klant.straat,
@@ -139,7 +139,7 @@ const Verified: React.FC<{ verified: boolean }> = ({ verified }) => {
   const borderColor = verified ? "border-green-500" : "border-red-200";
   return (
     <span
-      className={`capitalize text-gray-200 ${bgColor} border-1 ${borderColor} border-solid rounded px-3 py-1`}
+      className={`capitalize text-gray-200 ${bgColor} border-1 ${borderColor} border-solid rounded-2xl px-3 py-1`}
     >
       {verified ? "verified" : "not-verified"}
     </span>

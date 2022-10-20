@@ -42,9 +42,10 @@ export const getPaginatedKlanten = async (query: PaginatedRequestQuery) => {
           currentPage - 1
         }&amount=${pageSize}`
       : undefined;
+  const total = filteredKlanten.length;
 
   return {
     data: filteredKlanten.slice(first, last),
-    pagination: { currentPage, first, last, next, previous },
+    pagination: { currentPage, first, last, next, previous, total },
   };
 };

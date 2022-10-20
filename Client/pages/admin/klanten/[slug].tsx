@@ -2,22 +2,20 @@ import { Attachment } from "@sendgrid/helpers/classes";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import Dashboard from "../../../components/admin/dashboard";
 import Button from "../../../components/buttons/Button";
 import FormInput from "../../../components/form/FormInput";
 import FormRow from "../../../components/form/FormRow";
-import FormSection, {
-  StyleOptions,
-} from "../../../components/form/FormSection";
-import {
-  Body,
-  Title2,
-  Title3,
-} from "../../../components/Typography/Typography";
+import FormSection from "../../../components/form/FormSection";
+import { MySelect } from "../../../components/MySelect";
+import { Body } from "../../../components/Typography/Typography";
 import getData from "../../../hooks/useApi";
 import { ADMIN_KLANT_DETAIL } from "../../../types/apiTypes";
-import { HondCollection } from "../../../types/EntityTpes/HondTypes";
-import { ADMINLISTDOGS } from "../../../types/linkTypes";
+import {
+  ADMINLISTDOGS,
+  ADMINLISTSUBSCRIPTIONS,
+} from "../../../types/linkTypes";
 
 interface KlantDetail {
   _id: string;
@@ -26,16 +24,16 @@ interface KlantDetail {
   lnaam: string;
   gsm: string;
   straat: string;
-  nr: number;
+  nr: string;
   bus?: string;
   gemeente: string;
-  postcode: number;
+  postcode: string;
   honden: Hond[];
   roles: string;
   verified: boolean;
-  verifiedAt?: string;
-  createdAt: string;
-  inschrijvingen: number;
+  verified_at?: string;
+  created_at: string;
+  inschrijvingen: Inschrijving[];
 }
 
 interface Hond {
@@ -45,46 +43,54 @@ interface Hond {
   ras: string;
 }
 
+interface Inschrijving {
+  _id: string;
+  datum: string;
+  hond: string;
+  training: string;
+}
+
+const initialState: KlantDetail = {
+  _id: "",
+  email: "",
+  vnaam: "",
+  lnaam: "",
+  gsm: "",
+  straat: "",
+  nr: "0",
+  gemeente: "",
+  postcode: "0",
+  honden: [],
+  roles: "",
+  verified: false,
+  verified_at: "",
+  created_at: "",
+  inschrijvingen: [],
+};
+
 const KlantDetail = () => {
   const router = useRouter();
   const { slug, editMode } = router.query;
 
   const [edit, setEdit] = useState<boolean>(editMode ? true : false);
-  const [data, setData] = useState<KlantDetail>({
-    _id: "",
-    email: "",
-    vnaam: "",
-    lnaam: "",
-    gsm: "",
-    straat: "",
-    nr: 0,
-    gemeente: "",
-    postcode: 0,
-    honden: [{ _id: "", geslacht: "", naam: "", ras: "" }],
-    roles: "",
-    verified: false,
-    verifiedAt: "",
-    createdAt: "",
-    inschrijvingen: 0,
-  });
+  const [data, setData] = useState<KlantDetail>(initialState);
+  const [limitInschrijvingen, setLimitInschrijvingen] = useState<number>(5);
+
+  const onShowMore = () => {
+    setLimitInschrijvingen((limitInschrijvingen) => limitInschrijvingen + 5);
+  };
 
   useEffect(() => {
     (async () => {
       if (slug) {
         const { data } = await getData(ADMIN_KLANT_DETAIL + slug);
+        console.log(data);
         setData(data);
       }
     })();
   }, [slug]);
 
-  const onChange = () => {};
-
-  const formSectionStyle: StyleOptions = {
-    padding: "pt-20 px-10",
-    rounding: "rounded-lg",
-    borderColor: "border-gray-500",
-    margin: "mb-10",
-  };
+  const { control, handleSubmit } = useForm<KlantDetail>();
 
   return (
     <Dashboard>
@@ -96,27 +102,56 @@ const KlantDetail = () => {
         )}
       </FormRow>
       <FormSection label="Registratie gegevens">
-        <FormRow>
-          <FormInput
-            id="verified"
-            label="geverifiëerd"
+        <FormRow className="items-center">
+          <Controller
             name="verified"
-            onChange={onChange}
-            value={data.verified ? "Ja" : "Nee"}
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <MySelect
+                name="verified"
+                onChange={onChange}
+                disabled={true}
+                label="geverifiëerd"
+                options={[
+                  { label: "Ja", value: true },
+                  { label: "Nee", value: false },
+                ]}
+                value={
+                  value ?? {
+                    label: data.verified ? "Ja" : "Nee",
+                    value: data.verified,
+                  }
+                }
+              />
+            )}
           />
-          <FormInput
-            id="createdAt"
-            label="geregistreerd op"
+          <Controller
             name="created_at"
-            onChange={onChange}
-            value={data.createdAt ?? "Onbekend"}
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <FormInput
+                id="createdAt"
+                label="geregistreerd op"
+                name="created_at"
+                onChange={onChange}
+                value={value ?? data.created_at ?? "Onbekend"}
+                disabled={true}
+              />
+            )}
           />
-          <FormInput
-            id="verifiedAt"
-            label="geverifiëerd op"
+          <Controller
             name="verified_at"
-            onChange={onChange}
-            value={data.verifiedAt ?? "Not verified"}
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <FormInput
+                id="verifiedAt"
+                label="geverifiëerd op"
+                name="verified_at"
+                onChange={onChange}
+                value={value ?? data.verified_at ?? "Onbekend"}
+                disabled={true}
+              />
+            )}
           />
         </FormRow>
       </FormSection>
@@ -124,43 +159,71 @@ const KlantDetail = () => {
         <div className="mb-20">
           <FormRow className="mb-10">
             <div className="w-2/5">
-              <FormInput
-                id="vnaam"
-                label="voornaam"
+              <Controller
                 name="vnaam"
-                onChange={onChange}
-                value={data.vnaam}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <FormInput
+                    id="vnaam"
+                    label="voornaam"
+                    name="vnaam"
+                    onChange={onChange}
+                    value={value ?? data.vnaam}
+                    disabled={!edit}
+                  />
+                )}
               />
             </div>
             <div className="w-2/5">
-              <FormInput
-                id="lnaam"
-                label="achternaam"
+              <Controller
                 name="lnaam"
-                onChange={onChange}
-                value={data.lnaam}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <FormInput
+                    id="lnaam"
+                    label="achternaam"
+                    name="lnaam"
+                    onChange={onChange}
+                    value={value ?? data.lnaam}
+                    disabled={!edit}
+                  />
+                )}
               />
             </div>
           </FormRow>
           <FormRow>
             <div className="w-2/5">
-              <FormInput
-                id="email"
-                label="email"
+              <Controller
                 name="email"
-                onChange={onChange}
-                value={data.email}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <FormInput
+                    id="email"
+                    label="email"
+                    name="email"
+                    onChange={onChange}
+                    value={value ?? data.email}
+                    disabled={!edit}
+                  />
+                )}
               />
             </div>
             <div className="w-2/5">
               <FormRow>
                 <div className="w-1/2">
-                  <FormInput
-                    id="gsm"
-                    label="gsm-nummer"
+                  <Controller
                     name="gsm"
-                    onChange={onChange}
-                    value={data.gsm}
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <FormInput
+                        id="gsm"
+                        label="gsm-nummer"
+                        name="gsm"
+                        onChange={onChange}
+                        value={value ?? data.gsm}
+                        disabled={!edit}
+                      />
+                    )}
                   />
                 </div>
               </FormRow>
@@ -170,52 +233,87 @@ const KlantDetail = () => {
         <div>
           <FormRow className="mb-10">
             <div className="w-2/5">
-              <FormInput
-                id="straat"
-                label="straat"
+              <Controller
                 name="straat"
-                onChange={onChange}
-                value={data.straat}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <FormInput
+                    id="straat"
+                    label="straat"
+                    name="straat"
+                    onChange={onChange}
+                    value={value ?? data.straat}
+                    disabled={!edit}
+                  />
+                )}
               />
             </div>
             <div className="w-2/5">
               <FormRow>
-                <FormInput
-                  id="nr"
-                  label="Huisnummer"
+                <Controller
                   name="nr"
-                  onChange={onChange}
-                  value={data.nr.toString()}
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <FormInput
+                      id="nr"
+                      label="Huisnummer"
+                      name="nr"
+                      onChange={onChange}
+                      value={value ?? data.nr}
+                      disabled={!edit}
+                    />
+                  )}
                 />
-                <FormInput
-                  id="bus"
-                  label="bus"
+                <Controller
                   name="bus"
-                  onChange={onChange}
-                  value={data.bus ?? ""}
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <FormInput
+                      id="bus"
+                      label="bus"
+                      name="bus"
+                      onChange={onChange}
+                      value={value ?? data.bus ?? ""}
+                      disabled={!edit}
+                    />
+                  )}
                 />
               </FormRow>
             </div>
           </FormRow>
           <FormRow>
             <div className="w-2/5">
-              <FormInput
-                id="gemeente"
-                label="gemeente"
-                name="gemeent"
-                onChange={onChange}
-                value={data.gemeente}
+              <Controller
+                name="gemeente"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <FormInput
+                    id="gemeente"
+                    label="gemeente"
+                    name="gemeent"
+                    onChange={onChange}
+                    value={value ?? data.gemeente}
+                    disabled={!edit}
+                  />
+                )}
               />
             </div>
             <div className="w-2/5">
               <FormRow>
                 <div className="1/2">
-                  <FormInput
-                    id="postcode"
-                    label="postcode"
+                  <Controller
                     name="postcode"
-                    onChange={onChange}
-                    value={data.postcode.toString()}
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <FormInput
+                        id="postcode"
+                        label="postcode"
+                        name="postcode"
+                        onChange={onChange}
+                        value={value ?? data.postcode}
+                        disabled={!edit}
+                      />
+                    )}
                   />
                 </div>
               </FormRow>
@@ -226,7 +324,7 @@ const KlantDetail = () => {
       <FormRow>
         <div className="w-5/12">
           <FormSection label="honden" style={{ padding: "p-5" }}>
-            {data.honden.map((hond) => (
+            {data.honden?.map((hond) => (
               <div key={hond._id} className="flex justify-between">
                 <Link href={ADMINLISTDOGS + hond._id}>{hond.naam}</Link>
                 <Body>{hond.ras}</Body>
@@ -236,7 +334,32 @@ const KlantDetail = () => {
         </div>
         <div className="w-5/12">
           <FormSection label="inschrijvingen" style={{ padding: "p-5" }}>
-            {data.inschrijvingen}
+            {data.inschrijvingen
+              .slice(0, limitInschrijvingen)
+              .map((inschrijving) => (
+                <div key={inschrijving._id} className="flex justify-between">
+                  <Link href={ADMINLISTSUBSCRIPTIONS + inschrijving._id}>
+                    {inschrijving.datum.split(" ")[0]}
+                  </Link>
+                  <Body>{inschrijving.datum.split(" ")[1]}</Body>
+                  <Body>{inschrijving.training}</Body>
+                  <Body>{inschrijving.hond}</Body>
+                </div>
+              ))}
+            <div className="pt-10 flex justify-center">
+              <Button
+                label={
+                  limitInschrijvingen >= data.inschrijvingen.length
+                    ? "toon minder"
+                    : "toon meer"
+                }
+                onClick={
+                  limitInschrijvingen >= data.inschrijvingen.length
+                    ? () => setLimitInschrijvingen(5)
+                    : onShowMore
+                }
+              />
+            </div>
           </FormSection>
         </div>
       </FormRow>
