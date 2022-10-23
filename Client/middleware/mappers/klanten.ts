@@ -1,44 +1,41 @@
+import { ObjectId } from "mongodb";
+import { PaginatedData, PaginatedResponse } from "../../helpers/RequestHelper";
 import { InschrijvingCollection } from "../../types/EntityTpes/InschrijvingTypes";
 import { IsKlantCollection } from "../../types/EntityTpes/KlantTypes";
 
-type PaginatedData<T> = {
-  data: T[];
-  pagination: {
-    currentPage: number;
-    first: number;
-    last: number;
-    next?: string;
-    previous?: string;
-    total: number;
-  };
-};
-
 export const mapToAdminKlantenOverviewResult = (
   data: PaginatedData<IsKlantCollection>
-) => ({
-  klanten: data.data.map((klant) => ({
-    _id: klant._id,
-    verified: klant.verified,
-    email: klant.email,
-    vnaam: klant.vnaam,
-    lnaam: klant.lnaam,
-    straat: klant.straat,
-    nr: klant.nr,
-    bus: klant.bus,
-    postcode: klant.postcode,
-    gemeente: klant.gemeente,
-    created_at: klant.created_at,
-    verified_at: klant.verified_at,
-  })),
-  pagination: {
-    page: data.pagination.currentPage,
-    first: data.pagination.first + 1,
-    last: data.pagination.last,
-    total: data.pagination.total,
-    next: data.pagination.next,
-    previous: data.pagination.previous,
-  },
-});
+): PaginatedResponse<PaginatedKlant> => {
+  return {
+    data: data.data.map((klant) => ({
+      _id: klant._id,
+      verified: klant.verified,
+      email: klant.email,
+      vnaam: klant.vnaam,
+      lnaam: klant.lnaam,
+      straat: klant.straat,
+      nr: klant.nr.toString(),
+      bus: klant.bus ?? undefined,
+      postcode: klant.postcode.toString(),
+      gemeente: klant.gemeente,
+      created_at: klant.created_at
+        .toISOString()
+        .replace("T", " ")
+        .split(".")[0],
+      verified_at:
+        klant.verified_at?.toISOString().replace("T", " ").split(".")[0] ??
+        undefined,
+    })),
+    pagination: {
+      currentPage: data.pagination.currentPage,
+      first: data.pagination.first + 1,
+      last: data.pagination.last,
+      total: data.pagination.total,
+      next: data.pagination.next,
+      previous: data.pagination.previous,
+    },
+  };
+};
 
 export const mapToKlantDetail = (
   klant: IsKlantCollection,
@@ -62,12 +59,8 @@ export const mapToKlantDetail = (
   })),
   roles: klant.roles,
   verified: klant.verified,
-  verified_at:
-    klant.verified_at &&
-    formatDate(new Date(klant.verified_at), "DD-MM-YYYY hh:ii:ss"),
-  created_at:
-    klant.created_at &&
-    formatDate(new Date(klant.created_at), "DD-MM-YYYY hh:ii:ss"),
+  verified_at: klant.verified_at?.toISOString().replace("T", " ").split(".")[0],
+  created_at: klant.created_at.toISOString().replace("T", " ").split(".")[0],
   inschrijvingen: inschrijvingen
     .map((inschrijving) => ({
       _id: inschrijving._id,
@@ -77,6 +70,21 @@ export const mapToKlantDetail = (
     }))
     .sort((a, b) => new Date(b.datum).getTime() - new Date(a.datum).getTime()),
 });
+
+export interface PaginatedKlant {
+  _id: ObjectId;
+  verified: boolean;
+  email: string;
+  vnaam: string;
+  lnaam: string;
+  straat: string;
+  nr: string;
+  bus: string | undefined;
+  postcode: string;
+  gemeente: string;
+  created_at: string;
+  verified_at: string | undefined;
+}
 
 type Format = "DD-MM-YYYY hh:ii:ss" | "DD-MM-YYYY hh:ii:ss.mmm";
 

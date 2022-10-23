@@ -20,6 +20,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 const register = async (req: NextApiRequest, res: NextApiResponse) => {
+  console.log({
+    formatted: moment().local().format("YYYY-MM-DD HH:mm:SS.mmmm"),
+  });
+  console.log({
+    idk: new Date(moment.utc("2022-12-24 23:59:59").local().toString()),
+  });
+  console.log({
+    dateFromFormat: new Date(moment().format("YYYY-MM-DD HH:mm:ss")),
+  });
+  console.log({ localMoment: moment().local() });
+  console.log({ local: moment().local() });
+  console.log({ unix: moment().local().unix() });
+  console.log({ dateFromUnix: new Date(moment().local().unix() * 1000) });
+  console.log({ localToString: moment().local().toISOString() });
+  console.log({ date: new Date("2022-12-12 23:59:59") });
   try {
     await client.connect();
     await validateCsrfToken({ req, res });
@@ -41,7 +56,7 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
         const savedKlant = await Factory.getController(KLANT).save(klant);
         const confirm = Factory.createConfirm({
           klant_id: klant._id,
-          created_at: moment(savedKlant.created_at).local().toDate(),
+          created_at: klant.created_at,
         });
         const { code } = await Factory.getController(CONFIRM).saveConfirm(
           confirm
@@ -55,7 +70,7 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
           });
           await mailer.sendMail("register-headsup", {
             email: "info@degallohoeve.be",
-            id: savedKlant._id,
+            klant_id: savedKlant._id.toString(),
           });
         }
       }, transactionOptions);

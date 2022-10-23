@@ -72,6 +72,7 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
 
     // const data = { email, inschrijvingen };
     const session = client.startSession();
+    const ids: string[] = [];
 
     const transactionOptions = startTransaction();
     try {
@@ -100,6 +101,7 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
               hond
             );
             await saveInschrijving(newInschrijving, session);
+            ids.push(newInschrijving._id.toString());
           }, transactionOptions)
         );
       });
@@ -122,7 +124,8 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
               : Math.round(prijs * 1.21).toFixed(2),
         }))
         .reduce((prev, curr) => ({ ...prev, ...curr }), {});
-      mailer.sendMail("inschrijving", { naam, email, ...data });
+      await mailer.sendMail("inschrijving", { naam, email, ...data });
+      await mailer.sendMail("inschrijving-headsup", { _ids: ids.join(",") });
     }
 
     return res.status(201).json({ message: "Inschrijving ontvangen!" });

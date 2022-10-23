@@ -1,11 +1,9 @@
-import moment from "moment";
 import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
 import Dashboard from "../../../components/admin/dashboard";
-import Table, { TableRow } from "../../../components/Table/Table";
+import Table from "../../../components/Table/Table";
 import getData from "../../../hooks/useApi";
 import { ADMIN_KLANTEN_OVERVIEW } from "../../../types/apiTypes";
-import { IsKlantCollection } from "../../../types/EntityTpes/KlantTypes";
 import { GrView, GrEdit } from "react-icons/gr";
 import { MdDelete } from "react-icons/md";
 import { useRouter } from "next/router";
@@ -14,14 +12,15 @@ import FormSearch from "../../../components/form/FormSearch";
 import { toast } from "react-toastify";
 import { PaginationInterface } from "../../../components/Table/Table";
 import { nanoid } from "nanoid";
+import { PaginatedKlant } from "../../../middleware/mappers/klanten";
 
-interface apiOptionsInterface {
-  page?: number;
-  amount?: number;
-}
+export type apiOptionsInterface = Partial<{
+  page: number;
+  amount: number;
+}>;
 
-interface ApiResult {
-  klanten: IsKlantCollection[];
+export interface ApiResult<T> {
+  data: T[];
   pagination: PaginationInterface;
 }
 
@@ -35,9 +34,9 @@ const Klanten = () => {
     "actions",
   ];
   const [options, setOptions] = useState<apiOptionsInterface>({});
-  const [apiData, setApiData] = useState<ApiResult>({
-    klanten: [],
-    pagination: { first: 0, last: 0, total: 0, page: 0 },
+  const [apiData, setApiData] = useState<ApiResult<PaginatedKlant>>({
+    data: [],
+    pagination: { first: 0, last: 0, total: 0, currentPage: 0 },
   });
   const router = useRouter();
 
@@ -53,16 +52,14 @@ const Klanten = () => {
   }, []);
 
   const klanten = useMemo(() => {
-    return apiData.klanten.map((klant: IsKlantCollection) => {
+    return apiData.data.map((klant: PaginatedKlant) => {
       const naam = (
         <Link href={`/admin/klanten/${klant._id}`}>
           {[klant.vnaam, klant.lnaam].join(" ")}
         </Link>
       );
       const verified = <Verified verified={klant.verified} />;
-      const registered = klant.created_at
-        ? moment(klant.created_at).local().format("DD-MM-yyyy hh:mm:ss")
-        : "";
+      const registered = klant.created_at ?? "onbekend";
       const address = [
         klant.straat,
         `${klant.nr}${klant.bus ?? ""}`,

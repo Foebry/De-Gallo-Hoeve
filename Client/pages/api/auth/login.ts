@@ -21,7 +21,7 @@ interface LoginRequest extends NextApiRequest {
   query: Partial<{ a: string }>;
   params: { b: string };
 }
-type GenericRequest<T> = T;
+export type GenericRequest<T> = T;
 
 const login = async (
   req: GenericRequest<LoginRequest>,

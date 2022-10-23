@@ -6,8 +6,8 @@ import {
 } from "mongodb";
 import { getAllRassen, RAS } from "../controllers/rasController";
 import { getHondenByKlantId } from "../controllers/HondController";
-import Factory from "./Factory";
-import { KLANT } from "../controllers/KlantController";
+import Factory, { PaginatedControllerType } from "./Factory";
+import { getAllKlanten, KLANT } from "../controllers/KlantController";
 import { CONFIRM } from "../types/EntityTpes/ConfirmTypes";
 import { CONTENT } from "../controllers/ContentController";
 import {
@@ -19,6 +19,10 @@ import {
   TRAINING,
 } from "../controllers/TrainingController";
 import { PriveTrainingCollection } from "../types/EntityTpes/TrainingType";
+import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
+import { HondCollection } from "../types/EntityTpes/HondTypes";
+import { RasCollection } from "../types/EntityTpes/RasTypes";
+import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
 
 export interface Option {
   value: string;
@@ -167,3 +171,17 @@ export const {
   startTransaction,
   clearAllData,
 } = MongoDb;
+
+export async function getData(controller: string): Promise<IsKlantCollection[]>;
+export async function getData(controller: string): Promise<IsKlantCollection[]>;
+export async function getData(controller: string): Promise<HondCollection[]>;
+export async function getData(controller: string): Promise<RasCollection[]>;
+export async function getData(controller: string) {
+  return controller === "HondController"
+    ? Factory.getController(controller).getAllHonden()
+    : controller === "InschrijvingController"
+    ? Factory.getController(controller).getAllInschrijvingen()
+    : controller === "KlantController"
+    ? getAllKlanten()
+    : getAllRassen();
+}

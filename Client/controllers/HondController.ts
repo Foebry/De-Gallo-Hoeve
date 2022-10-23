@@ -30,6 +30,7 @@ export interface IsHondController {
     hondData: HondCollection
   ) => Promise<HondCollection>;
   delete: (klant: IsKlantCollection, _id: ObjectId) => Promise<void>;
+  getHondById: (_id: ObjectId) => Promise<void | HondCollection>;
 }
 
 const HondController: IsHondController = {
@@ -85,8 +86,12 @@ const HondController: IsHondController = {
     );
     if (modifiedCount !== 1) throw new InternalServerError();
   },
+  getHondById: async (_id) => {
+    const honden = await HondController.getAllHonden();
+    return honden.find((hond) => hond._id.toString() === _id.toString());
+  },
 };
 
 export default HondController;
-export const { getKlantHond, getHondenByKlantId } = HondController;
+export const { getKlantHond, getHondenByKlantId, getHondById } = HondController;
 export const HOND = "HondController";

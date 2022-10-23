@@ -33,6 +33,7 @@ export const Nav = () => {
       const payload = JSON.parse(JSON.stringify(verifiedToken));
       setUserName(payload.name);
       setRoles(payload.roles);
+      console.log(userName);
     } else {
       setUserName(undefined);
       setRoles(undefined);

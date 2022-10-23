@@ -22,7 +22,7 @@ const TablePagination: React.FC<Props> = ({ pagination, onClick }) => {
       </div>
       <div className="py-5">
         {pagination.first} tot {pagination.last} van totaal {pagination.total} -
-        pagina {pagination.page}
+        pagina {pagination.currentPage}
       </div>
       <div
         onClick={() => onClick(pagination.next)}

@@ -11,7 +11,7 @@ export interface PaginationInterface {
   first: number;
   last: number;
   total: number;
-  page: number;
+  currentPage: number;
   next?: string;
   previous?: string;
 }
