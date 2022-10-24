@@ -37,16 +37,16 @@ const Inschrijvingen = () => {
 
   useEffect(() => {
     (async () => {
-      const ids = router.query.inschrijvingen;
+      const ids = router.query.id;
       console.log(ids);
       const url = ids
-        ? ADMIN_INSCHRIJVINGEN_OVERVIEW + `?inschrijvingen=${ids}`
+        ? ADMIN_INSCHRIJVINGEN_OVERVIEW + `?id=${ids}`
         : ADMIN_INSCHRIJVINGEN_OVERVIEW;
       console.log(url);
       const { data } = await getData(url);
       setApiData(data);
     })();
-  }, [router.query.inschrijvingen]);
+  }, [router.query.id]);
 
   const inschrijvingen = useMemo(() => {
     return apiData.data.map((inschrijving) => {
