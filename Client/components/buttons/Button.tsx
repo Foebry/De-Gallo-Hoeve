@@ -1,8 +1,8 @@
-import React from "react";
+import React, { ReactNode } from "react";
 
 interface ButtonProps {
   onClick?: () => void;
-  label: string;
+  label: string | ReactNode;
   type?: ButtonTypes;
   className?: string;
   disabled?: boolean;
