@@ -20,7 +20,7 @@ import {
 } from "../controllers/TrainingController";
 import { PriveTrainingCollection } from "../types/EntityTpes/TrainingType";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
-import { HondCollection } from "../types/EntityTpes/HondTypes";
+import { HondCollection, KlantHond } from "../types/EntityTpes/HondTypes";
 import { RasCollection } from "../types/EntityTpes/RasTypes";
 import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
 
@@ -174,11 +174,11 @@ export const {
 
 export async function getData(controller: string): Promise<IsKlantCollection[]>;
 export async function getData(controller: string): Promise<IsKlantCollection[]>;
-export async function getData(controller: string): Promise<HondCollection[]>;
+export async function getData(controller: string): Promise<KlantHond[]>;
 export async function getData(controller: string): Promise<RasCollection[]>;
 export async function getData(controller: string) {
   return controller === "HondController"
-    ? Factory.getController(controller).getAllHonden()
+    ? Factory.getController(controller).getAllKlantHonden()
     : controller === "InschrijvingController"
     ? Factory.getController(controller).getAllInschrijvingen()
     : controller === "KlantController"

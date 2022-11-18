@@ -31,7 +31,6 @@ const getKlantenOverview = async (
     req.url,
     KLANT
   );
-  console.log({ url: req.url });
   const result = mapToAdminKlantenOverviewResult(data);
 
   return res.status(200).send(result);
