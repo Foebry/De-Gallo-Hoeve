@@ -16,6 +16,10 @@ const ApiTypes = {
   ADMIN_KLANT_DETAIL: "/api/admin/klanten/",
   ADMIN_INSCHRIJVINGEN_OVERVIEW: "/api/admin/inschrijvingen",
   ADMIN_INSCHRIJVING_DETAIL: "/api/admin/inschrijvingen/",
+  ADMIN_HONDEN_OVERVIEW: "/api/admin/honden",
+  ADMIN_HOND_DETAIL: "/api/admin/honden/",
+  ADMIN_RASSEN_OVERIEW: "/api/admin/rassen",
+  ADMIN_RAS_DETAIL: "/api/admin/ras/",
 };
 
 export const {
@@ -36,4 +40,8 @@ export const {
   ADMIN_KLANT_DETAIL,
   ADMIN_INSCHRIJVINGEN_OVERVIEW,
   ADMIN_INSCHRIJVING_DETAIL,
+  ADMIN_HONDEN_OVERVIEW,
+  ADMIN_HOND_DETAIL,
+  ADMIN_RASSEN_OVERIEW,
+  ADMIN_RAS_DETAIL,
 } = ApiTypes;

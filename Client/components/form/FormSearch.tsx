@@ -73,8 +73,8 @@ const FormSearch: React.FC<Props> = ({ api, onSearch }) => {
       </form>
       {searchActive && (
         <p className="text-lg pl-10">
-          Zoek resultaten voor \&quot
-          <span className="text-green-200">{filterSearch}</span>\&quot
+          Zoek resultaten voor &quot;
+          <span className="text-green-200">{filterSearch}</span>&quot;
         </p>
       )}
     </>
