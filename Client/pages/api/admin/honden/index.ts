@@ -30,11 +30,15 @@ const getHondenOverview = async (
   req: GenericRequest<ListHondenRequest>,
   res: NextApiResponse<PaginatedResponse<PaginatedKlantHond>>
 ) => {
-  const data = await getPaginatedData<KlantHond>(req.query, req.url, HOND);
+  try {
+    const data = await getPaginatedData<KlantHond>(req.query, req.url, HOND);
 
-  const result = mapToHondenOverviewResult(data);
+    const result = mapToHondenOverviewResult(data);
 
-  return res.status(200).send(result);
+    return res.status(200).send(result);
+  } catch (e: any) {
+    return res.status(e.code).send(e.message);
+  }
 };
 
 export default handler;
