@@ -3,10 +3,7 @@ import { ClientSession, Collection, ObjectId } from "mongodb";
 import { CASCADEKLANT } from "../middlewares/Factory";
 import client from "../middlewares/MongoDb";
 import { InternalServerError } from "../middlewares/RequestError";
-import {
-  InschrijvingCollection,
-  IsInschrijving,
-} from "../types/EntityTpes/InschrijvingTypes";
+import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 import {
   GroepTrainingCollection,

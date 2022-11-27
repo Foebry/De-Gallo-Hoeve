@@ -4,25 +4,24 @@ import {
   ReadPreference,
   TransactionOptions,
 } from "mongodb";
-import { getAllRassen, RAS } from "../controllers/rasController";
-import { getHondenByKlantId } from "../controllers/HondController";
-import Factory, { PaginatedControllerType } from "./Factory";
-import { getAllKlanten, KLANT } from "../controllers/KlantController";
-import { CONFIRM } from "../types/EntityTpes/ConfirmTypes";
-import { CONTENT } from "../controllers/ContentController";
+import { getAllRassen, RAS } from "@controllers/rasController";
+import { getHondenByKlantId } from "@controllers/HondController";
+import Factory from "./Factory";
+import { getAllKlanten, KLANT } from "@controllers/KlantController";
+import { CONFIRM } from "@/types/EntityTpes/ConfirmTypes";
+import { CONTENT } from "@controllers/ContentController";
 import {
   getInschrijvingCollection,
   INSCHRIJVING,
-} from "../controllers/InschrijvingController";
+} from "@controllers/InschrijvingController";
 import {
   getTrainingCollection,
   TRAINING,
-} from "../controllers/TrainingController";
-import { PriveTrainingCollection } from "../types/EntityTpes/TrainingType";
-import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
-import { HondCollection, KlantHond } from "../types/EntityTpes/HondTypes";
-import { RasCollection } from "../types/EntityTpes/RasTypes";
-import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
+} from "@controllers/TrainingController";
+import { PriveTrainingCollection } from "@/types/EntityTpes/TrainingType";
+import { IsKlantCollection } from "@/types/EntityTpes/KlantTypes";
+import { KlantHond } from "@/types/EntityTpes/HondTypes";
+import { RasCollection } from "@/types/EntityTpes/RasTypes";
 
 export interface Option {
   value: string;

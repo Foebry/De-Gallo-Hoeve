@@ -1,18 +1,18 @@
 import { nanoid } from "nanoid";
 import Link from "next/link";
-import Router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import React, { useEffect, useMemo, useState } from "react";
 import { GrEdit, GrView } from "react-icons/gr";
 import { MdDelete } from "react-icons/md";
 import { toast } from "react-toastify";
-import Dashboard from "../../../components/admin/dashboard";
-import Button from "../../../components/buttons/Button";
-import FormRow from "../../../components/form/FormRow";
-import FormSearch from "../../../components/form/FormSearch";
-import Table from "../../../components/Table/Table";
-import getData from "../../../hooks/useApi";
-import { PaginatedRas } from "../../../middleware/mappers/rassen";
-import { ADMIN_RASSEN_OVERIEW } from "../../../types/apiTypes";
+import Dashboard from "@components/admin/dashboard";
+import Button from "@components/buttons/Button";
+import FormRow from "@components/form/FormRow";
+import FormSearch from "@components/form/FormSearch";
+import Table from "@components/Table/Table";
+import getData from "hooks/useApi";
+import { PaginatedRas } from "@middlewares/mappers/rassen";
+import { ADMIN_RASSEN_OVERIEW } from "types/apiTypes";
 import { ApiResult } from "../klanten";
 
 const Rassen = () => {

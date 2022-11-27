@@ -1,7 +1,6 @@
 import React, { ReactNode } from "react";
 import MenuItem from "../Menu/MenuItem";
 import MenuSection from "../Menu/MenuSection";
-import { Title1 } from "../Typography/Typography";
 import {
   ADMIN,
   ADMINEDITINDEX,
@@ -11,7 +10,7 @@ import {
   ADMINLISTSUBSCRIPTIONS,
   ADMINLISTTRAININGS,
   ADMINLISTUSERS,
-} from "../../types/linkTypes";
+} from "@/types/linkTypes";
 import { BiUser } from "react-icons/bi";
 import { BsCalendarDay, BsListUl } from "react-icons/bs";
 import { GiSittingDog, GiJumpingDog } from "react-icons/gi";

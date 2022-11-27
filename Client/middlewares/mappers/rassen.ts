@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { PaginatedData, PaginatedResponse } from "../../helpers/RequestHelper";
+import { PaginatedData, PaginatedResponse } from "@helpers/RequestHelper";
 
 export interface Ras {
   _id: ObjectId;

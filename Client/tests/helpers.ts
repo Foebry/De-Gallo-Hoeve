@@ -1,15 +1,8 @@
 import moment from "moment";
-import {
-  getKlantByEmail,
-  getKlantCollection,
-} from "../controllers/KlantController";
-import client from "../middlewares/MongoDb";
-import { generateCsrf } from "../middlewares/Validator";
-import {
-  IsRegisterPayload,
-  IsRegisterResponseBody,
-  RegisterBodyType,
-} from "./auth/types";
+import { getKlantByEmail } from "controllers/KlantController";
+import client from "middlewares/MongoDb";
+import { generateCsrf } from "middlewares/Validator";
+import { IsRegisterPayload, IsRegisterResponseBody } from "./auth/types";
 
 export const generateRegisterResponseBodyFromPayload = async (
   payload: IsRegisterPayload

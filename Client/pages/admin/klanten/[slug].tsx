@@ -1,21 +1,17 @@
-import { Attachment } from "@sendgrid/helpers/classes";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import Dashboard from "../../../components/admin/dashboard";
-import Button from "../../../components/buttons/Button";
-import FormInput from "../../../components/form/FormInput";
-import FormRow from "../../../components/form/FormRow";
-import FormSection from "../../../components/form/FormSection";
-import { MySelect } from "../../../components/MySelect";
-import { Body } from "../../../components/Typography/Typography";
-import getData from "../../../hooks/useApi";
-import { ADMIN_KLANT_DETAIL } from "../../../types/apiTypes";
-import {
-  ADMINLISTDOGS,
-  ADMINLISTSUBSCRIPTIONS,
-} from "../../../types/linkTypes";
+import Dashboard from "@components/admin/dashboard";
+import Button from "@components/buttons/Button";
+import FormInput from "@components/form/FormInput";
+import FormRow from "@components/form/FormRow";
+import FormSection from "@components/form/FormSection";
+import { MySelect } from "@components/MySelect";
+import { Body } from "@components/Typography/Typography";
+import getData from "hooks/useApi";
+import { ADMIN_KLANT_DETAIL } from "types/apiTypes";
+import { ADMINLISTDOGS, ADMINLISTSUBSCRIPTIONS } from "types/linkTypes";
 
 interface KlantDetail {
   _id: string;
@@ -84,7 +80,6 @@ const KlantDetail = () => {
     (async () => {
       if (slug) {
         const { data } = await getData(ADMIN_KLANT_DETAIL + slug);
-        console.log(data);
         setData(data);
       }
     })();

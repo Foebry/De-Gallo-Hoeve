@@ -1,24 +1,16 @@
-import React, {
-  ButtonHTMLAttributes,
-  FormEvent,
-  useEffect,
-  useState,
-} from "react";
+import React, { useEffect, useState } from "react";
 import {
   Control,
   Controller,
   FieldValues,
-  UseFormGetValues,
   UseFormRegister,
-  UseFormSetValue,
 } from "react-hook-form";
 import FormInput from "../form/FormInput";
 import Select, { OptionsOrGroups } from "react-select";
 import { optionInterface } from "../register/HondGegevens";
 import { geslachten } from "./HondCard";
-import { Body, FormError } from "../Typography/Typography";
+import { FormError } from "../Typography/Typography";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { MySelect } from "../MySelect";
 
 type TrainingType = "prive" | "groep";
 

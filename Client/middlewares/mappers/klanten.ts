@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
-import { PaginatedData, PaginatedResponse } from "../../helpers/RequestHelper";
-import { InschrijvingCollection } from "../../types/EntityTpes/InschrijvingTypes";
-import { IsKlantCollection } from "../../types/EntityTpes/KlantTypes";
+import { PaginatedData, PaginatedResponse } from "@helpers/RequestHelper";
+import { InschrijvingCollection } from "@/types/EntityTpes/InschrijvingTypes";
+import { IsKlantCollection } from "@/types/EntityTpes/KlantTypes";
 
 export const mapToAdminKlantenOverviewResult = (
   data: PaginatedData<IsKlantCollection>

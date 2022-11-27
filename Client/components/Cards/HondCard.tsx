@@ -6,14 +6,13 @@ import {
   UseFieldArrayRemove,
   UseFormGetValues,
 } from "react-hook-form";
-import Select, { OptionsOrGroups } from "react-select";
+import { OptionsOrGroups } from "react-select";
 import { RegisterErrorInterface } from "../../pages/register";
 import Button from "../buttons/Button";
 import FormInput from "../form/FormInput";
 import FormRow from "../form/FormRow";
 import { optionInterface } from "../register/HondGegevens";
-import { Body, FormError, Title3 } from "../Typography/Typography";
-import DatePicker from "react-datepicker";
+import { Body, Title3 } from "../Typography/Typography";
 import "react-datepicker/dist/react-datepicker.css";
 import { MyDatePicker } from "../MyDatePicker";
 import { MySelect } from "../MySelect";

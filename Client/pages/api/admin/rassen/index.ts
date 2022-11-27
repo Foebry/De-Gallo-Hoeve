@@ -1,16 +1,16 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { RAS } from "../../../../controllers/rasController";
+import { RAS } from "@controllers/rasController";
 import {
   getPaginatedData,
   PaginatedRequestQuery,
   PaginatedResponse,
-} from "../../../../helpers/RequestHelper";
+} from "helpers/RequestHelper";
 import {
   mapToRassenOverviewResult,
   PaginatedRas,
   Ras,
-} from "../../../../middleware/mappers/rassen";
-import { GenericRequest } from "../../auth/login";
+} from "@middlewares/mappers/rassen";
+import { GenericRequest } from "pages/api/auth/login";
 
 type RassenOverviewRequest = {
   query: PaginatedRequestQuery;

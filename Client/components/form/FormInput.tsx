@@ -1,8 +1,7 @@
-import React, { FormEventHandler, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useRef } from "react";
 import useFormInputEffect from "../../hooks/layout/useFormInputEffect";
-import { Body, FormError } from "../Typography/Typography";
-import { BsInfoCircle } from "react-icons/bs";
+import { FormError } from "../Typography/Typography";
 
 export interface FormInputProps {
   label: string;

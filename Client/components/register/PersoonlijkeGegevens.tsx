@@ -1,7 +1,6 @@
 import React, { Dispatch } from "react";
 import FormInput from "../form/FormInput";
 import FormRow from "../form/FormRow";
-import Button from "../buttons/Button";
 import { Control, Controller, FieldValues } from "react-hook-form";
 import { RegisterErrorInterface } from "../../pages/register";
 

@@ -2,32 +2,30 @@ import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, FieldValues, useForm } from "react-hook-form";
-import useMutation, {
-  structureInschrijvingenPayload,
-} from "../hooks/useMutation";
-import { POST_INSCHRIJVING } from "../types/apiTypes";
-import { INDEX, LOGIN } from "../types/linkTypes";
-import FormSteps from "../components/form/FormSteps";
+import useMutation, { structureInschrijvingenPayload } from "hooks/useMutation";
+import { POST_INSCHRIJVING } from "types/apiTypes";
+import { INDEX, LOGIN } from "types/linkTypes";
+import FormSteps from "@components/form/FormSteps";
 import Form from "../components/form/Form";
-import Button, { SubmitButton } from "../components/buttons/Button";
+import Button, { SubmitButton } from "@components/buttons/Button";
 import { DatePicker } from "react-trip-date";
-import Contactgegevens from "../components/inschrijving/Contactgegevens";
+import Contactgegevens from "@components/inschrijving/Contactgegevens";
 import { toast } from "react-toastify";
 import { OptionsOrGroups } from "react-select";
-import { optionInterface } from "../components/register/HondGegevens";
-import HondGegevens from "../components/inschrijving/HondGegevens";
+import { optionInterface } from "@components/register/HondGegevens";
+import HondGegevens from "@components/inschrijving/HondGegevens";
 import client, {
   getFreeTimeSlots,
   getHondOptions,
   getRasOptions,
-} from "../middlewares/MongoDb";
+} from "@middlewares/MongoDb";
 import { ObjectId } from "mongodb";
-import { getDisabledDays } from "../middlewares/Helper";
-import { generateCsrf } from "../middlewares/Validator";
-import { securepage } from "../middlewares/Authenticator";
-import Skeleton from "../components/website/skeleton";
-import { getPriveTraining } from "../controllers/TrainingController";
-import getData from "../hooks/useApi";
+import { getDisabledDays } from "@middlewares/Helper";
+import { generateCsrf } from "@middlewares/Validator";
+import { securepage } from "@middlewares/Authenticator";
+import Skeleton from "@components/website/skeleton";
+import { getPriveTraining } from "@controllers/TrainingController";
+import getData from "hooks/useApi";
 
 type TrainingType = "prive" | "groep";
 

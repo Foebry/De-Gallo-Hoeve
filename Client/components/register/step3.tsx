@@ -1,9 +1,8 @@
 import React from "react";
-import { SubmitButton } from "../buttons/Button";
 import FormInput from "../form/FormInput";
 import FormRow from "../form/FormRow";
 import { Control, Controller, FieldValues } from "react-hook-form";
-import { RegisterErrorInterface } from "../../pages/register";
+import { RegisterErrorInterface } from "pages/register";
 
 interface Step3Props {
   control: Control<FieldValues, any>;

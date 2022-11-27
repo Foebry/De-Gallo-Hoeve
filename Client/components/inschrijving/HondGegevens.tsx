@@ -5,10 +5,9 @@ import {
   FieldValues,
   UseFormGetValues,
   UseFormRegister,
-  UseFormSetValue,
 } from "react-hook-form";
 import { OptionsOrGroups } from "react-select";
-import { InschrijvingErrorInterface } from "../../pages/inschrijving";
+import { InschrijvingErrorInterface } from "pages/inschrijving";
 import DayCard from "../Cards/DayCard";
 import { optionInterface } from "../register/HondGegevens";
 import { Body } from "../Typography/Typography";

@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import mailer from "../../middlewares/Mailer";
-import { validate, validateCsrfToken } from "../../middlewares/Validator";
-import { contactSchema } from "../../types/schemas";
+import mailer from "@middlewares/Mailer";
+import { validate } from "@middlewares/Validator";
+import { contactSchema } from "types/schemas";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== "POST") res.status(405).send({ message: "Not Allowed" });

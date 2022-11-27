@@ -1,17 +1,17 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { validateCsrfToken, validate } from "../../../middlewares/Validator";
-import mailer from "../../../middlewares/Mailer";
-import client, { startTransaction } from "../../../middlewares/MongoDb";
+import { validateCsrfToken, validate } from "@middlewares/Validator";
+import mailer from "@middlewares/Mailer";
+import client, { startTransaction } from "@middlewares/MongoDb";
 import {
   EmailOccupiedError,
   NotAllowedError,
   TransactionError,
-} from "../../../middlewares/RequestError";
-import { registerSchema } from "../../../types/schemas";
-import Factory from "../../../middlewares/Factory";
-import { getKlantByEmail, KLANT } from "../../../controllers/KlantController";
-import { IsRegisterBody } from "../../../types/requestTypes";
-import { CONFIRM } from "../../../types/EntityTpes/ConfirmTypes";
+} from "@middlewares/RequestError";
+import { registerSchema } from "types/schemas";
+import Factory from "@middlewares/Factory";
+import { getKlantByEmail, KLANT } from "@controllers/KlantController";
+import { IsRegisterBody } from "types/requestTypes";
+import { CONFIRM } from "types/EntityTpes/ConfirmTypes";
 import moment from "moment";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -20,21 +20,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 const register = async (req: NextApiRequest, res: NextApiResponse) => {
-  console.log({
-    formatted: moment().local().format("YYYY-MM-DD HH:mm:SS.mmmm"),
-  });
-  console.log({
-    idk: new Date(moment.utc("2022-12-24 23:59:59").local().toString()),
-  });
-  console.log({
-    dateFromFormat: new Date(moment().format("YYYY-MM-DD HH:mm:ss")),
-  });
-  console.log({ localMoment: moment().local() });
-  console.log({ local: moment().local() });
-  console.log({ unix: moment().local().unix() });
-  console.log({ dateFromUnix: new Date(moment().local().unix() * 1000) });
-  console.log({ localToString: moment().local().toISOString() });
-  console.log({ date: new Date("2022-12-12 23:59:59") });
   try {
     await client.connect();
     await validateCsrfToken({ req, res });

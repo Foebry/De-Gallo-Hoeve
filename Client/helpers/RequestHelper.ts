@@ -1,6 +1,4 @@
-import { ObjectId } from "mongodb";
-import client, { getData } from "../middleware/MongoDb";
-import { GenericRequest } from "../pages/api/auth/login";
+import client, { getData } from "@middlewares/MongoDb";
 import { HondCollection } from "../types/EntityTpes/HondTypes";
 import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";

@@ -1,10 +1,10 @@
 import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
-import { getInschrijvingenByIds } from "../../../../controllers/InschrijvingController";
-import { getKlantById } from "../../../../controllers/KlantController";
-import { mapToKlantDetail } from "../../../../middleware/mappers/klanten";
-import client from "../../../../middleware/MongoDb";
-import { KlantNotFoundError } from "../../../../middleware/RequestError";
+import { getInschrijvingenByIds } from "@controllers/InschrijvingController";
+import { getKlantById } from "@controllers/KlantController";
+import { mapToKlantDetail } from "@middlewares/mappers/klanten";
+import client from "@middlewares/MongoDb";
+import { KlantNotFoundError } from "@middlewares/RequestError";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") return getKlantDetail(req, res);

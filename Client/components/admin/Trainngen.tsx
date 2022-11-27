@@ -1,12 +1,8 @@
 import { nanoid } from "nanoid";
-import React, { useState } from "react";
-import { ContentStates } from "../../pages/admin/edit";
-import { CONTENTPRIVETRAINING } from "../../types/apiTypes";
-import Button from "../buttons/Button";
+import React from "react";
+import { ContentStates } from "pages/admin/edit";
 import { Body } from "../Typography/Typography";
-import { Edit, EditStates } from "./Intro";
 import Image from "next/image";
-import { BiEdit } from "react-icons/bi";
 import { GiCheckMark } from "react-icons/gi";
 import { IoMdAddCircleOutline, IoMdRemoveCircleOutline } from "react-icons/io";
 

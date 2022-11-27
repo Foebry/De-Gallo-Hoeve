@@ -1,4 +1,3 @@
-import { Moment } from "moment";
 import { ObjectId } from "mongodb";
 
 export interface ConfirmCollection extends NewConfirm {

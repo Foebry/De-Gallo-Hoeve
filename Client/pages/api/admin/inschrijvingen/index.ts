@@ -1,17 +1,16 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { UnionType } from "typescript";
-import { INSCHRIJVING } from "../../../../controllers/InschrijvingController";
+import { INSCHRIJVING } from "@controllers/InschrijvingController";
 import {
   getPaginatedData,
   PaginatedRequestQuery,
   PaginatedResponse,
-} from "../../../../helpers/RequestHelper";
+} from "helpers/RequestHelper";
+import { InschrijvingCollection } from "types/EntityTpes/InschrijvingTypes";
+import { GenericRequest } from "pages/api/auth/login";
 import {
   mapToAdminInschrijvingenOverviewResult,
   PaginatedInschrijving,
-} from "../../../../middleware/mappers/Inschrijvingen";
-import { InschrijvingCollection } from "../../../../types/EntityTpes/InschrijvingTypes";
-import { GenericRequest } from "../../auth/login";
+} from "@middlewares/mappers/Inschrijvingen";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET")

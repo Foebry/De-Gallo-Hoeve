@@ -2,13 +2,13 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import Dashboard from "../../../components/admin/dashboard";
-import Button from "../../../components/buttons/Button";
-import FormInput from "../../../components/form/FormInput";
-import FormRow from "../../../components/form/FormRow";
-import FormSection from "../../../components/form/FormSection";
-import getData from "../../../hooks/useApi";
-import { ADMIN_INSCHRIJVING_DETAIL } from "../../../types/apiTypes";
+import Dashboard from "@components/admin/dashboard";
+import Button from "@components/buttons/Button";
+import FormInput from "@components/form/FormInput";
+import FormRow from "@components/form/FormRow";
+import FormSection from "@components/form/FormSection";
+import getData from "hooks/useApi";
+import { ADMIN_INSCHRIJVING_DETAIL } from "types/apiTypes";
 
 interface InschrijvingDetail {
   _id: string;

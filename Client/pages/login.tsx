@@ -1,19 +1,18 @@
 import React, { useState } from "react";
-import { Body } from "../components/Typography/Typography";
-import Form from "../components/form/Form";
-import FormInput from "../components/form/FormInput";
-import { REGISTER, INDEX } from "../types/linkTypes";
-import Button, { SubmitButton } from "../components/buttons/Button";
-import FormRow from "../components/form/FormRow";
+import { Body } from "@components/Typography/Typography";
+import Form from "@components/form/Form";
+import FormInput from "@components/form/FormInput";
+import { REGISTER, INDEX } from "types/linkTypes";
+import { SubmitButton } from "@components/buttons/Button";
+import FormRow from "@components/form/FormRow";
 import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
-import useMutation from "../hooks/useMutation";
-import { LOGINAPI } from "../types/apiTypes";
-import { initializeLocalStorage } from "../helpers/localStorage";
+import useMutation from "hooks/useMutation";
+import { LOGINAPI } from "types/apiTypes";
 import { GetServerSidePropsContext } from "next";
 import nookies from "nookies";
-import validator, { generateCsrf } from "../middlewares/Validator";
-import Skeleton from "../components/website/skeleton";
+import validator, { generateCsrf } from "@middlewares/Validator";
+import Skeleton from "@components/website/skeleton";
 import Link from "next/link";
 
 export interface LoginErrorInterface {

@@ -19,9 +19,11 @@
       "@components/*": ["components/*"],
       "@controllers/*": ["controllers/*"],
       "@helpers/*": ["helpers/*"],
-      "@middleware/*": ["middleware/*"],
+      "@middlewares/*": ["middlewares/*"],
       "@/types/*": ["types/*"],
-      "@auth/*": ["auth/*"]
+      "@auth/*": ["auth/*"],
+      "@/pages/*": ["pages/"],
+      "@/hooks/*": ["hooks/"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "config-overrides.js", "src"],

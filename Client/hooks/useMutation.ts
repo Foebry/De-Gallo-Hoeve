@@ -1,6 +1,6 @@
 import axios from "axios";
 import { toast } from "react-toastify";
-import { InschrijvingErrorInterface } from "../pages/inschrijving";
+import { InschrijvingErrorInterface } from "pages/inschrijving";
 import { LoginErrorInterface } from "../pages/login";
 import moment from "moment";
 

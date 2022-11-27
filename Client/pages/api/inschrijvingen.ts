@@ -1,33 +1,29 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { validate, validateCsrfToken } from "../../middlewares/Validator";
-import { inschrijvingSchema } from "../../types/schemas";
-import { secureApi } from "../../middlewares/Authenticator";
+import { validate, validateCsrfToken } from "@middlewares/Validator";
+import { inschrijvingSchema } from "types/schemas";
+import { secureApi } from "@middlewares/Authenticator";
 import {
   EmailNotVerifiedError,
   HondNotFoundError,
-  InternalServerError,
   KlantNotFoundError,
   ReedsIngeschrevenError,
   TrainingNotFoundError,
   TrainingVolzetError,
   TransactionError,
-} from "../../middlewares/RequestError";
-import {
-  getKlantById,
-  getKlantCollection,
-} from "../../controllers/KlantController";
-import client, { startTransaction } from "../../middlewares/MongoDb";
-import mailer from "../../middlewares/Mailer";
-import { saveInschrijving } from "../../controllers/InschrijvingController";
+} from "@middlewares/RequestError";
+import { getKlantById } from "@controllers/KlantController";
+import client, { startTransaction } from "@middlewares/MongoDb";
+import mailer from "@middlewares/Mailer";
+import { saveInschrijving } from "@controllers/InschrijvingController";
 import { ObjectId } from "mongodb";
-import { getKlantHond } from "../../controllers/HondController";
+import { getKlantHond } from "@controllers/HondController";
 import {
   getTrainingByName,
   klantReedsIngeschreven,
   trainingVolzet,
-} from "../../controllers/TrainingController";
-import Factory from "../../middlewares/Factory";
-import { IsInschrijvingBody } from "../../types/requestTypes";
+} from "@controllers/TrainingController";
+import Factory from "@middlewares/Factory";
+import { IsInschrijvingBody } from "types/requestTypes";
 import moment from "moment";
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {

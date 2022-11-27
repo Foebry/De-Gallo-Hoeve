@@ -7,12 +7,8 @@ import {
 } from "../middlewares/Factory";
 import client, { startTransaction } from "../middlewares/MongoDb";
 import {
-  HondNotFoundError,
   InschrijvingKlantChangedError,
-  InschrijvingNotFoundError,
   InternalServerError,
-  KlantNotFoundError,
-  TrainingNotFoundError,
   TransactionError,
 } from "../middlewares/RequestError";
 import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
@@ -21,7 +17,6 @@ import { IsUpdateInschrijvingBody } from "../types/requestTypes";
 import { getKlantHond } from "./HondController";
 import {
   addKlantInschrijving,
-  getKlantById,
   removeKlantInschrijving,
 } from "./KlantController";
 import {

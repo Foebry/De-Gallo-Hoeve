@@ -1,15 +1,15 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { validate, validateCsrfToken } from "../../../middlewares/Validator";
-import { loginSchema } from "../../../types/schemas";
-import { getKlantByEmail } from "../../../controllers/KlantController";
+import { validate, validateCsrfToken } from "@middlewares/Validator";
+import { loginSchema } from "types/schemas";
+import { getKlantByEmail } from "@controllers/KlantController";
 import bcrypt from "bcrypt";
 import {
   InvalidEmailError,
   InvalidPasswordError,
   NotAllowedError,
-} from "../../../middlewares/RequestError";
-import { createJWT, setClientCookie } from "../../../middlewares/Authenticator";
-import client from "../../../middlewares/MongoDb";
+} from "@middlewares/RequestError";
+import { createJWT, setClientCookie } from "@middlewares/Authenticator";
+import client from "@middlewares/MongoDb";
 
 const handler = (req: GenericRequest<LoginRequest>, res: NextApiResponse) => {
   if (req.method === "POST") return login(req, res);

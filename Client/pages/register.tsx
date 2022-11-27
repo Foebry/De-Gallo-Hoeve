@@ -1,21 +1,21 @@
 import React, { Dispatch, useEffect, useState } from "react";
-import Form from "../components/form/Form";
+import Form from "@components/form/Form";
 import { useRouter } from "next/router";
-import { INDEX, LOGIN } from "../types/linkTypes";
+import { INDEX, LOGIN } from "types/linkTypes";
 import { useFieldArray, useForm } from "react-hook-form";
-import PersoonlijkeGegevens from "../components/register/PersoonlijkeGegevens";
-import Step2, { optionInterface } from "../components/register/HondGegevens";
+import PersoonlijkeGegevens from "components/register/PersoonlijkeGegevens";
+import Step2, { optionInterface } from "components/register/HondGegevens";
 import { OptionsOrGroups } from "react-select";
-import { REGISTERAPI } from "../types/apiTypes";
-import useMutation, { structureHondenPayload } from "../hooks/useMutation";
-import FormSteps from "../components/form/FormSteps";
+import { REGISTERAPI } from "types/apiTypes";
+import useMutation, { structureHondenPayload } from "hooks/useMutation";
+import FormSteps from "components/form/FormSteps";
 import { GetServerSidePropsContext } from "next";
 import nookies from "nookies";
 import { toast } from "react-toastify";
-import Button, { SubmitButton } from "../components/buttons/Button";
-import { generateCsrf } from "../middlewares/Validator";
-import { useAppContext } from "../context/appContext";
-import Skeleton from "../components/website/skeleton";
+import Button, { SubmitButton } from "components/buttons/Button";
+import { generateCsrf } from "middlewares/Validator";
+import { useAppContext } from "context/appContext";
+import Skeleton from "components/website/skeleton";
 
 export interface RegisterHondErrorInterface {
   naam?: string;

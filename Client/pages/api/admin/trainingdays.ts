@@ -1,9 +1,8 @@
-import moment from "moment";
 import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
-import { getTrainingDaysCollection } from "../../../controllers/TrainingController";
-import client from "../../../middlewares/MongoDb";
-import { TrainingDaysCollection } from "../../../types/EntityTpes/TrainingType";
+import { getTrainingDaysCollection } from "@controllers/TrainingController";
+import client from "@middlewares/MongoDb";
+import { TrainingDaysCollection } from "types/EntityTpes/TrainingType";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") return getAvailableDays(req, res);

@@ -1,17 +1,17 @@
 import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
-import { getHondById } from "../../../../controllers/HondController";
-import { getInschrijvingById } from "../../../../controllers/InschrijvingController";
+import { getHondById } from "@controllers/HondController";
+import { getInschrijvingById } from "@controllers/InschrijvingController";
 import {
   DetailInschrijvingResponse,
   mapToInschrijvingDetail,
-} from "../../../../middleware/mappers/Inschrijvingen";
-import client from "../../../../middleware/MongoDb";
+} from "@middlewares/mappers/Inschrijvingen";
+import client from "@middlewares/MongoDb";
 import {
   HondNotFoundError,
   InschrijvingNotFoundError,
-} from "../../../../middleware/RequestError";
-import { GenericRequest } from "../../auth/login";
+} from "@middlewares/RequestError";
+import { GenericRequest } from "pages/api/auth/login";
 
 interface DetailRequest extends NextApiRequest {
   query: { slug: string };
@@ -41,7 +41,6 @@ const getInschrijvingDetail = async (
 
     return res.status(200).send(result);
   } catch (e: any) {
-    console.log(e);
     return res.status(e.code).send(e.response);
   }
 };

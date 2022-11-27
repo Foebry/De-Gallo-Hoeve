@@ -5,13 +5,12 @@ import React, { useEffect, useMemo, useState } from "react";
 import { GrEdit, GrView } from "react-icons/gr";
 import { MdDelete } from "react-icons/md";
 import { toast } from "react-toastify";
-import Dashboard from "../../../components/admin/dashboard";
-import FormRow from "../../../components/form/FormRow";
-import Table from "../../../components/Table/Table";
-import { Title1 } from "../../../components/Typography/Typography";
-import getData from "../../../hooks/useApi";
-import { PaginatedInschrijving } from "../../../middleware/mappers/Inschrijvingen";
-import { ADMIN_INSCHRIJVINGEN_OVERVIEW } from "../../../types/apiTypes";
+import Dashboard from "@components/admin/dashboard";
+import FormRow from "@components/form/FormRow";
+import Table from "@components/Table/Table";
+import getData from "hooks/useApi";
+import { PaginatedInschrijving } from "@middlewares/mappers/Inschrijvingen";
+import { ADMIN_INSCHRIJVINGEN_OVERVIEW } from "types/apiTypes";
 import { apiOptionsInterface, ApiResult } from "../klanten";
 
 const Inschrijvingen = () => {
@@ -29,7 +28,6 @@ const Inschrijvingen = () => {
     pagination: { first: 0, last: 0, total: 0, currentPage: 0 },
   });
   const router = useRouter();
-  console.log({ query: router.query });
 
   const handleView = (_id: string) => {
     router.push(`/admin/inschrijvingen/${_id}`);
@@ -38,11 +36,9 @@ const Inschrijvingen = () => {
   useEffect(() => {
     (async () => {
       const ids = router.query.id;
-      console.log(ids);
       const url = ids
         ? ADMIN_INSCHRIJVINGEN_OVERVIEW + `?id=${ids}`
         : ADMIN_INSCHRIJVINGEN_OVERVIEW;
-      console.log(url);
       const { data } = await getData(url);
       setApiData(data);
     })();

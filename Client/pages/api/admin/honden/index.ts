@@ -1,19 +1,16 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { HOND } from "../../../../controllers/HondController";
+import { HOND } from "@controllers/HondController";
 import {
   getPaginatedData,
   PaginatedRequestQuery,
   PaginatedResponse,
-} from "../../../../helpers/RequestHelper";
+} from "@helpers/RequestHelper";
 import {
   mapToHondenOverviewResult,
   PaginatedKlantHond,
-} from "../../../../middleware/mappers/honden";
-import {
-  HondCollection,
-  KlantHond,
-} from "../../../../types/EntityTpes/HondTypes";
-import { GenericRequest } from "../../auth/login";
+} from "@middlewares/mappers/honden";
+import { KlantHond } from "types/EntityTpes/HondTypes";
+import { GenericRequest } from "pages/api/auth/login";
 
 type ListHondenRequest = {
   query: PaginatedRequestQuery;
@@ -30,10 +27,8 @@ const getHondenOverview = async (
   req: GenericRequest<ListHondenRequest>,
   res: NextApiResponse<PaginatedResponse<PaginatedKlantHond>>
 ) => {
-  console.log({ status: "inside handler" });
   try {
     const data = await getPaginatedData<KlantHond>(req.query, req.url, HOND);
-    console.log({ data });
 
     const result = mapToHondenOverviewResult(data);
 
