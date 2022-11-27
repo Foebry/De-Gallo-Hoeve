@@ -30,8 +30,10 @@ const getHondenOverview = async (
   req: GenericRequest<ListHondenRequest>,
   res: NextApiResponse<PaginatedResponse<PaginatedKlantHond>>
 ) => {
+  console.log({ status: "inside handler" });
   try {
     const data = await getPaginatedData<KlantHond>(req.query, req.url, HOND);
+    console.log({ data });
 
     const result = mapToHondenOverviewResult(data);
 

@@ -79,8 +79,13 @@ const getPagination = <T>(
 
   const pageSize = parseInt(amount ?? "10");
   const cPage = parseInt(page ?? "1");
-  const currentPage = Math.min(cPage, Math.ceil(data.length / pageSize));
-  const first = Math.max((currentPage - 1) * pageSize, -1);
+  const currentPage = Math.min(
+    Math.max(cPage, 1),
+    Math.ceil(data.length / pageSize)
+  );
+  const first =
+    data.length === 0 ? 0 : Math.max((currentPage - 1) * pageSize, -1);
+  // const first = Math.max(currentPage * pageSize, -1);
   const last = Math.min(first + pageSize, data.length);
 
   const searchValue = search ? `search=${search}` : undefined;
@@ -151,8 +156,7 @@ function filterData<T>(
     }
     return data;
   }
-  console.log({ status: "Not IsKlantCollectionArray" });
-  console.log({ dataObject0: data[0] });
+  return data;
 }
 
 function instanceOfKlantCollectionArray(

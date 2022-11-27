@@ -1,15 +1,15 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { KLANT } from "../../../../controllers/KlantController";
+import { KLANT } from "@controllers/KlantController";
 import {
   getPaginatedData,
   PaginatedRequestQuery,
   PaginatedResponse,
-} from "../../../../helpers/RequestHelper";
+} from "@helpers/RequestHelper";
 import {
   mapToAdminKlantenOverviewResult,
   PaginatedKlant,
-} from "../../../../middleware/mappers/klanten";
-import { IsKlantCollection } from "../../../../types/EntityTpes/KlantTypes";
+} from "@middleware/mappers/klanten";
+import { IsKlantCollection } from "@/types/EntityTpes/KlantTypes";
 import { GenericRequest } from "../../auth/login";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

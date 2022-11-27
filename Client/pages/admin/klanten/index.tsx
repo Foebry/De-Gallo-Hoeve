@@ -114,18 +114,23 @@ const Klanten = () => {
   };
 
   return (
-    <Dashboard>
-      <FormRow className="flex-row-reverse">
-        <FormSearch api="/api/admin/klanten?search=" onSearch={onSearch} />
-      </FormRow>
-      <Table
-        rows={klanten}
-        columns={headers}
-        colWidths={["15", "25", "22.5", "15", "12.5", "10"]}
-        pagination={apiData.pagination}
-        onPaginationClick={onPaginationClick}
-      />
-    </Dashboard>
+    <>
+      <head>
+        <title>De Gallo-hoeve - Klanten</title>
+      </head>
+      <Dashboard>
+        <FormRow className="flex-row-reverse">
+          <FormSearch api="/api/admin/klanten?search=" onSearch={onSearch} />
+        </FormRow>
+        <Table
+          rows={klanten}
+          columns={headers}
+          colWidths={["15", "25", "22.5", "15", "12.5", "10"]}
+          pagination={apiData.pagination}
+          onPaginationClick={onPaginationClick}
+        />
+      </Dashboard>
+    </>
   );
 };
 
