@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getContentCollection } from "../../../controllers/ContentController";
-import client from "../../../middleware/MongoDb";
+import client from "../../../middlewares/MongoDb";
 import { ContentCollection } from "../../../types/EntityTpes/ContentTypes";
 import { atob, btoa } from "buffer";
 

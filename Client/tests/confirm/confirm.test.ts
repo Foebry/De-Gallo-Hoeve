@@ -1,12 +1,12 @@
 import { createServer, IncomingMessage, RequestListener } from "http";
 import { NextApiHandler } from "next";
 import { apiResolver } from "next/dist/server/api-utils/node";
-import client, { clearAllData } from "../../middleware/MongoDb";
+import client, { clearAllData } from "../../middlewares/MongoDb";
 import request from "supertest";
-import { createRandomConfirmCode } from "../../middleware/Helper";
+import { createRandomConfirmCode } from "../../middlewares/Helper";
 import handler from "../../pages/api/confirm/[code]";
 import registerHandler from "../../pages/api/auth/register";
-import Factory from "../../middleware/Factory";
+import Factory from "../../middlewares/Factory";
 import {
   getConfirmByKlantId,
   getConfirmCollection,

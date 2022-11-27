@@ -13,7 +13,7 @@ import { GetServerSidePropsContext } from "next";
 import nookies from "nookies";
 import { toast } from "react-toastify";
 import Button, { SubmitButton } from "../components/buttons/Button";
-import { generateCsrf } from "../middleware/Validator";
+import { generateCsrf } from "../middlewares/Validator";
 import { useAppContext } from "../context/appContext";
 import Skeleton from "../components/website/skeleton";
 

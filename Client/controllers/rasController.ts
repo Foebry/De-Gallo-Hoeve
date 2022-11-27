@@ -1,9 +1,9 @@
 import { Collection, ObjectId } from "mongodb";
-import client from "../middleware/MongoDb";
+import client from "../middlewares/MongoDb";
 import {
   InternalServerError,
   RasNotFoundError,
-} from "../middleware/RequestError";
+} from "../middlewares/RequestError";
 import { RasCollection, UpdateRas } from "../types/EntityTpes/RasTypes";
 
 export interface IsRasController {

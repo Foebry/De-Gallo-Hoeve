@@ -1,14 +1,14 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { validateCsrfToken, validate } from "../../../middleware/Validator";
-import mailer from "../../../middleware/Mailer";
-import client, { startTransaction } from "../../../middleware/MongoDb";
+import { validateCsrfToken, validate } from "../../../middlewares/Validator";
+import mailer from "../../../middlewares/Mailer";
+import client, { startTransaction } from "../../../middlewares/MongoDb";
 import {
   EmailOccupiedError,
   NotAllowedError,
   TransactionError,
-} from "../../../middleware/RequestError";
+} from "../../../middlewares/RequestError";
 import { registerSchema } from "../../../types/schemas";
-import Factory from "../../../middleware/Factory";
+import Factory from "../../../middlewares/Factory";
 import { getKlantByEmail, KLANT } from "../../../controllers/KlantController";
 import { IsRegisterBody } from "../../../types/requestTypes";
 import { CONFIRM } from "../../../types/EntityTpes/ConfirmTypes";

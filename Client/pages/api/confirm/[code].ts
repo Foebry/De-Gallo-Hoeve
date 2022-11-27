@@ -5,13 +5,13 @@ import {
   getConfirmCollection,
 } from "../../../controllers/ConfirmController";
 import { getKlantById, KLANT } from "../../../controllers/KlantController";
-import Factory from "../../../middleware/Factory";
-import client from "../../../middleware/MongoDb";
+import Factory from "../../../middlewares/Factory";
+import client from "../../../middlewares/MongoDb";
 import {
   ExpiredConfirmCodeError,
   InvalidConfirmCodeError,
   KlantNotFoundError,
-} from "../../../middleware/RequestError";
+} from "../../../middlewares/RequestError";
 import { CONFIRM } from "../../../types/EntityTpes/ConfirmTypes";
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {

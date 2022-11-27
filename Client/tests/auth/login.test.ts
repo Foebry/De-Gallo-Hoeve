@@ -1,12 +1,12 @@
 import { LOGINAPI } from "../../types/apiTypes";
-import { generateCsrf } from "../../middleware/Validator";
+import { generateCsrf } from "../../middlewares/Validator";
 import { NextApiHandler } from "next";
 import { createServer, IncomingMessage, RequestListener } from "http";
 import request from "supertest";
 import { apiResolver } from "next/dist/server/api-utils/node";
 import handler from "../../pages/api/auth/login";
-import { clearAllData } from "../../middleware/MongoDb";
-import Factory from "../../middleware/Factory";
+import { clearAllData } from "../../middlewares/MongoDb";
+import Factory from "../../middlewares/Factory";
 
 describe("login", () => {
   beforeEach(async () => {

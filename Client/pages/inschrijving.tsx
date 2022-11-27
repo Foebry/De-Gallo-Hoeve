@@ -20,11 +20,11 @@ import client, {
   getFreeTimeSlots,
   getHondOptions,
   getRasOptions,
-} from "../middleware/MongoDb";
+} from "../middlewares/MongoDb";
 import { ObjectId } from "mongodb";
-import { getDisabledDays } from "../middleware/Helper";
-import { generateCsrf } from "../middleware/Validator";
-import { securepage } from "../middleware/Authenticator";
+import { getDisabledDays } from "../middlewares/Helper";
+import { generateCsrf } from "../middlewares/Validator";
+import { securepage } from "../middlewares/Authenticator";
 import Skeleton from "../components/website/skeleton";
 import { getPriveTraining } from "../controllers/TrainingController";
 import getData from "../hooks/useApi";

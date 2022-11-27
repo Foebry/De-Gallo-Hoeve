@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import mailer from "../../middleware/Mailer";
-import { validate, validateCsrfToken } from "../../middleware/Validator";
+import mailer from "../../middlewares/Mailer";
+import { validate, validateCsrfToken } from "../../middlewares/Validator";
 import { contactSchema } from "../../types/schemas";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

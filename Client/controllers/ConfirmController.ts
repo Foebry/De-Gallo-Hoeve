@@ -1,13 +1,13 @@
 import moment from "moment";
 import { Collection, MongoClient, ObjectId } from "mongodb";
-import Factory from "../middleware/Factory";
-import { createRandomConfirmCode } from "../middleware/Helper";
-import client, { MongoDb } from "../middleware/MongoDb";
+import Factory from "../middlewares/Factory";
+import { createRandomConfirmCode } from "../middlewares/Helper";
+import client, { MongoDb } from "../middlewares/MongoDb";
 import {
   ConfirmNotFoundError,
   InternalServerError,
   KlantNotFoundError,
-} from "../middleware/RequestError";
+} from "../middlewares/RequestError";
 import {
   ConfirmCollection,
   NewConfirm,

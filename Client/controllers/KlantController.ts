@@ -4,13 +4,13 @@ import {
   deleteInschrijvingen,
   getInschrijvingById,
 } from "./InschrijvingController";
-import client from "../middleware/MongoDb";
+import client from "../middlewares/MongoDb";
 import {
   InschrijvingNotFoundError,
   InternalServerError,
   KlantNotFoundError,
-} from "../middleware/RequestError";
-import { CASCADETRAINING } from "../middleware/Factory";
+} from "../middlewares/RequestError";
+import { CASCADETRAINING } from "../middlewares/Factory";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
 import { HondCollection } from "@/types/EntityTpes/HondTypes";

@@ -4,8 +4,8 @@ import { apiResolver } from "next/dist/server/api-utils/node";
 import handler from "../../pages/api/auth/register";
 import { REGISTERAPI } from "../../types/apiTypes";
 import request from "supertest";
-import Factory from "../../middleware/Factory";
-import { clearAllData } from "../../middleware/MongoDb";
+import Factory from "../../middlewares/Factory";
+import { clearAllData } from "../../middlewares/MongoDb";
 import {
   generateRegisterPayloadFromKlantData,
   generateRegisterResponseBodyFromPayload,

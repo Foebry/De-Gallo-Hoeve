@@ -3,8 +3,8 @@ import {
   getKlantByEmail,
   getKlantCollection,
 } from "../controllers/KlantController";
-import client from "../middleware/MongoDb";
-import { generateCsrf } from "../middleware/Validator";
+import client from "../middlewares/MongoDb";
+import { generateCsrf } from "../middlewares/Validator";
 import {
   IsRegisterPayload,
   IsRegisterResponseBody,

@@ -2,13 +2,13 @@ import { createServer, IncomingMessage, RequestListener } from "http";
 import { NextApiHandler } from "next";
 import request from "supertest";
 import { apiResolver } from "next/dist/server/api-utils/node";
-import { clearAllData } from "../../middleware/MongoDb";
+import { clearAllData } from "../../middlewares/MongoDb";
 import { LOGINAPI, POST_INSCHRIJVING } from "../../types/apiTypes";
 import handler from "../../pages/api/inschrijvingen";
-import Factory from "../../middleware/Factory";
-import { generateCsrf } from "../../middleware/Validator";
+import Factory from "../../middlewares/Factory";
+import { generateCsrf } from "../../middlewares/Validator";
 import loginHandler from "../../pages/api/auth/login";
-import { createBearer } from "../../middleware/Authenticator";
+import { createBearer } from "../../middlewares/Authenticator";
 import { ObjectId } from "mongodb";
 import moment from "moment";
 

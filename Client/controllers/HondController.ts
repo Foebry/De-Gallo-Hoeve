@@ -4,7 +4,7 @@ import {
   HondNotFoundError,
   InternalServerError,
   KlantNotFoundError,
-} from "../middleware/RequestError";
+} from "../middlewares/RequestError";
 import { HondCollection, KlantHond } from "../types/EntityTpes/HondTypes";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 import {

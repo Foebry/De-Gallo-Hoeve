@@ -12,7 +12,7 @@ import { LOGINAPI } from "../types/apiTypes";
 import { initializeLocalStorage } from "../helpers/localStorage";
 import { GetServerSidePropsContext } from "next";
 import nookies from "nookies";
-import validator, { generateCsrf } from "../middleware/Validator";
+import validator, { generateCsrf } from "../middlewares/Validator";
 import Skeleton from "../components/website/skeleton";
 import Link from "next/link";
 

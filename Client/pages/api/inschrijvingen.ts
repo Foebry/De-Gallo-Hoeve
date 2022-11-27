@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { validate, validateCsrfToken } from "../../middleware/Validator";
+import { validate, validateCsrfToken } from "../../middlewares/Validator";
 import { inschrijvingSchema } from "../../types/schemas";
-import { secureApi } from "../../middleware/Authenticator";
+import { secureApi } from "../../middlewares/Authenticator";
 import {
   EmailNotVerifiedError,
   HondNotFoundError,
@@ -11,13 +11,13 @@ import {
   TrainingNotFoundError,
   TrainingVolzetError,
   TransactionError,
-} from "../../middleware/RequestError";
+} from "../../middlewares/RequestError";
 import {
   getKlantById,
   getKlantCollection,
 } from "../../controllers/KlantController";
-import client, { startTransaction } from "../../middleware/MongoDb";
-import mailer from "../../middleware/Mailer";
+import client, { startTransaction } from "../../middlewares/MongoDb";
+import mailer from "../../middlewares/Mailer";
 import { saveInschrijving } from "../../controllers/InschrijvingController";
 import { ObjectId } from "mongodb";
 import { getKlantHond } from "../../controllers/HondController";
@@ -26,7 +26,7 @@ import {
   klantReedsIngeschreven,
   trainingVolzet,
 } from "../../controllers/TrainingController";
-import Factory from "../../middleware/Factory";
+import Factory from "../../middlewares/Factory";
 import { IsInschrijvingBody } from "../../types/requestTypes";
 import moment from "moment";
 
