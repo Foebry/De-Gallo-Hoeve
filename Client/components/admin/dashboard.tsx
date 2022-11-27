@@ -23,7 +23,7 @@ interface Props {
   children: ReactNode;
 }
 
-const dashboard: React.FC<Props> = ({ children }) => {
+const Dashboard: React.FC<Props> = ({ children }) => {
   return (
     <div className="flex" style={{ height: "100%" }}>
       <aside
@@ -63,11 +63,11 @@ const dashboard: React.FC<Props> = ({ children }) => {
           />
         </MenuSection>
       </aside>
-      <section className="mx-auto" style={{ width: "87.5%" }}>
-        {children}
+      <section style={{ width: "87.5%" }}>
+        <div className="w-10/12 mx-auto py-10">{children}</div>
       </section>
     </div>
   );
 };
 
-export default dashboard;
+export default Dashboard;

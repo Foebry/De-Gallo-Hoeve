@@ -129,7 +129,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
       setDisabled(() => true);
       const { data, error } = await register(REGISTERAPI, { ...payload, csrf });
       if (data) {
-        toast.success(data.message);
+        toast.success("Registratie succesvol!");
         router.push(LOGIN);
       }
       if (error) handleErrors(error);

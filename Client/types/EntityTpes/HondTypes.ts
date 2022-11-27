@@ -18,3 +18,17 @@ export interface NewHond {
   naam: string;
   ras: string;
 }
+
+export interface KlantHond {
+  _id: ObjectId;
+  ras: string;
+  geslacht: Geslacht;
+  geboortedatum: Date;
+  naam: string;
+  created_at: Date;
+  updated_at: Date;
+  klant: {
+    _id: ObjectId;
+    naam: string;
+  };
+}

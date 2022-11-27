@@ -18,8 +18,8 @@ type appContextType = {
 
 const appContextDefaultValues: appContextType = {
   retrieveRassen: async () => {
-    const { data } = await getData(RASSEN);
-    return data.rassen;
+    const { data: rassen } = await getData(RASSEN);
+    return rassen;
   },
   rassen: [],
   setRassen: () => {},

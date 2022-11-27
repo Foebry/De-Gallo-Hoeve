@@ -43,6 +43,9 @@ export interface IsInschrijvingController {
     _id: ObjectId,
     breakEarly?: boolean
   ) => Promise<InschrijvingCollection>;
+  getInschrijvingenByIds: (
+    ids: ObjectId[]
+  ) => Promise<InschrijvingCollection[]>;
   getInschrijvingenByFilter: (filter: any) => Promise<InschrijvingCollection[]>;
   updateInschrijving: (
     _id: ObjectId,
@@ -87,6 +90,13 @@ const InschrijvingController: IsInschrijvingController = {
     })) as InschrijvingCollection;
     return inschrijving;
   },
+  getInschrijvingenByIds: async (ids) => {
+    const inschrijvingen = await getInschrijvingCollection()
+      .find({ _id: { $in: ids } })
+      .toArray();
+    return inschrijvingen as InschrijvingCollection[];
+  },
+
   getInschrijvingenByFilter: async (filter) => {
     return (await getInschrijvingCollection()
       .find(filter)
@@ -191,4 +201,5 @@ export const {
   getInschrijvingById,
   deleteInschrijvingen,
   saveInschrijving,
+  getInschrijvingenByIds,
 } = InschrijvingController;

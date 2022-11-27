@@ -7,7 +7,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const rassen = await getRasOptions();
   // await client.close();
 
-  return res.status(200).send({ rassen });
+  return res.status(200).send(rassen);
 };
 
 export default handler;

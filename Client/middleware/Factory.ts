@@ -76,8 +76,8 @@ const Factory = {
     klant: { id: klant._id, lnaam: klant.lnaam, vnaam: klant.vnaam },
     hond: { id: hond._id, naam: hond.naam },
     _id: new ObjectId(),
-    created_at: moment().local().toDate(),
-    updated_at: moment().local().toDate(),
+    created_at: getCurrentTime(),
+    updated_at: getCurrentTime(),
   }),
   createConfirm: (confirm: NewConfirm): ConfirmCollection => ({
     ...confirm,
@@ -89,37 +89,37 @@ const Factory = {
     _id: new ObjectId(),
     naam: capitalize(hond.naam),
     geslacht: hond.geslacht,
-    geboortedatum: moment().local().toDate(),
+    geboortedatum: moment(hond.geboortedatum).local().toDate(),
     ras: hond.ras,
-    created_at: moment().local().toDate(),
-    updated_at: moment().local().toDate(),
+    created_at: getCurrentTime(),
+    updated_at: getCurrentTime(),
   }),
   createKlant: async (klant: IsNewKlantData): Promise<IsKlantCollection> => ({
     _id: new ObjectId(),
-    roles: "",
+    roles: "0",
     verified: false,
     inschrijvingen: [],
     reservaties: [],
-    created_at: moment().local().toDate(),
-    updated_at: moment().local().toDate(),
+    created_at: getCurrentTime(),
+    updated_at: getCurrentTime(),
     email: klant.email.toLowerCase(),
     password: await brcypt.hash(klant.password, 10),
     vnaam: capitalize(klant.vnaam),
     lnaam: capitalize(klant.lnaam),
     gsm: klant.gsm,
     straat: capitalize(klant.straat),
-    nr: 0,
+    nr: klant.nr,
     bus: klant.bus,
     gemeente: capitalize(klant.gemeente),
-    postcode: 0,
+    postcode: klant.postcode,
     honden: klant.honden.map((hond) => createHond(hond)),
   }),
   createRas: (ras: NewRas): RasCollection => ({
     _id: new ObjectId(),
     naam: ras.naam,
     soort: ras.soort,
-    created_at: moment().local().toDate(),
-    updated_at: moment().local().toDate(),
+    created_at: getCurrentTime(),
+    updated_at: getCurrentTime(),
   }),
   createRandomKlant: async (options?: any): Promise<IsRegisterPayload> => {
     await process.nextTick(() => {});
@@ -231,6 +231,17 @@ const Factory = {
   },
 };
 
+export type ControllerType =
+  | CONFIRM
+  | CONTENT
+  | HOND
+  | INSCHRIJVING
+  | KLANT
+  | RAS
+  | TRAINING;
+
+export type PaginatedControllerType = HOND | INSCHRIJVING | KLANT | RAS;
+
 function getController(type: CONFIRM): IsConfirmController;
 function getController(type: CONTENT): IsContentController;
 function getController(type: HOND): IsHondController;
@@ -238,9 +249,7 @@ function getController(type: INSCHRIJVING): IsInschrijvingController;
 function getController(type: KLANT): IsKlantController;
 function getController(type: RAS): IsRasController;
 function getController(type: TRAINING): IsTrainingController;
-function getController(
-  type: CONFIRM | CONTENT | HOND | INSCHRIJVING | KLANT | RAS | TRAINING
-) {
+function getController(type: ControllerType) {
   return type === CONFIRM
     ? ConfirmController
     : type === CONTENT
@@ -253,9 +262,7 @@ function getController(
     ? KlantController
     : type === RAS
     ? RasController
-    : type === TRAINING
-    ? TrainingController
-    : null;
+    : TrainingController;
 }
 export default Factory;
 const cascadeOptions = {
@@ -272,3 +279,8 @@ interface RandomInschrijving extends InschrijvingCollection {
 interface RandomTraining extends PriveTrainingCollection {
   save: () => Promise<PriveTrainingCollection>;
 }
+
+const getCurrentTime = () => {
+  const currentMoment = moment().format("YYYY-MM-DD HH:mm:ss");
+  return new Date(moment.utc(currentMoment).local().toString());
+};
