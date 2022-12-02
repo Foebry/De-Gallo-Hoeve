@@ -3,16 +3,16 @@ import { NextApiRequest, NextApiResponse } from "next";
 import {
   getConfirmByCode,
   getConfirmCollection,
-} from "../../../controllers/ConfirmController";
-import { getKlantById, KLANT } from "../../../controllers/KlantController";
-import Factory from "../../../middleware/Factory";
-import client from "../../../middleware/MongoDb";
+} from "@controllers/ConfirmController";
+import { getKlantById, KLANT } from "@controllers/KlantController";
+import Factory from "@middlewares/Factory";
+import client from "@middlewares/MongoDb";
 import {
   ExpiredConfirmCodeError,
   InvalidConfirmCodeError,
   KlantNotFoundError,
-} from "../../../middleware/RequestError";
-import { CONFIRM } from "../../../types/EntityTpes/ConfirmTypes";
+} from "@middlewares/RequestError";
+import { CONFIRM } from "types/EntityTpes/ConfirmTypes";
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") return confirm(req, res);

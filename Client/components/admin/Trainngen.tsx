@@ -1,12 +1,8 @@
 import { nanoid } from "nanoid";
-import React, { useState } from "react";
-import { ContentStates } from "../../pages/admin/edit";
-import { CONTENTPRIVETRAINING } from "../../types/apiTypes";
-import Button from "../buttons/Button";
+import React from "react";
+import { ContentStates } from "pages/admin/edit";
 import { Body } from "../Typography/Typography";
-import { Edit, EditStates } from "./Intro";
 import Image from "next/image";
-import { BiEdit } from "react-icons/bi";
 import { GiCheckMark } from "react-icons/gi";
 import { IoMdAddCircleOutline, IoMdRemoveCircleOutline } from "react-icons/io";
 
@@ -33,20 +29,6 @@ const Trainngen: React.FC<Props> = ({
   edit,
   handleBulletChange,
 }) => {
-  // const handleBulletChange = (e: any, index: number) => {
-  //   const trainingen = allContent.trainingen;
-  //   const bullets = trainingen.bullets;
-  //   const value = e.target.value;
-  //   bullets[index] = value;
-  //   console.log(bullets);
-  //   // bullets[index] = value;
-  //   // const newBullets = bullets;
-  //   setContent({
-  //     ...allContent,
-  //     trainingen: { ...allContent.trainingen, bullets: [...bullets] },
-  //   });
-  // };
-
   const handleDeleteBullet = (index: number, bullets: string[]) => {
     const newBullets = bullets.filter((_, idx) => idx !== index);
     setContent({

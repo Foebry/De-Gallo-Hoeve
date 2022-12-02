@@ -14,7 +14,7 @@ const linkTypes = {
   ADMINEDITINDEX: "/admin/edit",
   ADMINEDITTRAININGDAYS: "/admin/edit/trainingdagen",
   ADMINLISTUSERS: "/admin/klanten",
-  ADMINLISTSUBSCRIPTIONS: "/admin/inschrijvingen",
+  ADMINLISTSUBSCRIPTIONS: "/admin/inschrijvingen/",
   ADMINLISTDOGS: "/admin/honden/",
   ADMINLISTBREEDS: "/admin/rassen",
   ADMINLISTTRAININGS: "/admin/trainingen",

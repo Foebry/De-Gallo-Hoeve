@@ -1,9 +1,8 @@
-import moment from "moment";
 import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
-import { getTrainingDaysCollection } from "../../../controllers/TrainingController";
-import client from "../../../middleware/MongoDb";
-import { TrainingDaysCollection } from "../../../types/EntityTpes/TrainingType";
+import { getTrainingDaysCollection } from "@controllers/TrainingController";
+import client from "@middlewares/MongoDb";
+import { TrainingDaysCollection } from "types/EntityTpes/TrainingType";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") return getAvailableDays(req, res);
@@ -16,7 +15,6 @@ const getAvailableDays = async (req: NextApiRequest, res: NextApiResponse) => {
   const data = (await getTrainingDaysCollection()
     .find({ date: { $gt: new Date() } })
     .toArray()) as TrainingDaysCollection[];
-  console.log({ data });
 
   const result = data.map((day) => day.date.toISOString().split("T")[0]);
   return res.status(200).send(result);

@@ -4,15 +4,16 @@ import {
   deleteInschrijvingen,
   getInschrijvingById,
 } from "./InschrijvingController";
-import client from "../middleware/MongoDb";
+import client from "../middlewares/MongoDb";
 import {
   InschrijvingNotFoundError,
   InternalServerError,
   KlantNotFoundError,
-} from "../middleware/RequestError";
-import { CASCADETRAINING } from "../middleware/Factory";
+} from "../middlewares/RequestError";
+import { CASCADETRAINING } from "../middlewares/Factory";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
+import { HondCollection } from "@/types/EntityTpes/HondTypes";
 
 export interface IsKlantController {
   getKlantCollection: () => Collection;
@@ -21,6 +22,9 @@ export interface IsKlantController {
   getKlantByEmail: (
     email: string,
     db?: any
+  ) => Promise<IsKlantCollection | null>;
+  getEigenaarVanHond: (
+    hond: HondCollection
   ) => Promise<IsKlantCollection | null>;
   save: (klant: IsKlantCollection) => Promise<IsKlantCollection>;
   update: (
@@ -56,6 +60,11 @@ const KlantController: IsKlantController = {
   },
   getKlantByEmail: async (email) => {
     return (await getKlantCollection().findOne({ email })) as IsKlantCollection;
+  },
+  getEigenaarVanHond: async (hond) => {
+    return getKlantCollection().findOne({
+      honden: { $elemMatch: { _id: hond._id } },
+    }) as Promise<IsKlantCollection>;
   },
   save: async (klant) => {
     const { insertedId } = await getKlantCollection().insertOne(klant);
@@ -130,6 +139,7 @@ export const {
   getKlantById,
   getKlantByEmail,
   getAllKlanten,
+  getEigenaarVanHond,
   update: updateKlant,
   addKlantInschrijving,
   removeInschrijving: removeKlantInschrijving,

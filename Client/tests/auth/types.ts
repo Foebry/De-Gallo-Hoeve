@@ -1,4 +1,4 @@
-import { IsKlantCollection } from "../../types/EntityTpes/KlantTypes";
+import { IsKlantCollection } from "types/EntityTpes/KlantTypes";
 
 export type RegisterBodyType = {};
 

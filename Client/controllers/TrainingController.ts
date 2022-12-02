@@ -1,12 +1,9 @@
 import moment from "moment";
 import { ClientSession, Collection, ObjectId } from "mongodb";
-import { CASCADEKLANT } from "../middleware/Factory";
-import client from "../middleware/MongoDb";
-import { InternalServerError } from "../middleware/RequestError";
-import {
-  InschrijvingCollection,
-  IsInschrijving,
-} from "../types/EntityTpes/InschrijvingTypes";
+import { CASCADEKLANT } from "../middlewares/Factory";
+import client from "../middlewares/MongoDb";
+import { InternalServerError } from "../middlewares/RequestError";
+import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 import {
   GroepTrainingCollection,

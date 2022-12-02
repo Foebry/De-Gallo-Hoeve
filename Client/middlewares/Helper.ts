@@ -1,6 +1,5 @@
 import { getTrainingDaysCollection } from "../controllers/TrainingController";
 import { TrainingDaysCollection } from "../types/EntityTpes/TrainingType";
-import client, { MongoDb } from "./MongoDb";
 
 interface HelperInterface {
   getDisabledDays: (training: string) => Promise<string[]>;

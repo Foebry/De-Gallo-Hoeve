@@ -1,7 +1,6 @@
 import React, { ReactNode } from "react";
 import MenuItem from "../Menu/MenuItem";
 import MenuSection from "../Menu/MenuSection";
-import { Title1 } from "../Typography/Typography";
 import {
   ADMIN,
   ADMINEDITINDEX,
@@ -11,7 +10,7 @@ import {
   ADMINLISTSUBSCRIPTIONS,
   ADMINLISTTRAININGS,
   ADMINLISTUSERS,
-} from "../../types/linkTypes";
+} from "@/types/linkTypes";
 import { BiUser } from "react-icons/bi";
 import { BsCalendarDay, BsListUl } from "react-icons/bs";
 import { GiSittingDog, GiJumpingDog } from "react-icons/gi";
@@ -23,7 +22,7 @@ interface Props {
   children: ReactNode;
 }
 
-const dashboard: React.FC<Props> = ({ children }) => {
+const Dashboard: React.FC<Props> = ({ children }) => {
   return (
     <div className="flex" style={{ height: "100%" }}>
       <aside
@@ -63,11 +62,11 @@ const dashboard: React.FC<Props> = ({ children }) => {
           />
         </MenuSection>
       </aside>
-      <section className="mx-auto" style={{ width: "87.5%" }}>
-        {children}
+      <section style={{ width: "87.5%" }}>
+        <div className="w-10/12 mx-auto py-10">{children}</div>
       </section>
     </div>
   );
 };
 
-export default dashboard;
+export default Dashboard;

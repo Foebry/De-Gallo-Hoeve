@@ -1,8 +1,8 @@
 import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
-import { getTrainingCollection } from "../../../controllers/TrainingController";
-import client from "../../../middleware/MongoDb";
-import { PriveTrainingCollection } from "../../../types/EntityTpes/TrainingType";
+import { getTrainingCollection } from "@controllers/TrainingController";
+import client from "@middlewares/MongoDb";
+import { PriveTrainingCollection } from "types/EntityTpes/TrainingType";
 import { atob, btoa } from "buffer";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

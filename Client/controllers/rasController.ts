@@ -1,9 +1,9 @@
 import { Collection, ObjectId } from "mongodb";
-import client from "../middleware/MongoDb";
+import client from "../middlewares/MongoDb";
 import {
   InternalServerError,
   RasNotFoundError,
-} from "../middleware/RequestError";
+} from "../middlewares/RequestError";
 import { RasCollection, UpdateRas } from "../types/EntityTpes/RasTypes";
 
 export interface IsRasController {
@@ -11,6 +11,7 @@ export interface IsRasController {
   save: (ras: RasCollection) => Promise<RasCollection>;
   getAllRassen: () => Promise<RasCollection[]>;
   getRasById: (_id: ObjectId, breakEarly?: boolean) => Promise<RasCollection>;
+  getRasByName: (naam: string) => Promise<RasCollection | null>;
   update: (_id: ObjectId, updateRas: UpdateRas) => Promise<RasCollection>;
   delete: (ras: ObjectId) => Promise<void>;
   deleteAll: () => Promise<void>;
@@ -21,6 +22,9 @@ const RasController: IsRasController = {
   getRasCollection: () => {
     const database = process.env.MONGODB_DATABASE;
     return client.db(database).collection("ras");
+  },
+  getRasByName: (naam) => {
+    return getRasCollection().findOne({ naam }) as Promise<RasCollection>;
   },
   save: async (ras) => {
     const { insertedId } = await getRasCollection().insertOne(ras);
@@ -63,5 +67,10 @@ const RasController: IsRasController = {
 
 export default RasController;
 export const RAS = "RasController";
-export const { getRasCollection, getRasById, getAllRassen, getRandomRasNaam } =
-  RasController;
+export const {
+  getRasCollection,
+  getRasById,
+  getAllRassen,
+  getRandomRasNaam,
+  getRasByName,
+} = RasController;

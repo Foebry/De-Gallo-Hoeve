@@ -1,17 +1,17 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { validateCsrfToken, validate } from "../../../middleware/Validator";
-import mailer from "../../../middleware/Mailer";
-import client, { startTransaction } from "../../../middleware/MongoDb";
+import { validateCsrfToken, validate } from "@middlewares/Validator";
+import mailer from "@middlewares/Mailer";
+import client, { startTransaction } from "@middlewares/MongoDb";
 import {
   EmailOccupiedError,
   NotAllowedError,
   TransactionError,
-} from "../../../middleware/RequestError";
-import { registerSchema } from "../../../types/schemas";
-import Factory from "../../../middleware/Factory";
-import { getKlantByEmail, KLANT } from "../../../controllers/KlantController";
-import { IsRegisterBody } from "../../../types/requestTypes";
-import { CONFIRM } from "../../../types/EntityTpes/ConfirmTypes";
+} from "@middlewares/RequestError";
+import { registerSchema } from "types/schemas";
+import Factory from "@middlewares/Factory";
+import { getKlantByEmail, KLANT } from "@controllers/KlantController";
+import { IsRegisterBody } from "types/requestTypes";
+import { CONFIRM } from "types/EntityTpes/ConfirmTypes";
 import moment from "moment";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -41,7 +41,7 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
         const savedKlant = await Factory.getController(KLANT).save(klant);
         const confirm = Factory.createConfirm({
           klant_id: klant._id,
-          created_at: moment(savedKlant.created_at).local().toDate(),
+          created_at: klant.created_at,
         });
         const { code } = await Factory.getController(CONFIRM).saveConfirm(
           confirm
@@ -52,6 +52,10 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
             email: savedKlant.email,
             vnaam: savedKlant.vnaam,
             code,
+          });
+          await mailer.sendMail("register-headsup", {
+            email: "info@degallohoeve.be",
+            klant_id: savedKlant._id.toString(),
           });
         }
       }, transactionOptions);

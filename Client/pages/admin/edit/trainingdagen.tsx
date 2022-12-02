@@ -1,16 +1,11 @@
-import React, { useEffect, useState } from "react";
-import Dashboard from "../../../components/admin/dashboard";
-import {
-  Body,
-  Title1,
-  Title2,
-  Title3,
-} from "../../../components/Typography/Typography";
+import React, { useEffect } from "react";
+import Dashboard from "@components/admin/dashboard";
+import { Body, Title2, Title3 } from "@components/Typography/Typography";
 import { DatePicker } from "react-trip-date";
 import { Controller, useForm } from "react-hook-form";
-import getData from "../../../hooks/useApi";
-import Button from "../../../components/buttons/Button";
-import useMutation from "../../../hooks/useMutation";
+import getData from "hooks/useApi";
+import Button from "@components/buttons/Button";
+import useMutation from "hooks/useMutation";
 import { toast } from "react-toastify";
 
 interface Props {}

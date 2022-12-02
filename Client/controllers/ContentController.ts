@@ -1,9 +1,9 @@
 import { Collection, ObjectId } from "mongodb";
-import client from "../middleware/MongoDb";
+import client from "../middlewares/MongoDb";
 import {
   ContentNotFoundError,
   InternalServerError,
-} from "../middleware/RequestError";
+} from "../middlewares/RequestError";
 import {
   ContentCollection,
   EditContent,

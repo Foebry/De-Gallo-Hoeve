@@ -8,7 +8,6 @@ import { parseCookies } from "nookies";
 import jwt from "jsonwebtoken";
 import { Hamburger } from "./Hamburger";
 import { LOGOUT } from "../types/apiTypes";
-import Button from "./buttons/Button";
 import useMutation from "../hooks/useMutation";
 
 export const Nav = () => {

@@ -1,9 +1,9 @@
-import { Body, Title1 } from "../components/Typography/Typography";
-import TrainingCard from "../components/Cards/TrainingCard";
+import { Body, Title1 } from "@components/Typography/Typography";
+import TrainingCard from "@components/Cards/TrainingCard";
 import Image from "next/image";
-import Skeleton from "../components/website/skeleton";
+import Skeleton from "@components/website/skeleton";
 import { GiCheckMark } from "react-icons/gi";
-import { getPriveTraining } from "../controllers/TrainingController";
+import { getPriveTraining } from "@controllers/TrainingController";
 
 interface IndexProps {
   prijsExcl: number;

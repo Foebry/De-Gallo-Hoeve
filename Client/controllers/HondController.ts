@@ -4,8 +4,8 @@ import {
   HondNotFoundError,
   InternalServerError,
   KlantNotFoundError,
-} from "../middleware/RequestError";
-import { HondCollection } from "../types/EntityTpes/HondTypes";
+} from "../middlewares/RequestError";
+import { HondCollection, KlantHond } from "../types/EntityTpes/HondTypes";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 import {
   getAllKlanten,
@@ -30,6 +30,8 @@ export interface IsHondController {
     hondData: HondCollection
   ) => Promise<HondCollection>;
   delete: (klant: IsKlantCollection, _id: ObjectId) => Promise<void>;
+  getHondById: (_id: ObjectId) => Promise<void | HondCollection>;
+  getAllKlantHonden: () => Promise<KlantHond[]>;
 }
 
 const HondController: IsHondController = {
@@ -47,6 +49,20 @@ const HondController: IsHondController = {
     const klanten = await getAllKlanten();
     return klanten
       .map((klant) => klant.honden)
+      .reduce((honden, hond) => [...honden, ...hond], []);
+  },
+  getAllKlantHonden: async () => {
+    const klanten = await getAllKlanten();
+    return klanten
+      .map((klant) =>
+        klant.honden.map((hond) => ({
+          ...hond,
+          klant: {
+            _id: klant._id,
+            naam: [klant.vnaam, klant.lnaam].join(" "),
+          },
+        }))
+      )
       .reduce((honden, hond) => [...honden, ...hond], []);
   },
   getHondenByKlantId: async (klant_id) => {
@@ -85,8 +101,17 @@ const HondController: IsHondController = {
     );
     if (modifiedCount !== 1) throw new InternalServerError();
   },
+  getHondById: async (_id) => {
+    const honden = await HondController.getAllHonden();
+    return honden.find((hond) => hond._id.toString() === _id.toString());
+  },
 };
 
 export default HondController;
-export const { getKlantHond, getHondenByKlantId } = HondController;
+export const {
+  getKlantHond,
+  getHondenByKlantId,
+  getHondById,
+  getAllKlantHonden,
+} = HondController;
 export const HOND = "HondController";

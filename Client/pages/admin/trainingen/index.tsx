@@ -1,6 +1,5 @@
 import React from "react";
-import Dashboard from "../../../components/admin/dashboard";
-import { Title1 } from "../../../components/Typography/Typography";
+import { Title1 } from "@components/Typography/Typography";
 
 const trainingen = () => {
   return <Title1>trainingen</Title1>;

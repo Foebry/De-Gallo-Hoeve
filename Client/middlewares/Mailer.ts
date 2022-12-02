@@ -15,8 +15,6 @@ const send = async (msg: any) => {
     })
     .catch((error: any) => {
       console.log(error);
-      console.log({ sendGripAPIKey: process.env.SENDGRID_API_KEY });
-      console.log("error occured");
     });
 };
 
@@ -25,6 +23,10 @@ export const getTemplateId = (type: string): string => {
     ? "d-749bfb287b074dc68c8de14ac73ae240"
     : type === "inschrijving"
     ? "d-454de7c4904a4e11a3583562345443b1"
+    : type === "register-headsup"
+    ? "d-26a342a4849645dbb53266ec8e4c0ff5"
+    : type === "inschrijving-headsup"
+    ? "d-32b2e43b878e480192fc34b41a640979"
     : "";
   // let templateId: string;
   // switch (type) {
@@ -48,8 +50,8 @@ export const getTemplateId = (type: string): string => {
 const mailer: Mailer = {
   sendMail: async (type, { email, ...templateData }) => {
     await send({
-      to: email,
-      from: "info@degallohoeve.be",
+      to: process.env.NODE_ENV !== "production" ? process.env.MAIL_TO : email,
+      from: process.env.MAIL_FROM,
       templateId: getTemplateId(type),
       dynamic_template_data: { ...templateData },
     });
@@ -57,7 +59,7 @@ const mailer: Mailer = {
 
   contact: ({ naam, email, bericht }) => {
     send({
-      to: "sander.fabry@gmail.com",
+      to: "info@degallohoeve.be",
       from: "info@degallohoeve.be",
       subject: "contact",
       text: bericht,

@@ -1,16 +1,15 @@
 import { createServer, IncomingMessage, RequestListener } from "http";
 import { NextApiHandler } from "next";
 import { apiResolver } from "next/dist/server/api-utils/node";
-import handler from "../../pages/api/auth/register";
-import { REGISTERAPI } from "../../types/apiTypes";
+import handler from "pages/api/auth/register";
+import { REGISTERAPI } from "types/apiTypes";
 import request from "supertest";
-import Factory from "../../middleware/Factory";
-import { clearAllData } from "../../middleware/MongoDb";
+import Factory from "middlewares/Factory";
+import { clearAllData } from "middlewares/MongoDb";
 import {
   generateRegisterPayloadFromKlantData,
   generateRegisterResponseBodyFromPayload,
-} from "../../tests/helpers";
-import moment from "moment";
+} from "tests/helpers";
 
 describe("/register", () => {
   beforeEach(async () => {

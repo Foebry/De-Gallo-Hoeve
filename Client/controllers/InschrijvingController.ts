@@ -4,24 +4,19 @@ import {
   CASCADEFULL,
   CASCADEKLANT,
   CASCADETRAINING,
-} from "../middleware/Factory";
-import client, { startTransaction } from "../middleware/MongoDb";
+} from "../middlewares/Factory";
+import client, { startTransaction } from "../middlewares/MongoDb";
 import {
-  HondNotFoundError,
   InschrijvingKlantChangedError,
-  InschrijvingNotFoundError,
   InternalServerError,
-  KlantNotFoundError,
-  TrainingNotFoundError,
   TransactionError,
-} from "../middleware/RequestError";
+} from "../middlewares/RequestError";
 import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 import { IsUpdateInschrijvingBody } from "../types/requestTypes";
 import { getKlantHond } from "./HondController";
 import {
   addKlantInschrijving,
-  getKlantById,
   removeKlantInschrijving,
 } from "./KlantController";
 import {
@@ -43,6 +38,9 @@ export interface IsInschrijvingController {
     _id: ObjectId,
     breakEarly?: boolean
   ) => Promise<InschrijvingCollection>;
+  getInschrijvingenByIds: (
+    ids: ObjectId[]
+  ) => Promise<InschrijvingCollection[]>;
   getInschrijvingenByFilter: (filter: any) => Promise<InschrijvingCollection[]>;
   updateInschrijving: (
     _id: ObjectId,
@@ -87,6 +85,13 @@ const InschrijvingController: IsInschrijvingController = {
     })) as InschrijvingCollection;
     return inschrijving;
   },
+  getInschrijvingenByIds: async (ids) => {
+    const inschrijvingen = await getInschrijvingCollection()
+      .find({ _id: { $in: ids } })
+      .toArray();
+    return inschrijvingen as InschrijvingCollection[];
+  },
+
   getInschrijvingenByFilter: async (filter) => {
     return (await getInschrijvingCollection()
       .find(filter)
@@ -191,4 +196,5 @@ export const {
   getInschrijvingById,
   deleteInschrijvingen,
   saveInschrijving,
+  getInschrijvingenByIds,
 } = InschrijvingController;

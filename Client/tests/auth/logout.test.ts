@@ -1,13 +1,13 @@
 import { createServer, IncomingMessage, RequestListener } from "http";
 import { NextApiHandler } from "next";
 import { apiResolver } from "next/dist/server/api-utils/node";
-import Factory from "../../middleware/Factory";
-import client, { clearAllData } from "../../middleware/MongoDb";
-import { generateCsrf } from "../../middleware/Validator";
-import handler from "../../pages/api/auth/logout";
-import loginHandler from "../../pages/api/auth/login";
+import Factory from "middlewares/Factory";
+import client, { clearAllData } from "middlewares/MongoDb";
+import { generateCsrf } from "middlewares/Validator";
+import handler from "pages/api/auth/logout";
+import loginHandler from "pages/api/auth/login";
 import request from "supertest";
-import { LOGINAPI, LOGOUT } from "../../types/apiTypes";
+import { LOGINAPI, LOGOUT } from "types/apiTypes";
 
 describe("/logout", () => {
   beforeEach(async () => {

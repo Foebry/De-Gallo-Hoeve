@@ -4,21 +4,24 @@ import {
   ReadPreference,
   TransactionOptions,
 } from "mongodb";
-import { getAllRassen, RAS } from "../controllers/rasController";
-import { getHondenByKlantId } from "../controllers/HondController";
+import { getAllRassen, RAS } from "@controllers/rasController";
+import { getHondenByKlantId } from "@controllers/HondController";
 import Factory from "./Factory";
-import { KLANT } from "../controllers/KlantController";
-import { CONFIRM } from "../types/EntityTpes/ConfirmTypes";
-import { CONTENT } from "../controllers/ContentController";
+import { getAllKlanten, KLANT } from "@controllers/KlantController";
+import { CONFIRM } from "@/types/EntityTpes/ConfirmTypes";
+import { CONTENT } from "@controllers/ContentController";
 import {
   getInschrijvingCollection,
   INSCHRIJVING,
-} from "../controllers/InschrijvingController";
+} from "@controllers/InschrijvingController";
 import {
   getTrainingCollection,
   TRAINING,
-} from "../controllers/TrainingController";
-import { PriveTrainingCollection } from "../types/EntityTpes/TrainingType";
+} from "@controllers/TrainingController";
+import { PriveTrainingCollection } from "@/types/EntityTpes/TrainingType";
+import { IsKlantCollection } from "@/types/EntityTpes/KlantTypes";
+import { KlantHond } from "@/types/EntityTpes/HondTypes";
+import { RasCollection } from "@/types/EntityTpes/RasTypes";
 
 export interface Option {
   value: string;
@@ -167,3 +170,17 @@ export const {
   startTransaction,
   clearAllData,
 } = MongoDb;
+
+export async function getData(controller: string): Promise<IsKlantCollection[]>;
+export async function getData(controller: string): Promise<IsKlantCollection[]>;
+export async function getData(controller: string): Promise<KlantHond[]>;
+export async function getData(controller: string): Promise<RasCollection[]>;
+export async function getData(controller: string) {
+  return controller === "HondController"
+    ? Factory.getController(controller).getAllKlantHonden()
+    : controller === "InschrijvingController"
+    ? Factory.getController(controller).getAllInschrijvingen()
+    : controller === "KlantController"
+    ? getAllKlanten()
+    : getAllRassen();
+}
