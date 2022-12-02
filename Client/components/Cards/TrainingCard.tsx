@@ -81,7 +81,7 @@ const TrainingCard: React.FC<TrainingProps> = ({
           </li>
           <li className="flex gap-2">
             <GiCheckMark />
-            <Body>€ {Math.round(price * 1.21).toFixed(2)} incl.btw</Body>
+            <Body>€ {Math.round(price * 1.21).toFixed(2)} incl.btw / uur</Body>
           </li>
         </ul>
       </div>
