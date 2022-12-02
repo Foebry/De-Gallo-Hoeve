@@ -1,12 +1,12 @@
 import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-import Dashboard from "../../../components/admin/dashboard";
-import Table from "../../../components/Table/Table";
-import { PaginatedResponse } from "../../../helpers/RequestHelper";
-import getData from "../../../hooks/useApi";
-import { PaginatedKlantHond } from "../../../middleware/mappers/honden";
-import { ADMIN_HONDEN_OVERVIEW } from "../../../types/apiTypes";
+import Dashboard from "@components/admin/dashboard";
+import Table from "@components/Table/Table";
+import { PaginatedResponse } from "helpers/RequestHelper";
+import getData from "hooks/useApi";
+import { PaginatedKlantHond } from "@middlewares/mappers/honden";
+import { ADMIN_HONDEN_OVERVIEW } from "types/apiTypes";
 
 const Index = () => {
   const headers = [

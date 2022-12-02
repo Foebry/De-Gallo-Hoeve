@@ -1,7 +1,6 @@
-import { nanoid } from "nanoid";
 import { useRouter } from "next/router";
 import React from "react";
-import { INSCHRIJVING } from "../../types/linkTypes";
+import { INSCHRIJVING } from "@/types/linkTypes";
 import Button from "../buttons/Button";
 import FormRow from "../form/FormRow";
 import { Body } from "../Typography/Typography";

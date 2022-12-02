@@ -1,13 +1,13 @@
 import { getHondById } from "@controllers/HondController";
 import { getEigenaarVanHond } from "@controllers/KlantController";
 import { getRasByName } from "@controllers/rasController";
-import { mapToHondDetailResponse } from "@middleware/mappers/honden";
-import client from "@middleware/MongoDb";
+import { mapToHondDetailResponse } from "@middlewares/mappers/honden";
+import client from "@middlewares/MongoDb";
 import {
   HondNotFoundError,
   KlantNotFoundError,
   RasNotFoundError,
-} from "@middleware/RequestError";
+} from "@middlewares/RequestError";
 import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
 import { GenericRequest } from "pages/api/auth/login";

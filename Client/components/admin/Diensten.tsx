@@ -1,10 +1,7 @@
 import { nanoid } from "nanoid";
-import React, { useState } from "react";
-import { ContentStates } from "../../pages/admin/edit";
-import { CONTENTDIENSTEN } from "../../types/apiTypes";
-import Button from "../buttons/Button";
+import { ContentStates } from "pages/admin/edit";
+import React from "react";
 import { Body, Title1 } from "../Typography/Typography";
-import { Edit, EditStates } from "./Intro";
 
 interface Props {
   content: { subtitle: string; content: string[]; image: string };

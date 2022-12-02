@@ -8,7 +8,6 @@ import { parseCookies } from "nookies";
 import jwt from "jsonwebtoken";
 import { Hamburger } from "./Hamburger";
 import { LOGOUT } from "../types/apiTypes";
-import Button from "./buttons/Button";
 import useMutation from "../hooks/useMutation";
 
 export const Nav = () => {
@@ -33,7 +32,6 @@ export const Nav = () => {
       const payload = JSON.parse(JSON.stringify(verifiedToken));
       setUserName(payload.name);
       setRoles(payload.roles);
-      console.log(userName);
     } else {
       setUserName(undefined);
       setRoles(undefined);

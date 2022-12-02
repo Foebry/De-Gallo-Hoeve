@@ -42,10 +42,7 @@ import {
   ConfirmCollection,
   NewConfirm,
 } from "../types/EntityTpes/ConfirmTypes";
-import {
-  InschrijvingCollection,
-  IsInschrijving,
-} from "../types/EntityTpes/InschrijvingTypes";
+import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
 import {
   PriveTrainingCollection,
   TrainingType,

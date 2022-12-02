@@ -5,7 +5,7 @@ import { geslachten } from "@components/Cards/HondCard";
 import FormInput from "@components/form/FormInput";
 import FormRow from "@components/form/FormRow";
 import { MySelect } from "@components/MySelect";
-import { Option } from "@middleware/MongoDb";
+import { Option } from "@middlewares/MongoDb";
 import getData from "hooks/useApi";
 import moment from "moment";
 import { useRouter } from "next/router";

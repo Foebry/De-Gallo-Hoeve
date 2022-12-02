@@ -4,24 +4,19 @@ import {
   CASCADEFULL,
   CASCADEKLANT,
   CASCADETRAINING,
-} from "../middleware/Factory";
-import client, { startTransaction } from "../middleware/MongoDb";
+} from "../middlewares/Factory";
+import client, { startTransaction } from "../middlewares/MongoDb";
 import {
-  HondNotFoundError,
   InschrijvingKlantChangedError,
-  InschrijvingNotFoundError,
   InternalServerError,
-  KlantNotFoundError,
-  TrainingNotFoundError,
   TransactionError,
-} from "../middleware/RequestError";
+} from "../middlewares/RequestError";
 import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 import { IsUpdateInschrijvingBody } from "../types/requestTypes";
 import { getKlantHond } from "./HondController";
 import {
   addKlantInschrijving,
-  getKlantById,
   removeKlantInschrijving,
 } from "./KlantController";
 import {

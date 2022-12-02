@@ -2,12 +2,12 @@ import { IsKlantCollection } from "@/types/EntityTpes/KlantTypes";
 import { RasCollection } from "@/types/EntityTpes/RasTypes";
 import moment from "moment";
 import { HondDetailResponse } from "pages/api/admin/honden/[slug]";
-import { PaginatedData, PaginatedResponse } from "../../helpers/RequestHelper";
+import { PaginatedData, PaginatedResponse } from "@helpers/RequestHelper";
 import {
   Geslacht,
   HondCollection,
   KlantHond,
-} from "../../types/EntityTpes/HondTypes";
+} from "@/types/EntityTpes/HondTypes";
 
 export type PaginatedKlantHond = {
   _id: string;

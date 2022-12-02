@@ -3,17 +3,13 @@ import {
   NextApiRequest,
   NextApiResponse,
 } from "next";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import nookies, { parseCookies, setCookie } from "nookies";
 import { ObjectId } from "mongodb";
 import { INSCHRIJVING } from "../types/linkTypes";
 import validationHelper from "./Validator";
 import base64 from "base-64";
-import {
-  EmailNotVerifiedError,
-  NotLoggedInError,
-  UnauthorizedAccessError,
-} from "./RequestError";
+import { NotLoggedInError, UnauthorizedAccessError } from "./RequestError";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 import { HondCollection } from "../types/EntityTpes/HondTypes";
 

@@ -1,13 +1,10 @@
-import { nanoid } from "nanoid";
 import { useRouter } from "next/router";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { MdClose } from "react-icons/md";
 import useMutation from "../hooks/useMutation";
-import logout from "../pages/api/auth/logout";
 import { LOGOUT } from "../types/apiTypes";
-import { ADMIN, INDEX, PERSONAL } from "../types/linkTypes";
-import { Body } from "./Typography/Typography";
+import { INDEX } from "../types/linkTypes";
 interface Props {
   children: any;
   roles: number;

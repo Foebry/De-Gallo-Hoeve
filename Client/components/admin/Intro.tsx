@@ -1,14 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Body, Title1 } from "../Typography/Typography";
 import Image from "next/image";
 import { nanoid } from "nanoid";
 import { BiEdit } from "react-icons/bi";
-import { useGetContent } from "../../hooks/useGetContent";
-import useMutation from "../../hooks/useMutation";
-import Button from "../buttons/Button";
-import { CONTENTINTRO } from "../../types/apiTypes";
-import { toast } from "react-toastify";
-import { ContentStates } from "../../pages/admin/edit";
+import { ContentStates } from "pages/admin/edit";
 
 export interface EditStates {
   title: { shown: boolean; edit: boolean };

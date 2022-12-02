@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import Dashboard from "../../../components/admin/dashboard";
-import Diensten from "../../../components/admin/Diensten";
-import Intro from "../../../components/admin/Intro";
-import Trainingen from "../../../components/admin/Trainngen";
-import Button from "../../../components/buttons/Button";
-import { useGetContent } from "../../../hooks/useGetContent";
-import useMutation from "../../../hooks/useMutation";
+import Dashboard from "@components/admin/dashboard";
+import Diensten from "@components/admin/Diensten";
+import Intro from "@components/admin/Intro";
+import Trainingen from "@components/admin/Trainngen";
+import Button from "@components/buttons/Button";
+import useMutation from "hooks/useMutation";
+import { useGetContent } from "hooks/useGetContent";
 
 export interface ContentStates {
   intro: {

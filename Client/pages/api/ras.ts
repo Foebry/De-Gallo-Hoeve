@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import client, { getRasOptions } from "../../middleware/MongoDb";
+import client, { getRasOptions } from "@middlewares/MongoDb";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== "GET") return res.status(405).send({});

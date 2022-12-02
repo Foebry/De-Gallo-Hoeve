@@ -8,9 +8,9 @@ import {
 import {
   mapToAdminKlantenOverviewResult,
   PaginatedKlant,
-} from "@middleware/mappers/klanten";
+} from "@middlewares/mappers/klanten";
 import { IsKlantCollection } from "@/types/EntityTpes/KlantTypes";
-import { GenericRequest } from "../../auth/login";
+import { GenericRequest } from "pages/api/auth/login";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET")

@@ -1,16 +1,16 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { RAS } from "../../../../controllers/rasController";
+import { RAS } from "@controllers/rasController";
 import {
   getPaginatedData,
   PaginatedRequestQuery,
   PaginatedResponse,
-} from "../../../../helpers/RequestHelper";
+} from "helpers/RequestHelper";
 import {
   mapToRassenOverviewResult,
   PaginatedRas,
-  Ras,
-} from "../../../../middleware/mappers/rassen";
-import { GenericRequest } from "../../auth/login";
+} from "@middlewares/mappers/rassen";
+import { GenericRequest } from "pages/api/auth/login";
+import { RasCollection } from "@/types/EntityTpes/RasTypes";
 
 type RassenOverviewRequest = {
   query: PaginatedRequestQuery;
@@ -26,7 +26,7 @@ const getRassenOverview = async (
   req: GenericRequest<RassenOverviewRequest>,
   res: NextApiResponse<PaginatedResponse<PaginatedRas>>
 ) => {
-  const data = await getPaginatedData<Ras>(req.query, req.url, RAS);
+  const data = await getPaginatedData<RasCollection>(req.query, req.url, RAS);
 
   const result = mapToRassenOverviewResult(data);
 

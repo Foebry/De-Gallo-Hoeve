@@ -1,6 +1,6 @@
-import { PaginatedData, PaginatedResponse } from "../../helpers/RequestHelper";
-import { HondCollection } from "../../types/EntityTpes/HondTypes";
-import { InschrijvingCollection } from "../../types/EntityTpes/InschrijvingTypes";
+import { PaginatedData, PaginatedResponse } from "@helpers/RequestHelper";
+import { HondCollection } from "@/types/EntityTpes/HondTypes";
+import { InschrijvingCollection } from "@/types/EntityTpes/InschrijvingTypes";
 
 export interface PaginatedInschrijving {
   _id: string;

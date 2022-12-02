@@ -1,18 +1,18 @@
 import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
-import Dashboard from "../../../components/admin/dashboard";
-import Table from "../../../components/Table/Table";
-import getData from "../../../hooks/useApi";
-import { ADMIN_KLANTEN_OVERVIEW } from "../../../types/apiTypes";
+import Dashboard from "@components/admin/dashboard";
+import Table from "@components/Table/Table";
+import getData from "hooks/useApi";
+import { ADMIN_KLANTEN_OVERVIEW } from "types/apiTypes";
 import { GrView, GrEdit } from "react-icons/gr";
 import { MdDelete } from "react-icons/md";
 import { useRouter } from "next/router";
-import FormRow from "../../../components/form/FormRow";
-import FormSearch from "../../../components/form/FormSearch";
+import FormRow from "@components/form/FormRow";
+import FormSearch from "@components/form/FormSearch";
 import { toast } from "react-toastify";
-import { PaginationInterface } from "../../../components/Table/Table";
+import { PaginationInterface } from "@components/Table/Table";
 import { nanoid } from "nanoid";
-import { PaginatedKlant } from "../../../middleware/mappers/klanten";
+import { PaginatedKlant } from "@middlewares/mappers/klanten";
 
 export type apiOptionsInterface = Partial<{
   page: number;

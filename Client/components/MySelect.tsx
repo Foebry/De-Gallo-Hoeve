@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
-import Select, { OptionsOrGroups } from "react-select";
-import { optionInterface } from "./register/HondGegevens";
+import Select from "react-select";
 import { FormError } from "./Typography/Typography";
 
 interface Props {

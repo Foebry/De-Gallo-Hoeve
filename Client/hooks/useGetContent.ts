@@ -1,4 +1,3 @@
-import { ContentStates } from "../pages/admin/edit";
 import {
   CONTENTPRIVETRAINING,
   CONTENTINTRO,
