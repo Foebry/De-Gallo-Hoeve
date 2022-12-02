@@ -153,6 +153,13 @@ function filterData<T>(
       );
     }
     return data;
+  } else if (instanceOfRasCollectionArray(data)) {
+    console.log("filter rascollections");
+    return search
+      ? data.filter((ras) =>
+          ras.naam.toLowerCase().includes(search.toLowerCase())
+        )
+      : data;
   }
   return data;
 }
@@ -196,6 +203,14 @@ function instanceOfInschrijvingCollectionArray(
     "hond" in array[0] &&
     "id" in array[0].hond &&
     "naam" in array[0].hond
+  );
+}
+function instanceOfRasCollectionArray(array: any[]): array is RasCollection[] {
+  return (
+    "_id" in array[0] &&
+    "naam" in array[0] &&
+    "soort" in array[0] &&
+    "avatar" in array[0]
   );
 }
 

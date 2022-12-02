@@ -14,6 +14,7 @@ import getData from "hooks/useApi";
 import { PaginatedRas } from "@middlewares/mappers/rassen";
 import { ADMIN_RASSEN_OVERIEW } from "types/apiTypes";
 import { ApiResult } from "../klanten";
+import { AiOutlinePlus } from "react-icons/ai";
 
 const Rassen = () => {
   const router = useRouter();
@@ -70,11 +71,33 @@ const Rassen = () => {
     if (data) setApiData(data);
     if (error) toast.warning("Fout bij laden van rassen");
   };
+
+  const onSearch = async (searchValue: string) => {
+    const { data, error } = await getData(
+      `/api/admin/rassen?search=${searchValue}`
+    );
+    if (!error && data) {
+      setApiData(data);
+    }
+    if (error) {
+      toast.warning("Zoek opdracht mislukt");
+    }
+  };
   return (
     <Dashboard>
       <FormRow className="mb-5">
-        <Button label="ras toevoegen" className="flex items-center" />
-        <FormSearch api="/admin/rassen" onSearch={() => {}} />
+        <Button
+          label={
+            <span className="flex items-center">
+              <AiOutlinePlus />
+              <span className="ml-1">ras toevoegen</span>
+            </span>
+          }
+          className="flex items-center"
+        />
+        <FormRow className="flex flex-row-reverse gap-10">
+          <FormSearch api="/admin/rassen" onSearch={onSearch} />
+        </FormRow>
       </FormRow>
       <Table
         rows={rassen}
