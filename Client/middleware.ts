@@ -10,13 +10,16 @@ interface VerifiedToken {
 }
 
 const JWT_COOKIE_NAME = "JWT";
-const INDEX = process.env.DOMAIN!;
 const SECRET = process.env.JWT_SECRET!;
-const LOGIN = INDEX + "/login";
-const UNAUTHORIZED = INDEX + "/unauthorized";
 
 export async function middleware(req: NextRequest) {
+  const url = req.url;
   const path = req.nextUrl.pathname;
+  const domain = url.split(path)[0];
+
+  const INDEX = domain;
+  const LOGIN = domain + "/login";
+  const UNAUTHORIZED = domain + "/unauthorized";
 
   if (await shouldRedirectToIndex(req, path))
     return NextResponse.redirect(INDEX);
