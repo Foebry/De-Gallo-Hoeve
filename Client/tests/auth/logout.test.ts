@@ -1,13 +1,13 @@
 import { createServer, IncomingMessage, RequestListener } from "http";
 import { NextApiHandler } from "next";
 import { apiResolver } from "next/dist/server/api-utils/node";
-import Factory from "middlewares/Factory";
-import client, { clearAllData, getConnection } from "middlewares/MongoDb";
-import { generateCsrf } from "middlewares/Validator";
-import handler from "pages/api/auth/logout";
-import loginHandler from "pages/api/auth/login";
+import Factory from "src/services/Factory";
+import { clearAllData, getConnection } from "src/utils/MongoDb";
+import { generateCsrf } from "src/services/Validator";
+import handler from "src/pages/api/auth/logout.page";
+import loginHandler from "src/pages/api/auth/login.page";
 import request from "supertest";
-import { LOGINAPI, LOGOUT } from "types/apiTypes";
+import { LOGINAPI, LOGOUT } from "src/types/apiTypes";
 
 describe("/logout", () => {
   beforeEach(async () => {
@@ -36,9 +36,7 @@ describe("/logout", () => {
   describe("/DELETE", () => {
     it("Should remove Client and JWT on successfull logout", async () => {
       const klant = await Factory.createRandomKlant();
-      await getConnection();
       await klant.save();
-      await client.close();
 
       const loginPayload = {
         csrf: generateCsrf(),

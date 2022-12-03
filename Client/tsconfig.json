@@ -16,14 +16,14 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@components/*": ["components/*"],
-      "@controllers/*": ["controllers/*"],
-      "@helpers/*": ["helpers/*"],
-      "@middlewares/*": ["middlewares/*"],
-      "@/types/*": ["types/*"],
+      "@components/*": ["src/components/*"],
+      "@controllers/*": ["src/controllers/*"],
+      "@helpers/*": ["src/helpers/*"],
+      "@middlewares/*": ["src/middlewares/*"],
+      "@/types/*": ["src/types/*"],
       "@auth/*": ["auth/*"],
-      "@/pages/*": ["pages/"],
-      "@/hooks/*": ["hooks/"]
+      "@/pages/*": ["src/pages"],
+      "@/hooks/*": ["src/hooks"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "config-overrides.js", "src"],

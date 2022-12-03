@@ -1,22 +1,22 @@
 import { createServer, IncomingMessage, RequestListener } from "http";
 import { NextApiHandler } from "next";
 import { apiResolver } from "next/dist/server/api-utils/node";
-import client, { clearAllData, getConnection } from "middlewares/MongoDb";
+import { clearAllData, getConnection } from "src/utils/MongoDb";
 import request from "supertest";
-import { createRandomConfirmCode } from "middlewares/Helper";
-import handler from "pages/api/confirm/[code]";
-import registerHandler from "pages/api/auth/register";
-import Factory from "middlewares/Factory";
+import { createRandomConfirmCode } from "src/middlewares/Helper";
+import handler from "src/pages/api/confirm/[code].page";
+import registerHandler from "src/pages/api/auth/register.page";
+import Factory from "src/services/Factory";
 import {
   getConfirmByKlantId,
   getConfirmCollection,
-} from "controllers/ConfirmController";
+} from "src/controllers/ConfirmController";
 import { generateRegisterPayloadFromKlantData } from "../helpers";
-import { REGISTERAPI } from "types/apiTypes";
-import { getKlantByEmail } from "controllers/KlantController";
+import { REGISTERAPI } from "src/types/apiTypes";
+import { getKlantByEmail } from "src/controllers/KlantController";
 import moment from "moment";
 import { ObjectId } from "mongodb";
-import { CONFIRM } from "types/EntityTpes/ConfirmTypes";
+import { CONFIRM } from "src/types/EntityTpes/ConfirmTypes";
 
 describe("/confirm", () => {
   beforeEach(async () => {
@@ -53,19 +53,18 @@ describe("/confirm", () => {
     it("Should throw ExpiredConfirmCodeError", async () => {
       const klant = await Factory.createRandomKlant();
       const payload = generateRegisterPayloadFromKlantData(klant);
+      const confirmCollection = await getConfirmCollection();
       const { body } = await testClient(registerHandler)
         .post(REGISTERAPI)
         .send(payload);
 
-      await getConnection();
       const confirm = await getConfirmByKlantId(new ObjectId(body._id));
       const valid_to = moment().subtract(1, "hour").local().format();
-      await getConfirmCollection().updateOne(
+      await confirmCollection.updateOne(
         { _id: confirm?._id },
         { $set: { valid_to } }
       );
       code = confirm!.code;
-      await client.close();
 
       const response = await testClient(handler).get(`/api/confirm/${code}`);
 
@@ -81,9 +80,7 @@ describe("/confirm", () => {
         .post(REGISTERAPI)
         .send(payload);
 
-      await getConnection();
       const confirm = await getConfirmByKlantId(new ObjectId(body._id));
-      await client.close();
 
       code = confirm!.code;
       const response = await testClient(handler).get("/api/confirm/");
@@ -115,9 +112,7 @@ describe("/confirm", () => {
       });
       confirm.code = code;
       await process.nextTick(() => {});
-      await getConnection();
       await Factory.getController(CONFIRM).saveConfirm(confirm);
-      await client.close();
 
       const response = await testClient(handler).put(`/api/confirm/${code}`);
       expect(response.statusCode).toBe(404);
@@ -128,19 +123,15 @@ describe("/confirm", () => {
       const payload = generateRegisterPayloadFromKlantData(randomKlant);
       await testClient(registerHandler).post(REGISTERAPI).send(payload);
 
-      await getConnection();
       const klant = await getKlantByEmail(randomKlant.email);
       const confirm = await getConfirmByKlantId(klant!._id);
-      await client.close();
 
       const confirmCode = confirm!.code;
       expect(confirmCode).toBeDefined();
       code = confirmCode;
 
       const result = await testClient(handler).put("/api/confirm/");
-      await getConnection();
       const newConfirm = await getConfirmByKlantId(new ObjectId(klant!._id));
-      await client.close();
       const newCode = newConfirm!.code;
 
       expect(result.statusCode).toBe(200);

@@ -4,6 +4,7 @@ const nextConfig = {
   images: {
     domains: ["www.wdev2.be", "res.cloudinary.com"],
   },
+  pageExtensions: ["page.tsx", "page.ts"],
 };
 
 module.exports = nextConfig;
