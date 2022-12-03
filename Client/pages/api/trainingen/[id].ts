@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getTrainingCollection } from "@controllers/TrainingController";
-import client from "@middlewares/MongoDb";
+import client, { getConnection } from "@middlewares/MongoDb";
 import { PriveTrainingCollection } from "types/EntityTpes/TrainingType";
 import { atob, btoa } from "buffer";
 
@@ -14,7 +14,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 const getTrainingData = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
 
-  await client.connect();
+  await getConnection();
   const data = (await getTrainingCollection().findOne({
     _id: new ObjectId(id as string),
   })) as PriveTrainingCollection;
@@ -37,7 +37,7 @@ const updateTrainingData = async (
   const { id } = req.query;
   const { subtitle, content, image, price, bullets } = req.body;
 
-  await client.connect();
+  await getConnection();
   await getTrainingCollection().updateOne(
     { _id: new ObjectId(id as string) },
     {

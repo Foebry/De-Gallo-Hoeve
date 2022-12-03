@@ -1,4 +1,4 @@
-import client, { getData } from "@middlewares/MongoDb";
+import client, { getConnection, getData } from "@middlewares/MongoDb";
 import { HondCollection } from "../types/EntityTpes/HondTypes";
 import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
@@ -56,7 +56,7 @@ export async function getPaginatedData<T>(
   url: string,
   controller: string
 ) {
-  await client.connect();
+  await getConnection();
 
   const data = await getData(controller);
 

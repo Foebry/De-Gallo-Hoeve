@@ -15,6 +15,7 @@ import { OptionsOrGroups } from "react-select";
 import { optionInterface } from "@components/register/HondGegevens";
 import HondGegevens from "@components/inschrijving/HondGegevens";
 import client, {
+  getConnection,
   getFreeTimeSlots,
   getHondOptions,
   getRasOptions,
@@ -240,7 +241,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       redirect: { permanent: false, destination: LOGIN },
     };
   }
-  await client.connect();
+  await getConnection();
   const honden = await getHondOptions(klant_id as ObjectId);
   const csrf = generateCsrf();
   const disabledDays = await getDisabledDays(type);

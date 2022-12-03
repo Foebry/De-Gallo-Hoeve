@@ -1,13 +1,13 @@
 import moment from "moment";
 import { getKlantByEmail } from "controllers/KlantController";
-import client from "middlewares/MongoDb";
+import client, { getConnection } from "middlewares/MongoDb";
 import { generateCsrf } from "middlewares/Validator";
 import { IsRegisterPayload, IsRegisterResponseBody } from "./auth/types";
 
 export const generateRegisterResponseBodyFromPayload = async (
   payload: IsRegisterPayload
 ): Promise<IsRegisterResponseBody> => {
-  await client.connect();
+  await getConnection();
   const klant = await getKlantByEmail(payload.email);
   const response = {
     roles: "",

@@ -2,12 +2,12 @@ import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getContentCollection } from "@controllers/ContentController";
 import { getTrainingCollection } from "@controllers/TrainingController";
-import client from "@middlewares/MongoDb";
+import client, { getConnection } from "@middlewares/MongoDb";
 import { btoa } from "buffer";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { intro, diensten, trainingen } = req.body;
-  await client.connect();
+  await getConnection();
 
   await getContentCollection().updateOne(
     { _id: new ObjectId("62fa1f25bacc03711136ad59") },

@@ -2,7 +2,7 @@ import { getHondById } from "@controllers/HondController";
 import { getEigenaarVanHond } from "@controllers/KlantController";
 import { getRasByName } from "@controllers/rasController";
 import { mapToHondDetailResponse } from "@middlewares/mappers/honden";
-import client from "@middlewares/MongoDb";
+import client, { getConnection } from "@middlewares/MongoDb";
 import {
   HondNotFoundError,
   KlantNotFoundError,
@@ -43,7 +43,7 @@ const getHondDetail = async (
   try {
     const { slug: _id } = req.query;
 
-    await client.connect();
+    await getConnection();
 
     const hond = await getHondById(new ObjectId(_id));
     if (!hond) throw new HondNotFoundError();

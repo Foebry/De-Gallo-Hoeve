@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getInschrijvingenByIds } from "@controllers/InschrijvingController";
 import { getKlantById } from "@controllers/KlantController";
 import { mapToKlantDetail } from "@middlewares/mappers/klanten";
-import client from "@middlewares/MongoDb";
+import client, { getConnection } from "@middlewares/MongoDb";
 import { KlantNotFoundError } from "@middlewares/RequestError";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -23,7 +23,7 @@ const getKlantDetail = async (
 ) => {
   const { slug: _id } = req.query as RequestQuery;
 
-  await client.connect();
+  await getConnection();
 
   const klant = await getKlantById(new ObjectId(_id));
   if (!klant) throw new KlantNotFoundError();

@@ -50,7 +50,7 @@ import {
 import { NewRas, RasCollection } from "../types/EntityTpes/RasTypes";
 import axios from "axios";
 import { IsRegisterPayload } from "../tests/auth/types";
-import client from "./MongoDb";
+import client, { getConnection } from "./MongoDb";
 
 export type CONFIRM = "ConfirmController";
 export type CONTENT = "ContentController";
@@ -147,7 +147,7 @@ const Factory = {
     return {
       ...randomKlant,
       save: async (): Promise<IsKlantCollection> => {
-        await client.connect();
+        await getConnection();
         const klant = {
           ...randomKlant,
           password: await brcypt.hash(randomKlant.password, 10),
@@ -192,7 +192,7 @@ const Factory = {
     return {
       ...randomInschrijving,
       save: async () => {
-        await client.connect();
+        await getConnection();
         await getInschrijvingCollection().insertOne(randomInschrijving);
         await client.close();
         return randomInschrijving;
@@ -219,7 +219,7 @@ const Factory = {
       ...randomTraining,
       save: async () => {
         await process.nextTick(() => {});
-        await client.connect();
+        await getConnection();
         await getTrainingCollection().insertOne(randomTraining);
         await client.close();
         return randomTraining;
