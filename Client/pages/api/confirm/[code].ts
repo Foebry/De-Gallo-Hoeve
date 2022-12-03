@@ -6,7 +6,7 @@ import {
 } from "@controllers/ConfirmController";
 import { getKlantById, KLANT } from "@controllers/KlantController";
 import Factory from "@middlewares/Factory";
-import client from "@middlewares/MongoDb";
+import client, { getConnection } from "@middlewares/MongoDb";
 import {
   ExpiredConfirmCodeError,
   InvalidConfirmCodeError,
@@ -22,7 +22,7 @@ const handler = (req: NextApiRequest, res: NextApiResponse) => {
 
 const confirm = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    await client.connect();
+    await getConnection();
 
     const { code } = req.query;
 
@@ -46,7 +46,7 @@ const confirm = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const reset = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    await client.connect();
+    await getConnection();
     const { code } = req.query;
 
     const confirm = await getConfirmByCode(code as string);

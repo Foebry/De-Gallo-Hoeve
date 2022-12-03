@@ -12,7 +12,7 @@ import {
   TransactionError,
 } from "@middlewares/RequestError";
 import { getKlantById } from "@controllers/KlantController";
-import client, { startTransaction } from "@middlewares/MongoDb";
+import client, { getConnection, startTransaction } from "@middlewares/MongoDb";
 import mailer from "@middlewares/Mailer";
 import { saveInschrijving } from "@controllers/InschrijvingController";
 import { ObjectId } from "mongodb";
@@ -35,7 +35,7 @@ const handler = (req: NextApiRequest, res: NextApiResponse) => {
 const getInschrijvingen = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const { _id: klantId } = secureApi({ req, res });
-    await client.connect();
+    await getConnection();
     const klant = await getKlantById(new ObjectId(klantId));
     if (!klant) throw new KlantNotFoundError("Klant niet gevonden");
     const inschrijvingen = klant.inschrijvingen;
@@ -48,7 +48,7 @@ const getInschrijvingen = async (req: NextApiRequest, res: NextApiResponse) => {
 const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     secureApi({ req, res });
-    await client.connect();
+    await getConnection();
     await validateCsrfToken({ req, res });
     await validate({ req, res }, { schema: inschrijvingSchema });
 

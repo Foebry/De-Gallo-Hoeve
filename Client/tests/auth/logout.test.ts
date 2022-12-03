@@ -2,7 +2,7 @@ import { createServer, IncomingMessage, RequestListener } from "http";
 import { NextApiHandler } from "next";
 import { apiResolver } from "next/dist/server/api-utils/node";
 import Factory from "middlewares/Factory";
-import client, { clearAllData } from "middlewares/MongoDb";
+import client, { clearAllData, getConnection } from "middlewares/MongoDb";
 import { generateCsrf } from "middlewares/Validator";
 import handler from "pages/api/auth/logout";
 import loginHandler from "pages/api/auth/login";
@@ -36,7 +36,7 @@ describe("/logout", () => {
   describe("/DELETE", () => {
     it("Should remove Client and JWT on successfull logout", async () => {
       const klant = await Factory.createRandomKlant();
-      await client.connect();
+      await getConnection();
       await klant.save();
       await client.close();
 

@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getTrainingDaysCollection } from "@controllers/TrainingController";
-import client from "@middlewares/MongoDb";
+import client, { getConnection } from "@middlewares/MongoDb";
 import { TrainingDaysCollection } from "types/EntityTpes/TrainingType";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -11,7 +11,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 const getAvailableDays = async (req: NextApiRequest, res: NextApiResponse) => {
-  await client.connect();
+  await getConnection();
   const data = (await getTrainingDaysCollection()
     .find({ date: { $gt: new Date() } })
     .toArray()) as TrainingDaysCollection[];
@@ -22,7 +22,7 @@ const getAvailableDays = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const setAvailabelDays = async (req: NextApiRequest, res: NextApiResponse) => {
   const { selected } = req.body;
-  await client.connect();
+  await getConnection();
 
   const currentCollections = (await getTrainingDaysCollection()
     .find({ date: { $gt: new Date() } })

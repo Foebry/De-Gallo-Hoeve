@@ -6,7 +6,7 @@ import {
   DetailInschrijvingResponse,
   mapToInschrijvingDetail,
 } from "@middlewares/mappers/Inschrijvingen";
-import client from "@middlewares/MongoDb";
+import client, { getConnection } from "@middlewares/MongoDb";
 import {
   HondNotFoundError,
   InschrijvingNotFoundError,
@@ -28,7 +28,7 @@ const getInschrijvingDetail = async (
 ) => {
   const { slug: _id } = req.query;
 
-  await client.connect();
+  await getConnection();
   try {
     const inschrijving = await getInschrijvingById(new ObjectId(_id));
     if (!inschrijving) throw new InschrijvingNotFoundError();

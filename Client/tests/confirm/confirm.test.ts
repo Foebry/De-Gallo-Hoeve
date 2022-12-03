@@ -1,7 +1,7 @@
 import { createServer, IncomingMessage, RequestListener } from "http";
 import { NextApiHandler } from "next";
 import { apiResolver } from "next/dist/server/api-utils/node";
-import client, { clearAllData } from "middlewares/MongoDb";
+import client, { clearAllData, getConnection } from "middlewares/MongoDb";
 import request from "supertest";
 import { createRandomConfirmCode } from "middlewares/Helper";
 import handler from "pages/api/confirm/[code]";
@@ -57,7 +57,7 @@ describe("/confirm", () => {
         .post(REGISTERAPI)
         .send(payload);
 
-      await client.connect();
+      await getConnection();
       const confirm = await getConfirmByKlantId(new ObjectId(body._id));
       const valid_to = moment().subtract(1, "hour").local().format();
       await getConfirmCollection().updateOne(
@@ -81,7 +81,7 @@ describe("/confirm", () => {
         .post(REGISTERAPI)
         .send(payload);
 
-      await client.connect();
+      await getConnection();
       const confirm = await getConfirmByKlantId(new ObjectId(body._id));
       await client.close();
 
@@ -115,7 +115,7 @@ describe("/confirm", () => {
       });
       confirm.code = code;
       await process.nextTick(() => {});
-      await client.connect();
+      await getConnection();
       await Factory.getController(CONFIRM).saveConfirm(confirm);
       await client.close();
 
@@ -128,7 +128,7 @@ describe("/confirm", () => {
       const payload = generateRegisterPayloadFromKlantData(randomKlant);
       await testClient(registerHandler).post(REGISTERAPI).send(payload);
 
-      await client.connect();
+      await getConnection();
       const klant = await getKlantByEmail(randomKlant.email);
       const confirm = await getConfirmByKlantId(klant!._id);
       await client.close();
@@ -138,7 +138,7 @@ describe("/confirm", () => {
       code = confirmCode;
 
       const result = await testClient(handler).put("/api/confirm/");
-      await client.connect();
+      await getConnection();
       const newConfirm = await getConfirmByKlantId(new ObjectId(klant!._id));
       await client.close();
       const newCode = newConfirm!.code;

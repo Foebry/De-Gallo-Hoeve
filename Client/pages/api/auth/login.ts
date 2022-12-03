@@ -9,7 +9,7 @@ import {
   NotAllowedError,
 } from "@middlewares/RequestError";
 import { createJWT, setClientCookie } from "@middlewares/Authenticator";
-import client from "@middlewares/MongoDb";
+import client, { getConnection } from "@middlewares/MongoDb";
 
 const handler = (req: GenericRequest<LoginRequest>, res: NextApiResponse) => {
   if (req.method === "POST") return login(req, res);
@@ -28,7 +28,7 @@ const login = async (
   res: NextApiResponse
 ) => {
   try {
-    await client.connect();
+    await getConnection();
     await validateCsrfToken({ req, res });
     await validate({ req, res }, { schema: loginSchema });
     const b = req.query;

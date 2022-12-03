@@ -29,6 +29,7 @@ export interface Option {
 }
 
 interface MongoDbInterface {
+  getConnection: () => Promise<MongoClient>;
   getIndexData: () => Promise<{
     trainingen: {
       image: string;
@@ -44,9 +45,13 @@ interface MongoDbInterface {
 }
 
 export const MongoDb: MongoDbInterface = {
+  getConnection: async () => {
+    if (MongoDb.status === "open") return client;
+    else return client.connect();
+  },
   getIndexData: async () => {
     try {
-      await client.connect();
+      await MongoDb.getConnection();
       const trainingen = (await getTrainingCollection()
         .find()
         .toArray()) as PriveTrainingCollection[];
@@ -163,6 +168,7 @@ client.on("connectionClosed", () => (MongoDb.status = "closed"));
 
 export default client;
 export const {
+  getConnection,
   getIndexData,
   getRasOptions,
   getHondOptions,

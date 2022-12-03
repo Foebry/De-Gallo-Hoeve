@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { validateCsrfToken, validate } from "@middlewares/Validator";
 import mailer from "@middlewares/Mailer";
-import client, { startTransaction } from "@middlewares/MongoDb";
+import client, { getConnection, startTransaction } from "@middlewares/MongoDb";
 import {
   EmailOccupiedError,
   NotAllowedError,
@@ -21,7 +21,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const register = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    await client.connect();
+    await getConnection();
     await validateCsrfToken({ req, res });
     await validate(
       { req, res },

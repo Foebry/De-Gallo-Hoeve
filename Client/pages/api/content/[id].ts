@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getContentCollection } from "@controllers/ContentController";
-import client from "@middlewares/MongoDb";
+import client, { getConnection } from "@middlewares/MongoDb";
 import { ContentCollection } from "types/EntityTpes/ContentTypes";
 import { atob, btoa } from "buffer";
 
@@ -14,7 +14,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 const getContent = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
 
-  await client.connect();
+  await getConnection();
   const data = (await getContentCollection().findOne({
     _id: new ObjectId(id as string),
   })) as ContentCollection;
@@ -32,7 +32,7 @@ const changeContent = async (req: NextApiRequest, res: NextApiResponse) => {
   const { subtitle, content, image } = req.body;
   const { id } = req.query;
 
-  await client.connect();
+  await getConnection();
   await getContentCollection().updateOne(
     { _id: new ObjectId(id as string) },
     {
