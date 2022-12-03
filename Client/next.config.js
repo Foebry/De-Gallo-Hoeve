@@ -5,6 +5,14 @@ const nextConfig = {
     domains: ["www.wdev2.be", "res.cloudinary.com"],
   },
   pageExtensions: ["page.tsx", "page.ts"],
+  rewrites: async () => {
+    return [
+      {
+        destination: "/index/",
+        source: "/",
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

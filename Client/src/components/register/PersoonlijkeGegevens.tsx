@@ -2,7 +2,7 @@ import React, { Dispatch } from "react";
 import FormInput from "../form/FormInput";
 import FormRow from "../form/FormRow";
 import { Control, Controller, FieldValues } from "react-hook-form";
-import { RegisterErrorInterface } from "../../pages/register.page";
+import { RegisterErrorInterface } from "../../pages/register/index.page";
 
 interface Step1Props {
   control: Control<FieldValues, any>;

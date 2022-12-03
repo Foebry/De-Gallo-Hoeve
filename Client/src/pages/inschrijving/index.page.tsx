@@ -2,11 +2,13 @@ import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, FieldValues, useForm } from "react-hook-form";
-import useMutation, { structureInschrijvingenPayload } from "src/hooks/useMutation";
+import useMutation, {
+  structureInschrijvingenPayload,
+} from "src/hooks/useMutation";
 import { POST_INSCHRIJVING } from "src/types/apiTypes";
 import { INDEX, LOGIN } from "src/types/linkTypes";
 import FormSteps from "src/components/form/FormSteps";
-import Form from "../components/form/Form";
+import Form from "../../components/form/Form";
 import Button, { SubmitButton } from "src/components/buttons/Button";
 import { DatePicker } from "react-trip-date";
 import Contactgegevens from "src/components/inschrijving/Contactgegevens";

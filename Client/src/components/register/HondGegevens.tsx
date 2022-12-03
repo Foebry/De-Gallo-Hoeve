@@ -8,7 +8,7 @@ import {
   UseFieldArrayRemove,
   UseFormGetValues,
 } from "react-hook-form";
-import { RegisterErrorInterface } from "../../pages/register.page";
+import { RegisterErrorInterface } from "../../pages/register/index.page";
 import HondCard from "../Cards/HondCard";
 
 export interface optionInterface {

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { toast } from "react-toastify";
-import { InschrijvingErrorInterface } from "src/pages/inschrijving";
-import { LoginErrorInterface } from "../pages/login.page";
+import { InschrijvingErrorInterface } from "src/pages/inschrijving/index.page";
+import { LoginErrorInterface } from "../pages/login/index.page";
 import moment from "moment";
 
 interface ApiError {

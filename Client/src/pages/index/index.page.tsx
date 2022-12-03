@@ -1,5 +1,5 @@
 import { Body, Title1 } from "src/components/Typography/Typography";
-import TrainingCard from "src/components/Cards/TrainingCard";
+import TrainingCard from "./components/TrainingCard";
 import Image from "next/image";
 import Skeleton from "src/components/website/skeleton";
 import { GiCheckMark } from "react-icons/gi";

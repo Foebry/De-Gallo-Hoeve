@@ -22,6 +22,7 @@ export async function middleware(req: NextRequest) {
   const UNAUTHORIZED = domain + "/unauthorized";
 
   if (await shouldRedirectToIndex(req, path))
+    // return NextResponse.rewrite(new URL(INDEX));
     return NextResponse.redirect(INDEX);
 
   if (await shouldRedirectToLogin(req, path))
@@ -33,6 +34,7 @@ export async function middleware(req: NextRequest) {
 
 const shouldRedirectToIndex = async (req: NextRequest, path: string) => {
   const pageMatch = path.startsWith("/login") || path.startsWith("/register");
+  console.log("shouldRedirectToIndexPage");
   return (await validJwtToken(req)) && pageMatch;
 };
 

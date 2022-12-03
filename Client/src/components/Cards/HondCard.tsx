@@ -7,7 +7,7 @@ import {
   UseFormGetValues,
 } from "react-hook-form";
 import { OptionsOrGroups } from "react-select";
-import { RegisterErrorInterface } from "../../pages/register.page";
+import { RegisterErrorInterface } from "../../pages/register/index.page";
 import Button from "../buttons/Button";
 import FormInput from "../form/FormInput";
 import FormRow from "../form/FormRow";

@@ -1,9 +1,9 @@
 import { useRouter } from "next/router";
 import React from "react";
 import { INSCHRIJVING } from "src/types/linkTypes";
-import Button from "../buttons/Button";
-import FormRow from "../form/FormRow";
-import { Body } from "../Typography/Typography";
+import Button from "../../../components/buttons/Button";
+import FormRow from "../../../components/form/FormRow";
+import { Body } from "../../../components/Typography/Typography";
 import { GiCheckMark } from "react-icons/gi";
 import Image from "next/image";
 

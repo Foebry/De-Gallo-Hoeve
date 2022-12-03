@@ -7,7 +7,7 @@ import {
   UseFormRegister,
 } from "react-hook-form";
 import { OptionsOrGroups } from "react-select";
-import { InschrijvingErrorInterface } from "src/pages/inschrijving";
+import { InschrijvingErrorInterface } from "src/pages/inschrijving/index.page";
 import DayCard from "../Cards/DayCard";
 import { optionInterface } from "../register/HondGegevens";
 import { Body } from "../Typography/Typography";
