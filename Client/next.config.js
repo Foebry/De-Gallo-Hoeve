@@ -4,6 +4,15 @@ const nextConfig = {
   images: {
     domains: ["www.wdev2.be", "res.cloudinary.com"],
   },
+  pageExtensions: ["page.tsx", "page.ts"],
+  rewrites: async () => {
+    return [
+      {
+        destination: "/",
+        source: "/home/",
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

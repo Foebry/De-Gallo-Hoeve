@@ -1,11 +1,11 @@
 import { createServer, IncomingMessage, RequestListener } from "http";
 import { NextApiHandler } from "next";
 import { apiResolver } from "next/dist/server/api-utils/node";
-import handler from "pages/api/auth/register";
-import { REGISTERAPI } from "types/apiTypes";
+import handler from "src/pages/api/auth/register.page";
+import { REGISTERAPI } from "src/types/apiTypes";
 import request from "supertest";
-import Factory from "middlewares/Factory";
-import { clearAllData } from "middlewares/MongoDb";
+import Factory from "src/services/Factory";
+import { clearAllData } from "src/utils/MongoDb";
 import {
   generateRegisterPayloadFromKlantData,
   generateRegisterResponseBodyFromPayload,
