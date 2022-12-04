@@ -1,6 +1,7 @@
+// eslint-disable-next-line @next/next/no-server-import-in-page
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify, JWTVerifyResult, JWTVerifyOptions } from "jose";
-import { HondCollection } from "./types/EntityTpes/HondTypes";
+import { HondCollection } from "src/types/EntityTpes/HondTypes";
 
 interface VerifiedToken {
   verified: boolean;
@@ -12,7 +13,7 @@ interface VerifiedToken {
 const JWT_COOKIE_NAME = "JWT";
 const SECRET = process.env.JWT_SECRET!;
 
-export async function middleware(req: NextRequest) {
+async function middleware(req: NextRequest) {
   const url = req.url;
   const path = req.nextUrl.pathname;
   const domain = url.split(path)[0];
@@ -30,11 +31,12 @@ export async function middleware(req: NextRequest) {
 
   if (await shouldRedirectToUnAuthorized(req, path))
     return NextResponse.redirect(UNAUTHORIZED);
+
+  return NextResponse.next();
 }
 
 const shouldRedirectToIndex = async (req: NextRequest, path: string) => {
   const pageMatch = path.startsWith("/login") || path.startsWith("/register");
-  console.log("shouldRedirectToIndexPage");
   return (await validJwtToken(req)) && pageMatch;
 };
 
@@ -71,3 +73,4 @@ const isAdmin = async (req: NextRequest): Promise<boolean> => {
 export const config = {
   matcher: ["/login", "/register", "/inschrijving", "/admin/:path*"],
 };
+export default middleware;
