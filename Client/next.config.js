@@ -4,13 +4,12 @@ const nextConfig = {
   images: {
     domains: ["www.wdev2.be", "res.cloudinary.com"],
   },
-  // trailingSlash: true,
   pageExtensions: ["page.tsx", "page.ts"],
   rewrites: async () => {
     return [
       {
-        destination: "/home/",
-        source: "/",
+        destination: "/",
+        source: "/home/",
       },
     ];
   },

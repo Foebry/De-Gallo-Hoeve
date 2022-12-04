@@ -1,5 +1,3 @@
-const Index: React.FC = () => {
-  return <></>;
-};
+import Home from "./home/index.page";
 
-export default Index;
+export default Home;
