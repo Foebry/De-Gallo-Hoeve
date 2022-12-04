@@ -19,7 +19,7 @@ const helper: HelperInterface = {
 
     const temp = new Date();
     const enddate = new Date(temp.getFullYear(), temp.getMonth() + 2, 0);
-    const trainingDaysCollection = await getTrainingCollection();
+    const trainingDaysCollection = await getTrainingDaysCollection();
     const trainingDays = (await trainingDaysCollection
       .find({
         date: { $gt: new Date(temp) },

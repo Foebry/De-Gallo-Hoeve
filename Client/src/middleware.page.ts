@@ -15,7 +15,7 @@ const SECRET = process.env.JWT_SECRET!;
 
 async function middleware(req: NextRequest) {
   const url = req.url;
-  const path = req.nextUrl.pathname;
+  const path = req.nextUrl.pathname.toLowerCase();
   const domain = url.split(path)[0];
 
   const INDEX = domain;
@@ -23,7 +23,6 @@ async function middleware(req: NextRequest) {
   const UNAUTHORIZED = domain + "/unauthorized";
 
   if (await shouldRedirectToIndex(req, path))
-    // return NextResponse.rewrite(new URL(INDEX));
     return NextResponse.redirect(INDEX);
 
   if (await shouldRedirectToLogin(req, path))
