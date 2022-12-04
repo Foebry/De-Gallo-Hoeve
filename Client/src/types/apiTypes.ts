@@ -13,13 +13,13 @@ const ApiTypes = {
   CONTENTDIENSTEN: "/api/content/633862b5fbcc3a3006dcda52",
   CONTENTPRIVETRAINING: "/api/trainingen/62fa1f25bacc03711136ad5f",
   ADMIN_KLANTEN_OVERVIEW: "/api/admin/klanten",
-  ADMIN_KLANT_DETAIL: "/api/admin/klanten/index",
+  ADMIN_KLANT_DETAIL: "/api/admin/klanten/",
   ADMIN_INSCHRIJVINGEN_OVERVIEW: "/api/admin/inschrijvingen",
-  ADMIN_INSCHRIJVING_DETAIL: "/api/admin/inschrijvingen/index",
+  ADMIN_INSCHRIJVING_DETAIL: "/api/admin/inschrijvingen/",
   ADMIN_HONDEN_OVERVIEW: "/api/admin/honden",
-  ADMIN_HOND_DETAIL: "/api/admin/honden/index",
+  ADMIN_HOND_DETAIL: "/api/admin/honden/",
   ADMIN_RASSEN_OVERIEW: "/api/admin/rassen",
-  ADMIN_RAS_DETAIL: "/api/admin/ras/index",
+  ADMIN_RAS_DETAIL: "/api/admin/ras/",
 };
 
 export const {

@@ -1,4 +1,4 @@
-import { PaginatedData, PaginatedResponse } from "src/helpers/RequestHelper";
+import { PaginatedData, PaginatedResponse } from "src/shared/RequestHelper";
 import { HondCollection } from "src/types/EntityTpes/HondTypes";
 import { InschrijvingCollection } from "src/types/EntityTpes/InschrijvingTypes";
 

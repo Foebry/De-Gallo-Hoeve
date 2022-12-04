@@ -10,7 +10,7 @@ import { closeConnection, getConnection } from "src/utils/MongoDb";
 import {
   HondNotFoundError,
   InschrijvingNotFoundError,
-} from "src/middlewares/RequestError";
+} from "src/shared/RequestError";
 import { GenericRequest } from "src/pages/api/auth/login.page";
 
 interface DetailRequest extends NextApiRequest {

@@ -11,11 +11,11 @@ import FormSteps from "src/components/form/FormSteps";
 import Form from "../../components/form/Form";
 import Button, { SubmitButton } from "src/components/buttons/Button";
 import { DatePicker } from "react-trip-date";
-import Contactgegevens from "src/components/inschrijving/Contactgegevens";
+import Contactgegevens from "src/pages/inschrijving/components/Contactgegevens";
 import { toast } from "react-toastify";
 import { OptionsOrGroups } from "react-select";
-import { optionInterface } from "src/components/register/HondGegevens";
-import HondGegevens from "src/components/inschrijving/HondGegevens";
+import { optionInterface } from "src/pages/register/components/HondGegevens";
+import HondGegevens from "src/pages/inschrijving/components/HondGegevens";
 import {
   closeConnection,
   getConnection,
@@ -24,12 +24,12 @@ import {
   getRasOptions,
 } from "src/utils/MongoDb";
 import { ObjectId } from "mongodb";
-import { getDisabledDays } from "src/middlewares/Helper";
 import { generateCsrf } from "src/services/Validator";
 import { securepage } from "src/services/Authenticator";
-import Skeleton from "src/components/website/skeleton";
+import Skeleton from "src/layouts/skeleton";
 import { getPriveTraining } from "src/controllers/TrainingController";
 import getData from "src/hooks/useApi";
+import { getDisabledDays } from "src/shared/functions";
 
 type TrainingType = "prive" | "groep";
 

@@ -1,4 +1,4 @@
-import { optionInterface } from "src/components/register/HondGegevens";
+import { optionInterface } from "src/pages/register/components/HondGegevens";
 
 export interface RegisterPersonalValuesInterface {
   name: string;

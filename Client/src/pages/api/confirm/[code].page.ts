@@ -11,7 +11,7 @@ import {
   ExpiredConfirmCodeError,
   InvalidConfirmCodeError,
   KlantNotFoundError,
-} from "src/middlewares/RequestError";
+} from "src/shared/RequestError";
 import { CONFIRM } from "src/types/EntityTpes/ConfirmTypes";
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {

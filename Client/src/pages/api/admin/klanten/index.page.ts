@@ -4,7 +4,7 @@ import {
   getPaginatedData,
   PaginatedRequestQuery,
   PaginatedResponse,
-} from "src/helpers/RequestHelper";
+} from "src/shared/RequestHelper";
 import {
   mapToAdminKlantenOverviewResult,
   PaginatedKlant,

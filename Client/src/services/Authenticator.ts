@@ -12,7 +12,7 @@ import base64 from "base-64";
 import {
   NotLoggedInError,
   UnauthorizedAccessError,
-} from "../middlewares/RequestError";
+} from "../shared/RequestError";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 import { HondCollection } from "../types/EntityTpes/HondTypes";
 

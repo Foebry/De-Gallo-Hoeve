@@ -4,7 +4,7 @@ import {
   getPaginatedData,
   PaginatedRequestQuery,
   PaginatedResponse,
-} from "src/helpers/RequestHelper";
+} from "src/shared/RequestHelper";
 import { mapToHondenOverviewResult, PaginatedKlantHond } from "src/mappers/honden";
 import { KlantHond } from "src/types/EntityTpes/HondTypes";
 import { GenericRequest } from "src/pages/api/auth/login.page";

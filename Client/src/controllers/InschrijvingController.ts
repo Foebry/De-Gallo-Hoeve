@@ -10,7 +10,7 @@ import {
   InschrijvingKlantChangedError,
   InternalServerError,
   TransactionError,
-} from "../middlewares/RequestError";
+} from "../shared/RequestError";
 import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 import { IsUpdateInschrijvingBody } from "../types/requestTypes";

@@ -1,8 +1,8 @@
 import React from "react";
 import { Control, Controller, FieldValues } from "react-hook-form";
-import FormRow from "../form/FormRow";
+import FormRow from "../../../components/form/FormRow";
 import Select from "react-select";
-import FormInput from "../form/FormInput";
+import FormInput from "../../../components/form/FormInput";
 
 interface ContactProps {
   control: Control<FieldValues, any>;

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
-import Dashboard from "src/components/admin/dashboard";
+import Dashboard from "src/layouts/dashboard";
 import Table from "src/components/Table/Table";
 import getData from "src/hooks/useApi";
 import { ADMIN_KLANTEN_OVERVIEW } from "src/types/apiTypes";

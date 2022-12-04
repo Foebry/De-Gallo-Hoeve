@@ -1,7 +1,7 @@
 import { Body, Title1 } from "src/components/Typography/Typography";
 import TrainingCard from "./components/TrainingCard";
 import Image from "next/image";
-import Skeleton from "src/components/website/skeleton";
+import Skeleton from "src/layouts/skeleton";
 import { GiCheckMark } from "react-icons/gi";
 import { getPriveTraining } from "src/controllers/TrainingController";
 

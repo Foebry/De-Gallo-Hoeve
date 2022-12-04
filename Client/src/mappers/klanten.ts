@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { PaginatedData, PaginatedResponse } from "src/helpers/RequestHelper";
+import { PaginatedData, PaginatedResponse } from "src/shared/RequestHelper";
 import { InschrijvingCollection } from "src/types/EntityTpes/InschrijvingTypes";
 import { IsKlantCollection } from "src/types/EntityTpes/KlantTypes";
 

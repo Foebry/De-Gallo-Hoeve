@@ -5,7 +5,7 @@ import {
   ConfirmNotFoundError,
   InternalServerError,
   KlantNotFoundError,
-} from "../middlewares/RequestError";
+} from "../shared/RequestError";
 import { ConfirmCollection } from "../types/EntityTpes/ConfirmTypes";
 import { getKlantCollection } from "./KlantController";
 import { getConnection } from "src/utils/MongoDb";

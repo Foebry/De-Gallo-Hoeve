@@ -10,7 +10,7 @@ import {
   EmailOccupiedError,
   NotAllowedError,
   TransactionError,
-} from "src/middlewares/RequestError";
+} from "src/shared/RequestError";
 import { registerSchema } from "src/types/schemas";
 import Factory from "src/services/Factory";
 import { getKlantByEmail, KLANT } from "src/controllers/KlantController";

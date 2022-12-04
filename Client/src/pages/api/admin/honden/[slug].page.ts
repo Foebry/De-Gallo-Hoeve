@@ -7,7 +7,7 @@ import {
   HondNotFoundError,
   KlantNotFoundError,
   RasNotFoundError,
-} from "src/middlewares/RequestError";
+} from "src/shared/RequestError";
 import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
 import { GenericRequest } from "src/pages/api/auth/login.page";

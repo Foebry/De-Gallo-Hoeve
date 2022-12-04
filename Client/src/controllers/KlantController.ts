@@ -8,7 +8,7 @@ import {
   InschrijvingNotFoundError,
   InternalServerError,
   KlantNotFoundError,
-} from "../middlewares/RequestError";
+} from "../shared/RequestError";
 import { CASCADETRAINING } from "../services/Factory";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
@@ -57,6 +57,7 @@ const KlantController: IsKlantController = {
     return (await collection.find().toArray()) as IsKlantCollection[];
   },
   getKlantById: async (_id) => {
+    console.log({ _id });
     const collection = await getKlantCollection();
     const klant = await collection.findOne({ _id });
     return klant as IsKlantCollection;

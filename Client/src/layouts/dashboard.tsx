@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
-import MenuItem from "../Menu/MenuItem";
-import MenuSection from "../Menu/MenuSection";
+import MenuItem from "../components/Menu/MenuItem";
+import MenuSection from "../components/Menu/MenuSection";
 import {
   ADMIN,
   ADMINEDITINDEX,
@@ -26,7 +26,7 @@ const Dashboard: React.FC<Props> = ({ children }) => {
   return (
     <div className="flex" style={{ height: "100%" }}>
       <aside
-        className="bg-green-300 px-2 pt-5 min-h-full"
+        className="bg-green-200 px-2 pt-5 min-h-full"
         style={{ width: "12.5%" }}
       >
         <MenuSection title="dashboard" icon={<AiOutlineHome />} link={ADMIN} />

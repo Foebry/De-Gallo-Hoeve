@@ -12,7 +12,7 @@ import { LOGINAPI } from "src/types/apiTypes";
 import { GetServerSidePropsContext } from "next";
 import nookies from "nookies";
 import validator, { generateCsrf } from "src/services/Validator";
-import Skeleton from "src/components/website/skeleton";
+import Skeleton from "src/layouts/skeleton";
 import Link from "next/link";
 
 export interface LoginErrorInterface {

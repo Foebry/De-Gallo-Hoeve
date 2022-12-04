@@ -3,7 +3,6 @@ import { NextApiHandler } from "next";
 import { apiResolver } from "next/dist/server/api-utils/node";
 import { clearAllData, getConnection } from "src/utils/MongoDb";
 import request from "supertest";
-import { createRandomConfirmCode } from "src/middlewares/Helper";
 import handler from "src/pages/api/confirm/[code].page";
 import registerHandler from "src/pages/api/auth/register.page";
 import Factory from "src/services/Factory";
@@ -17,6 +16,7 @@ import { getKlantByEmail } from "src/controllers/KlantController";
 import moment from "moment";
 import { ObjectId } from "mongodb";
 import { CONFIRM } from "src/types/EntityTpes/ConfirmTypes";
+import { createRandomConfirmCode } from "src/shared/functions";
 
 describe("/confirm", () => {
   beforeEach(async () => {

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import Dashboard from "src/components/admin/dashboard";
+import Dashboard from "src/layouts/dashboard";
 import { Body, Title2, Title3 } from "src/components/Typography/Typography";
 import { DatePicker } from "react-trip-date";
 import { Controller, useForm } from "react-hook-form";

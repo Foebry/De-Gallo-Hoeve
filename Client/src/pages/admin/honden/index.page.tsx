@@ -1,9 +1,9 @@
 import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-import Dashboard from "src/components/admin/dashboard";
+import Dashboard from "src/layouts/dashboard";
 import Table from "src/components/Table/Table";
-import { PaginatedResponse } from "src/helpers/RequestHelper";
+import { PaginatedResponse } from "src/shared/RequestHelper";
 import getData from "src/hooks/useApi";
 import { PaginatedKlantHond } from "src/mappers/honden";
 import { ADMIN_HONDEN_OVERVIEW } from "src/types/apiTypes";

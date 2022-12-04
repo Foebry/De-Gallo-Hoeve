@@ -1,7 +1,7 @@
 import { ADMIN_HOND_DETAIL, RASSEN } from "src/types/apiTypes";
-import Dashboard from "src/components/admin/dashboard";
+import Dashboard from "src/layouts/dashboard";
 import Button from "src/components/buttons/Button";
-import { geslachten } from "src/components/Cards/HondCard";
+import { geslachten } from "src/pages/register/components/HondCard";
 import FormInput from "src/components/form/FormInput";
 import FormRow from "src/components/form/FormRow";
 import { MySelect } from "src/components/MySelect";

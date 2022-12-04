@@ -1,8 +1,8 @@
 import React, { Dispatch } from "react";
-import FormInput from "../form/FormInput";
-import FormRow from "../form/FormRow";
+import FormInput from "../../../components/form/FormInput";
+import FormRow from "../../../components/form/FormRow";
 import { Control, Controller, FieldValues } from "react-hook-form";
-import { RegisterErrorInterface } from "../../pages/register/index.page";
+import { RegisterErrorInterface } from "../index.page";
 
 interface Step1Props {
   control: Control<FieldValues, any>;

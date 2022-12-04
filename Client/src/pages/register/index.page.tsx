@@ -3,8 +3,8 @@ import Form from "src/components/form/Form";
 import { useRouter } from "next/router";
 import { INDEX, LOGIN } from "src/types/linkTypes";
 import { useFieldArray, useForm } from "react-hook-form";
-import PersoonlijkeGegevens from "src/components/register/PersoonlijkeGegevens";
-import Step2, { optionInterface } from "src/components/register/HondGegevens";
+import PersoonlijkeGegevens from "./components/PersoonlijkeGegevens";
+import HondGegevens, { optionInterface } from "./components/HondGegevens";
 import { OptionsOrGroups } from "react-select";
 import { REGISTERAPI } from "src/types/apiTypes";
 import useMutation, { structureHondenPayload } from "src/hooks/useMutation";
@@ -15,7 +15,7 @@ import { toast } from "react-toastify";
 import Button, { SubmitButton } from "src/components/buttons/Button";
 import { generateCsrf } from "src/services/Validator";
 import { useAppContext } from "src/context/appContext";
-import Skeleton from "src/components/website/skeleton";
+import Skeleton from "src/layouts/skeleton";
 
 export interface RegisterHondErrorInterface {
   naam?: string;
@@ -172,7 +172,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
                   validatePassword={validatePassword}
                 />
               ) : activeStep === 1 ? (
-                <Step2
+                <HondGegevens
                   control={control}
                   setActiveStep={setActiveStep}
                   fields={fields}

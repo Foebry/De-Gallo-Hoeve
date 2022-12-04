@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Dashboard from "src/components/admin/dashboard";
+import Dashboard from "src/layouts/dashboard";
 import Diensten from "src/components/admin/Diensten";
 import Intro from "src/components/admin/Intro";
 import Trainingen from "src/components/admin/Trainngen";

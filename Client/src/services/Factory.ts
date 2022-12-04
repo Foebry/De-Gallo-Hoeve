@@ -35,7 +35,6 @@ import {
   IsNewKlantData,
 } from "../types/requestTypes";
 import brcypt from "bcrypt";
-import { capitalize, createRandomConfirmCode } from "../middlewares/Helper";
 import { HondCollection, NewHond } from "../types/EntityTpes/HondTypes";
 import {
   CONFIRM,
@@ -51,6 +50,7 @@ import { NewRas, RasCollection } from "../types/EntityTpes/RasTypes";
 import axios from "axios";
 import { IsRegisterPayload } from "../../tests/auth/types";
 import { getConnection } from "../utils/MongoDb";
+import { capitalize, createRandomConfirmCode } from "src/shared/functions";
 
 export type CONFIRM = "ConfirmController";
 export type CONTENT = "ContentController";

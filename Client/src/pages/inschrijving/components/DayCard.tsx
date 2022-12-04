@@ -5,11 +5,11 @@ import {
   FieldValues,
   UseFormRegister,
 } from "react-hook-form";
-import FormInput from "../form/FormInput";
+import FormInput from "../../../components/form/FormInput";
 import Select, { OptionsOrGroups } from "react-select";
-import { optionInterface } from "../register/HondGegevens";
-import { geslachten } from "./HondCard";
-import { FormError } from "../Typography/Typography";
+import { optionInterface } from "../../register/components/HondGegevens";
+import { geslachten } from "../../register/components/HondCard";
+import { FormError } from "../../../components/Typography/Typography";
 import { RiDeleteBin6Line } from "react-icons/ri";
 
 type TrainingType = "prive" | "groep";

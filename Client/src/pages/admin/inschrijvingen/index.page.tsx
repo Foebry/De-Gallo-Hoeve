@@ -5,7 +5,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { GrEdit, GrView } from "react-icons/gr";
 import { MdDelete } from "react-icons/md";
 import { toast } from "react-toastify";
-import Dashboard from "src/components/admin/dashboard";
+import Dashboard from "src/layouts/dashboard";
 import FormRow from "src/components/form/FormRow";
 import Table from "src/components/Table/Table";
 import getData from "src/hooks/useApi";

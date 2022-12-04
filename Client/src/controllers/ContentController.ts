@@ -3,7 +3,7 @@ import { getConnection } from "src/utils/MongoDb";
 import {
   ContentNotFoundError,
   InternalServerError,
-} from "../middlewares/RequestError";
+} from "../shared/RequestError";
 import {
   ContentCollection,
   EditContent,

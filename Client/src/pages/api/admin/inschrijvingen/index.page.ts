@@ -4,7 +4,7 @@ import {
   getPaginatedData,
   PaginatedRequestQuery,
   PaginatedResponse,
-} from "src/helpers/RequestHelper";
+} from "src/shared/RequestHelper";
 import { InschrijvingCollection } from "src/types/EntityTpes/InschrijvingTypes";
 import { GenericRequest } from "src/pages/api/auth/login.page";
 import {

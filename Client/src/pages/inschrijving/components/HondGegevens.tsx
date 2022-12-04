@@ -8,9 +8,9 @@ import {
 } from "react-hook-form";
 import { OptionsOrGroups } from "react-select";
 import { InschrijvingErrorInterface } from "src/pages/inschrijving/index.page";
-import DayCard from "../Cards/DayCard";
-import { optionInterface } from "../register/HondGegevens";
-import { Body } from "../Typography/Typography";
+import DayCard from "./DayCard";
+import { optionInterface } from "../../register/components/HondGegevens";
+import { Body } from "../../../components/Typography/Typography";
 
 type TrainingType = "prive" | "groep";
 

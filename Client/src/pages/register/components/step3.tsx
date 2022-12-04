@@ -1,6 +1,6 @@
 import React from "react";
-import FormInput from "../form/FormInput";
-import FormRow from "../form/FormRow";
+import FormInput from "../../../components/form/FormInput";
+import FormRow from "../../../components/form/FormRow";
 import { Control, Controller, FieldValues } from "react-hook-form";
 import { RegisterErrorInterface } from "src/pages/register/index.page";
 

@@ -7,15 +7,15 @@ import {
   UseFormGetValues,
 } from "react-hook-form";
 import { OptionsOrGroups } from "react-select";
-import { RegisterErrorInterface } from "../../pages/register/index.page";
-import Button from "../buttons/Button";
-import FormInput from "../form/FormInput";
-import FormRow from "../form/FormRow";
-import { optionInterface } from "../register/HondGegevens";
-import { Body, Title3 } from "../Typography/Typography";
+import { RegisterErrorInterface } from "../index.page";
+import Button from "../../../components/buttons/Button";
+import FormInput from "../../../components/form/FormInput";
+import FormRow from "../../../components/form/FormRow";
+import { optionInterface } from "./HondGegevens";
+import { Body, Title3 } from "../../../components/Typography/Typography";
 import "react-datepicker/dist/react-datepicker.css";
-import { MyDatePicker } from "../MyDatePicker";
-import { MySelect } from "../MySelect";
+import { MyDatePicker } from "../../../components/MyDatePicker";
+import { MySelect } from "../../../components/MySelect";
 
 interface HondCardProps {
   control: Control<FieldValues, any>;

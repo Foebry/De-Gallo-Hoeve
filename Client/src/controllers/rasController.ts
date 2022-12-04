@@ -3,7 +3,7 @@ import { getConnection } from "src/utils/MongoDb";
 import {
   InternalServerError,
   RasNotFoundError,
-} from "../middlewares/RequestError";
+} from "../shared/RequestError";
 import { RasCollection, UpdateRas } from "../types/EntityTpes/RasTypes";
 
 export interface IsRasController {

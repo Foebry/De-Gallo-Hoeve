@@ -1,5 +1,5 @@
 import React from "react";
-import Dashboard from "src/components/admin/dashboard";
+import Dashboard from "src/layouts/dashboard";
 import { Title1 } from "src/components/Typography/Typography";
 
 interface Props {}

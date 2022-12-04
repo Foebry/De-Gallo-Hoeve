@@ -10,7 +10,7 @@ import {
   TrainingNotFoundError,
   TrainingVolzetError,
   TransactionError,
-} from "src/middlewares/RequestError";
+} from "src/shared/RequestError";
 import { getKlantById } from "src/controllers/KlantController";
 import {
   closeConnection,

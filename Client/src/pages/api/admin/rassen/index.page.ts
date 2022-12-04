@@ -4,7 +4,7 @@ import {
   getPaginatedData,
   PaginatedRequestQuery,
   PaginatedResponse,
-} from "src/helpers/RequestHelper";
+} from "src/shared/RequestHelper";
 import { mapToRassenOverviewResult, PaginatedRas } from "src/mappers/rassen";
 import { GenericRequest } from "src/pages/api/auth/login.page";
 import { RasCollection } from "src/types/EntityTpes/RasTypes";

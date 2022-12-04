@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import Dashboard from "src/components/admin/dashboard";
+import Dashboard from "src/layouts/dashboard";
 import Button from "src/components/buttons/Button";
 import FormInput from "src/components/form/FormInput";
 import FormRow from "src/components/form/FormRow";

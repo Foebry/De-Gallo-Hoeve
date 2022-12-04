@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import Button from "../buttons/Button";
+import Button from "../../../components/buttons/Button";
 import { OptionsOrGroups } from "react-select";
 import {
   Control,
@@ -8,8 +8,8 @@ import {
   UseFieldArrayRemove,
   UseFormGetValues,
 } from "react-hook-form";
-import { RegisterErrorInterface } from "../../pages/register/index.page";
-import HondCard from "../Cards/HondCard";
+import { RegisterErrorInterface } from "../index.page";
+import HondCard from "./HondCard";
 
 export interface optionInterface {
   options: [{ value: any; label: string }];

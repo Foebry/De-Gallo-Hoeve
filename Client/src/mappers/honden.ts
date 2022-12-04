@@ -2,7 +2,7 @@ import { IsKlantCollection } from "src/types/EntityTpes/KlantTypes";
 import { RasCollection } from "src/types/EntityTpes/RasTypes";
 import moment from "moment";
 import { HondDetailResponse } from "src/pages/api/admin/honden/[slug].page";
-import { PaginatedData, PaginatedResponse } from "src/helpers/RequestHelper";
+import { PaginatedData, PaginatedResponse } from "src/shared/RequestHelper";
 import {
   Geslacht,
   HondCollection,

@@ -4,7 +4,7 @@ import { compare, hash } from "./Authenticator";
 import {
   InvalidCsrfError,
   ValidationError,
-} from "../middlewares/RequestError";
+} from "../shared/RequestError";
 
 interface OptionsInterface {
   schema: AnySchema;

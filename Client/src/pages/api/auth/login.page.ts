@@ -7,7 +7,7 @@ import {
   InvalidEmailError,
   InvalidPasswordError,
   NotAllowedError,
-} from "src/middlewares/RequestError";
+} from "src/shared/RequestError";
 import { createJWT, setClientCookie } from "src/services/Authenticator";
 import { closeConnection, getConnection } from "src/utils/MongoDb";
 

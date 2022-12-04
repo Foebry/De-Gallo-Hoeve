@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { OptionsOrGroups } from "react-select";
-import { optionInterface } from "../components/register/HondGegevens";
+import { optionInterface } from "../pages/register/components/HondGegevens";
 import getData from "../hooks/useApi";
 import { RASSEN } from "../types/apiTypes";
 
