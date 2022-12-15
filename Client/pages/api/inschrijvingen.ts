@@ -121,7 +121,10 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
         }))
         .reduce((prev, curr) => ({ ...prev, ...curr }), {});
       await mailer.sendMail("inschrijving", { naam, email, ...data });
-      await mailer.sendMail("inschrijving-headsup", { _ids: ids.join(",") });
+      await mailer.sendMail("inschrijving-headsup", {
+        email: process.env.MAIL_TO,
+        _ids: ids.join(","),
+      });
     }
 
     return res.status(201).json({ message: "Inschrijving ontvangen!" });
