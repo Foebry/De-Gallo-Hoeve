@@ -54,7 +54,7 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
             code,
           });
           await mailer.sendMail("register-headsup", {
-            email: "info@degallohoeve.be",
+            email: process.env.MAIL_TO,
             klant_id: savedKlant._id.toString(),
           });
         }
