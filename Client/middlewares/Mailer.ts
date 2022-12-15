@@ -50,7 +50,7 @@ export const getTemplateId = (type: string): string => {
 const mailer: Mailer = {
   sendMail: async (type, { email, ...templateData }) => {
     await send({
-      to: process.env.NODE_ENV !== "production" ? process.env.MAIL_TO : email,
+      to: email,
       from: process.env.MAIL_FROM,
       templateId: getTemplateId(type),
       dynamic_template_data: { ...templateData },
@@ -59,8 +59,8 @@ const mailer: Mailer = {
 
   contact: ({ naam, email, bericht }) => {
     send({
-      to: "info@degallohoeve.be",
-      from: "info@degallohoeve.be",
+      to: process.env.MAIL_FROM,
+      from: process.env.MAIL_TO,
       subject: "contact",
       text: bericht,
       html: bericht,
