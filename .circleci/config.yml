@@ -10,8 +10,8 @@ jobs:
         environment:
           MONGODB_PASSWORD: jNlNNjp97wPXZPCC
           MONGODB_DATABASE: degallohoeve_test
-	  MAIL_TO: sander.fabry@gmail.com
-	  MAIL_FROM: sander.fabry@gmail.com
+          MAIL_TO: sander.fabry@gmail.com
+          MAIL_FROM: sander.fabry@gmail.com
     parallelism: 1
     working_directory: ~/degallohoeve
     steps:
