@@ -1,0 +1,94 @@
+# More info
+# https://circleci.com/docs/2.0/workflows/
+# https://circleci.com/docs/2.0/configuration-reference
+
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:14
+      - image: mongodb
+        environment:
+          MONGODB_PASSWORD: jNlNNjp97wPXZPCC
+          MONGODB_DATABASE: degallohoeve_test
+    parallelism: 1
+    working_directory: ~/degallohoeve
+    steps:
+      - attach_workspace:
+          at: ~/degallohoeve
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - v1-yarn-{{ checksum "yarn.lock" }}
+      - run:
+          name: Install Dependencies
+          command: yarn install --immutable
+      - save_cache:
+          name: Save Yarn Package Cache
+          paths:
+            - node_modules
+            - ~/.cache/yarn
+          key: v1-yarn-{{ checksum "yarn.lock" }}
+
+      - run:
+          name: Type Tests
+          command: yarn lint:types
+
+      - run:
+          name: Linting
+          command: npm run lint
+
+      - run:
+          name: Integration Tests
+          command: yarn test
+          environment:
+            JEST_JUNIT_OUTPUT_DIR: /tmp/junit
+
+      - store_test_results:
+          path: /tmp/junit
+
+      - run:
+          name: Build
+          command: |
+            export BRANCH_NAME=`echo ${CIRCLE_BRANCH} | sed 's/\/.*//'`
+            yarn setVersion
+            if  [[ ${CIRCLE_BRANCH} = dev ]];
+              then export TARGET_ENV=Development
+            elif [[ ${CIRCLE_BRANCH} =~ main ]]; then
+              export TARGET_ENV=Production
+            else
+              then export TARGET_ENV=Preview
+            fi
+            TARGET_ENV=`${TARGET_ENV}` yarn build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - build
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only:
+                - develop
+                - master
+                - production
+                - /release\/.*/
+                - /hotfix\/.*/
+                - /feature\/.*/
+                - /refactor\/.*/
+                - /bugfix\/.*/
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - develop
+                - master
+                - production
+                - /release\/.*/
+                - /hotfix\/.*/
