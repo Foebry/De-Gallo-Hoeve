@@ -4,9 +4,9 @@ import {
   HondNotFoundError,
   InternalServerError,
   KlantNotFoundError,
-} from "../shared/RequestError";
-import { HondCollection, KlantHond } from "../types/EntityTpes/HondTypes";
-import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
+} from "@/shared/RequestError";
+import { HondCollection, KlantHond } from "@/types/EntityTpes/HondTypes";
+import { IsKlantCollection } from "@/types/EntityTpes/KlantTypes";
 import {
   getAllKlanten,
   getKlantById,

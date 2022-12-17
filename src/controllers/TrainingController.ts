@@ -1,17 +1,17 @@
 import moment from "moment";
 import { ClientSession, Collection, ObjectId } from "mongodb";
-import { CASCADEKLANT } from "../services/Factory";
-import { getConnection } from "../utils/MongoDb";
-import { InternalServerError } from "../shared/RequestError";
-import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
-import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
+import { CASCADEKLANT } from "@/services/Factory";
+import { getConnection } from "@/utils/MongoDb";
+import { InternalServerError } from "@/shared/RequestError";
+import { InschrijvingCollection } from "@/types/EntityTpes/InschrijvingTypes";
+import { IsKlantCollection } from "@/types/EntityTpes/KlantTypes";
 import {
   GroepTrainingCollection,
   PriveTrainingCollection,
   TrainingType,
   UpdateTraining,
-} from "../types/EntityTpes/TrainingType";
-import { IsInschrijvingBodyInschrijving } from "../types/requestTypes";
+} from "@/types/EntityTpes/TrainingType";
+import { IsInschrijvingBodyInschrijving } from "@/types/requestTypes";
 import {
   deleteInschrijvingen,
   getInschrijvingById,

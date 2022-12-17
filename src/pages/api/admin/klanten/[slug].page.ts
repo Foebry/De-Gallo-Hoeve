@@ -22,10 +22,8 @@ const getKlantDetail = async (
   res: NextApiResponse<KlantDetailResponse>
 ) => {
   const { slug: _id } = req.query as RequestQuery;
-  console.log({ _id });
 
   const klant = await getKlantById(new ObjectId(_id));
-  console.log({ klant });
   if (!klant) throw new KlantNotFoundError();
 
   const inschrijvingen = await getInschrijvingenByIds(klant.inschrijvingen);

@@ -1,13 +1,13 @@
 import { Collection, ObjectId } from "mongodb";
-import { getConnection } from "src/utils/MongoDb";
+import { getConnection } from "@/utils/MongoDb";
 import {
   ContentNotFoundError,
   InternalServerError,
-} from "../shared/RequestError";
+} from "@/shared/RequestError";
 import {
   ContentCollection,
   EditContent,
-} from "../types/EntityTpes/ContentTypes";
+} from "@/types/EntityTpes/ContentTypes";
 
 export interface IsContentController {
   getContentCollection: () => Promise<Collection>;

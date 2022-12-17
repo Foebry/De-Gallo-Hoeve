@@ -1,22 +1,22 @@
 import { createServer, IncomingMessage, RequestListener } from "http";
 import { NextApiHandler } from "next";
 import { apiResolver } from "next/dist/server/api-utils/node";
-import { clearAllData, getConnection } from "src/utils/MongoDb";
+import { clearAllData, getConnection } from "@/utils/MongoDb";
 import request from "supertest";
-import handler from "src/pages/api/confirm/[code].page";
-import registerHandler from "src/pages/api/auth/register.page";
-import Factory from "src/services/Factory";
+import handler from "@/pages/api/confirm/[code].page";
+import registerHandler from "@/pages/api/auth/register.page";
+import Factory from "@/services/Factory";
 import {
   getConfirmByKlantId,
   getConfirmCollection,
-} from "src/controllers/ConfirmController";
+} from "@/controllers/ConfirmController";
 import { generateRegisterPayloadFromKlantData } from "../helpers";
-import { REGISTERAPI } from "src/types/apiTypes";
-import { getKlantByEmail } from "src/controllers/KlantController";
+import { REGISTERAPI } from "@/types/apiTypes";
+import { getKlantByEmail } from "@/controllers/KlantController";
 import moment from "moment";
 import { ObjectId } from "mongodb";
-import { CONFIRM } from "src/types/EntityTpes/ConfirmTypes";
-import { createRandomConfirmCode } from "src/shared/functions";
+import { CONFIRM } from "@/types/EntityTpes/ConfirmTypes";
+import { createRandomConfirmCode } from "@/shared/functions";
 
 describe("/confirm", () => {
   beforeEach(async () => {

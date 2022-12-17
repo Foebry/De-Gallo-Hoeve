@@ -8,12 +8,12 @@ import {
   InschrijvingNotFoundError,
   InternalServerError,
   KlantNotFoundError,
-} from "../shared/RequestError";
-import { CASCADETRAINING } from "../services/Factory";
-import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
-import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
-import { HondCollection } from "src/types/EntityTpes/HondTypes";
-import { getConnection } from "src/utils/MongoDb";
+} from "@/shared/RequestError";
+import { CASCADETRAINING } from "@/services/Factory";
+import { IsKlantCollection } from "@/types/EntityTpes/KlantTypes";
+import { InschrijvingCollection } from "@/types/EntityTpes/InschrijvingTypes";
+import { HondCollection } from "@/types/EntityTpes/HondTypes";
+import { getConnection } from "@/utils/MongoDb";
 
 export interface IsKlantController {
   getKlantCollection: () => Promise<Collection>;
@@ -57,7 +57,6 @@ const KlantController: IsKlantController = {
     return (await collection.find().toArray()) as IsKlantCollection[];
   },
   getKlantById: async (_id) => {
-    console.log({ _id });
     const collection = await getKlantCollection();
     const klant = await collection.findOne({ _id });
     return klant as IsKlantCollection;

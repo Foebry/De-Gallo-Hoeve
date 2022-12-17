@@ -2,23 +2,23 @@ import { createServer, IncomingMessage, RequestListener } from "http";
 import { NextApiHandler } from "next";
 import request from "supertest";
 import { apiResolver } from "next/dist/server/api-utils/node";
-import { clearAllData } from "src/utils/MongoDb";
-import { LOGINAPI, POST_INSCHRIJVING } from "src/types/apiTypes";
-import handler from "src/pages/api/inschrijvingen.page";
-import Factory from "src/services/Factory";
-import { generateCsrf } from "src/services/Validator";
-import loginHandler from "src/pages/api/auth/login.page";
-import { createBearer } from "src/services/Authenticator";
+import { LOGINAPI, POST_INSCHRIJVING } from "@/types/apiTypes";
+import handler from "@/pages/api/inschrijvingen.page";
+import Factory from "@/services/Factory";
+import { generateCsrf } from "@/services/Validator";
+import loginHandler from "@/pages/api/auth/login.page";
+import { createBearer } from "@/services/Authenticator";
 import { ObjectId } from "mongodb";
 import moment from "moment";
+import { clearAllData } from "@/utils/MongoDb";
 
 describe("/inschrijving", () => {
   beforeEach(async () => {
     await clearAllData();
   });
-  // afterAll(async () => {
-  //   await clearAllData();
-  // });
+  afterAll(async () => {
+    await clearAllData();
+  });
   const testClient = (handler: NextApiHandler) => {
     const listener: RequestListener = (req: IncomingMessage, res) => {
       return apiResolver(

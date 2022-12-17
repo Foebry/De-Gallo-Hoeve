@@ -2,55 +2,55 @@ import moment from "moment";
 import { ObjectId } from "mongodb";
 import ConfirmController, {
   IsConfirmController,
-} from "../controllers/ConfirmController";
+} from "@/controllers/ConfirmController";
 import ContentController, {
   CONTENT,
   IsContentController,
-} from "../controllers/ContentController";
+} from "@/controllers/ContentController";
 import HondController, {
   HOND,
   IsHondController,
-} from "../controllers/HondController";
+} from "@/controllers/HondController";
 import InschrijvingController, {
   getInschrijvingCollection,
   INSCHRIJVING,
   IsInschrijvingController,
-} from "../controllers/InschrijvingController";
+} from "@/controllers/InschrijvingController";
 import KlantController, {
   IsKlantController,
   KLANT,
-} from "../controllers/KlantController";
+} from "@/controllers/KlantController";
 import RasController, {
   IsRasController,
   RAS,
-} from "../controllers/rasController";
+} from "@/controllers/rasController";
 import TrainingController, {
   getTrainingCollection,
   IsTrainingController,
   TRAINING,
-} from "../controllers/TrainingController";
-import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
+} from "@/controllers/TrainingController";
+import { IsKlantCollection } from "@/types/EntityTpes/KlantTypes";
 import {
   IsInschrijvingBodyInschrijving,
   IsNewKlantData,
-} from "../types/requestTypes";
+} from "@/types/requestTypes";
 import brcypt from "bcrypt";
-import { HondCollection, NewHond } from "../types/EntityTpes/HondTypes";
+import { HondCollection, NewHond } from "@/types/EntityTpes/HondTypes";
 import {
   CONFIRM,
   ConfirmCollection,
   NewConfirm,
-} from "../types/EntityTpes/ConfirmTypes";
-import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
+} from "@/types/EntityTpes/ConfirmTypes";
+import { InschrijvingCollection } from "@/types/EntityTpes/InschrijvingTypes";
 import {
   PriveTrainingCollection,
   TrainingType,
-} from "../types/EntityTpes/TrainingType";
-import { NewRas, RasCollection } from "../types/EntityTpes/RasTypes";
+} from "@/types/EntityTpes/TrainingType";
+import { NewRas, RasCollection } from "@/types/EntityTpes/RasTypes";
 import axios from "axios";
-import { IsRegisterPayload } from "../../tests/auth/types";
-import { getConnection } from "../utils/MongoDb";
-import { capitalize, createRandomConfirmCode } from "src/shared/functions";
+import { IsRegisterPayload } from "@/tests/auth/types";
+import { getConnection } from "@/utils/MongoDb";
+import { capitalize, createRandomConfirmCode } from "@/shared/functions";
 
 export type CONFIRM = "ConfirmController";
 export type CONTENT = "ContentController";

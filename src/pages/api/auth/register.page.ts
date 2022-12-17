@@ -1,21 +1,21 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { validateCsrfToken, validate } from "src/services/Validator";
-import mailer from "src/utils/Mailer";
+import { validateCsrfToken, validate } from "@/services/Validator";
+import mailer from "@/utils/Mailer";
 import {
   closeConnection,
   getConnection,
   startTransaction,
-} from "src/utils/MongoDb";
+} from "@/utils/MongoDb";
 import {
   EmailOccupiedError,
   NotAllowedError,
   TransactionError,
-} from "src/shared/RequestError";
-import { registerSchema } from "src/types/schemas";
-import Factory from "src/services/Factory";
-import { getKlantByEmail, KLANT } from "src/controllers/KlantController";
-import { IsRegisterBody } from "src/types/requestTypes";
-import { CONFIRM } from "src/types/EntityTpes/ConfirmTypes";
+} from "@/shared/RequestError";
+import { registerSchema } from "@/types/schemas";
+import Factory from "@/services/Factory";
+import { getKlantByEmail, KLANT } from "@/controllers/KlantController";
+import { IsRegisterBody } from "@/types/requestTypes";
+import { CONFIRM } from "@/types/EntityTpes/ConfirmTypes";
 import moment from "moment";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

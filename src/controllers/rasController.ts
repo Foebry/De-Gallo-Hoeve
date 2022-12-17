@@ -1,10 +1,7 @@
 import { Collection, ObjectId } from "mongodb";
-import { getConnection } from "src/utils/MongoDb";
-import {
-  InternalServerError,
-  RasNotFoundError,
-} from "../shared/RequestError";
-import { RasCollection, UpdateRas } from "../types/EntityTpes/RasTypes";
+import { getConnection } from "@/utils/MongoDb";
+import { InternalServerError, RasNotFoundError } from "@/shared/RequestError";
+import { RasCollection, UpdateRas } from "@/types/EntityTpes/RasTypes";
 
 export interface IsRasController {
   getRasCollection: () => Promise<Collection>;
