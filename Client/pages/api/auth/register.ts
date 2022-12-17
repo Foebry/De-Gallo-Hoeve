@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { validateCsrfToken, validate } from "@middlewares/Validator";
+import { validateCsrfToken, validate } from "../../../middlewares/Validator";
 import mailer from "@middlewares/Mailer";
 import client, { startTransaction } from "@middlewares/MongoDb";
 import {
@@ -7,12 +7,12 @@ import {
   NotAllowedError,
   TransactionError,
 } from "@middlewares/RequestError";
-import { registerSchema } from "types/schemas";
 import Factory from "@middlewares/Factory";
 import { getKlantByEmail, KLANT } from "@controllers/KlantController";
 import { IsRegisterBody } from "types/requestTypes";
-import { CONFIRM } from "types/EntityTpes/ConfirmTypes";
 import moment from "moment";
+import { registerSchema } from "@/types/schemas";
+import { CONFIRM } from "@/types/EntityTpes/ConfirmTypes";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") return register(req, res);
@@ -47,17 +47,15 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
           confirm
         );
 
-        if (process.env.NODE_ENV !== "test") {
-          await mailer.sendMail("register", {
-            email: savedKlant.email,
-            vnaam: savedKlant.vnaam,
-            code,
-          });
-          await mailer.sendMail("register-headsup", {
-            email: process.env.MAIL_TO,
-            klant_id: savedKlant._id.toString(),
-          });
-        }
+        await mailer.sendMail("register", {
+          email: savedKlant.email,
+          vnaam: savedKlant.vnaam,
+          code,
+        });
+        await mailer.sendMail("register-headsup", {
+          email: process.env.MAIL_TO,
+          klant_id: savedKlant._id.toString(),
+        });
       }, transactionOptions);
       // const result = createKlantDto(klant);
       const returnKlant = await Factory.getController(KLANT).getKlantByEmail(

@@ -71,3 +71,4 @@ const mailer: Mailer = {
 };
 
 export default mailer;
+export const sendMail = mailer.sendMail;

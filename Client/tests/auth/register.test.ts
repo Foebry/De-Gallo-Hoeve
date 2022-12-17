@@ -1,18 +1,31 @@
 import { createServer, IncomingMessage, RequestListener } from "http";
 import { NextApiHandler } from "next";
 import { apiResolver } from "next/dist/server/api-utils/node";
-import handler from "pages/api/auth/register";
-import { REGISTERAPI } from "types/apiTypes";
+import handler from "../../pages/api/auth/register";
 import request from "supertest";
-import Factory from "middlewares/Factory";
-import { clearAllData } from "middlewares/MongoDb";
+import Factory from "../../middlewares/Factory";
+import { clearAllData } from "../../middlewares/MongoDb";
+import { REGISTERAPI } from "@/types/apiTypes";
 import {
   generateRegisterPayloadFromKlantData,
   generateRegisterResponseBodyFromPayload,
-} from "tests/helpers";
+} from "@/tests/helpers";
+import { sendMail } from "@middlewares/Mailer";
+
+jest.mock("@middlewares/Mailer", () => {
+  return {
+    sendMail: jest.fn().mockResolvedValue("sending mock email"),
+  };
+});
+import dbClient from "@middlewares/MongoDb";
+import { ObjectId } from "mongodb";
 
 describe("/register", () => {
   beforeEach(async () => {
+    jest.clearAllMocks();
+    await clearAllData();
+  });
+  afterAll(async () => {
     await clearAllData();
   });
   const testClient = (handler: NextApiHandler) => {
@@ -44,17 +57,24 @@ describe("/register", () => {
       const payload = generateRegisterPayloadFromKlantData(klant);
 
       const client = testClient(handler);
-      const response = await client.post(REGISTERAPI).send(payload);
-      const body = await generateRegisterResponseBodyFromPayload(payload);
 
-      expect(response.statusCode).toBe(201);
-      expect(response.body).toStrictEqual({
-        ...body,
-        _id: body._id.toString(),
-        honden: [...body.honden].map((hond) => ({
-          ...hond,
-          _id: hond._id.toString(),
-        })),
+      const { body } = await client.post(REGISTERAPI).send(payload).expect(201);
+
+      await dbClient.connect();
+      const code = await Factory.getController(
+        "ConfirmController"
+      ).getConfirmByKlantId(new ObjectId(body._id));
+      await dbClient.close();
+
+      expect(sendMail).toHaveBeenCalledTimes(2);
+      expect(sendMail).toHaveBeenNthCalledWith(1, "register", {
+        email: klant.email,
+        vnaam: klant.vnaam,
+        code: code?.code,
+      });
+      expect(sendMail).toHaveBeenNthCalledWith(2, "register-headsup", {
+        email: "sander.fabry@gmail.com",
+        klant_id: body._id,
       });
     });
     it("Should throw EmailOccupiedError", async () => {

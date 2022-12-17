@@ -23,7 +23,8 @@
       "@/types/*": ["types/*"],
       "@auth/*": ["auth/*"],
       "@/pages/*": ["pages/"],
-      "@/hooks/*": ["hooks/"]
+      "@/hooks/*": ["hooks/"],
+      "@/tests/*": ["tests/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "config-overrides.js", "src"],
