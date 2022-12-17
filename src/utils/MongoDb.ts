@@ -176,6 +176,7 @@ export const MongoDb: MongoDbInterface = {
       await Factory.getController(RAS).deleteAll();
       await process.nextTick(() => {});
       await Factory.getController(TRAINING).deleteAll();
+      await process.nextTick(() => {});
       await MongoDb.closeConnection();
     }
   },
