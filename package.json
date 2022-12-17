@@ -9,7 +9,7 @@
     "lint": "next lint",
     "lint:types": "tsc --noEmit",
     "network": "next dev -H 192.168.0.239",
-    "test": "jest --detectOpenHandles"
+    "test": "jest --runInBand --detectOpenHandles --forceExit"
   },
   "dependencies": {
     "@sendgrid/mail": "^7.7.0",
