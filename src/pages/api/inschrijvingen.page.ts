@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { validate, validateCsrfToken } from "src/services/Validator";
-import { inschrijvingSchema } from "src/types/schemas";
-import { secureApi } from "src/services/Authenticator";
+import { validate, validateCsrfToken } from "@/services/Validator";
+import { inschrijvingSchema } from "@/types/schemas";
+import { secureApi } from "@/services/Authenticator";
 import {
   EmailNotVerifiedError,
   HondNotFoundError,
@@ -10,24 +10,24 @@ import {
   TrainingNotFoundError,
   TrainingVolzetError,
   TransactionError,
-} from "src/shared/RequestError";
-import { getKlantById } from "src/controllers/KlantController";
+} from "@/shared/RequestError";
+import { getKlantById } from "@/controllers/KlantController";
 import {
   closeConnection,
   getConnection,
   startTransaction,
-} from "src/utils/MongoDb";
-import mailer from "src/utils/Mailer";
-import { saveInschrijving } from "src/controllers/InschrijvingController";
+} from "@/utils/MongoDb";
+import mailer from "@/utils/Mailer";
+import { saveInschrijving } from "@/controllers/InschrijvingController";
 import { ObjectId } from "mongodb";
-import { getKlantHond } from "src/controllers/HondController";
+import { getKlantHond } from "@/controllers/HondController";
 import {
   getTrainingByName,
   klantReedsIngeschreven,
   trainingVolzet,
-} from "src/controllers/TrainingController";
-import Factory from "src/services/Factory";
-import { IsInschrijvingBody } from "src/types/requestTypes";
+} from "@/controllers/TrainingController";
+import Factory from "@/services/Factory";
+import { IsInschrijvingBody } from "@/types/requestTypes";
 import moment from "moment";
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {

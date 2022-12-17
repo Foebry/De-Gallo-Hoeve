@@ -17,13 +17,17 @@
     "baseUrl": ".",
     "paths": {
       "@components/*": ["src/components/*"],
-      "@controllers/*": ["src/controllers/*"],
+      "@/controllers/*": ["src/controllers/*"],
       "@helpers/*": ["src/helpers/*"],
       "@middlewares/*": ["src/middlewares/*"],
       "@/types/*": ["src/types/*"],
       "@auth/*": ["auth/*"],
-      "@/pages/*": ["src/pages"],
-      "@/hooks/*": ["src/hooks"]
+      "@/pages/*": ["src/pages/*"],
+      "@/hooks/*": ["src/hooks"],
+      "@/utils/*": ["src/utils/*"],
+      "@/services/*": ["src/services/*"],
+      "@/shared/*": ["src/shared/*"],
+      "@/tests/*": ["tests/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "config-overrides.js", "src"],

@@ -1,15 +1,15 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { validate, validateCsrfToken } from "src/services/Validator";
-import { loginSchema } from "src/types/schemas";
-import { getKlantByEmail } from "src/controllers/KlantController";
+import { validate, validateCsrfToken } from "@/services/Validator";
+import { loginSchema } from "@/types/schemas";
+import { getKlantByEmail } from "@/controllers/KlantController";
 import bcrypt from "bcrypt";
 import {
   InvalidEmailError,
   InvalidPasswordError,
   NotAllowedError,
-} from "src/shared/RequestError";
-import { createJWT, setClientCookie } from "src/services/Authenticator";
-import { closeConnection, getConnection } from "src/utils/MongoDb";
+} from "@/shared/RequestError";
+import { createJWT, setClientCookie } from "@/services/Authenticator";
+import { closeConnection, getConnection } from "@/utils/MongoDb";
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST")

@@ -1,12 +1,12 @@
-import { LOGINAPI } from "src/types/apiTypes";
-import { generateCsrf } from "src/services/Validator";
+import { LOGINAPI } from "@/types/apiTypes";
+import { generateCsrf } from "@/services/Validator";
 import { NextApiHandler } from "next";
 import { createServer, IncomingMessage, RequestListener } from "http";
 import request from "supertest";
 import { apiResolver } from "next/dist/server/api-utils/node";
-import handler from "src/pages/api/auth/login.page";
-import { clearAllData } from "src/utils/MongoDb";
-import Factory from "src/services/Factory";
+import handler from "@/pages/api/auth/login.page";
+import { clearAllData } from "@/utils/MongoDb";
+import Factory from "@/services/Factory";
 
 describe("login", () => {
   beforeEach(async () => {

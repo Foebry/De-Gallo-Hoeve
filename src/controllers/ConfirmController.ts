@@ -8,7 +8,7 @@ import {
 } from "../shared/RequestError";
 import { ConfirmCollection } from "../types/EntityTpes/ConfirmTypes";
 import { getKlantCollection } from "./KlantController";
-import { getConnection } from "src/utils/MongoDb";
+import { getConnection } from "@/utils/MongoDb";
 
 export interface IsConfirmController {
   getConfirmCollection: () => Promise<Collection>;

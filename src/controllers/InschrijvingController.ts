@@ -1,19 +1,15 @@
 import moment from "moment";
 import { ClientSession, Collection, ObjectId } from "mongodb";
-import {
-  CASCADEFULL,
-  CASCADEKLANT,
-  CASCADETRAINING,
-} from "../services/Factory";
-import { getConnection, startTransaction } from "../utils/MongoDb";
+import { CASCADEFULL, CASCADEKLANT, CASCADETRAINING } from "@/services/Factory";
+import { getConnection, startTransaction } from "@/utils/MongoDb";
 import {
   InschrijvingKlantChangedError,
   InternalServerError,
   TransactionError,
-} from "../shared/RequestError";
-import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
-import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
-import { IsUpdateInschrijvingBody } from "../types/requestTypes";
+} from "@/shared/RequestError";
+import { InschrijvingCollection } from "@/types/EntityTpes/InschrijvingTypes";
+import { IsKlantCollection } from "@/types/EntityTpes/KlantTypes";
+import { IsUpdateInschrijvingBody } from "@/types/requestTypes";
 import { getKlantHond } from "./HondController";
 import {
   addKlantInschrijving,
