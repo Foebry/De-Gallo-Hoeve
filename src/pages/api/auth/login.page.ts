@@ -11,8 +11,9 @@ import {
 import { createJWT, setClientCookie } from "src/services/Authenticator";
 import { closeConnection, getConnection } from "src/utils/MongoDb";
 
-const handler = (req: GenericRequest<LoginRequest>, res: NextApiResponse) => {
-  if (req.method === "POST") return login(req, res);
+const handler = (req: NextApiRequest, res: NextApiResponse) => {
+  if (req.method === "POST")
+    return login(req as GenericRequest<LoginRequest>, res);
   else throw new NotAllowedError();
 };
 
