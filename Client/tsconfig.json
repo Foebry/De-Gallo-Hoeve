@@ -22,7 +22,7 @@
       "@middlewares/*": ["middlewares/*"],
       "@/types/*": ["types/*"],
       "@auth/*": ["auth/*"],
-      "@/pages/*": ["pages/"],
+      "@/pages/*": ["pages/*"],
       "@/hooks/*": ["hooks/"],
       "@/tests/*": ["tests/*"],
     }

@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { validate, validateCsrfToken } from "@middlewares/Validator";
-import { inschrijvingSchema } from "types/schemas";
+import { inschrijvingSchema } from "@/types/schemas";
 import { secureApi } from "@middlewares/Authenticator";
 import {
   EmailNotVerifiedError,
@@ -23,8 +23,10 @@ import {
   trainingVolzet,
 } from "@controllers/TrainingController";
 import Factory from "@middlewares/Factory";
-import { IsInschrijvingBody } from "types/requestTypes";
+import { IsInschrijvingBody } from "@/types/requestTypes";
 import moment from "moment";
+import { InschrijvingCollection } from "@/types/EntityTpes/InschrijvingTypes";
+import { mapToInschrijvingResponse } from "@middlewares/mappers/Inschrijvingen";
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") return getInschrijvingen(req, res);
@@ -66,9 +68,8 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
     const email = klant.email;
     const naam = klant.vnaam;
 
-    // const data = { email, inschrijvingen };
     const session = client.startSession();
-    const ids: string[] = [];
+    const newInschrijvingen: InschrijvingCollection[] = [];
 
     const transactionOptions = startTransaction();
     try {
@@ -97,37 +98,39 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
               hond
             );
             await saveInschrijving(newInschrijving, session);
-            ids.push(newInschrijving._id.toString());
+            newInschrijvingen.push(newInschrijving);
           }, transactionOptions)
         );
       });
     } catch (e: any) {
       throw new TransactionError(e.name, e.code, e.response);
     }
-    if (process.env.NODE_ENV !== "test") {
-      const data = inschrijvingen
-        .map((inschrijving, index) => ({
-          [`moment${index}`]: moment(inschrijving.datum)
-            .toISOString()
-            .replace("T", " ")
-            .split(":00.")[0],
-          [`hond${index}`]: inschrijving.hond_naam,
-          [`prijsExcl${index}`]:
-            index === 0 && isFirstInschrijving ? "0.00" : prijs,
-          [`prijsIncl${index}`]:
-            index === 0 && isFirstInschrijving
-              ? "0.00"
-              : Math.round(prijs * 1.21).toFixed(2),
-        }))
-        .reduce((prev, curr) => ({ ...prev, ...curr }), {});
-      await mailer.sendMail("inschrijving", { naam, email, ...data });
-      await mailer.sendMail("inschrijving-headsup", {
-        email: process.env.MAIL_TO,
-        _ids: ids.join(","),
-      });
-    }
 
-    return res.status(201).json({ message: "Inschrijving ontvangen!" });
+    const data = inschrijvingen
+      .map((inschrijving, index) => ({
+        [`moment${index}`]: moment(inschrijving.datum)
+          .toISOString()
+          .replace("T", " ")
+          .split(":00.")[0],
+        [`hond${index}`]: inschrijving.hond_naam,
+        [`prijsExcl${index}`]:
+          index === 0 && isFirstInschrijving ? "0.00" : prijs,
+        [`prijsIncl${index}`]:
+          index === 0 && isFirstInschrijving
+            ? "0.00"
+            : Math.round(prijs * 1.21).toFixed(2),
+      }))
+      .reduce((prev, curr) => ({ ...prev, ...curr }), {});
+
+    await mailer.sendMail("inschrijving", { naam, email, ...data });
+    await mailer.sendMail("inschrijving-headsup", {
+      email: process.env.MAIL_TO,
+      _ids: newInschrijvingen.map((inschrijving) => inschrijving._id).join(","),
+    });
+
+    const result = mapToInschrijvingResponse(newInschrijvingen, klant);
+
+    return res.status(201).send(result);
   } catch (e: any) {
     return res.status(e.code).send(e.response);
   } finally {

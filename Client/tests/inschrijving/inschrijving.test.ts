@@ -2,23 +2,31 @@ import { createServer, IncomingMessage, RequestListener } from "http";
 import { NextApiHandler } from "next";
 import request from "supertest";
 import { apiResolver } from "next/dist/server/api-utils/node";
-import { clearAllData } from "middlewares/MongoDb";
-import { LOGINAPI, POST_INSCHRIJVING } from "types/apiTypes";
-import handler from "pages/api/inschrijvingen";
-import Factory from "middlewares/Factory";
-import { generateCsrf } from "middlewares/Validator";
-import loginHandler from "pages/api/auth/login";
-import { createBearer } from "middlewares/Authenticator";
+import { clearAllData } from "@middlewares/MongoDb";
+import { LOGINAPI, POST_INSCHRIJVING } from "@/types/apiTypes";
+import handler from "@/pages/api/inschrijvingen";
+import Factory from "@middlewares/Factory";
+import { generateCsrf } from "@middlewares/Validator";
+import loginHandler from "@/pages/api/auth/login";
+import { createBearer } from "@middlewares/Authenticator";
 import { ObjectId } from "mongodb";
 import moment from "moment";
+import { sendMail } from "@middlewares/Mailer";
+
+jest.mock("@middlewares/Mailer", () => {
+  return {
+    sendMail: jest.fn().mockResolvedValue("sending mock email"),
+  };
+});
 
 describe("/inschrijving", () => {
   beforeEach(async () => {
+    jest.clearAllMocks();
     await clearAllData();
   });
-  // afterAll(async () => {
-  //   await clearAllData();
-  // });
+  afterAll(async () => {
+    await clearAllData();
+  });
   const testClient = (handler: NextApiHandler) => {
     const listener: RequestListener = (req: IncomingMessage, res) => {
       return apiResolver(
@@ -275,6 +283,7 @@ describe("/inschrijving", () => {
       const klant = await (
         await Factory.createRandomKlant({ verified: true, honden: [hond] })
       ).save();
+      const klantInschrijvingen = klant.inschrijvingen;
       const bearer = createBearer(klant);
       const payload = {
         csrf: generateCsrf(),
@@ -288,6 +297,8 @@ describe("/inschrijving", () => {
         ],
         training: training.naam,
         klant_id: klant._id,
+        prijs: training.prijsExcl,
+        isFirstInschrijving: klantInschrijvingen.length === 0,
       };
 
       const { body } = await testClient(handler)
@@ -296,6 +307,32 @@ describe("/inschrijving", () => {
         .auth(bearer, { type: "bearer" })
         .expect(201);
       expect(body.message).toBe("Inschrijving ontvangen!");
+
+      const data = {
+        naam: klant.vnaam,
+        email: klant.email,
+        moment0: moment(payload.inschrijvingen[0].datum)
+          .local()
+          .toISOString()
+          .split("T")
+          .join(" "),
+        hond0: payload.inschrijvingen[0].hond_naam,
+        prijsExcl0: payload.isFirstInschrijving ? "0.00" : payload.prijs,
+        prijsIncl0: payload.isFirstInschrijving
+          ? "0.00"
+          : Math.round(payload.prijs * 1.21).toFixed(2),
+      };
+
+      expect(sendMail).toHaveBeenCalledTimes(2);
+      expect(sendMail).toHaveBeenNthCalledWith(1, "inschrijving", {
+        ...data,
+      });
+      expect(sendMail).toHaveBeenNthCalledWith(2, "inschrijving-headsup", {
+        email: "sander.fabry@gmail.com",
+        _ids: body.inschrijivngen
+          .map((inschrijving: any) => inschrijving._id)
+          .join(","),
+      });
     });
   });
 });

@@ -154,7 +154,6 @@ function filterData<T>(
     }
     return data;
   } else if (instanceOfRasCollectionArray(data)) {
-    console.log("filter rascollections");
     return search
       ? data.filter((ras) =>
           ras.naam.toLowerCase().includes(search.toLowerCase())

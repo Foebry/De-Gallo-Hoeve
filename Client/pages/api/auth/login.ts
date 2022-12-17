@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { validate, validateCsrfToken } from "@middlewares/Validator";
-import { loginSchema } from "types/schemas";
+import { loginSchema } from "@/types/schemas";
 import { getKlantByEmail } from "@controllers/KlantController";
 import bcrypt from "bcrypt";
 import {
@@ -11,12 +11,13 @@ import {
 import { createJWT, setClientCookie } from "@middlewares/Authenticator";
 import client from "@middlewares/MongoDb";
 
-const handler = (req: GenericRequest<LoginRequest>, res: NextApiResponse) => {
-  if (req.method === "POST") return login(req, res);
+const handler = (req: NextApiRequest, res: NextApiResponse) => {
+  if (req.method === "POST")
+    return login(req as GenericRequest<LoginRequest>, res);
   else throw new NotAllowedError();
 };
 
-interface LoginRequest extends NextApiRequest {
+export interface LoginRequest extends NextApiRequest {
   body: { email: string; password: string };
   query: Partial<{ a: string }>;
   params: { b: string };

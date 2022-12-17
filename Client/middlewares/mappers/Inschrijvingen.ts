@@ -1,6 +1,7 @@
 import { PaginatedData, PaginatedResponse } from "@helpers/RequestHelper";
 import { HondCollection } from "@/types/EntityTpes/HondTypes";
 import { InschrijvingCollection } from "@/types/EntityTpes/InschrijvingTypes";
+import { IsKlantCollection } from "@/types/EntityTpes/KlantTypes";
 
 export interface PaginatedInschrijving {
   _id: string;
@@ -83,3 +84,31 @@ export const mapToInschrijvingDetail = (
     ras: hond.ras,
   },
 });
+
+export const mapToInschrijvingResponse = (
+  inschrijvingen: InschrijvingCollection[],
+  klant: IsKlantCollection
+) => {
+  return {
+    message: "Inschrijving ontvangen!",
+    klant: {
+      vnaam: klant.vnaam,
+      lnaam: klant.lnaam,
+      _id: klant._id.toString(),
+    },
+    inschrijivngen: inschrijvingen.map((inschrijving) => ({
+      _id: inschrijving._id,
+      training: inschrijving.training,
+      datum: inschrijving.datum,
+      hond: {
+        naam: inschrijving.hond.naam,
+        id: inschrijving.hond.id.toString(),
+        ras: klant.honden.find((hond) => hond._id === inschrijving.hond.id)
+          ?.ras,
+        geboortedatum: klant.honden.find(
+          (hond) => hond._id === inschrijving.hond.id
+        )?.geboortedatum,
+      },
+    })),
+  };
+};
