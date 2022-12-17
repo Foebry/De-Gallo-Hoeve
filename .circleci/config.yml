@@ -16,6 +16,10 @@ jobs:
     working_directory: ~/degallohoeve
     steps:
       - checkout
+
+      - run:
+          yarn
+
       - attach_workspace:
           at: ~/degallohoeve
 
