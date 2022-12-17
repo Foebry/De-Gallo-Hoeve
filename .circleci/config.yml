@@ -15,6 +15,7 @@ jobs:
     parallelism: 1
     working_directory: ~/degallohoeve
     steps:
+      - checkout
       - attach_workspace:
           at: ~/degallohoeve
 
