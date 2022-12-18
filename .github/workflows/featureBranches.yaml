@@ -1,0 +1,22 @@
+name: Feature-Branch
+on: 
+  push:
+    branches-ignore:
+      - feature/**
+      - bugfix/**
+      - refactor/**
+jobs:
+  Lint-And-Type-checks:
+    name: Lint-And-Type-checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with: 
+          node-version: "14.17.6"
+      - name: Install Packages
+        run: npm install
+      - name: EsLint
+        run: npm run lint
+    

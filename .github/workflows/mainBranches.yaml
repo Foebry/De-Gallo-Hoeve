@@ -1,5 +1,16 @@
-name: CI
-on: [pull_request]
+name: Main-Branches
+on: 
+  push:
+    branches:
+      - dev
+      - accept
+      - main
+  pull_request:
+    branches:
+      - dev
+      - accept
+      - main
+
 jobs:
   Base-checks:
     name: Lint and Test
