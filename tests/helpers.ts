@@ -4,6 +4,38 @@ import { getConnection } from "@/utils/MongoDb";
 import { generateCsrf } from "@/services/Validator";
 import { IsRegisterPayload, IsRegisterResponseBody } from "./auth/types";
 
+export type EnvironmentEnum = "production" | "accept" | "development" | "test";
+
+/**
+ * @param env specify the enviroment in which this test should be ran (if "accept" will run for production and accept.
+ *
+ * If "development" will run for development, accept and production)
+ *
+ *  accepts: "production" | "accept" | "development" | "test"
+ */
+export const itif = (
+  env: EnvironmentEnum,
+  name: string,
+  fn?: jest.ProvidesCallback,
+  timeout?: number | undefined
+) => {
+  const priorities = {
+    production: 1,
+    accept: 2,
+    development: 3,
+    test: 4,
+  };
+  const envPriority =
+    priorities[process.env.TEST_PRIORITY as keyof typeof priorities];
+  const testPriority = priorities[env as keyof typeof priorities] ?? 0;
+
+  if (envPriority === 1) return it(name, fn, timeout);
+
+  return testPriority >= envPriority
+    ? it(name, fn, timeout)
+    : it.skip(name, fn, timeout);
+};
+
 export const generateRegisterResponseBodyFromPayload = async (
   payload: IsRegisterPayload
 ): Promise<IsRegisterResponseBody> => {

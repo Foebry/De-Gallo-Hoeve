@@ -7,6 +7,7 @@ import { apiResolver } from "next/dist/server/api-utils/node";
 import handler from "@/pages/api/auth/login.page";
 import { clearAllData } from "@/utils/MongoDb";
 import Factory from "@/services/Factory";
+import { EnvironmentEnum, itif as it } from "../helpers";
 
 describe("login", () => {
   beforeEach(async () => {
@@ -32,9 +33,9 @@ describe("login", () => {
     };
     return request(createServer(listener));
   };
-  it("login without csrf should result in bad request", async () => {
+
+  it("accept", "login without csrf should result in bad request", async () => {
     const loginPayload = {
-      // csrf: generateCsrf(),
       email: "rain_fabry@hotmail.com",
       password: "password",
     };
@@ -46,54 +47,66 @@ describe("login", () => {
       message: "Probeer later opnieuw...",
     });
   });
-  it("login with wrong email should throw InvalidEmailError", async () => {
-    const loginPayload = {
-      csrf: generateCsrf(),
-      email: "rain_fabry@hotmail.com",
-      password: "password",
-    };
-    const response = await testClient(handler)
-      .post(LOGINAPI)
-      .send(loginPayload);
+  it(
+    "test",
+    "login with wrong email should throw InvalidEmailError",
+    async () => {
+      const loginPayload = {
+        csrf: generateCsrf(),
+        email: "rain_fabry@hotmail.com",
+        password: "password",
+      };
+      const response = await testClient(handler)
+        .post(LOGINAPI)
+        .send(loginPayload);
 
-    expect(response.statusCode).toBe(422);
-    expect(response.body).toStrictEqual({
-      email: "Onbekende email",
-      message: "Kan verzoek niet verwerken",
-    });
-  });
-  it("Login with wrong password should throw InvalidPasswordError", async () => {
-    const klant = await (await Factory.createRandomKlant()).save();
-    const loginPayload = {
-      csrf: generateCsrf(),
-      email: klant.email,
-      password: "abc",
-    };
-    const response = await testClient(handler)
-      .post(LOGINAPI)
-      .send(loginPayload);
-    expect(response.statusCode).toBe(422);
-    expect(response.body).toStrictEqual({
-      password: "Ongeldig wachtwoord",
-      message: "Kan verzoek niet verwerken",
-    });
-  });
-  it("Login with correct credentials should create jwt token and frontend token", async () => {
-    const klant = await Factory.createRandomKlant();
-    await klant.save();
+      expect(response.statusCode).toBe(422);
+      expect(response.body).toStrictEqual({
+        email: "Onbekende email",
+        message: "Kan verzoek niet verwerken",
+      });
+    }
+  );
+  it(
+    "test",
+    "Login with wrong password should throw InvalidPasswordError",
+    async () => {
+      const klant = await (await Factory.createRandomKlant()).save();
+      const loginPayload = {
+        csrf: generateCsrf(),
+        email: klant.email,
+        password: "abc",
+      };
+      const response = await testClient(handler)
+        .post(LOGINAPI)
+        .send(loginPayload);
+      expect(response.statusCode).toBe(422);
+      expect(response.body).toStrictEqual({
+        password: "Ongeldig wachtwoord",
+        message: "Kan verzoek niet verwerken",
+      });
+    }
+  );
+  it(
+    "test",
+    "Login with correct credentials should create jwt token and frontend token",
+    async () => {
+      const klant = await Factory.createRandomKlant();
+      await klant.save();
 
-    const loginPayload = {
-      csrf: generateCsrf(),
-      email: klant.email,
-      password: klant.password,
-    };
+      const loginPayload = {
+        csrf: generateCsrf(),
+        email: klant.email,
+        password: klant.password,
+      };
 
-    const response = await testClient(handler)
-      .post(LOGINAPI)
-      .send(loginPayload);
+      const response = await testClient(handler)
+        .post(LOGINAPI)
+        .send(loginPayload);
 
-    expect(response.statusCode).toBe(200);
-    expect(Object.keys(response.headers["set-cookie"]).includes("JWT"));
-    expect(response.headers["set-cookie"].includes("Client"));
-  });
+      expect(response.statusCode).toBe(200);
+      expect(Object.keys(response.headers["set-cookie"]).includes("JWT"));
+      expect(response.headers["set-cookie"].includes("Client"));
+    }
+  );
 });
