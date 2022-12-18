@@ -19,7 +19,7 @@ jobs:
 
       - run:
           name: Install Packages
-          command: yarn
+          command: npm install
 
       - attach_workspace:
           at: ~/degallohoeve
@@ -44,7 +44,7 @@ jobs:
       - run:
           name: Build
           environment:
-            MONGODB_DATABASE: degallohoeve_dev
+            MONGODB_DATABASE: degallohoeve_develop
           command: |
             export BRANCH_NAME=`echo ${CIRCLE_BRANCH} | sed 's/\/.*//'`
             yarn setVersion
