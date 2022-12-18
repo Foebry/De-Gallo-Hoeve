@@ -18,3 +18,6 @@ jobs:
         run: npm run lint
       - name: Run Tests
         run: npm run test
+        env:
+          MONGODB_PASSWORD: "jNlNNjp97wPXZPCC"
+          MONGODB_DATABASE: "degallohoeve_test"
