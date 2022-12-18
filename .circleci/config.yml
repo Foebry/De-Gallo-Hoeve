@@ -43,6 +43,8 @@ jobs:
 
       - run:
           name: Build
+          environment:
+            MONGODB_DATABASE: degallohoeve_dev
           command: |
             export BRANCH_NAME=`echo ${CIRCLE_BRANCH} | sed 's/\/.*//'`
             yarn setVersion
@@ -61,16 +63,16 @@ jobs:
 
 workflows:
   version: 2
+      - build
+
   build-and-deploy:
     jobs:
       - build:
           filters:
             branches:
               only:
-                - develop
-                - master
-                - production
-                - /release\/.*/
+                - dev
+                - main
                 - /hotfix\/.*/
                 - /feature\/.*/
                 - /refactor\/.*/
