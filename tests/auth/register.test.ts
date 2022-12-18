@@ -33,7 +33,7 @@ describe("/register", () => {
     return request(createServer(listener));
   };
   describe("/POST", () => {
-    it("should create new klant", async () => {
+    it.skip("should create new klant", async () => {
       const honden = await Promise.all(
         new Array(3).fill(0).map(async () => {
           return Factory.createRandomHond();
