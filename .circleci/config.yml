@@ -18,7 +18,8 @@ jobs:
       - checkout
 
       - run:
-          yarn
+          name: Install Packages
+          command: yarn
 
       - attach_workspace:
           at: ~/degallohoeve
@@ -50,7 +51,7 @@ jobs:
             elif [[ ${CIRCLE_BRANCH} =~ main ]]; then
               export TARGET_ENV=Production
             else
-              then export TARGET_ENV=Preview
+              export TARGET_ENV=Preview
             fi
             TARGET_ENV=`${TARGET_ENV}` yarn build
       - persist_to_workspace:
