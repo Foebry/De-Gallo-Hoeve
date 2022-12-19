@@ -13,6 +13,9 @@ on:
       - dev
       - accept
       - main
+      - feature/**
+      - bugfix/**
+      - refactor/**
     
 
 jobs:
