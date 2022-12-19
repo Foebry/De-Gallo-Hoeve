@@ -10,6 +10,7 @@ on:
       - dev
       - accept
       - main
+    
 
 jobs:
   Base-checks:
@@ -27,8 +28,19 @@ jobs:
         run: npm i
       - name: EsLint
         run: npm run lint
-      - name: Run Tests
-        run: npm run test
+      - name: Run Integration Tests
+        run: npm run test:int
         env:
           MONGODB_PASSWORD: ${{secrets.MONGODB_PASSWORD}}
           MONGODB_DATABASE: ${{secrets.MONGODB_DATABASE}}
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build Project Artifacts
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy Preview
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Run Unit Tests
+        run: npm run test:unit
+      
