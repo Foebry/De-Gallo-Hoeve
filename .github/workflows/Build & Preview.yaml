@@ -51,7 +51,7 @@ jobs:
           vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }} 
           vercel build --token=${{ secrets.VERCEL_TOKEN }}
           vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
-      - uses: aaimio/vercel-preview-url-action@1.0.1
+      - uses: aaimio/vercel-preview-url-action@v1.0.1
         id: capturePreviewUrl
       - uses: marocchino/sticky-pull-request-comment@v1
         with:
