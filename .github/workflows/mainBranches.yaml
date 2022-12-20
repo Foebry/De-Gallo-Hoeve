@@ -28,24 +28,29 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: "14.17.6"
-
       - name: Install Packages
         run: npm i
       - name: EsLint
         run: npm run lint
       - name: Run Integration Tests
         run: npm run test:int
+        if: github.event_name == 'pull_request'
         env:
           MONGODB_PASSWORD: ${{secrets.MONGODB_PASSWORD}}
           MONGODB_DATABASE: ${{secrets.MONGODB_DATABASE}}
       - name: Install Vercel CLI
+        if: github.event_name == 'pull_request'
         run: npm install --global vercel@latest
       - name: Pull Vercel Environment Information
+        if: github.event_name == 'pull_request'
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
       - name: Build Project Artifacts
+        if: github.event_name == 'pull_request'
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
       - name: Run Unit Tests
+        if: github.event_name == 'pull_request'
         run: npm run test:unit
       - name: Deploy Preview
+        if: github.event_name == 'pull_request'
         run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
       
