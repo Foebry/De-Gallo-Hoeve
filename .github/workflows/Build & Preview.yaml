@@ -53,6 +53,8 @@ jobs:
           vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
       - uses: zentered/vercel-preview-url@v1.1.2
         id: capturePreviewUrl
+        env: 
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       - uses: marocchino/sticky-pull-request-comment@v1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
