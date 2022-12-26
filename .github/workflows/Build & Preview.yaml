@@ -56,6 +56,8 @@ jobs:
         id: capturePreviewUrl
         env: 
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        with:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       - uses: marocchino/sticky-pull-request-comment@v1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
