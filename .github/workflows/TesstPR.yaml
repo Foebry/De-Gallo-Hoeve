@@ -1,4 +1,4 @@
-name: Build And Preview
+name: Test for PR
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -31,16 +31,3 @@ jobs:
         env:
           MONGODB_PASSWORD: ${{secrets.MONGODB_PASSWORD}}
           MONGODB_DATABASE: ${{secrets.MONGODB_DATABASE}}
-      # - uses: zentered/vercel-preview-url@v1.1.2
-      #   id: capturePreviewUrl
-      #   env: 
-      #     VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      #   with:
-      #     VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-      # - uses: marocchino/sticky-pull-request-comment@v1
-      #   with:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     number: ${{ github.event.pull_request.number }}
-      #     header: Preview link
-      #     message: |
-      #       View the code changes on preview-branch: [preview branch](${{steps.capturePreviewUrl.vercel_preview_url}})   
