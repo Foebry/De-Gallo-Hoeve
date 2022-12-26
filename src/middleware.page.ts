@@ -42,15 +42,17 @@ async function middleware(req: NextRequest) {
 
 const shouldRedirectToIndex = async (req: NextRequest, path: string) => {
   const pageMatch = path.startsWith("/login") || path.startsWith("/register");
-  console.log({ path });
+  console.log({ "path in shouldRedirectToIndex": path });
   return (await validJwtToken(req)) && pageMatch;
 };
 
 const shouldRedirectToLogin = async (req: NextRequest, path: string) => {
+  console.log({ "path in shouldRedirectToLogin": path });
   return !(await validJwtToken(req)) && path.startsWith("/inschrijving");
 };
 
 const shouldRedirectToUnAuthorized = async (req: NextRequest, path: string) => {
+  console.log({ "path in shouldRedirectToUnauthorized": path });
   return !(await isAdmin(req)) && path.startsWith("/admin");
 };
 
