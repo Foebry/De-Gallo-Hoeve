@@ -66,6 +66,7 @@ const Groepslessen: React.FC<LessenProps> = ({
   timeslots,
   prijsExcl,
 }) => {
+  console.log({ status: "mounting component" });
   const [errors, setErrors] = useState<InschrijvingErrorInterface>({});
   const [activeStep, setActiveStep] = useState<number>(0);
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
@@ -233,6 +234,7 @@ const Groepslessen: React.FC<LessenProps> = ({
 export default Groepslessen;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  console.log({ status: "inside getServerSideProps" });
   // const { type } = ctx.query;
   const type = "prive";
   if (!type) return { redirect: { permanent: false, destination: INDEX } };
