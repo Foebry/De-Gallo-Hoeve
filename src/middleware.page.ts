@@ -42,6 +42,7 @@ async function middleware(req: NextRequest) {
 
 const shouldRedirectToIndex = async (req: NextRequest, path: string) => {
   const pageMatch = path.startsWith("/login") || path.startsWith("/register");
+  console.log({ path });
   return (await validJwtToken(req)) && pageMatch;
 };
 
@@ -63,8 +64,8 @@ const validJwtToken = async (
   const options: JWTVerifyOptions = { algorithms: ["RS256", "HS256"] };
 
   const verifiedToken = await jwtVerify(token, secret, options);
-
-  return !verifiedToken ? false : verifiedToken;
+  console.log({ verifiedToken });
+  return verifiedToken ?? false;
 };
 
 const isAdmin = async (req: NextRequest): Promise<boolean> => {
