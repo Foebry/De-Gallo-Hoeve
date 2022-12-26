@@ -22,14 +22,20 @@ async function middleware(req: NextRequest) {
   const LOGIN = domain + "/login";
   const UNAUTHORIZED = domain + "/unauthorized";
 
-  if (await shouldRedirectToIndex(req, path))
+  if (await shouldRedirectToIndex(req, path)) {
+    console.log("redirecting to index");
     return NextResponse.redirect(INDEX);
+  }
 
-  if (await shouldRedirectToLogin(req, path))
+  if (await shouldRedirectToLogin(req, path)) {
+    console.log("redirecting to login");
     return NextResponse.redirect(LOGIN);
+  }
 
-  if (await shouldRedirectToUnAuthorized(req, path))
+  if (await shouldRedirectToUnAuthorized(req, path)) {
+    console.log("redirecting to unauthorized");
     return NextResponse.redirect(UNAUTHORIZED);
+  }
 
   return NextResponse.next();
 }
