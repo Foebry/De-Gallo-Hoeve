@@ -31,37 +31,16 @@ jobs:
         env:
           MONGODB_PASSWORD: ${{secrets.MONGODB_PASSWORD}}
           MONGODB_DATABASE: ${{secrets.MONGODB_DATABASE}}
-  
-  Deploy:
-    name: Deploy Preview
-    needs: Build
-    runs-on: ubuntu-latest
-    steps: 
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: setup Node-environment
-        uses: actions/setup-node@v2
-        with:
-          node-version: "14.17.6"
-      - name: Install Packages
-        run: npm install
-      # - name: Deploy Preview
-      #   run: |
-      #     npm install --global vercel@latest
-      #     vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }} 
-      #     vercel build --token=${{ secrets.VERCEL_TOKEN }}
-      #     vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
-      # - run: sleep 30
-      - uses: zentered/vercel-preview-url@v1.1.2
-        id: capturePreviewUrl
-        env: 
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        with:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-      - uses: marocchino/sticky-pull-request-comment@v1
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          number: ${{ github.event.pull_request.number }}
-          header: Preview link
-          message: |
-            View the code changes on preview-branch: [preview branch](${{steps.capturePreviewUrl.vercel_preview_url}})   
+      # - uses: zentered/vercel-preview-url@v1.1.2
+      #   id: capturePreviewUrl
+      #   env: 
+      #     VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      #   with:
+      #     VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      # - uses: marocchino/sticky-pull-request-comment@v1
+      #   with:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     number: ${{ github.event.pull_request.number }}
+      #     header: Preview link
+      #     message: |
+      #       View the code changes on preview-branch: [preview branch](${{steps.capturePreviewUrl.vercel_preview_url}})   
