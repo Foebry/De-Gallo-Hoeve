@@ -45,13 +45,13 @@ jobs:
           node-version: "14.17.6"
       - name: Install Packages
         run: npm install
-      - name: Deploy Preview
-        run: |
-          npm install --global vercel@latest
-          vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }} 
-          vercel build --token=${{ secrets.VERCEL_TOKEN }}
-          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
-      - run: sleep 30
+      # - name: Deploy Preview
+      #   run: |
+      #     npm install --global vercel@latest
+      #     vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }} 
+      #     vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      #     vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+      # - run: sleep 30
       - uses: zentered/vercel-preview-url@v1.1.2
         id: capturePreviewUrl
         env: 
