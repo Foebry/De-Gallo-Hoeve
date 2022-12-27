@@ -47,17 +47,15 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
           confirm
         );
 
-        if (process.env.NODE_ENV !== "test") {
-          await mailer.sendMail("register", {
-            email: savedKlant.email,
-            vnaam: savedKlant.vnaam,
-            code,
-          });
-          await mailer.sendMail("register-headsup", {
-            email: process.env.MAIL_TO,
-            klant_id: savedKlant._id.toString(),
-          });
-        }
+        await mailer.sendMail("register", {
+          email: savedKlant.email,
+          vnaam: savedKlant.vnaam,
+          code,
+        });
+        await mailer.sendMail("register-headsup", {
+          email: process.env.MAIL_TO,
+          klant_id: savedKlant._id.toString(),
+        });
       }, transactionOptions);
       // const result = createKlantDto(klant);
       const returnKlant = await Factory.getController(KLANT).getKlantByEmail(
