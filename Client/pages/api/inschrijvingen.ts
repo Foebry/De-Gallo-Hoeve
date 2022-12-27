@@ -104,25 +104,28 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
     } catch (e: any) {
       throw new TransactionError(e.name, e.code, e.response);
     }
-    if (process.env.NODE_ENV !== "test") {
-      const data = inschrijvingen
-        .map((inschrijving, index) => ({
-          [`moment${index}`]: moment(inschrijving.datum)
-            .toISOString()
-            .replace("T", " ")
-            .split(":00.")[0],
-          [`hond${index}`]: inschrijving.hond_naam,
-          [`prijsExcl${index}`]:
-            index === 0 && isFirstInschrijving ? "0.00" : prijs,
-          [`prijsIncl${index}`]:
-            index === 0 && isFirstInschrijving
-              ? "0.00"
-              : Math.round(prijs * 1.21).toFixed(2),
-        }))
-        .reduce((prev, curr) => ({ ...prev, ...curr }), {});
-      await mailer.sendMail("inschrijving", { naam, email, ...data });
-      await mailer.sendMail("inschrijving-headsup", { _ids: ids.join(",") });
-    }
+
+    const data = inschrijvingen
+      .map((inschrijving, index) => ({
+        [`moment${index}`]: moment(inschrijving.datum)
+          .toISOString()
+          .replace("T", " ")
+          .split(":00.")[0],
+        [`hond${index}`]: inschrijving.hond_naam,
+        [`prijsExcl${index}`]:
+          index === 0 && isFirstInschrijving ? "0.00" : prijs,
+        [`prijsIncl${index}`]:
+          index === 0 && isFirstInschrijving
+            ? "0.00"
+            : Math.round(prijs * 1.21).toFixed(2),
+      }))
+      .reduce((prev, curr) => ({ ...prev, ...curr }), {});
+
+    await mailer.sendMail("inschrijving", { naam, email, ...data });
+    await mailer.sendMail("inschrijving-headsup", {
+      email: process.env.MAIL_TO,
+      _ids: ids.join(","),
+    });
 
     return res.status(201).json({ message: "Inschrijving ontvangen!" });
   } catch (e: any) {
