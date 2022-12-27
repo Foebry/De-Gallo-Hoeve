@@ -54,7 +54,7 @@ const Footer: React.FC<Props> = ({}) => {
           <div>
             <Body className="flex gap-2 items-center">
               <IoMdPhonePortrait className="text-green-200 text-2xl" />
-              <a href="tel:+32456552678">+32 456 55 26 78</a>
+              <a href="tel:+32456552678">+32 470 47 16 60</a>
             </Body>
             <Body className="flex gap-2 items-center">
               <IoMdMail className="text-green-200 text-2xl" />
