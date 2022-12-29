@@ -71,17 +71,15 @@ const TrainingCard: React.FC<TrainingProps> = ({
           </li>
           <li className="flex gap-2">
             <GiCheckMark />
-            <Body>€ {kmHeffing} / kilometer</Body>
+            <Body>€ 0.30 / kilometer</Body>
           </li>
           <li className="flex gap-2">
             <GiCheckMark />
-            <Body>
-              gratis verplaatsing binnen {gratisVerplaatsingBinnen} kilometer
-            </Body>
+            <Body>gratis verplaatsing binnen 10 kilometer</Body>
           </li>
           <li className="flex gap-2">
             <GiCheckMark />
-            <Body>€ {Math.round(price * 1.21).toFixed(2)} incl.btw / uur</Body>
+            <Body>€ {Math.round(20.66 * 1.21).toFixed(2)} incl.btw / uur</Body>
           </li>
         </ul>
       </div>
