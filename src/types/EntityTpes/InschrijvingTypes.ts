@@ -23,6 +23,7 @@ export interface InschrijvingCollection extends BaseInschrijving {
   _id: ObjectId;
   created_at: Date;
   updated_at: Date;
+  deleted_at?: Date;
 }
 
 export interface IsInschrijving {

@@ -52,7 +52,9 @@ const KlantController: IsKlantController = {
     return client.db(database).collection("klant");
   },
   getAllKlanten: async () => {
-    return (await getKlantCollection().find().toArray()) as IsKlantCollection[];
+    return (await getKlantCollection()
+      .find({ deleted_at: null })
+      .toArray()) as IsKlantCollection[];
   },
   getKlantById: async (_id) => {
     const klant = await getKlantCollection().findOne({ _id });
