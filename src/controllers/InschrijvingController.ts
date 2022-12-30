@@ -76,7 +76,7 @@ const InschrijvingController: IsInschrijvingController = {
   },
   getAllInschrijvingen: async () => {
     return (await getInschrijvingCollection()
-      .find()
+      .find({ deleted_at: null })
       .toArray()) as InschrijvingCollection[];
   },
   getInschrijvingById: async (_id, breakEarly = true) => {
