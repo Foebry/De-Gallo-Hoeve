@@ -21,12 +21,6 @@ const Index: React.FC<IndexProps> = ({
     <>
       <Head>
         <title>De Gallo-hoeve - hondentrainer Hulshout</title>
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/favicon.ico"
-        ></link>
         <meta
           name="description"
           content="Honden trainer Hulshout en omstreken. Heeft u graag hulp bij de training op basis commando's, wandelt uw hond niet correct aan de lijn? Dit en nog veel meer zijn de zaken waar ik u graag bij kom helpen. Maak een account en reserveer een plekje, zo eenvoudig is het."
@@ -45,7 +39,7 @@ const Index: React.FC<IndexProps> = ({
                   width={800}
                   height={800}
                   objectFit="cover"
-                  alt="degallohoeve hondenschool beagle duitse herder"
+                  alt="degallohoeve hondentrainer Hulshout honden"
                 />
               </div>
             </div>
@@ -58,7 +52,7 @@ const Index: React.FC<IndexProps> = ({
                   width={800}
                   height={800}
                   objectFit="cover"
-                  alt="degallohoeve zaakvoerder duitseherder"
+                  alt="degallohoeve hondentaining honden"
                 />
               </div>
             </div>
@@ -71,7 +65,7 @@ const Index: React.FC<IndexProps> = ({
                   width={800}
                   height={800}
                   objectFit="cover"
-                  alt="labrador retriever landschap honden"
+                  alt="hondentraining Vlaams-Brabant prive-training"
                 />
               </div>
             </div>

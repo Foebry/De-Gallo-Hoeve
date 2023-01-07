@@ -145,71 +145,79 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
   }, []);
 
   return (
-    <Skeleton>
-      <section className="mb-48 md:px-5 mt-20">
-        <div className="max-w-7xl mx-auto">
-          <FormSteps
-            activeStep={activeStep}
-            errorSteps={errorSteps}
-            setActiveStep={setActiveStep}
-            steps={["Persoonlijke gegevens", "Honden gegevens"]}
-          />
-        </div>
-        <div>
-          <Form
-            onSubmit={handleSubmit(onSubmit)}
-            activeStep={activeStep}
-            errorSteps={errorSteps}
-            setActiveStep={setActiveStep}
-          >
-            <div className="max-w-4xl mx-auto mt-20 py-10">
-              {activeStep === 0 ? (
-                <PersoonlijkeGegevens
-                  control={control}
-                  setActiveStep={setActiveStep}
-                  errors={formErrors}
-                  setErrors={setFormErrors}
-                  validatePassword={validatePassword}
-                />
-              ) : activeStep === 1 ? (
-                <Step2
-                  control={control}
-                  setActiveStep={setActiveStep}
-                  fields={fields}
-                  append={append}
-                  remove={remove}
-                  options={rassen}
-                  errors={formErrors}
-                  setErrors={setFormErrors}
-                  values={getValues}
-                />
-              ) : null}
-            </div>
-          </Form>
-          {activeStep === 1 && (
-            <div className="absolute left-10 top-20">
-              <Button
-                label="vorige"
-                onClick={() => setActiveStep(activeStep - 1)}
-              />
-            </div>
-          )}
-          <div className="absolute right-10 top-20">
-            {activeStep === 1 ? (
-              <SubmitButton
-                label="verzend"
-                onClick={() => onSubmit(getValues())}
-              />
-            ) : (
-              <Button
-                label="volgende"
-                onClick={() => setActiveStep(activeStep + 1)}
-              />
-            )}
+    <>
+      <title>De Gallo-hoeve - registratie</title>
+      <meta
+        name="description"
+        content="Honden trainer Hulshout en omstreken. Maak nu een account aan door enkele persoonlijke gegevens in te vullen, gegevens van uw hond(en). U ontvangt een email met registratie bevestiging, eenmaal bevestigt kan u nieuwe trainingen boeken."
+      ></meta>
+      <html lang="nl"></html>
+      <Skeleton>
+        <section className="mb-48 md:px-5 mt-20">
+          <div className="max-w-7xl mx-auto">
+            <FormSteps
+              activeStep={activeStep}
+              errorSteps={errorSteps}
+              setActiveStep={setActiveStep}
+              steps={["Persoonlijke gegevens", "Honden gegevens"]}
+            />
           </div>
-        </div>
-      </section>
-    </Skeleton>
+          <div>
+            <Form
+              onSubmit={handleSubmit(onSubmit)}
+              activeStep={activeStep}
+              errorSteps={errorSteps}
+              setActiveStep={setActiveStep}
+            >
+              <div className="max-w-4xl mx-auto mt-20 py-10">
+                {activeStep === 0 ? (
+                  <PersoonlijkeGegevens
+                    control={control}
+                    setActiveStep={setActiveStep}
+                    errors={formErrors}
+                    setErrors={setFormErrors}
+                    validatePassword={validatePassword}
+                  />
+                ) : activeStep === 1 ? (
+                  <Step2
+                    control={control}
+                    setActiveStep={setActiveStep}
+                    fields={fields}
+                    append={append}
+                    remove={remove}
+                    options={rassen}
+                    errors={formErrors}
+                    setErrors={setFormErrors}
+                    values={getValues}
+                  />
+                ) : null}
+              </div>
+            </Form>
+            {activeStep === 1 && (
+              <div className="absolute left-10 top-20">
+                <Button
+                  label="vorige"
+                  onClick={() => setActiveStep(activeStep - 1)}
+                />
+              </div>
+            )}
+            <div className="absolute right-10 top-20">
+              {activeStep === 1 ? (
+                <SubmitButton
+                  label="verzend"
+                  onClick={() => onSubmit(getValues())}
+                />
+              ) : (
+                <Button
+                  label="volgende"
+                  onClick={() => setActiveStep(activeStep + 1)}
+                />
+              )}
+            </div>
+          </div>
+        </section>
+      </Skeleton>
+    </>
   );
 };
 
