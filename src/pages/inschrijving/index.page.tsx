@@ -28,6 +28,7 @@ import { securepage } from "src/services/Authenticator";
 import Skeleton from "src/components/website/skeleton";
 import { getPriveTraining } from "src/controllers/TrainingController";
 import getData from "src/hooks/useApi";
+import Head from "next/head";
 
 type TrainingType = "prive" | "groep";
 
@@ -146,12 +147,14 @@ const Groepslessen: React.FC<LessenProps> = ({
 
   return (
     <>
-      <title>De Gallo-hoeve - inschrijving privétraining</title>
-      <meta
-        name="description"
-        content="Maak nu een nieuwe afspraak. Selecteer de datum en het tijdstap waarop u een trainng wil boeken. Selecteer vervolgens voor welke hond u deze training wil boeken. U ontvangt een email ter bevestiging van uw inschrijving."
-        key="description inschrijving"
-      ></meta>
+      <Head>
+        <title>De Gallo-hoeve - inschrijving privétraining</title>
+        <meta
+          name="description"
+          content="Maak nu een nieuwe afspraak. Selecteer de datum en het tijdstap waarop u een trainng wil boeken. Selecteer vervolgens voor welke hond u deze training wil boeken. U ontvangt een email ter bevestiging van uw inschrijving."
+          key="description inschrijving"
+        ></meta>
+      </Head>
       <Skeleton>
         <section className="mb-48 md:px-5 mt-20">
           <div className="max-w-7xl mx-auto">

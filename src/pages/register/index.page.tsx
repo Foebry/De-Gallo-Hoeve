@@ -16,6 +16,7 @@ import Button, { SubmitButton } from "src/components/buttons/Button";
 import { generateCsrf } from "src/services/Validator";
 import { useAppContext } from "src/context/appContext";
 import Skeleton from "src/components/website/skeleton";
+import Head from "next/head";
 
 export interface RegisterHondErrorInterface {
   naam?: string;
@@ -146,12 +147,14 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
 
   return (
     <>
-      <title>De Gallo-hoeve - registratie</title>
-      <meta
-        name="description"
-        content="Honden trainer Hulshout en omstreken. Maak nu een account aan door enkele persoonlijke gegevens in te vullen, gegevens van uw hond(en). U ontvangt een email met registratie bevestiging, eenmaal bevestigt kan u nieuwe trainingen boeken."
-        key="description registration"
-      ></meta>
+      <Head>
+        <title>De Gallo-hoeve - registratie</title>
+        <meta
+          name="description"
+          content="Honden trainer Hulshout en omstreken. Maak nu een account aan door enkele persoonlijke gegevens in te vullen, gegevens van uw hond(en). U ontvangt een email met registratie bevestiging, eenmaal bevestigt kan u nieuwe trainingen boeken."
+          key="description registration"
+        ></meta>
+      </Head>
       <Skeleton>
         <section className="mb-48 md:px-5 mt-20">
           <div className="max-w-7xl mx-auto">
