@@ -150,8 +150,8 @@ const Groepslessen: React.FC<LessenProps> = ({
       <meta
         name="description"
         content="Maak nu een nieuwe afspraak. Selecteer de datum en het tijdstap waarop u een trainng wil boeken. Selecteer vervolgens voor welke hond u deze training wil boeken. U ontvangt een email ter bevestiging van uw inschrijving."
+        key="description inschrijving"
       ></meta>
-      <html lang="nl"></html>
       <Skeleton>
         <section className="mb-48 md:px-5 mt-20">
           <div className="max-w-7xl mx-auto">

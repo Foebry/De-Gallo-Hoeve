@@ -58,8 +58,8 @@ const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
         <meta
           name="description"
           content="Honden trainer Hulshout en omstreken. Login om toegang te krijgen tot uw accout."
+          key="description login"
         ></meta>
-        <html lang="nl"></html>
       </Head>
       <Skeleton>
         <section>

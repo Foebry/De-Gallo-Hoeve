@@ -24,8 +24,8 @@ const Index: React.FC<IndexProps> = ({
         <meta
           name="description"
           content="Honden trainer Hulshout en omstreken. Heeft u graag hulp bij de training op basis commando's, wandelt uw hond niet correct aan de lijn? Dit en nog veel meer zijn de zaken waar ik u graag bij kom helpen. Maak een account en reserveer een plekje, zo eenvoudig is het."
+          key="description-index"
         ></meta>
-        <html lang="nl"></html>
       </Head>
       <Skeleton>
         <section className="mb-40 block flex-wrap mt-10 items-center max-w-7xl justify-between mx-auto md:flex md:px-5">

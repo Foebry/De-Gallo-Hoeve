@@ -150,8 +150,8 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
       <meta
         name="description"
         content="Honden trainer Hulshout en omstreken. Maak nu een account aan door enkele persoonlijke gegevens in te vullen, gegevens van uw hond(en). U ontvangt een email met registratie bevestiging, eenmaal bevestigt kan u nieuwe trainingen boeken."
+        key="description registration"
       ></meta>
-      <html lang="nl"></html>
       <Skeleton>
         <section className="mb-48 md:px-5 mt-20">
           <div className="max-w-7xl mx-auto">
