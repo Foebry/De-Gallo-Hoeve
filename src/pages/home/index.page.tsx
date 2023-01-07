@@ -23,7 +23,7 @@ const Index: React.FC<IndexProps> = ({
         <title>De Gallo-hoeve - hondentrainer Hulshout</title>
         <meta
           name="description"
-          content="Honden trainer Hulshout en omstreken. Heeft u graag hulp bij de training op basis commando's, wandelt uw hond niet correct aan de lijn? Dit en nog veel meer zijn de zaken waar ik u graag bij kom helpen. Maak een account en reserveer een plekje, zo eenvoudig is het."
+          content="Honden trainer Hulshour en omstreken. Training op basis commando's wandelen aan de leiband en nog veel meer."
           key="description-index"
         ></meta>
       </Head>
