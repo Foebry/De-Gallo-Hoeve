@@ -35,7 +35,9 @@ const RasController: IsRasController = {
     return ras as RasCollection;
   },
   getAllRassen: async () => {
-    return (await getRasCollection().find().toArray()) as RasCollection[];
+    return (await getRasCollection()
+      .find({ deleted_at: null })
+      .toArray()) as RasCollection[];
   },
   update: async (_id, updateRas) => {
     await getRasById(_id);

@@ -24,6 +24,7 @@ export interface IsKlantCollection extends IsNewKlant {
   created_at: Date;
   verified_at?: Date;
   updated_at: Date;
+  deleted_at?: Date;
 }
 
 export interface IsUpdateKlantBody {
