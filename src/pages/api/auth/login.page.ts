@@ -49,6 +49,7 @@ const login = async (
 
     return res.send({});
   } catch (e: any) {
+    req.body.password = await bcrypt.hash(req.body.password, 10);
     logError("login", req, e);
     res.status(e.code).json(e.response);
   }

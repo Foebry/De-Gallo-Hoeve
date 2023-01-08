@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { validateCsrfToken, validate } from "src/services/Validator";
 import mailer from "src/utils/Mailer";
 import client, { startTransaction } from "src/utils/MongoDb";
+import bcrypt from "bcrypt";
 import {
   EmailOccupiedError,
   NotAllowedError,
@@ -67,6 +68,7 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
       throw new TransactionError(e.name, e.code, e.response);
     }
   } catch (e: any) {
+    req.body.password = await bcrypt.hash(req.body.password, 10);
     logError("register", req, e);
     return res.status(e.code).json(e.response);
   } finally {
