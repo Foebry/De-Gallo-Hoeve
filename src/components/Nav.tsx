@@ -50,7 +50,7 @@ export const Nav = () => {
               src="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1659613403/De-Gallo-Hoeve/content/logo-r_vwnpdy.png"
               width={64}
               height={64}
-              alt="degallohoeve training prive hond honden hondentraining hondtrainer hondentrainer"
+              alt="degallohoeve training privé hond honden hondentraining hondtrainer hondentrainer"
             />
           </div>
           <div className="hidden 4xs:block text-lg uppercase text-green-200 font-medium">

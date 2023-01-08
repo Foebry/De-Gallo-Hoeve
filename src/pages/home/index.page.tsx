@@ -65,7 +65,7 @@ const Index: React.FC<IndexProps> = ({
                   width={800}
                   height={800}
                   objectFit="cover"
-                  alt="hondentraining Vlaams-Brabant prive-training"
+                  alt="hondentraining Vlaams-Brabant privé-training"
                 />
               </div>
             </div>
