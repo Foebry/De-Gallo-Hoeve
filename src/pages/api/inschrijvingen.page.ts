@@ -25,6 +25,7 @@ import {
 import Factory from "src/services/Factory";
 import { IsInschrijvingBody } from "src/types/requestTypes";
 import moment from "moment";
+import { logError } from "src/controllers/ErrorLogController";
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") return getInschrijvingen(req, res);
@@ -41,6 +42,7 @@ const getInschrijvingen = async (req: NextApiRequest, res: NextApiResponse) => {
     const inschrijvingen = klant.inschrijvingen;
     return res.status(200).send(inschrijvingen);
   } catch (e: any) {
+    logError("inschrijving", req, e);
     return res.status(e.code).send(e.response);
   }
 };
@@ -129,9 +131,8 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
 
     return res.status(201).json({ message: "Inschrijving ontvangen!" });
   } catch (e: any) {
+    logError("inschrijving", req, e);
     return res.status(e.code).send(e.response);
-  } finally {
-    await client.close();
   }
 };
 

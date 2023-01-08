@@ -13,6 +13,7 @@ import {
   KlantNotFoundError,
 } from "src/shared/RequestError";
 import { CONFIRM } from "src/types/EntityTpes/ConfirmTypes";
+import { logError } from "src/controllers/ErrorLogController";
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") return confirm(req, res);
@@ -40,6 +41,7 @@ const confirm = async (req: NextApiRequest, res: NextApiResponse) => {
     await client.close();
     return res.redirect("/login");
   } catch (e: any) {
+    logError("confirm", req, e);
     return res.status(e.code).send(e.response);
   }
 };
@@ -59,6 +61,7 @@ const reset = async (req: NextApiRequest, res: NextApiResponse) => {
     await client.close();
     return res.status(200).json(newConfirm);
   } catch (e: any) {
+    logError("reset", req, e);
     return res.status(e.code).send(e.response);
   }
 };

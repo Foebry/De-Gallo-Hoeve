@@ -13,6 +13,7 @@ import { getKlantByEmail, KLANT } from "src/controllers/KlantController";
 import { IsRegisterBody } from "src/types/requestTypes";
 import { CONFIRM } from "src/types/EntityTpes/ConfirmTypes";
 import moment from "moment";
+import { logError } from "src/controllers/ErrorLogController";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") return register(req, res);
@@ -66,9 +67,10 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
       throw new TransactionError(e.name, e.code, e.response);
     }
   } catch (e: any) {
+    logError("register", req, e);
     return res.status(e.code).json(e.response);
   } finally {
-    await client.close();
+    // await client.close();
   }
 };
 
