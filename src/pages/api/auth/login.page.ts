@@ -10,6 +10,7 @@ import {
 } from "src/shared/RequestError";
 import { createJWT, setClientCookie } from "src/services/Authenticator";
 import client from "src/utils/MongoDb";
+import { logError } from "src/controllers/ErrorLogController";
 
 const handler = (req: GenericRequest<LoginRequest>, res: NextApiResponse) => {
   if (req.method === "POST") return login(req, res);
@@ -48,6 +49,7 @@ const login = async (
 
     return res.send({});
   } catch (e: any) {
+    logError("login", req, e);
     res.status(e.code).json(e.response);
   }
 };
