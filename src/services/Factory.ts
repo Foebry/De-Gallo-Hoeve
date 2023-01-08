@@ -277,7 +277,7 @@ interface RandomTraining extends PriveTrainingCollection {
   save: () => Promise<PriveTrainingCollection>;
 }
 
-const getCurrentTime = () => {
+export const getCurrentTime = () => {
   const currentMoment = moment().format("YYYY-MM-DD HH:mm:ss");
   return new Date(moment.utc(currentMoment).local().toString());
 };
