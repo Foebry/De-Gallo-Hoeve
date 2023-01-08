@@ -68,7 +68,12 @@ const Trainngen: React.FC<Props> = ({
         ></div>
       </div>
       <div className="mb-5 mx-auto max-w-md">
-        <Image src={content.image} width="448" height="262" />
+        <Image
+          src={content.image}
+          width="448"
+          height="262"
+          alt="degallohoeve hondentrainer hond training basis-commandos basis commando's training privé"
+        />
       </div>
       <div className="relative">
         {edit ? (

@@ -1,4 +1,4 @@
-import { Title1, Body } from "./Typography/Typography";
+import { Title1, Body, Title2 } from "./Typography/Typography";
 import {
   IoLogoFacebook,
   IoLogoInstagram,
@@ -49,7 +49,7 @@ const Footer: React.FC<Props> = ({}) => {
   return (
     <footer className="mx-auto relative">
       <div className="px-5 mx-auto  max-w-7xl mb-20 md:px-0">
-        <Title1 className="text-green-200">Contacteer ons</Title1>
+        <Title2 className="text-green-200">Contacteer ons</Title2>
         <div className="flex flex-wrap-reverse gap-10 justify-evenly">
           <div>
             <Body className="flex gap-2 items-center">

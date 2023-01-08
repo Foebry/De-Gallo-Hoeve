@@ -18,9 +18,11 @@ export const Title1: React.FC<Props> = ({ children, className, color }) => {
   );
 };
 
-export const Title2: React.FC<Props> = ({ children }) => {
+export const Title2: React.FC<Props> = ({ children, className }) => {
   return (
-    <h2 className="text-4xl text-black-200 4xs:text-5xl text-center mt-12 mx-auto mb-18">
+    <h2
+      className={`${className} text-4xl text-black-200 4xs:text-5xl text-center mt-12 mx-auto mb-12`}
+    >
       {children}
     </h2>
   );
