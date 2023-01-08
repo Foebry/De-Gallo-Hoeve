@@ -36,6 +36,7 @@ const Intro: React.FC<Props> = ({
               width={800}
               height={800}
               objectFit="cover"
+              alt="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1659626902/De-Gallo-Hoeve/content/image1_swsxl6.png"
             />
           </div>
         </div>
@@ -48,6 +49,7 @@ const Intro: React.FC<Props> = ({
               width={800}
               height={800}
               objectFit="cover"
+              alt="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656188518/De-Gallo-Hoeve/content/intro_gfgoo0.jpg"
             />
           </div>
         </div>
@@ -60,6 +62,7 @@ const Intro: React.FC<Props> = ({
               width={800}
               height={800}
               objectFit="cover"
+              alt="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656174227/De-Gallo-Hoeve/images/pexels-helena-lopes-1959052_eosst4.jpg"
             />
           </div>
         </div>

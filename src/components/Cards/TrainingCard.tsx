@@ -29,7 +29,7 @@ const TrainingCard: React.FC<TrainingProps> = ({
       }
     >
       <div className="bg-green-200 text-center text-2xl py-8 text-gray-50 rounded-t-lg">
-        Privé training
+        Priv&eacute; training
       </div>
       <div className="pb-2">
         <div className="mb-5">
@@ -37,7 +37,7 @@ const TrainingCard: React.FC<TrainingProps> = ({
             src="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656188984/De-Gallo-Hoeve/content/pexels-blue-bird-7210258_m74qdh.jpg"
             width="448"
             height="262"
-            alt="degallohoeve hondenschool border-collie training prive"
+            alt="degallohoeve hondentrainer hond training basis-commandos basis commando's training privé"
           />
         </div>
         <div className="px-2 flex flex-col gap-2">

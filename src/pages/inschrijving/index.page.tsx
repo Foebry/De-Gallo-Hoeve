@@ -28,6 +28,7 @@ import { securepage } from "src/services/Authenticator";
 import Skeleton from "src/components/website/skeleton";
 import { getPriveTraining } from "src/controllers/TrainingController";
 import getData from "src/hooks/useApi";
+import Head from "next/head";
 
 type TrainingType = "prive" | "groep";
 
@@ -145,86 +146,96 @@ const Groepslessen: React.FC<LessenProps> = ({
   };
 
   return (
-    <Skeleton>
-      <section className="mb-48 md:px-5 mt-20">
-        <div className="max-w-7xl mx-auto">
-          <FormSteps
-            steps={steps}
-            activeStep={activeStep}
-            errorSteps={errorSteps}
-            setActiveStep={setActiveStep}
-          />
-          <Form onSubmit={handleSubmit(onSubmit)}>
-            <div className="max-w-3xl mx-0 md:mx-auto mt-20 mb-30">
-              {activeStep === 0 ? (
-                <>
-                  <Controller
-                    name="dates"
+    <>
+      <Head>
+        <title>De Gallo-hoeve - inschrijving privétraining</title>
+        <meta
+          name="description"
+          content="Maak nu een nieuwe afspraak. Selecteer de datum en het tijdstap waarop u een trainng wil boeken. Selecteer vervolgens voor welke hond u deze training wil boeken. U ontvangt een email ter bevestiging van uw inschrijving."
+          key="description inschrijving"
+        ></meta>
+      </Head>
+      <Skeleton>
+        <section className="mb-48 md:px-5 mt-20">
+          <div className="max-w-7xl mx-auto">
+            <FormSteps
+              steps={steps}
+              activeStep={activeStep}
+              errorSteps={errorSteps}
+              setActiveStep={setActiveStep}
+            />
+            <Form onSubmit={handleSubmit(onSubmit)}>
+              <div className="max-w-3xl mx-0 md:mx-auto mt-20 mb-30">
+                {activeStep === 0 ? (
+                  <>
+                    <Controller
+                      name="dates"
+                      control={control}
+                      render={({ field: { onChange } }) => (
+                        <DatePicker
+                          onChange={(e) => {
+                            onChange(e);
+                            setSelectedDates(
+                              getValues().dates.sort(
+                                (a: string, b: string) =>
+                                  new Date(a).getTime() - new Date(b).getTime()
+                              )
+                            );
+                            setValue("inschrijvingen", []);
+                          }}
+                          disabledBeforeToday={true}
+                          numberOfSelectableDays={5}
+                          startOfWeek={1}
+                          disabledDays={disabledDays}
+                          selectedDays={selectedDates}
+                          disabledAfterDate={
+                            disabledDays?.[disabledDays?.length - 1]
+                          }
+                        />
+                      )}
+                    />
+                  </>
+                ) : activeStep === 1 ? (
+                  <HondGegevens
                     control={control}
-                    render={({ field: { onChange } }) => (
-                      <DatePicker
-                        onChange={(e) => {
-                          onChange(e);
-                          setSelectedDates(
-                            getValues().dates.sort(
-                              (a: string, b: string) =>
-                                new Date(a).getTime() - new Date(b).getTime()
-                            )
-                          );
-                          setValue("inschrijvingen", []);
-                        }}
-                        disabledBeforeToday={true}
-                        numberOfSelectableDays={5}
-                        startOfWeek={1}
-                        disabledDays={disabledDays}
-                        selectedDays={selectedDates}
-                        disabledAfterDate={
-                          disabledDays?.[disabledDays?.length - 1]
-                        }
-                      />
-                    )}
+                    register={register}
+                    rassen={rassen}
+                    values={getValues}
+                    errors={errors}
+                    setErrors={setErrors}
+                    selectedDates={selectedDates}
+                    honden={honden}
+                    type={type}
+                    handleDelete={handleDelete}
+                    timeslots={timeslots}
                   />
-                </>
-              ) : activeStep === 1 ? (
-                <HondGegevens
-                  control={control}
-                  register={register}
-                  rassen={rassen}
-                  values={getValues}
-                  errors={errors}
-                  setErrors={setErrors}
-                  selectedDates={selectedDates}
-                  honden={honden}
-                  type={type}
-                  handleDelete={handleDelete}
-                  timeslots={timeslots}
+                ) : activeStep === 2 ? (
+                  <Contactgegevens control={control} />
+                ) : null}
+              </div>
+            </Form>
+            {activeStep > 0 && (
+              <div className="absolute left-10 top-20">
+                <Button
+                  label="vorige"
+                  onClick={() => setActiveStep(activeStep - 1)}
                 />
-              ) : activeStep === 2 ? (
-                <Contactgegevens control={control} />
-              ) : null}
-            </div>
-          </Form>
-          {activeStep > 0 && (
-            <div className="absolute left-10 top-20">
-              <Button
-                label="vorige"
-                onClick={() => setActiveStep(activeStep - 1)}
-              />
-            </div>
-          )}
-          <div className="absolute right-10 top-20">
-            {activeStep === 1 ? (
-              <SubmitButton
-                label="verzend"
-                onClick={() => onSubmit(getValues())}
-              />
-            ) : (
-              <Button label="volgende" onClick={handleNextPageClick} />
+              </div>
             )}
+            <div className="absolute right-10 top-20">
+              {activeStep === 1 ? (
+                <SubmitButton
+                  label="verzend"
+                  onClick={() => onSubmit(getValues())}
+                />
+              ) : (
+                <Button label="volgende" onClick={handleNextPageClick} />
+              )}
+            </div>
           </div>
-        </div>
-      </section>
-    </Skeleton>
+        </section>
+      </Skeleton>
+    </>
   );
 };
 

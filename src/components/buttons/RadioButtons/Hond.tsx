@@ -34,7 +34,7 @@ const Hond: React.FC<HondProps> = ({
             <div className="w-25 aspect-square">
               <img
                 src={avatar}
-                alt=""
+                alt="image"
                 className="w-full object-cover aspect-square"
               />
             </div>
