@@ -12,9 +12,7 @@ import {
   TransactionError,
 } from "src/shared/RequestError";
 import { getKlantById } from "src/controllers/KlantController";
-import client, { startTransaction } from "src/utils/MongoDb";
 import mailer from "src/utils/Mailer";
-import { saveInschrijving } from "src/controllers/InschrijvingController";
 import { ObjectId } from "mongodb";
 import { getKlantHond } from "src/controllers/HondController";
 import {
@@ -24,8 +22,10 @@ import {
 } from "src/controllers/TrainingController";
 import Factory from "src/services/Factory";
 import { IsInschrijvingBody } from "src/types/requestTypes";
-import moment from "moment";
 import { logError } from "src/controllers/ErrorLogController";
+import { save } from "src/controllers/InschrijvingController";
+import { closeClient, startSession, startTransaction } from "src/utils/db";
+import { mapInschrijvingen } from "src/mappers/Inschrijvingen";
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") return getInschrijvingen(req, res);
@@ -36,13 +36,16 @@ const handler = (req: NextApiRequest, res: NextApiResponse) => {
 const getInschrijvingen = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const { _id: klantId } = secureApi({ req, res });
-    await client.connect();
     const klant = await getKlantById(new ObjectId(klantId));
     if (!klant) throw new KlantNotFoundError("Klant niet gevonden");
+
     const inschrijvingen = klant.inschrijvingen;
+
+    closeClient();
     return res.status(200).send(inschrijvingen);
   } catch (e: any) {
-    logError("inschrijving", req, e);
+    await logError("inschrijving", req, e);
+    closeClient();
     return res.status(e.code).send(e.response);
   }
 };
@@ -50,7 +53,7 @@ const getInschrijvingen = async (req: NextApiRequest, res: NextApiResponse) => {
 const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     secureApi({ req, res });
-    await client.connect();
+
     await validateCsrfToken({ req, res });
     await validate({ req, res }, { schema: inschrijvingSchema });
 
@@ -68,72 +71,51 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
     const email = klant.email;
     const naam = klant.vnaam;
 
-    // const data = { email, inschrijvingen };
-    const session = client.startSession();
+    const session = await startSession();
     const ids: string[] = [];
 
     const transactionOptions = startTransaction();
     try {
       await session.withTransaction(async () => {
-        await Promise.all(
-          inschrijvingen.map(async (inschrijving, index) => {
-            const hond = await getKlantHond(
-              klant,
-              new ObjectId(inschrijving.hond_id)
-            );
-            if (!hond) throw new HondNotFoundError();
+        for (const inschrijving of inschrijvingen) {
+          const index = inschrijvingen.indexOf(inschrijving);
+          const hondId = new ObjectId(inschrijving.hond_id);
+          const hond = await getKlantHond(klant._id, hondId);
+          if (!hond) throw new HondNotFoundError();
 
-            if (await klantReedsIngeschreven(klant, training, inschrijving))
-              throw new ReedsIngeschrevenError({
-                [`inschrijvingen[${index}][timeslot]`]:
-                  "U bent reeds ingeschreven voor deze training",
-                message: "Inschrijving niet verwerkt",
-              });
-            if (await trainingVolzet(training, inschrijving.datum))
-              throw new TrainingVolzetError("Dit tijdstip is niet meer vrij");
+          const newInschrijving = Factory.createInschrijving(
+            inschrijving,
+            training,
+            klant,
+            hond
+          );
 
-            const newInschrijving = Factory.createInschrijving(
-              inschrijving,
-              training,
-              klant,
-              hond
-            );
-            await saveInschrijving(newInschrijving, session);
-            ids.push(newInschrijving._id.toString());
-          }, transactionOptions)
-        );
-      });
+          if (await klantReedsIngeschreven(klant, training, newInschrijving))
+            throw new ReedsIngeschrevenError(index);
+          if (await trainingVolzet(selectedTraining, newInschrijving.datum))
+            throw new TrainingVolzetError();
+
+          await save(newInschrijving, session);
+          ids.push(newInschrijving._id.toString());
+        }
+      }, transactionOptions);
     } catch (e: any) {
       throw new TransactionError(e.name, e.code, e.response);
     }
 
-    const data = inschrijvingen
-      .map((inschrijving, index) => ({
-        [`moment${index}`]: moment(inschrijving.datum)
-          .toISOString()
-          .replace("T", " ")
-          .split(":00.")[0],
-        [`hond${index}`]: inschrijving.hond_naam,
-        [`prijsExcl${index}`]:
-          index === 0 && isFirstInschrijving ? "0.00" : prijs,
-        [`prijsIncl${index}`]:
-          index === 0 && isFirstInschrijving
-            ? "0.00"
-            : Math.round(prijs * 1.21).toFixed(2),
-      }))
-      .reduce((prev, curr) => ({ ...prev, ...curr }), {});
+    const data = mapInschrijvingen(inschrijvingen, isFirstInschrijving, prijs);
 
     await mailer.sendMail("inschrijving", { naam, email, ...data });
     await mailer.sendMail("inschrijving-headsup", {
       email: process.env.MAIL_TO,
       _ids: ids.join(","),
     });
-
+    closeClient();
     return res.status(201).json({ message: "Inschrijving ontvangen!" });
   } catch (e: any) {
-    logError("inschrijving", req, e);
+    await logError("inschrijving", req, e);
+    closeClient();
     return res.status(e.code).send(e.response);
   }
 };
-
 export default handler;

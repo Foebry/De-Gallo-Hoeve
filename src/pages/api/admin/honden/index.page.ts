@@ -11,6 +11,8 @@ import {
 } from "src/mappers/honden";
 import { KlantHond } from "src/types/EntityTpes/HondTypes";
 import { GenericRequest } from "src/pages/api/auth/login.page";
+import { closeClient } from "src/utils/db";
+import { logError } from "src/controllers/ErrorLogController";
 
 type ListHondenRequest = {
   query: PaginatedRequestQuery;
@@ -32,8 +34,12 @@ const getHondenOverview = async (
 
     const result = mapToHondenOverviewResult(data);
 
+    closeClient();
+
     return res.status(200).send(result);
   } catch (e: any) {
+    await logError("honden", req, e);
+    closeClient();
     return res.status(e.code).send(e.message);
   }
 };

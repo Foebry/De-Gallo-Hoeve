@@ -3,27 +3,23 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getInschrijvingenByIds } from "src/controllers/InschrijvingController";
 import { getKlantById } from "src/controllers/KlantController";
 import { mapToKlantDetail } from "src/mappers/klanten";
-import client from "src/utils/MongoDb";
 import { KlantNotFoundError } from "src/shared/RequestError";
+import { closeClient } from "src/utils/db";
+import { GenericRequest } from "../../auth/login.page";
+import { DetailRequest } from "../inschrijvingen/[slug].page";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method === "GET") return getKlantDetail(req, res);
+  if (req.method === "GET")
+    return getKlantDetail(req as GenericRequest<DetailRequest>, res);
   return res.status(405).send({ message: "Not Allowed" });
 };
-
-interface RequestQuery {
-  slug?: string;
-}
-
 type KlantDetailResponse = {};
 
 const getKlantDetail = async (
-  req: NextApiRequest,
+  req: GenericRequest<DetailRequest>,
   res: NextApiResponse<KlantDetailResponse>
 ) => {
-  const { slug: _id } = req.query as RequestQuery;
-
-  await client.connect();
+  const { slug: _id } = req.query;
 
   const klant = await getKlantById(new ObjectId(_id));
   if (!klant) throw new KlantNotFoundError();
@@ -32,7 +28,7 @@ const getKlantDetail = async (
 
   const result = mapToKlantDetail(klant, inschrijvingen);
 
-  await client.close();
+  closeClient();
 
   return res.status(200).send(result);
 };

@@ -14,6 +14,9 @@ export interface PriveTrainingCollection {
   bullets: string[];
   image: string;
   subtitle: string;
+  updated_at: Date;
+  created_at: Date;
+  deleted_at?: Date;
 }
 
 export interface TrainingDaysCollection {

@@ -11,6 +11,7 @@ import {
 } from "src/mappers/klanten";
 import { IsKlantCollection } from "src/types/EntityTpes/KlantTypes";
 import { GenericRequest } from "src/pages/api/auth/login.page";
+import { closeClient } from "src/utils/db";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET")
@@ -32,6 +33,8 @@ const getKlantenOverview = async (
     KLANT
   );
   const result = mapToAdminKlantenOverviewResult(data);
+
+  closeClient();
 
   return res.status(200).send(result);
 };

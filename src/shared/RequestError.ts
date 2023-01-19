@@ -137,14 +137,18 @@ export class InvalidPasswordError extends UnprocessablePayloadError {
 }
 
 export class ReedsIngeschrevenError extends UnprocessablePayloadError {
-  constructor(response: any) {
-    super("ReedsIngeschrevenError", "Inschrijving niet verwerkt", response);
+  constructor(index: number) {
+    super("ReedsIngeschrevenError", "Inschrijving niet verwerkt", {
+      [`inschrijvingen[${index}][timeslot]`]:
+        "U bent reeds ingeschreven voor deze training",
+      message: "Inschrijving niet verwerkt",
+    });
   }
 }
 
 export class TrainingVolzetError extends UnprocessablePayloadError {
-  constructor(message: string) {
-    super("TrainingVolzetError", message);
+  constructor() {
+    super("TrainingVolzetError", "Dit tijdstip is niet meer vrij");
   }
 }
 

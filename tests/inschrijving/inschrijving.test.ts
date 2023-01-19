@@ -3,22 +3,31 @@ import { NextApiHandler } from "next";
 import request from "supertest";
 import { apiResolver } from "next/dist/server/api-utils/node";
 import { clearAllData } from "src/utils/MongoDb";
-import { LOGINAPI, POST_INSCHRIJVING } from "src/types/apiTypes";
+import { POST_INSCHRIJVING } from "src/types/apiTypes";
 import handler from "src/pages/api/inschrijvingen.page";
-import Factory from "src/services/Factory";
+import Factory, {
+  createRandomHond,
+  createRandomInschrijving,
+  createRandomKlant,
+  createRandomTraining,
+  getController,
+} from "src/services/Factory";
 import { generateCsrf } from "src/services/Validator";
-import loginHandler from "src/pages/api/auth/login.page";
 import { createBearer } from "src/services/Authenticator";
 import { ObjectId } from "mongodb";
 import moment from "moment";
+import Mailer from "../../src/utils/Mailer";
+import { KLANT } from "src/controllers/KlantController";
+import { TRAINING } from "src/controllers/TrainingController";
+import { INSCHRIJVING } from "src/controllers/InschrijvingController";
 
 describe("/inschrijving", () => {
-  beforeEach(async () => {
+  beforeEach(async () => await clearAllData());
+  afterAll(async () => {
+    jest.clearAllMocks();
     await clearAllData();
   });
-  // afterAll(async () => {
-  //   await clearAllData();
-  // });
+
   const testClient = (handler: NextApiHandler) => {
     const listener: RequestListener = (req: IncomingMessage, res) => {
       return apiResolver(
@@ -36,23 +45,19 @@ describe("/inschrijving", () => {
     };
     return request(createServer(listener));
   };
+
+  const mockedSendMail = jest.spyOn(Mailer, "sendMail");
+  mockedSendMail.mockImplementation();
+
   describe("/POST", () => {
     it("Should throw InvalidCsRFToken when request has no or invalid csrf token", async () => {
       const inschrijvingPayload = {};
 
       const randomKlant = await Factory.createRandomKlant({ verified: true });
-      const email = randomKlant.email;
-      const psw = randomKlant.password;
 
-      await randomKlant.save();
-      const loginResponse = await testClient(loginHandler)
-        .post(LOGINAPI)
-        .send({ email, password: psw, csrf: generateCsrf() });
+      await getController(KLANT).save(randomKlant);
 
-      const JWT = loginResponse.headers["set-cookie"].find((cookie: string) =>
-        cookie.includes("JWT")
-      );
-      const bearer = JWT.split("JWT=")[1].split(";")[0];
+      const bearer = createBearer(randomKlant);
 
       const response = await testClient(handler)
         .post(POST_INSCHRIJVING)
@@ -68,7 +73,7 @@ describe("/inschrijving", () => {
       const payload = {};
       const randomKlant = await Factory.createRandomKlant({ verified: true });
 
-      await randomKlant.save();
+      await getController(KLANT).save(randomKlant);
 
       const response = await testClient(handler)
         .post(POST_INSCHRIJVING)
@@ -80,10 +85,10 @@ describe("/inschrijving", () => {
     it("Should throw ValidationError on wrong request Body", async () => {
       const payload = {};
       const klant = await Factory.createRandomKlant({ verified: true });
-      await klant.save();
+      await getController(KLANT).save(klant);
 
       const bearer = createBearer(klant);
-      const { body } = await testClient(handler)
+      await testClient(handler)
         .post(POST_INSCHRIJVING)
         .auth(bearer, { type: "bearer" })
         .send(payload)
@@ -114,9 +119,9 @@ describe("/inschrijving", () => {
       expect(body.message).toBe("Klant niet gevonden");
     });
     it("Should throw TrainingNotFoundError", async () => {
-      const klant = await (
-        await Factory.createRandomKlant({ verified: true })
-      ).save();
+      const klant = await createRandomKlant({ verified: true });
+      await getController(KLANT).save(klant);
+
       const payload = {
         csrf: generateCsrf(),
         inschrijvingen: [
@@ -140,11 +145,13 @@ describe("/inschrijving", () => {
       expect(body.message).toBe("Training niet gevonden");
     });
     it("Should throw HondNotFoundError when klant tries to subscribe with a hond that is not found", async () => {
-      const klant = await (
-        await Factory.createRandomKlant({ verified: true })
-      ).save();
+      const klant = await createRandomKlant({ verified: true });
       const hond = await Factory.createRandomHond();
-      const training = await Factory.createRandomTraining("prive").save();
+      const training = Factory.createRandomTraining("prive");
+
+      await getController(KLANT).save(klant);
+      await getController(TRAINING).save(training);
+
       const bearer = createBearer(klant);
 
       const payload = {
@@ -169,13 +176,15 @@ describe("/inschrijving", () => {
       expect(body.message).toBe("Hond niet gevonden");
     });
     it("Should throw ReedsIngeschrevenError when klant already subscribed for specific training at that time/day", async () => {
-      await Factory.createRandomTraining("prive").save();
+      const training = createRandomTraining("prive");
       const hond = await Factory.createRandomHond();
       const klant = await Factory.createRandomKlant({
         verified: true,
         honden: [hond],
       });
-      await klant.save();
+
+      await getController(TRAINING).save(training);
+      await getController(KLANT).save(klant);
 
       const bearer = createBearer(klant);
       const inschrijving = await Factory.createRandomInschrijving(
@@ -205,23 +214,26 @@ describe("/inschrijving", () => {
       expect(body.message).toBe("Inschrijving niet verwerkt");
     });
     it("Should throw TrainingVolzetError when klant tries to subscribe to a training which has already a subscription at a chose time", async () => {
-      const training = await Factory.createRandomTraining("prive").save();
-      const randomHond = await Factory.createRandomHond();
-      const randomKlant = await (
-        await Factory.createRandomKlant({
+      const training = await getController(TRAINING).save(
+        createRandomTraining("prive")
+      );
+      const randomHond = await createRandomHond();
+      const randomKlant = await getController(KLANT).save(
+        await createRandomKlant({
           verified: true,
           honden: [randomHond],
         })
-      ).save();
-      const inschrijving = await Factory.createRandomInschrijving(
-        randomKlant,
-        randomHond
-      ).save();
+      );
+
+      const inschrijving = await getController(INSCHRIJVING).save(
+        createRandomInschrijving(randomKlant, randomHond)
+      );
 
       const hond = await Factory.createRandomHond();
-      const klant = await (
-        await Factory.createRandomKlant({ verified: true, honden: [hond] })
-      ).save();
+      const klant = await getController(KLANT).save(
+        await createRandomKlant({ verified: true, honden: [hond] })
+      );
+
       const bearer = createBearer(klant);
       const payload = {
         csrf: generateCsrf(),
@@ -246,7 +258,9 @@ describe("/inschrijving", () => {
       expect(body.message).toBe("Dit tijdstip is niet meer vrij");
     });
     it("Should throw EmailNotVerifiedError when klant has not verified email", async () => {
-      const klant = await (await Factory.createRandomKlant()).save();
+      const klant = await getController(KLANT).save(
+        await Factory.createRandomKlant()
+      );
       const bearer = createBearer(klant);
       const payload = {
         csrf: generateCsrf(),
@@ -270,11 +284,14 @@ describe("/inschrijving", () => {
       expect(body.message).toBe("Gelieve uw email te verifiëren");
     });
     it("Should correctly subscribe for the selected training at the selected time", async () => {
-      const training = await Factory.createRandomTraining("prive").save();
+      const training = await getController(TRAINING).save(
+        createRandomTraining("prive")
+      );
       const hond = await Factory.createRandomHond();
-      const klant = await (
-        await Factory.createRandomKlant({ verified: true, honden: [hond] })
-      ).save();
+      const klant = await getController(KLANT).save(
+        await createRandomKlant({ verified: true, honden: [hond] })
+      );
+
       const bearer = createBearer(klant);
       const payload = {
         csrf: generateCsrf(),
@@ -296,6 +313,7 @@ describe("/inschrijving", () => {
         .auth(bearer, { type: "bearer" })
         .expect(201);
       expect(body.message).toBe("Inschrijving ontvangen!");
+      expect(mockedSendMail).toHaveBeenCalledTimes(2);
     });
   });
 });

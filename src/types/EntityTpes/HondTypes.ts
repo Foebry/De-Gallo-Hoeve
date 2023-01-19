@@ -10,6 +10,7 @@ export interface HondCollection {
   ras: string;
   created_at: Date;
   updated_at: Date;
+  deleted_at?: Date;
 }
 
 export interface NewHond {
