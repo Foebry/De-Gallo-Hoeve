@@ -6,10 +6,13 @@ import { REGISTERAPI } from "src/types/apiTypes";
 import request from "supertest";
 import Factory from "src/services/Factory";
 import { clearAllData } from "src/utils/MongoDb";
-import {
-  generateRegisterPayloadFromKlantData,
-  generateRegisterResponseBodyFromPayload,
-} from "tests/helpers";
+import { generateRegisterPayloadFromKlantData } from "tests/helpers";
+import { capitalize } from "src/shared/functions";
+import Mailer from "src/utils/Mailer";
+
+const mock = jest.mock("../../src/utils/Mailer", () => {
+  return { sendMail: jest.fn() };
+});
 
 describe("/register", () => {
   beforeEach(async () => {
@@ -33,6 +36,9 @@ describe("/register", () => {
     return request(createServer(listener));
   };
   describe("/POST", () => {
+    const mockedSendMail = jest.spyOn(Mailer, "sendMail");
+    mockedSendMail.mockImplementation();
+
     it("should create new klant", async () => {
       const honden = await Promise.all(
         new Array(3).fill(0).map(async () => {
@@ -44,18 +50,44 @@ describe("/register", () => {
       const payload = generateRegisterPayloadFromKlantData(klant);
 
       const client = testClient(handler);
-      const response = await client.post(REGISTERAPI).send(payload);
-      const body = await generateRegisterResponseBodyFromPayload(payload);
+      const { body } = await client.post(REGISTERAPI).send(payload).expect(201);
+      expect(mockedSendMail).toHaveBeenCalledTimes(2);
 
-      expect(response.statusCode).toBe(201);
-      expect(response.body).toStrictEqual({
-        ...body,
-        _id: body._id.toString(),
-        honden: [...body.honden].map((hond) => ({
-          ...hond,
-          _id: hond._id.toString(),
-        })),
-      });
+      expect(body).toEqual(
+        expect.objectContaining({
+          _id: body._id.toString(),
+          roles: "0",
+          verified: false,
+          inschrijvingen: [],
+          reservaties: [],
+          email: klant.email,
+          vnaam: klant.vnaam,
+          lnaam: klant.lnaam,
+          gsm: klant.gsm,
+          straat: capitalize(klant.straat),
+          nr: klant.nr,
+          bus: klant.bus,
+          gemeente: capitalize(klant.gemeente),
+          postcode: klant.postcode,
+          honden: expect.arrayContaining([
+            expect.objectContaining({
+              naam: klant.honden[0].naam,
+              geslacht: klant.honden[0].geslacht,
+              ras: klant.honden[0].ras,
+            }),
+            expect.objectContaining({
+              geslacht: klant.honden[1].geslacht,
+              naam: klant.honden[1].naam,
+              ras: klant.honden[1].ras,
+            }),
+            expect.objectContaining({
+              geslacht: klant.honden[2].geslacht,
+              naam: klant.honden[2].naam,
+              ras: klant.honden[2].ras,
+            }),
+          ]),
+        })
+      );
     });
     it("Should throw EmailOccupiedError", async () => {
       const klant = await (await Factory.createRandomKlant()).save();
@@ -64,11 +96,9 @@ describe("/register", () => {
       const payload = generateRegisterPayloadFromKlantData(newKlant);
 
       const client = testClient(handler);
-      const response = await client.post(REGISTERAPI).send(payload);
-      await generateRegisterResponseBodyFromPayload(payload);
+      const { body } = await client.post(REGISTERAPI).send(payload).expect(422);
 
-      expect(response.statusCode).toBe(422);
-      expect(response.body).toStrictEqual({
+      expect(body).toStrictEqual({
         message: "Kan registratie niet verwerken",
         email: "Email reeds in gebruik",
       });
@@ -80,10 +110,9 @@ describe("/register", () => {
     const payload = generateRegisterPayloadFromKlantData(klant);
 
     const client = testClient(handler);
-    const response = await client.post(REGISTERAPI).send(payload);
+    const { body } = await client.post(REGISTERAPI).send(payload).expect(400);
 
-    expect(response.statusCode).toBe(400);
-    expect(response.body).toStrictEqual({
+    expect(body).toStrictEqual({
       email: "ongeldige email",
       message: "Registratie niet verwerkt",
     });

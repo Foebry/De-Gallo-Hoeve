@@ -11,6 +11,7 @@ import {
   mapToAdminInschrijvingenOverviewResult,
   PaginatedInschrijving,
 } from "src/mappers/Inschrijvingen";
+import { closeClient } from "src/utils/db";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET")
@@ -36,6 +37,8 @@ const getInschrijvingOverview = async (
   );
 
   const result = mapToAdminInschrijvingenOverviewResult(data);
+
+  closeClient();
 
   return res.status(200).send(result);
 };

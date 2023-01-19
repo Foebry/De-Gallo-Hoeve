@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 import { OptionsOrGroups } from "react-select";
 import { optionInterface } from "src/components/register/HondGegevens";
 import HondGegevens from "src/components/inschrijving/HondGegevens";
-import client, {
+import {
   getFreeTimeSlots,
   getHondOptions,
   getRasOptions,
@@ -29,6 +29,7 @@ import Skeleton from "src/components/website/skeleton";
 import { getPriveTraining } from "src/controllers/TrainingController";
 import getData from "src/hooks/useApi";
 import Head from "next/head";
+import { closeClient } from "src/utils/db";
 
 type TrainingType = "prive" | "groep";
 
@@ -253,14 +254,14 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       redirect: { permanent: false, destination: LOGIN },
     };
   }
-  await client.connect();
   const honden = await getHondOptions(klant_id as ObjectId);
   const csrf = generateCsrf();
   const disabledDays = await getDisabledDays(type);
   const rassen = await getRasOptions();
   const timeslots = await getFreeTimeSlots();
-  const { prijsExcl } = await getPriveTraining();
-  await client.close();
+  const training = await getPriveTraining();
+
+  closeClient();
 
   return {
     props: {
@@ -271,7 +272,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       csrf,
       type,
       timeslots,
-      prijsExcl,
+      prijsExcl: training?.prijsExcl ?? "",
     },
   };
 };

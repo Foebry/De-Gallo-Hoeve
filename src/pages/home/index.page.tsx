@@ -5,6 +5,7 @@ import Skeleton from "src/components/website/skeleton";
 import { GiCheckMark } from "react-icons/gi";
 import { getPriveTraining } from "src/controllers/TrainingController";
 import Head from "next/head";
+import { closeClient } from "src/utils/db";
 
 interface IndexProps {
   prijsExcl: number;
@@ -170,14 +171,15 @@ const Index: React.FC<IndexProps> = ({
 export default Index;
 
 export const getStaticProps = async () => {
-  const { prijsExcl, kmHeffing, gratisVerplaatsingBinnen } =
-    await getPriveTraining();
+  const priveTraining = await getPriveTraining();
+
+  closeClient();
 
   return {
     props: {
-      prijsExcl,
-      kmHeffing,
-      gratisVerplaatsingBinnen,
+      prijsExcl: priveTraining?.prijsExcl,
+      kmHeffing: priveTraining?.kmHeffing,
+      gratisVerplaatsingBinnen: priveTraining?.gratisVerplaatsingBinnen,
     },
     revalidate: 86400,
   };

@@ -1,6 +1,10 @@
 interface Mailer {
   sendMail: (type: string, data: any) => Promise<void>;
-  contact: (data: { naam: string; email: string; bericht: string }) => void;
+  contact: (data: {
+    naam: string;
+    email: string;
+    bericht: string;
+  }) => Promise<void>;
 }
 
 const send = async (msg: any) => {
@@ -57,8 +61,8 @@ const mailer: Mailer = {
     });
   },
 
-  contact: ({ naam, email, bericht }) => {
-    send({
+  contact: async ({ naam, email, bericht }) => {
+    await send({
       to: process.env.MAIL_FROM,
       from: process.env.MAIL_TO,
       subject: "contact",

@@ -1,19 +1,19 @@
 import moment from "moment";
 import { NextApiRequest, NextApiResponse } from "next";
 import {
+  deleteByKlantId,
   getConfirmByCode,
-  getConfirmCollection,
+  reset as resetConfirm,
 } from "src/controllers/ConfirmController";
-import { getKlantById, KLANT } from "src/controllers/KlantController";
-import Factory from "src/services/Factory";
-import client from "src/utils/MongoDb";
+import { getKlantById, setVerified } from "src/controllers/KlantController";
 import {
   ExpiredConfirmCodeError,
   InvalidConfirmCodeError,
   KlantNotFoundError,
 } from "src/shared/RequestError";
-import { CONFIRM } from "src/types/EntityTpes/ConfirmTypes";
 import { logError } from "src/controllers/ErrorLogController";
+import { closeClient } from "src/utils/db";
+import { ConfirmCollection } from "@/types/EntityTpes/ConfirmTypes";
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") return confirm(req, res);
@@ -23,32 +23,43 @@ const handler = (req: NextApiRequest, res: NextApiResponse) => {
 
 const confirm = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    await client.connect();
-
     const { code } = req.query;
 
     const confirm = await getConfirmByCode(code as string);
-    if (!confirm) throw new InvalidConfirmCodeError();
+    if (!confirm) {
+      console.log(`Confirm ${code} not found`);
+      throw new InvalidConfirmCodeError();
+    }
 
-    if (moment(confirm.valid_to) < moment())
+    if (moment(confirm.valid_to) < moment()) {
+      console.log(`code ${confirm.code} expired`);
       throw new ExpiredConfirmCodeError();
+    }
 
     const klant = await getKlantById(confirm.klant_id);
-    if (!klant) throw new KlantNotFoundError();
+    if (!klant) {
+      console.log(`klant ${confirm.klant_id} not found`);
+      throw new KlantNotFoundError();
+    }
 
-    await Factory.getController(KLANT).setVerified(klant);
-    await getConfirmCollection().deleteOne({ code });
-    await client.close();
+    await setVerified(klant);
+    await deleteByKlantId(confirm.klant_id);
+
+    // closeClient();
+
     return res.redirect("/login");
   } catch (e: any) {
-    logError("confirm", req, e);
+    await logError("confirm", req, e);
+    // closeClient();
     return res.status(e.code).send(e.response);
   }
 };
 
-const reset = async (req: NextApiRequest, res: NextApiResponse) => {
+const reset = async (
+  req: NextApiRequest,
+  res: NextApiResponse<ConfirmCollection>
+) => {
   try {
-    await client.connect();
     const { code } = req.query;
 
     const confirm = await getConfirmByCode(code as string);
@@ -57,11 +68,11 @@ const reset = async (req: NextApiRequest, res: NextApiResponse) => {
     const klant = await getKlantById(confirm.klant_id);
     if (!klant) throw new KlantNotFoundError();
 
-    const newConfirm = await Factory.getController(CONFIRM).reset(confirm);
-    await client.close();
+    const newConfirm = await resetConfirm(confirm);
+
     return res.status(200).json(newConfirm);
   } catch (e: any) {
-    logError("reset", req, e);
+    await logError("reset", req, e);
     return res.status(e.code).send(e.response);
   }
 };

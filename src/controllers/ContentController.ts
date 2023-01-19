@@ -1,65 +1,78 @@
-import { Collection, ObjectId } from "mongodb";
-import client from "../utils/MongoDb";
-import {
-  ContentNotFoundError,
-  InternalServerError,
-} from "../shared/RequestError";
-import {
-  ContentCollection,
-  EditContent,
-} from "../types/EntityTpes/ContentTypes";
+import { ObjectId } from "mongodb";
+import { InternalServerError } from "../shared/RequestError";
+import { ContentCollection } from "../types/EntityTpes/ContentTypes";
+import { getContentCollection } from "src/utils/db";
+import { getCurrentTime } from "src/shared/functions";
 
-export interface IsContentController {
-  getContentCollection: () => Collection;
-  findAllContent: () => Promise<ContentCollection[] | null>;
-  getContentById: (_id: ObjectId) => Promise<ContentCollection>;
-  editContent: (
-    _id: ObjectId,
-    editData: EditContent
-  ) => Promise<ContentCollection>;
-  deleteContent: (_id: ObjectId) => Promise<void>;
-  deleteAll: () => Promise<void>;
-}
-
-const ContentController: IsContentController = {
-  getContentCollection: () => {
-    const database = process.env.MONGODB_DATABASE;
-    return client.db(database).collection("content");
-  },
-  findAllContent: async () => {
-    const collections = await getContentCollection().find().toArray();
-    return collections ? (collections as ContentCollection[]) : null;
-  },
-  getContentById: async (_id) => {
-    const content = await getContentCollection().findOne({ _id });
-    if (!content) throw new ContentNotFoundError();
-    return content as ContentCollection;
-  },
-  editContent: async (_id, editData) => {
-    const content = await getContentById(_id);
-
-    const updatedContent = { ...content, ...editData };
-    const { upsertedCount } = await getContentCollection().updateOne(
-      { _id },
-      updatedContent
-    );
-    if (upsertedCount !== 1) throw new InternalServerError();
-
-    return updatedContent;
-  },
-  deleteContent: async (_id) => {
-    await getContentById(_id);
-    const { deletedCount } = await getContentCollection().deleteOne({ _id });
-    if (deletedCount !== 1) throw new InternalServerError();
-  },
-  deleteAll: async () => {
-    const ids = (await getContentCollection().find().toArray()).map(
-      (item) => item._id
-    );
-    await getContentCollection().deleteMany({ _id: { $in: [...ids] } });
-  },
+export const findAllContent = async (): Promise<ContentCollection[]> => {
+  const collection = await getContentCollection();
+  return collection.find().toArray() as Promise<ContentCollection[]>;
 };
 
-export default ContentController;
-export const { getContentCollection, getContentById } = ContentController;
+export const getContentById = async (
+  _id: ObjectId
+): Promise<ContentCollection | null> => {
+  const collection = await getContentCollection();
+  return collection.findOne({ _id });
+};
+
+export const editContent = async (
+  data: ContentCollection
+): Promise<ContentCollection> => {
+  const collection = await getContentCollection();
+
+  const { upsertedCount } = await collection.updateOne(
+    { _id: data._id },
+    { ...data, updated_at: getCurrentTime() }
+  );
+  if (upsertedCount !== 1) throw new InternalServerError();
+
+  return data;
+};
+
+export const hardDelete = async (content: ContentCollection): Promise<void> => {
+  const collection = await getContentCollection();
+
+  const { deletedCount } = await collection.deleteOne(content);
+  if (deletedCount !== 1) throw new InternalServerError();
+};
+
+export const softDelete = async (content: ContentCollection): Promise<void> => {
+  const collection = await getContentCollection();
+
+  const deletedContent = { ...content, deleted_at: getCurrentTime() };
+  const { upsertedCount } = await collection.updateOne(
+    { _id: content._id },
+    deletedContent
+  );
+  if (upsertedCount !== 1) throw new InternalServerError();
+};
+
+export const deleteAll = async (): Promise<void> => {
+  const collection = await getContentCollection();
+
+  if (process.env.NODE_ENV === "test") {
+    collection.deleteMany({});
+  }
+};
+
+const contentController: IsContentController = {
+  deleteAll,
+  softDelete,
+  hardDelete,
+  editContent,
+  getContentById,
+  findAllContent,
+};
+
+export type IsContentController = {
+  findAllContent: () => Promise<ContentCollection[]>;
+  getContentById: (_id: ObjectId) => Promise<ContentCollection | null>;
+  editContent: (content: ContentCollection) => Promise<ContentCollection>;
+  hardDelete: (content: ContentCollection) => Promise<void>;
+  softDelete: (content: ContentCollection) => Promise<void>;
+  deleteAll: () => Promise<void>;
+};
+
+export default contentController;
 export const CONTENT = "ContentController";

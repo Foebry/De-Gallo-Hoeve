@@ -1,9 +1,9 @@
 import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
-import { getContentCollection } from "src/controllers/ContentController";
-import client from "src/utils/MongoDb";
-import { ContentCollection } from "src/types/EntityTpes/ContentTypes";
 import { atob, btoa } from "buffer";
+import { getContentById } from "src/controllers/ContentController";
+import { ContentNotFoundError } from "src/shared/RequestError";
+import { closeClient, getContentCollection } from "src/utils/db";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") return getContent(req, res);
@@ -14,17 +14,19 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 const getContent = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
 
-  await client.connect();
-  const data = (await getContentCollection().findOne({
-    _id: new ObjectId(id as string),
-  })) as ContentCollection;
+  const data = await getContentById(new ObjectId(id as string));
+  if (!data) {
+    throw new ContentNotFoundError();
+  }
 
   const result = {
-    subtitle: atob(data.subtitle),
-    content: atob(data.content).split("\n"),
+    subtitle: Buffer.from(data.subtitle, "base64").toString(),
+    content: Buffer.from(data.content, "base64").toString().split("\n"),
     image: data.image,
   };
-  // await client.close();
+
+  closeClient();
+
   return res.status(200).send(result);
 };
 
@@ -32,8 +34,8 @@ const changeContent = async (req: NextApiRequest, res: NextApiResponse) => {
   const { subtitle, content, image } = req.body;
   const { id } = req.query;
 
-  await client.connect();
-  await getContentCollection().updateOne(
+  const collection = await getContentCollection();
+  await collection.updateOne(
     { _id: new ObjectId(id as string) },
     {
       $set: {
@@ -43,7 +45,9 @@ const changeContent = async (req: NextApiRequest, res: NextApiResponse) => {
       },
     }
   );
-  await client.close();
+
+  closeClient();
+
   return res.status(200).send({ subtitle, content, image });
 };
 

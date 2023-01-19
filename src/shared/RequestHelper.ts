@@ -1,4 +1,4 @@
-import client, { getData } from "src/utils/MongoDb";
+import { getData } from "src/utils/MongoDb";
 import { HondCollection } from "../types/EntityTpes/HondTypes";
 import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
@@ -56,7 +56,7 @@ export async function getPaginatedData<T>(
   url: string,
   controller: string
 ) {
-  await client.connect();
+  // await client.connect();
 
   const data = await getData(controller);
 
@@ -154,7 +154,6 @@ function filterData<T>(
     }
     return data;
   } else if (instanceOfRasCollectionArray(data)) {
-    console.log("filter rascollections");
     return search
       ? data.filter((ras) =>
           ras.naam.toLowerCase().includes(search.toLowerCase())
@@ -214,6 +213,6 @@ function instanceOfRasCollectionArray(array: any[]): array is RasCollection[] {
   );
 }
 
-const notEmpty = <T>(obj: T | null | undefined): obj is T => {
+export const notEmpty = <T>(obj: T | null | undefined): obj is T => {
   return obj !== null && obj !== undefined;
 };

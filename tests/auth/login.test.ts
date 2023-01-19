@@ -6,7 +6,11 @@ import request from "supertest";
 import { apiResolver } from "next/dist/server/api-utils/node";
 import handler from "src/pages/api/auth/login.page";
 import { clearAllData } from "src/utils/MongoDb";
-import Factory from "src/services/Factory";
+import Factory, {
+  createRandomKlant,
+  getController,
+} from "src/services/Factory";
+import { KLANT } from "src/controllers/KlantController";
 
 describe("login", () => {
   beforeEach(async () => {
@@ -34,15 +38,13 @@ describe("login", () => {
   };
   it("login without csrf should result in bad request", async () => {
     const loginPayload = {
-      // csrf: generateCsrf(),
       email: "rain_fabry@hotmail.com",
       password: "password",
     };
     const client = testClient(handler);
-    const response = await client.post(LOGINAPI).send(loginPayload);
+    const { body } = await client.post(LOGINAPI).send(loginPayload).expect(400);
 
-    expect(response.statusCode).toBe(400);
-    expect(response.body).toStrictEqual({
+    expect(body).toStrictEqual({
       message: "Probeer later opnieuw...",
     });
   });
@@ -52,12 +54,12 @@ describe("login", () => {
       email: "rain_fabry@hotmail.com",
       password: "password",
     };
-    const response = await testClient(handler)
+    const { body } = await testClient(handler)
       .post(LOGINAPI)
-      .send(loginPayload);
+      .send(loginPayload)
+      .expect(422);
 
-    expect(response.statusCode).toBe(422);
-    expect(response.body).toStrictEqual({
+    expect(body).toStrictEqual({
       email: "Onbekende email",
       message: "Kan verzoek niet verwerken",
     });
@@ -69,18 +71,19 @@ describe("login", () => {
       email: klant.email,
       password: "abc",
     };
-    const response = await testClient(handler)
+    const { body } = await testClient(handler)
       .post(LOGINAPI)
-      .send(loginPayload);
-    expect(response.statusCode).toBe(422);
-    expect(response.body).toStrictEqual({
+      .send(loginPayload)
+      .expect(422);
+
+    expect(body).toStrictEqual({
       password: "Ongeldig wachtwoord",
       message: "Kan verzoek niet verwerken",
     });
   });
   it("Login with correct credentials should create jwt token and frontend token", async () => {
-    const klant = await Factory.createRandomKlant();
-    await klant.save();
+    const klant = await createRandomKlant();
+    await getController(KLANT).save(klant);
 
     const loginPayload = {
       csrf: generateCsrf(),
@@ -90,9 +93,9 @@ describe("login", () => {
 
     const response = await testClient(handler)
       .post(LOGINAPI)
-      .send(loginPayload);
+      .send(loginPayload)
+      .expect(200);
 
-    expect(response.statusCode).toBe(200);
     expect(Object.keys(response.headers["set-cookie"]).includes("JWT"));
     expect(response.headers["set-cookie"].includes("Client"));
   });

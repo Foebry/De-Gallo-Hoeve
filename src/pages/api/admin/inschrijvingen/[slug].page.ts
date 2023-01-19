@@ -6,14 +6,15 @@ import {
   DetailInschrijvingResponse,
   mapToInschrijvingDetail,
 } from "src/mappers/Inschrijvingen";
-import client from "src/utils/MongoDb";
 import {
   HondNotFoundError,
   InschrijvingNotFoundError,
 } from "src/shared/RequestError";
 import { GenericRequest } from "src/pages/api/auth/login.page";
+import { closeClient } from "src/utils/db";
+import { logError } from "src/controllers/ErrorLogController";
 
-interface DetailRequest extends NextApiRequest {
+export interface DetailRequest extends NextApiRequest {
   query: { slug: string };
 }
 
@@ -27,8 +28,6 @@ const getInschrijvingDetail = async (
   res: NextApiResponse<DetailInschrijvingResponse>
 ) => {
   const { slug: _id } = req.query;
-
-  await client.connect();
   try {
     const inschrijving = await getInschrijvingById(new ObjectId(_id));
     if (!inschrijving) throw new InschrijvingNotFoundError();
@@ -37,10 +36,12 @@ const getInschrijvingDetail = async (
 
     const result = mapToInschrijvingDetail(inschrijving, hond);
 
-    await client.close();
+    closeClient();
 
     return res.status(200).send(result);
   } catch (e: any) {
+    await logError("admin/inschrijvingen/:id", req, e);
+    closeClient();
     return res.status(e.code).send(e.response);
   }
 };

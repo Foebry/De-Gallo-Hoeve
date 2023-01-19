@@ -2,12 +2,13 @@ import { createServer, IncomingMessage, RequestListener } from "http";
 import { NextApiHandler } from "next";
 import { apiResolver } from "next/dist/server/api-utils/node";
 import Factory from "src/services/Factory";
-import client, { clearAllData } from "src/utils/MongoDb";
+import { clearAllData } from "src/utils/MongoDb";
 import { generateCsrf } from "src/services/Validator";
 import handler from "src/pages/api/auth/logout.page";
 import loginHandler from "src/pages/api/auth/login.page";
 import request from "supertest";
 import { LOGINAPI, LOGOUT } from "src/types/apiTypes";
+import { createBearer } from "src/services/Authenticator";
 
 describe("/logout", () => {
   beforeEach(async () => {
@@ -36,27 +37,18 @@ describe("/logout", () => {
   describe("/DELETE", () => {
     it("Should remove Client and JWT on successfull logout", async () => {
       const klant = await Factory.createRandomKlant();
-      await client.connect();
-      await klant.save();
-      await client.close();
+      const bearer = createBearer(klant);
 
-      const loginPayload = {
-        csrf: generateCsrf(),
-        email: klant.email,
-        password: klant.password,
-      };
-      const response = await testClient(loginHandler)
-        .post(LOGINAPI)
-        .send(loginPayload);
+      const logoutResponse = await testClient(handler)
+        .delete(LOGOUT)
+        .set("bearer", bearer)
+        .send()
+        .expect(200);
 
-      expect(response.statusCode).toBe(200);
-      expect(response.headers["set-cookie"].includes("JWT"));
-      expect(response.headers["set-cookie"].includes("Client"));
-
-      const logoutResponse = await testClient(handler).delete(LOGOUT).send();
-
-      expect(!logoutResponse.headers["set-cookie"].includes("JWT"));
-      expect(!logoutResponse.headers["set-cookie"].includes("Client"));
+      expect(logoutResponse.headers["set-cookie"].includes("JWT")).toBe(false);
+      expect(logoutResponse.headers["set-cookie"].includes("Client")).toBe(
+        false
+      );
     });
   });
 });
