@@ -1,8 +1,8 @@
-import { getData } from "src/utils/MongoDb";
-import { HondCollection } from "../types/EntityTpes/HondTypes";
-import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
-import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
-import { RasCollection } from "../types/EntityTpes/RasTypes";
+import { getData } from 'src/utils/MongoDb';
+import { HondCollection } from '../types/EntityTpes/HondTypes';
+import { InschrijvingCollection } from '../types/EntityTpes/InschrijvingTypes';
+import { IsKlantCollection } from '../types/EntityTpes/KlantTypes';
+import { RasCollection } from '../types/EntityTpes/RasTypes';
 
 export type PaginatedRequestQuery = Partial<{
   search: string;
@@ -33,22 +33,22 @@ export type PaginatedData<T> = {
 export async function getPaginatedData<T>(
   query: PaginatedRequestQuery,
   url: string,
-  controller: "KlantController"
+  controller: 'KlantController'
 ): Promise<PaginatedData<T>>;
 export async function getPaginatedData<T>(
   query: PaginatedRequestQuery,
   url: string,
-  controller: "InschrijvingController"
+  controller: 'InschrijvingController'
 ): Promise<PaginatedData<T>>;
 export async function getPaginatedData<T>(
   query: PaginatedRequestQuery,
   url: string,
-  controller: "HondController"
+  controller: 'HondController'
 ): Promise<PaginatedData<T>>;
 export async function getPaginatedData<T>(
   query: PaginatedRequestQuery,
   url: string,
-  controller: "RasController"
+  controller: 'RasController'
 ): Promise<PaginatedData<T>>;
 
 export async function getPaginatedData<T>(
@@ -75,14 +75,10 @@ const getPagination = <T>(
 ): Pagination => {
   const { page, amount, search } = query;
 
-  const pageSize = parseInt(amount ?? "10");
-  const cPage = parseInt(page ?? "1");
-  const currentPage = Math.min(
-    Math.max(cPage, 1),
-    Math.ceil(data.length / pageSize)
-  );
-  const first =
-    data.length === 0 ? 0 : Math.max((currentPage - 1) * pageSize, -1);
+  const pageSize = parseInt(amount ?? '10');
+  const cPage = parseInt(page ?? '1');
+  const currentPage = Math.min(Math.max(cPage, 1), Math.ceil(data.length / pageSize));
+  const first = data.length === 0 ? 0 : Math.max((currentPage - 1) * pageSize, -1);
   // const first = Math.max(currentPage * pageSize, -1);
   const last = Math.min(first + pageSize, data.length);
 
@@ -90,42 +86,26 @@ const getPagination = <T>(
   const nextPage = data.length > last ? `page=${currentPage + 1}` : undefined;
   const prevPage = currentPage > 1 ? `page=${currentPage - 1}` : undefined;
   const sizeValue = `amount=${pageSize}`;
-  const baseUrl = url.split("?")[0];
+  const baseUrl = url.split('?')[0];
 
   return {
     currentPage,
     first,
     last,
     next: nextPage
-      ? `${baseUrl}?${[searchValue, nextPage, sizeValue]
-          .filter(notEmpty)
-          .join("&")}`
+      ? `${baseUrl}?${[searchValue, nextPage, sizeValue].filter(notEmpty).join('&')}`
       : undefined,
     previous: prevPage
-      ? `${baseUrl}?${[searchValue, prevPage, sizeValue]
-          .filter(notEmpty)
-          .join("&")}`
+      ? `${baseUrl}?${[searchValue, prevPage, sizeValue].filter(notEmpty).join('&')}`
       : undefined,
     total: data.length,
   };
 };
 
-function filterData<T>(
-  data: IsKlantCollection[],
-  query: PaginatedRequestQuery
-): T[];
-function filterData<T>(
-  data: InschrijvingCollection[],
-  query: PaginatedRequestQuery
-): T[];
-function filterData<T>(
-  data: HondCollection[],
-  query: PaginatedRequestQuery
-): T[];
-function filterData<T>(
-  data: RasCollection[],
-  query: PaginatedRequestQuery
-): T[];
+function filterData<T>(data: IsKlantCollection[], query: PaginatedRequestQuery): T[];
+function filterData<T>(data: InschrijvingCollection[], query: PaginatedRequestQuery): T[];
+function filterData<T>(data: HondCollection[], query: PaginatedRequestQuery): T[];
+function filterData<T>(data: RasCollection[], query: PaginatedRequestQuery): T[];
 function filterData<T>(
   data:
     | IsKlantCollection[]
@@ -147,43 +127,38 @@ function filterData<T>(
       : data;
   } else if (instanceOfInschrijvingCollectionArray(data)) {
     if (id) {
-      const ids = id.split(",");
-      return data.filter((inschrijving) =>
-        ids.includes(inschrijving._id.toString())
-      );
+      const ids = id.split(',');
+      return data.filter((inschrijving) => ids.includes(inschrijving._id.toString()));
     }
     return data;
   } else if (instanceOfRasCollectionArray(data)) {
     return search
-      ? data.filter((ras) =>
-          ras.naam.toLowerCase().includes(search.toLowerCase())
-        )
+      ? data.filter((ras) => ras.naam.toLowerCase().includes(search.toLowerCase()))
       : data;
   }
   return data;
 }
 
-function instanceOfKlantCollectionArray(
-  array: any[]
-): array is IsKlantCollection[] {
+function instanceOfKlantCollectionArray(array: any[]): array is IsKlantCollection[] {
   return (
-    "_id" in array[0] &&
-    "roles" in array[0] &&
-    "verified" in array[0] &&
-    "inschrijvingen" in array[0] &&
-    "reservaties" in array[0] &&
-    "created_at" in array[0] &&
-    "updated_at" in array[0] &&
-    "email" in array[0] &&
-    "password" in array[0] &&
-    "vnaam" in array[0] &&
-    "lnaam" in array[0] &&
-    "gsm" in array[0] &&
-    "straat" in array[0] &&
-    "nr" in array[0] &&
-    "gemeente" in array[0] &&
-    "postcode" in array[0] &&
-    "honden" in array[0]
+    !array.length ||
+    ('_id' in array[0] &&
+      'roles' in array[0] &&
+      'verified' in array[0] &&
+      'inschrijvingen' in array[0] &&
+      'reservaties' in array[0] &&
+      'created_at' in array[0] &&
+      'updated_at' in array[0] &&
+      'email' in array[0] &&
+      'password' in array[0] &&
+      'vnaam' in array[0] &&
+      'lnaam' in array[0] &&
+      'gsm' in array[0] &&
+      'straat' in array[0] &&
+      'nr' in array[0] &&
+      'gemeente' in array[0] &&
+      'postcode' in array[0] &&
+      'honden' in array[0])
   );
 }
 
@@ -191,25 +166,22 @@ function instanceOfInschrijvingCollectionArray(
   array: any[]
 ): array is InschrijvingCollection[] {
   return (
-    "_id" in array[0] &&
-    "created_at" in array[0] &&
-    "updated_at" in array[0] &&
-    "datum" in array[0] &&
-    "training" in array[0] &&
-    "klant" in array[0] &&
-    "id" in array[0].klant &&
-    "vnaam" in array[0].klant &&
-    "hond" in array[0] &&
-    "id" in array[0].hond &&
-    "naam" in array[0].hond
+    '_id' in array[0] &&
+    'created_at' in array[0] &&
+    'updated_at' in array[0] &&
+    'datum' in array[0] &&
+    'training' in array[0] &&
+    'klant' in array[0] &&
+    'id' in array[0].klant &&
+    'vnaam' in array[0].klant &&
+    'hond' in array[0] &&
+    'id' in array[0].hond &&
+    'naam' in array[0].hond
   );
 }
 function instanceOfRasCollectionArray(array: any[]): array is RasCollection[] {
   return (
-    "_id" in array[0] &&
-    "naam" in array[0] &&
-    "soort" in array[0] &&
-    "avatar" in array[0]
+    '_id' in array[0] && 'naam' in array[0] && 'soort' in array[0] && 'avatar' in array[0]
   );
 }
 

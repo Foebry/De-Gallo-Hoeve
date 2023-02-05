@@ -6,25 +6,24 @@ import {
   ReadConcernLevel,
   ClientSession,
   MongoClientOptions,
-} from "mongodb";
-import { ConfirmCollection } from "src/types/EntityTpes/ConfirmTypes";
-import { ContentCollection } from "src/types/EntityTpes/ContentTypes";
-import { ErrorLogCollection } from "src/types/EntityTpes/ErrorLogTypes";
-import { InschrijvingCollection } from "src/types/EntityTpes/InschrijvingTypes";
-import { IsKlantCollection } from "src/types/EntityTpes/KlantTypes";
-import { RasCollection } from "src/types/EntityTpes/RasTypes";
+} from 'mongodb';
+import { ConfirmCollection } from 'src/types/EntityTpes/ConfirmTypes';
+import { ContentCollection } from 'src/types/EntityTpes/ContentTypes';
+import { ErrorLogCollection } from 'src/types/EntityTpes/ErrorLogTypes';
+import { InschrijvingCollection } from 'src/types/EntityTpes/InschrijvingTypes';
+import { IsKlantCollection } from 'src/types/EntityTpes/KlantTypes';
+import { RasCollection } from 'src/types/EntityTpes/RasTypes';
 import {
   GroepTrainingCollection,
   PriveTrainingCollection,
   TrainingDaysCollection,
-} from "src/types/EntityTpes/TrainingType";
+} from 'src/types/EntityTpes/TrainingType';
 
 export type CollectionOptions = {
   includeDeleted?: boolean;
 };
 
 let client: MongoClient | null;
-let closed: boolean = false;
 
 const { URI, MONGODB_DATABASE: DATABASE } = process.env;
 const options: MongoClientOptions = {};
@@ -32,57 +31,55 @@ const options: MongoClientOptions = {};
 export const connectClient = async () => {
   if (!client) {
     client = new MongoClient(URI!, options);
-    await client.connect();
+    try {
+      await client.connect();
+    } catch (e: any) {}
   }
   return client;
 };
 
-export const closeClient = () => {
+export const closeClient = async () => {
   if (!client) return;
-  client.close();
+  const clientToClose = client;
   client = null;
+  try {
+    await clientToClose.close();
+  } catch (e: any) {}
 };
 
-export const getConfirmCollection = async (): Promise<
-  Collection<ConfirmCollection>
-> => {
+export const getConfirmCollection = async (): Promise<Collection<ConfirmCollection>> => {
   const client = await connectClient();
-  return client.db(DATABASE).collection<ConfirmCollection>("confirm");
+  return client.db(DATABASE).collection<ConfirmCollection>('confirm');
 };
 
-export const getContentCollection = async (): Promise<
-  Collection<ContentCollection>
-> => {
+export const getContentCollection = async (): Promise<Collection<ContentCollection>> => {
   const client = await connectClient();
-  return client.db(DATABASE).collection<ContentCollection>("content");
+  return client.db(DATABASE).collection<ContentCollection>('content');
 };
 
 export const getErrorLogCollection = async (): Promise<
   Collection<ErrorLogCollection>
 > => {
   const client = await connectClient();
-  return client.db(DATABASE).collection<ErrorLogCollection>("ErrorLog");
+  return client.db(DATABASE).collection<ErrorLogCollection>('ErrorLog');
 };
 
 export const getInschrijvingCollection = async (): Promise<
   Collection<InschrijvingCollection>
 > => {
   const client = await connectClient();
-  return client.db(DATABASE).collection<InschrijvingCollection>("inschrijving");
+  return client.db(DATABASE).collection<InschrijvingCollection>('inschrijving');
 };
 
-export const getKlantCollection = async (): Promise<
-  Collection<IsKlantCollection>
-> => {
+export const getKlantCollection = async (): Promise<Collection<IsKlantCollection>> => {
   const client = await connectClient();
-  return client.db(DATABASE).collection<IsKlantCollection>("klant");
+  const db = client.db(DATABASE);
+  return client.db(DATABASE).collection<IsKlantCollection>('klant');
 };
 
-export const getRasCollection = async (): Promise<
-  Collection<RasCollection>
-> => {
+export const getRasCollection = async (): Promise<Collection<RasCollection>> => {
   const client = await connectClient();
-  return client.db(DATABASE).collection<RasCollection>("ras");
+  return client.db(DATABASE).collection<RasCollection>('ras');
 };
 
 export const getTrainingCollection = async (): Promise<
@@ -91,21 +88,21 @@ export const getTrainingCollection = async (): Promise<
   const client = await connectClient();
   return client
     .db(DATABASE)
-    .collection<PriveTrainingCollection | GroepTrainingCollection>("training");
+    .collection<PriveTrainingCollection | GroepTrainingCollection>('training');
 };
 
 export const getTrainingDaysCollection = async (): Promise<
   Collection<TrainingDaysCollection>
 > => {
   const client = await connectClient();
-  return client.db(DATABASE).collection<TrainingDaysCollection>("trainingDays");
+  return client.db(DATABASE).collection<TrainingDaysCollection>('trainingDays');
 };
 
 export const startTransaction = (): TransactionOptions => {
   const transactionOptions: TransactionOptions = {
     readPreference: ReadPreference.primary,
     readConcern: { level: ReadConcernLevel.local },
-    writeConcern: { w: "majority" },
+    writeConcern: { w: 'majority' },
   };
 
   return transactionOptions;

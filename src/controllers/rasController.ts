@@ -1,12 +1,10 @@
-import { ObjectId } from "mongodb";
-import { InternalServerError } from "../shared/RequestError";
-import { RasCollection } from "../types/EntityTpes/RasTypes";
-import { getRasCollection } from "src/utils/db";
-import { getCurrentTime } from "src/shared/functions";
+import { ObjectId } from 'mongodb';
+import { InternalServerError } from '../shared/RequestError';
+import { RasCollection } from '../types/EntityTpes/RasTypes';
+import { getRasCollection } from 'src/utils/db';
+import { getCurrentTime } from 'src/shared/functions';
 
-export const getRasByName = async (
-  naam: string
-): Promise<RasCollection | null> => {
+export const getRasByName = async (naam: string): Promise<RasCollection | null> => {
   const collection = await getRasCollection();
   return collection.findOne({ naam });
 };
@@ -19,9 +17,15 @@ export const save = async (ras: RasCollection): Promise<RasCollection> => {
   return ras;
 };
 
-export const getRasById = async (
-  _id: ObjectId
-): Promise<RasCollection | null> => {
+export const saveMany = async (rassen: RasCollection[]): Promise<RasCollection[]> => {
+  const collection = await getRasCollection();
+  const { insertedIds } = await collection.insertMany(rassen);
+  if (!insertedIds) throw new InternalServerError();
+
+  return rassen;
+};
+
+export const getRasById = async (_id: ObjectId): Promise<RasCollection | null> => {
   const collection = await getRasCollection();
 
   return collection.findOne({ _id });
@@ -56,10 +60,7 @@ export const softDelete = async (ras: RasCollection): Promise<void> => {
   const collection = await getRasCollection();
   const deleteRas = { ...ras, deleted_at: getCurrentTime() };
 
-  const { upsertedCount } = await collection.updateOne(
-    { _id: ras._id },
-    deleteRas
-  );
+  const { upsertedCount } = await collection.updateOne({ _id: ras._id }, deleteRas);
   if (upsertedCount !== 1) throw new InternalServerError();
 };
 
@@ -75,7 +76,7 @@ export const getRandomRasNaam = async (): Promise<string> => {
   return rassen[random].naam;
 };
 
-export const RAS = "RasController";
+export const RAS = 'RasController';
 
 const rasController: IsRasController = {
   getRandomRasNaam,
@@ -87,6 +88,7 @@ const rasController: IsRasController = {
   getRasById,
   getRasByName,
   save,
+  saveMany,
 };
 
 export type IsRasController = {
@@ -99,6 +101,7 @@ export type IsRasController = {
   getRasById: (_id: ObjectId) => Promise<RasCollection | null>;
   getRasByName: (naam: string) => Promise<RasCollection | null>;
   save: (ras: RasCollection) => Promise<RasCollection>;
+  saveMany: (rassen: RasCollection[]) => Promise<RasCollection[]>;
 };
 
 export default rasController;

@@ -1,38 +1,19 @@
-import {
-  Collection,
-  MongoClient,
-  ObjectId,
-  ReadPreference,
-  TransactionOptions,
-} from "mongodb";
-import { getAllRassen, RAS } from "src/controllers/rasController";
-import { getHondenByKlantId } from "src/controllers/HondController";
-import Factory from "../services/Factory";
-import { getAllKlanten, KLANT } from "src/controllers/KlantController";
-import { CONFIRM, ConfirmCollection } from "src/types/EntityTpes/ConfirmTypes";
-import { CONTENT } from "src/controllers/ContentController";
-import { INSCHRIJVING } from "src/controllers/InschrijvingController";
-import { TRAINING } from "src/controllers/TrainingController";
-import {
-  GroepTrainingCollection,
-  PriveTrainingCollection,
-  TrainingDaysCollection,
-} from "src/types/EntityTpes/TrainingType";
-import { IsKlantCollection } from "src/types/EntityTpes/KlantTypes";
-import { KlantHond } from "src/types/EntityTpes/HondTypes";
-import { RasCollection } from "src/types/EntityTpes/RasTypes";
-import {
-  ERRORLOG,
-  ErrorLogCollection,
-} from "src/types/EntityTpes/ErrorLogTypes";
-import { ContentCollection } from "src/types/EntityTpes/ContentTypes";
-import { InschrijvingCollection } from "src/types/EntityTpes/InschrijvingTypes";
-import {
-  closeClient,
-  connectClient,
-  getInschrijvingCollection,
-  getTrainingCollection,
-} from "./db";
+import { ObjectId } from 'mongodb';
+import { getAllRassen, RAS } from 'src/controllers/rasController';
+import { getHondenByKlantId } from 'src/controllers/HondController';
+import Factory from '../services/Factory';
+import { getAllKlanten, KLANT } from 'src/controllers/KlantController';
+import { CONFIRM } from 'src/types/EntityTpes/ConfirmTypes';
+import { CONTENT } from 'src/controllers/ContentController';
+import { INSCHRIJVING } from 'src/controllers/InschrijvingController';
+import { TRAINING } from 'src/controllers/TrainingController';
+import { PriveTrainingCollection } from 'src/types/EntityTpes/TrainingType';
+import { IsKlantCollection } from 'src/types/EntityTpes/KlantTypes';
+import { KlantHond } from 'src/types/EntityTpes/HondTypes';
+import { RasCollection } from 'src/types/EntityTpes/RasTypes';
+import { ERRORLOG } from 'src/types/EntityTpes/ErrorLogTypes';
+import { InschrijvingCollection } from 'src/types/EntityTpes/InschrijvingTypes';
+import { getInschrijvingCollection, getTrainingCollection } from './db';
 
 export interface Option {
   value: string;
@@ -57,8 +38,8 @@ export const getIndexData = async () => {
   } catch (e: any) {
     console.error(e.message);
     return {
-      intro: { subtitle: "", content: [] },
-      diensten: { subtitle: "", content: [] },
+      intro: { subtitle: '', content: [] },
+      diensten: { subtitle: '', content: [] },
       trainingen: [],
     };
   }
@@ -82,29 +63,27 @@ export const getHondOptions = async (klant_id: ObjectId) => {
 
 export const getFreeTimeSlots = async () => {
   const all = [
-    "10:00",
-    "11:00",
-    "12:00",
-    "13:00",
-    "14:00",
-    "15:00",
-    "16:00",
-    "17:00",
+    '10:00',
+    '11:00',
+    '12:00',
+    '13:00',
+    '14:00',
+    '15:00',
+    '16:00',
+    '17:00',
   ].map((el) => ({ label: el, value: el }));
   const collection = await getInschrijvingCollection();
   const inschrijvingen = await collection
-    .find({ training: "prive", datum: { $gt: new Date() } })
+    .find({ training: 'prive', datum: { $gt: new Date() } })
     .toArray();
 
   const timeSlots = inschrijvingen.reduce((prev, curr) => {
-    const [date, time] = curr.datum.toISOString().split("T");
+    const [date, time] = curr.datum.toISOString().split('T');
     const keys = Object.keys(prev);
     if (keys.includes(date)) {
       return {
         ...prev,
-        [date]: prev[date].filter(
-          (el: Option) => el.label !== time.substring(0, 5)
-        ),
+        [date]: prev[date].filter((el: Option) => el.label !== time.substring(0, 5)),
       };
     } else
       return {
@@ -119,7 +98,7 @@ export const getFreeTimeSlots = async () => {
 };
 
 export const clearAllData = async () => {
-  if (process.env.NODE_ENV === "test") {
+  if (process.env.NODE_ENV === 'test') {
     await Factory.getController(CONFIRM).deleteAll();
     await Factory.getController(KLANT).deleteAll();
     await Factory.getController(CONTENT).deleteAll();
@@ -131,15 +110,15 @@ export const clearAllData = async () => {
 };
 
 export async function getData(controller: string): Promise<IsKlantCollection[]>;
-export async function getData(controller: string): Promise<IsKlantCollection[]>;
+export async function getData(controller: string): Promise<InschrijvingCollection[]>;
 export async function getData(controller: string): Promise<KlantHond[]>;
 export async function getData(controller: string): Promise<RasCollection[]>;
 export async function getData(controller: string) {
-  return controller === "HondController"
+  return controller === 'HondController'
     ? Factory.getController(controller).getAllHonden()
-    : controller === "InschrijvingController"
+    : controller === 'InschrijvingController'
     ? Factory.getController(controller).getAllInschrijvingen()
-    : controller === "KlantController"
+    : controller === 'KlantController'
     ? getAllKlanten()
     : getAllRassen();
 }

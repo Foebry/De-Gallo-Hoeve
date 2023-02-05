@@ -1,14 +1,14 @@
-import { ObjectId } from "mongodb";
-import { NextApiRequest, NextApiResponse } from "next";
-import { atob, btoa } from "buffer";
-import { getContentById } from "src/controllers/ContentController";
-import { ContentNotFoundError } from "src/shared/RequestError";
-import { closeClient, getContentCollection } from "src/utils/db";
+import { ObjectId } from 'mongodb';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { btoa } from 'buffer';
+import { getContentById } from 'src/controllers/ContentController';
+import { ContentNotFoundError } from 'src/shared/RequestError';
+import { getContentCollection } from 'src/utils/db';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method === "GET") return getContent(req, res);
-  else if (req.method === "PUT") return changeContent(req, res);
-  else return res.status(405).send("Not Allowed");
+  if (req.method === 'GET') return getContent(req, res);
+  else if (req.method === 'PUT') return changeContent(req, res);
+  else return res.status(405).send('Not Allowed');
 };
 
 const getContent = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -20,12 +20,10 @@ const getContent = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const result = {
-    subtitle: Buffer.from(data.subtitle, "base64").toString(),
-    content: Buffer.from(data.content, "base64").toString().split("\n"),
+    subtitle: Buffer.from(data.subtitle, 'base64').toString(),
+    content: Buffer.from(data.content, 'base64').toString().split('\n'),
     image: data.image,
   };
-
-  closeClient();
 
   return res.status(200).send(result);
 };
@@ -40,13 +38,11 @@ const changeContent = async (req: NextApiRequest, res: NextApiResponse) => {
     {
       $set: {
         subtitle: btoa(subtitle),
-        content: btoa(content.join("\n")),
+        content: btoa(content.join('\n')),
         image,
       },
     }
   );
-
-  closeClient();
 
   return res.status(200).send({ subtitle, content, image });
 };
