@@ -1,75 +1,107 @@
-import { Collection, ObjectId } from "mongodb";
-import client from "../utils/MongoDb";
-import { InternalServerError, RasNotFoundError } from "../shared/RequestError";
-import { RasCollection, UpdateRas } from "../types/EntityTpes/RasTypes";
+import { ObjectId } from 'mongodb';
+import { InternalServerError } from '../shared/RequestError';
+import { RasCollection } from '../types/EntityTpes/RasTypes';
+import { getRasCollection } from 'src/utils/db';
+import { getCurrentTime } from 'src/shared/functions';
 
-export interface IsRasController {
-  getRasCollection: () => Collection;
-  save: (ras: RasCollection) => Promise<RasCollection>;
-  getAllRassen: () => Promise<RasCollection[]>;
-  getRasById: (_id: ObjectId, breakEarly?: boolean) => Promise<RasCollection>;
-  getRasByName: (naam: string) => Promise<RasCollection | null>;
-  update: (_id: ObjectId, updateRas: UpdateRas) => Promise<RasCollection>;
-  delete: (ras: ObjectId) => Promise<void>;
-  deleteAll: () => Promise<void>;
-  getRandomRasNaam: () => Promise<string>;
-}
-
-const RasController: IsRasController = {
-  getRasCollection: () => {
-    const database = process.env.MONGODB_DATABASE;
-    return client.db(database).collection("ras");
-  },
-  getRasByName: (naam) => {
-    return getRasCollection().findOne({ naam }) as Promise<RasCollection>;
-  },
-  save: async (ras) => {
-    const { insertedId } = await getRasCollection().insertOne(ras);
-    if (!insertedId) throw new InternalServerError();
-
-    return await getRasById(insertedId);
-  },
-  getRasById: async (_id, breakEarly = true) => {
-    const ras = await getRasCollection().findOne({ _id });
-    if (!ras && breakEarly) throw new RasNotFoundError();
-    return ras as RasCollection;
-  },
-  getAllRassen: async () => {
-    return (await getRasCollection()
-      .find({ deleted_at: null })
-      .toArray()) as RasCollection[];
-  },
-  update: async (_id, updateRas) => {
-    await getRasById(_id);
-    const collection = getRasCollection();
-    const { upsertedCount } = await collection.updateOne({ _id }, updateRas);
-    if (upsertedCount !== 1) throw new InternalServerError();
-    return await getRasById(_id);
-  },
-  delete: async (_id) => {
-    const ras = await getRasById(_id);
-    const { deletedCount } = await getRasCollection().deleteOne(ras);
-    if (deletedCount !== 1) throw new InternalServerError();
-  },
-  deleteAll: async () => {
-    const ids = (await getRasCollection().find().toArray()).map(
-      (item) => item._id
-    );
-    await getRasCollection().deleteMany({ _id: { $in: [...ids] } });
-  },
-  getRandomRasNaam: async () => {
-    const rassen = await getAllRassen();
-    const random = Math.floor(Math.random() * rassen.length);
-    return rassen[random].naam;
-  },
+export const getRasByName = async (naam: string): Promise<RasCollection | null> => {
+  const collection = await getRasCollection();
+  return collection.findOne({ naam });
 };
 
-export default RasController;
-export const RAS = "RasController";
-export const {
-  getRasCollection,
-  getRasById,
-  getAllRassen,
+export const save = async (ras: RasCollection): Promise<RasCollection> => {
+  const collection = await getRasCollection();
+  const { insertedId } = await collection.insertOne(ras);
+  if (!insertedId) throw new InternalServerError();
+
+  return ras;
+};
+
+export const saveMany = async (rassen: RasCollection[]): Promise<RasCollection[]> => {
+  const collection = await getRasCollection();
+  const { insertedIds } = await collection.insertMany(rassen);
+  if (!insertedIds) throw new InternalServerError();
+
+  return rassen;
+};
+
+export const getRasById = async (_id: ObjectId): Promise<RasCollection | null> => {
+  const collection = await getRasCollection();
+
+  return collection.findOne({ _id });
+};
+
+export const getAllRassen = async (): Promise<RasCollection[]> => {
+  const collection = await getRasCollection();
+  return collection.find({ deleted_at: undefined }).toArray();
+};
+
+export const update = async (
+  _id: ObjectId,
+  data: RasCollection
+): Promise<RasCollection> => {
+  const collection = await getRasCollection();
+
+  const updateRas = { ...data, updated_at: getCurrentTime() };
+
+  const { upsertedCount } = await collection.updateOne({ _id }, updateRas);
+  if (upsertedCount !== 1) throw new InternalServerError();
+
+  return data;
+};
+
+export const hardDelete = async (ras: RasCollection): Promise<void> => {
+  const collection = await getRasCollection();
+  const { deletedCount } = await collection.deleteOne(ras);
+  if (!deletedCount) throw new InternalServerError();
+};
+
+export const softDelete = async (ras: RasCollection): Promise<void> => {
+  const collection = await getRasCollection();
+  const deleteRas = { ...ras, deleted_at: getCurrentTime() };
+
+  const { upsertedCount } = await collection.updateOne({ _id: ras._id }, deleteRas);
+  if (upsertedCount !== 1) throw new InternalServerError();
+};
+
+export const deleteAll = async (): Promise<void> => {
+  const collection = await getRasCollection();
+
+  collection.deleteMany({});
+};
+
+export const getRandomRasNaam = async (): Promise<string> => {
+  const rassen = await getAllRassen();
+  const random = Math.floor(Math.random() * rassen.length);
+  return rassen[random].naam;
+};
+
+export const RAS = 'RasController';
+
+const rasController: IsRasController = {
   getRandomRasNaam,
+  deleteAll,
+  hardDelete,
+  softDelete,
+  update,
+  getAllRassen,
+  getRasById,
   getRasByName,
-} = RasController;
+  save,
+  saveMany,
+};
+
+export type IsRasController = {
+  getRandomRasNaam: () => Promise<string>;
+  deleteAll: () => Promise<void>;
+  hardDelete: (ras: RasCollection) => Promise<void>;
+  softDelete: (ras: RasCollection) => Promise<void>;
+  update: (_id: ObjectId, data: RasCollection) => Promise<RasCollection>;
+  getAllRassen: () => Promise<RasCollection[]>;
+  getRasById: (_id: ObjectId) => Promise<RasCollection | null>;
+  getRasByName: (naam: string) => Promise<RasCollection | null>;
+  save: (ras: RasCollection) => Promise<RasCollection>;
+  saveMany: (rassen: RasCollection[]) => Promise<RasCollection[]>;
+};
+
+export default rasController;

@@ -1,5 +1,6 @@
-import { getTrainingDaysCollection } from "../controllers/TrainingController";
-import { TrainingDaysCollection } from "../types/EntityTpes/TrainingType";
+import moment from 'moment';
+import { getTrainingDaysCollection } from 'src/utils/db';
+import { TrainingDaysCollection } from '../types/EntityTpes/TrainingType';
 
 interface HelperInterface {
   getDisabledDays: (training: string) => Promise<string[]>;
@@ -7,53 +8,77 @@ interface HelperInterface {
   createRandomConfirmCode: () => string;
 }
 
-const helper: HelperInterface = {
-  getDisabledDays: async (training) => {
-    const date = new Date();
+export const getDisabledDays = async (traning: string) => {
+  const trainingDaysCollection = await getTrainingDaysCollection();
+  const date = new Date();
 
-    // vandaag wordt steeds disabled
-    const disabledDays = [date.toISOString().split(".")[0].split("T")[0]];
+  //today is always disabled to prevent any new inschrijvingen or reservations for the current day
+  const disabledDays = [date.toISOString().split('.')[0].split('T')[0]];
 
-    const temp = new Date();
-    const enddate = new Date(temp.getFullYear(), temp.getMonth() + 2, 0);
-    const trainingDays = (await getTrainingDaysCollection()
-      .find({
-        date: { $gt: new Date(temp) },
-      })
-      .toArray()) as TrainingDaysCollection[];
+  const temp = new Date();
+  const endDate = new Date(temp.getFullYear(), temp.getMonth() + 2, 0);
+  const trainingDays = (await trainingDaysCollection
+    .find({ date: { $gt: new Date(temp) } })
+    .toArray()) as TrainingDaysCollection[];
 
-    const enabledDays = trainingDays.map((el) => el.date.toISOString());
+  const enabledDays = trainingDays.map((day) => day.date.toISOString());
 
-    while (true) {
-      const newDate = new Date(date.setDate(date.getDate() + 1));
-      const dateString = newDate.toISOString().split(".")[0].split("T")[0];
+  while (true) {
+    const newDate = new Date(date.setDate(date.getDate() + 1));
+    const dateString = newDate.toISOString().split('.')[0].split('T')[0];
 
-      if (!enabledDays.includes(new Date(dateString).toISOString())) {
-        disabledDays.push(dateString);
-      }
-
-      if (newDate.getTime() > enddate.getTime()) return disabledDays;
+    if (!enabledDays.includes(new Date(dateString).toISOString())) {
+      disabledDays.push(dateString);
     }
-  },
-  capitalize: (string) => {
-    const words = string.split(" ");
-    return words
-      .map(
-        (word) =>
-          word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase()
-      )
-      .join(" ");
-  },
-  createRandomConfirmCode: (length: number = 50) => {
-    const options = "abcdefghijklmnopqrstuvwxyz0123456789";
-    const code = new Array(length).fill(0).map((_) => {
-      const index = Math.floor(Math.random() * options.length);
-      return Math.random() > 0.5
-        ? options[index].toUpperCase()
-        : options[index];
-    });
-    return code.join("");
-  },
+    if (newDate.getTime() > endDate.getTime()) return disabledDays;
+  }
 };
 
-export const { getDisabledDays, capitalize, createRandomConfirmCode } = helper;
+export const capitalize = (string: string) => {
+  return string
+    .split(' ')
+    .map(
+      (word) => word.substring(0, 1).toUpperCase() + word.substring(1).toLocaleLowerCase()
+    )
+    .join(' ');
+};
+
+export const getCurrentTime = () => {
+  const currentMoment = moment().format('YYYY-MM-DD HH:mm:ss');
+  return toLocalTime(currentMoment);
+};
+
+export const toLocalTime = (date: string): Date => {
+  return new Date(moment.utc(date).local().toString());
+};
+
+export const createRandomConfirmCode = (length: number = 50) => {
+  const options = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  const code = new Array(length).fill(0).map((_) => {
+    const index = Math.floor(Math.random() * options.length);
+    return Math.random() > 0.5 ? options[index].toUpperCase() : options[index];
+  });
+  return code.join('');
+};
+
+export const getAge = (date: Date) =>
+  moment(date)
+    .fromNow()
+    .replace('years ago', 'jaar')
+    .replace('a month ago', '1 maand')
+    .replace('days ago', 'dagen');
+
+export const toReadableDate = (date: Date): string =>
+  date.toISOString().replace('T', ' ').split('.')[0];
+
+export const pick = <T>(arr: T[]): T => {
+  return arr[Math.floor(Math.random() * arr.length)];
+};
+
+const helper: HelperInterface = {
+  createRandomConfirmCode,
+  capitalize,
+  getDisabledDays,
+};
+
+export default helper;

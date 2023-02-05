@@ -1,100 +1,115 @@
 import moment from "moment";
-import { Collection, ObjectId } from "mongodb";
-import Factory from "../services/Factory";
-import client from "../utils/MongoDb";
-import {
-  ConfirmNotFoundError,
-  InternalServerError,
-  KlantNotFoundError,
-} from "../shared/RequestError";
+import { Code, ObjectId } from "mongodb";
+import { InternalServerError } from "../shared/RequestError";
 import { ConfirmCollection } from "../types/EntityTpes/ConfirmTypes";
-import { getKlantCollection } from "./KlantController";
+import { getConfirmCollection } from "src/utils/db";
+import {
+  createRandomConfirmCode,
+  getCurrentTime,
+  toLocalTime,
+} from "src/shared/functions";
 
-export interface IsConfirmController {
-  getConfirmCollection: () => Collection;
-  saveConfirm: (confirm: ConfirmCollection) => Promise<ConfirmCollection>;
-  getAllConfirm: () => Promise<ConfirmCollection[]>;
-  getConfirmById: (_id: ObjectId) => Promise<ConfirmCollection>;
+export const save = async (
+  confirm: ConfirmCollection
+): Promise<ConfirmCollection> => {
+  const controller = await getConfirmCollection();
+  const { acknowledged } = await controller.insertOne(confirm);
+  if (!acknowledged) throw new InternalServerError();
+
+  return confirm;
+};
+
+export const getAllConfirm = async (): Promise<ConfirmCollection[]> => {
+  const collection = await getConfirmCollection();
+  return collection.find().toArray();
+};
+
+export const getConfirmById = async (
+  _id: ObjectId
+): Promise<ConfirmCollection | null> => {
+  const collection = await getConfirmCollection();
+  return collection.findOne({ _id });
+};
+
+export const getConfirmByKlantId = async (
+  klant_id: ObjectId
+): Promise<ConfirmCollection | null> => {
+  const collection = await getConfirmCollection();
+  return collection.findOne({ klant_id });
+};
+
+export const getConfirmByCode = async (
+  code: string
+): Promise<ConfirmCollection | null> => {
+  const collection = await getConfirmCollection();
+  return collection.findOne({ code });
+};
+
+export const updateConfirm = async (
+  _id: ObjectId,
+  data: ConfirmCollection
+): Promise<void> => {
+  const collection = await getConfirmCollection();
+  const { upsertedCount } = await collection.updateOne({ _id }, data);
+  if (upsertedCount !== 1) throw new InternalServerError();
+};
+
+export const reset = async (
+  confirm: ConfirmCollection
+): Promise<ConfirmCollection> => {
+  const collection = await getConfirmCollection();
+  const newCode = createRandomConfirmCode();
+  const valid_to = toLocalTime(moment(getCurrentTime()).add(1, "day").format());
+  await collection.updateOne(
+    { _id: confirm._id },
+    {
+      $set: {
+        valid_to,
+        code: newCode,
+      },
+    }
+  );
+  return { ...confirm, valid_to, code: newCode };
+};
+
+export const deleteByKlantId = async (klant_id: ObjectId): Promise<void> => {
+  const collection = await getConfirmCollection();
+  const { deletedCount } = await collection.deleteOne({ klant_id });
+  if (deletedCount !== 1) throw new InternalServerError();
+};
+
+export const deleteAll = async (): Promise<void> => {
+  const collection = await getConfirmCollection();
+
+  if (process.env.NODE_ENV === "test") {
+    collection.deleteMany({});
+  }
+};
+
+const confirmController: IsConfirmController = {
+  deleteAll,
+  deleteByKlantId,
+  reset,
+  updateConfirm,
+  getConfirmByCode,
+  getConfirmByKlantId,
+  getConfirmById,
+  getAllConfirm,
+  save,
+};
+
+export type IsConfirmController = {
+  deleteAll: () => Promise<void>;
+  deleteByKlantId: (klant_id: ObjectId) => Promise<void>;
+  reset: (confirm: ConfirmCollection) => Promise<ConfirmCollection>;
+  updateConfirm: (_id: ObjectId, data: ConfirmCollection) => Promise<void>;
+  getConfirmByCode: (code: string) => Promise<ConfirmCollection | null>;
   getConfirmByKlantId: (
     klant_id: ObjectId
   ) => Promise<ConfirmCollection | null>;
-  getConfirmByCode: (code: string) => Promise<null | ConfirmCollection>;
-  reset: (confirm: ConfirmCollection) => Promise<ConfirmCollection>;
-  deleteConfirmByKlantId: (_id: ObjectId) => Promise<void>;
-  deleteAll: () => Promise<void>;
-}
-
-const ConfirmController: IsConfirmController = {
-  getConfirmCollection: () => {
-    const database = process.env.MONGODB_DATABASE;
-    return client.db(database).collection("confirm");
-  },
-  saveConfirm: async (confirm) => {
-    const { acknowledged } = await (
-      await getConfirmCollection()
-    ).insertOne(confirm);
-    if (!acknowledged) throw new InternalServerError();
-    return confirm;
-  },
-  getAllConfirm: async () => {
-    const allConfirms = await getConfirmCollection().find().toArray();
-    return allConfirms as ConfirmCollection[];
-  },
-  getConfirmById: async (_id) => {
-    const confirm = await getConfirmCollection().findOne({ _id });
-    if (!confirm) throw new ConfirmNotFoundError();
-    return confirm as ConfirmCollection;
-  },
-  getConfirmByKlantId: async (klant_id) => {
-    const klant = await getKlantCollection().findOne({ _id: klant_id });
-    if (!klant) throw new KlantNotFoundError();
-
-    const confirm = await getConfirmCollection().findOne({ klant_id });
-    if (!confirm) throw new ConfirmNotFoundError();
-
-    return confirm as ConfirmCollection;
-  },
-  getConfirmByCode: async (code) => {
-    const confirm = await getConfirmCollection().findOne({ code });
-    return confirm as ConfirmCollection;
-  },
-  reset: async (confirm) => {
-    await getConfirmCollection().deleteOne(confirm);
-
-    const newConfirm = Factory.createConfirm({
-      klant_id: confirm.klant_id,
-      created_at: moment().local().toDate(),
-    });
-    const { insertedId: _id } = await getConfirmCollection().insertOne(
-      newConfirm
-    );
-
-    return getConfirmById(_id);
-  },
-  deleteConfirmByKlantId: async (klant_id) => {
-    const klant = await getKlantCollection().findOne({ _id: klant_id });
-    if (!klant) throw new KlantNotFoundError();
-
-    const confirm = await getConfirmByKlantId(klant_id);
-    if (!confirm) throw new ConfirmNotFoundError();
-
-    const { deletedCount } = await getConfirmCollection().deleteOne({
-      _id: confirm._id,
-    });
-    if (deletedCount !== 1) throw new InternalServerError();
-  },
-  deleteAll: async () => {
-    const ids = (await getConfirmCollection().find().toArray()).map(
-      (item) => item._id
-    );
-    await getConfirmCollection().deleteMany({ _id: { $in: [...ids] } });
-  },
+  getConfirmById: (_id: ObjectId) => Promise<ConfirmCollection | null>;
+  getAllConfirm: () => Promise<ConfirmCollection[]>;
+  save: (confirm: ConfirmCollection) => Promise<ConfirmCollection>;
 };
 
-export default ConfirmController;
-export const {
-  getConfirmCollection,
-  getConfirmById,
-  getConfirmByKlantId,
-  getConfirmByCode,
-} = ConfirmController;
+export default confirmController;

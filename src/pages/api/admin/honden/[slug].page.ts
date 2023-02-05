@@ -1,16 +1,19 @@
-import { getHondById } from "src/controllers/HondController";
-import { getEigenaarVanHond } from "src/controllers/KlantController";
-import { getRasByName } from "src/controllers/rasController";
-import { mapToHondDetailResponse } from "src/mappers/honden";
-import client from "src/utils/MongoDb";
+import { getHondById } from 'src/controllers/HondController';
+import { getHondOwner } from 'src/controllers/KlantController';
+import { getRasByName } from 'src/controllers/rasController';
+import { mapToHondDetailResponse } from 'src/mappers/honden';
 import {
   HondNotFoundError,
   KlantNotFoundError,
+  NotAllowedError,
   RasNotFoundError,
-} from "src/shared/RequestError";
-import { ObjectId } from "mongodb";
-import { NextApiRequest, NextApiResponse } from "next";
-import { GenericRequest } from "src/pages/api/auth/login.page";
+} from 'src/shared/RequestError';
+import { ObjectId } from 'mongodb';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { GenericRequest } from 'src/pages/api/auth/login.page';
+import { closeClient } from 'src/utils/db';
+import { logError } from 'src/controllers/ErrorLogController';
+import { adminApi } from 'src/services/Authenticator';
 
 export interface HondDetailResponse {
   _id: string;
@@ -32,35 +35,39 @@ interface HondDetailRequest {
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method === "GET")
+  try {
+    adminApi({ req, res });
+
+    if (req.method !== 'GET') throw new NotAllowedError();
+
     return getHondDetail(req as GenericRequest<HondDetailRequest>, res);
+  } catch (e: any) {
+    return res.status(e.code).json(e.response);
+  }
 };
 
 const getHondDetail = async (
   req: GenericRequest<HondDetailRequest>,
-  res: NextApiResponse<HondDetailResponse>
+  res: NextApiResponse<HondDetailResponse | { message: string }>
 ) => {
   try {
     const { slug: _id } = req.query;
 
-    await client.connect();
-
     const hond = await getHondById(new ObjectId(_id));
     if (!hond) throw new HondNotFoundError();
 
-    const klant = await getEigenaarVanHond(hond);
+    const klant = await getHondOwner(hond);
     if (!klant) throw new KlantNotFoundError();
 
     const ras = await getRasByName(hond.ras);
     if (!ras) throw new RasNotFoundError();
 
-    // await client.close();
-
     const result = mapToHondDetailResponse(hond, klant, ras);
 
     return res.status(200).send(result);
   } catch (e: any) {
-    return res.status(e.code).send(e.message);
+    await logError('honden/:id', req, e);
+    return res.status(e.code).json(e.response);
   }
 };
 

@@ -9,4 +9,8 @@ module.exports = {
   transformIgnorePatterns: ["<rootDir>/node_modules/"],
   setupFiles: ["dotenv/config"],
   collectCoverageFrom: ["src/**/*.tsx", "src/**/*.ts"],
+  moduleNameMapper: {
+    "^src/(.*)$": "<rootDir>/src/$1",
+    "^tests/(.*)$": "<rootDir>/tests/$1",
+  },
 };

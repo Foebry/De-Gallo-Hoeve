@@ -1,34 +1,29 @@
-import { ObjectId } from "mongodb";
-import { NextApiRequest, NextApiResponse } from "next";
-import { getTrainingDaysCollection } from "src/controllers/TrainingController";
-import client from "src/utils/MongoDb";
-import { TrainingDaysCollection } from "src/types/EntityTpes/TrainingType";
+import { ObjectId } from 'mongodb';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { closeClient, getTrainingDaysCollection } from 'src/utils/db';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method === "GET") return getAvailableDays(req, res);
-  if (req.method === "POST") return setAvailabelDays(req, res);
-  return res.status(405).send("Not Allowed");
+  if (req.method === 'GET') return getAvailableDays(req, res);
+  if (req.method === 'POST') return setAvailabelDays(req, res);
+  return res.status(405).send('Not Allowed');
 };
 
 const getAvailableDays = async (req: NextApiRequest, res: NextApiResponse) => {
-  await client.connect();
-  const data = (await getTrainingDaysCollection()
-    .find({ date: { $gt: new Date() } })
-    .toArray()) as TrainingDaysCollection[];
+  const collection = await getTrainingDaysCollection();
+  const data = await collection.find({ date: { $gt: new Date() } }).toArray();
 
-  const result = data.map((day) => day.date.toISOString().split("T")[0]);
+  const result = data.map((day) => day.date.toISOString().split('T')[0]);
+
   return res.status(200).send(result);
 };
 
 const setAvailabelDays = async (req: NextApiRequest, res: NextApiResponse) => {
   const { selected } = req.body;
-  await client.connect();
+  const collection = await getTrainingDaysCollection();
 
-  const currentCollections = (await getTrainingDaysCollection()
-    .find({ date: { $gt: new Date() } })
-    .toArray()) as TrainingDaysCollection[];
-  const currentTrainingDays = currentCollections.map((day) => ({
-    date: day.date.toISOString().split("T")[0],
+  const data = await collection.find({ date: { $gt: new Date() } }).toArray();
+  const currentTrainingDays = data.map((day) => ({
+    date: day.date.toISOString().split('T')[0],
     _id: day._id,
   }));
 
@@ -39,11 +34,11 @@ const setAvailabelDays = async (req: NextApiRequest, res: NextApiResponse) => {
     (day: string) => !currentTrainingDays.map((day) => day.date).includes(day)
   );
 
-  await getTrainingDaysCollection().deleteMany({
+  await collection.deleteMany({
     _id: { $in: deletedTrainingDays.map((day) => day._id) },
   });
 
-  await getTrainingDaysCollection().insertMany(
+  await collection.insertMany(
     daysToAdd.map((day: string) => ({
       _id: new ObjectId(),
       date: new Date(day),
@@ -51,7 +46,7 @@ const setAvailabelDays = async (req: NextApiRequest, res: NextApiResponse) => {
   );
 
   // verwijder inschrijvingen met data uit deleteTrainingDays vervolgens deze klanten verwittigen.
-  await client.close();
+  //closeClient(;
 
   return res.status(200).send(selected);
 };
