@@ -25,7 +25,7 @@ const getContent = async (req: NextApiRequest, res: NextApiResponse) => {
     image: data.image,
   };
 
-  closeClient();
+  //closeClient(;
 
   return res.status(200).send(result);
 };
@@ -46,7 +46,7 @@ const changeContent = async (req: NextApiRequest, res: NextApiResponse) => {
     }
   );
 
-  closeClient();
+  //closeClient(;
 
   return res.status(200).send({ subtitle, content, image });
 };

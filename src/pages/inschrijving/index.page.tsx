@@ -261,7 +261,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const timeslots = await getFreeTimeSlots();
   const training = await getPriveTraining();
 
-  closeClient();
+  //closeClient(;
 
   return {
     props: {

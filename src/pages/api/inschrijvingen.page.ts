@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { validate, validateCsrfToken } from "src/services/Validator";
 import { inschrijvingSchema } from "src/types/schemas";
-import { secureApi } from "src/services/Authenticator";
+import { secureApi, verifiedUserApi } from "src/services/Authenticator";
 import {
   EmailNotVerifiedError,
   HondNotFoundError,
@@ -24,7 +24,7 @@ import Factory from "src/services/Factory";
 import { IsInschrijvingBody } from "src/types/requestTypes";
 import { logError } from "src/controllers/ErrorLogController";
 import { save } from "src/controllers/InschrijvingController";
-import { closeClient, startSession, startTransaction } from "src/utils/db";
+import { startSession, startTransaction } from "src/utils/db";
 import { mapInschrijvingen } from "src/mappers/Inschrijvingen";
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
@@ -41,18 +41,16 @@ const getInschrijvingen = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const inschrijvingen = klant.inschrijvingen;
 
-    closeClient();
     return res.status(200).send(inschrijvingen);
   } catch (e: any) {
     await logError("inschrijving", req, e);
-    closeClient();
     return res.status(e.code).send(e.response);
   }
 };
 
 const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    secureApi({ req, res });
+    verifiedUserApi({ req, res });
 
     await validateCsrfToken({ req, res });
     await validate({ req, res }, { schema: inschrijvingSchema });
@@ -62,8 +60,6 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const klant = await getKlantById(new ObjectId(klant_id));
     if (!klant) throw new KlantNotFoundError();
-
-    if (!klant.verified) throw new EmailNotVerifiedError();
 
     const selectedTraining = await getTrainingByName(training);
     if (!selectedTraining) throw new TrainingNotFoundError();
@@ -110,11 +106,11 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
       email: process.env.MAIL_TO,
       _ids: ids.join(","),
     });
-    closeClient();
+    //closeClient(;
     return res.status(201).json({ message: "Inschrijving ontvangen!" });
   } catch (e: any) {
     await logError("inschrijving", req, e);
-    closeClient();
+    //closeClient(;
     return res.status(e.code).send(e.response);
   }
 };

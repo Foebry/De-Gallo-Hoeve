@@ -1,17 +1,17 @@
-import { ClientSession, ObjectId, WithId } from "mongodb";
-import inschrijvingController, {
-  getAllInschrijvingen,
-} from "./InschrijvingController";
-import { InternalServerError, TransactionError } from "../shared/RequestError";
-import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
-import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
-import { HondCollection } from "src/types/EntityTpes/HondTypes";
-import { getKlantCollection } from "src/utils/db";
-import { getCurrentTime } from "src/shared/functions";
-import bcrypt from "bcrypt";
+import { ClientSession, ObjectId, WithId } from 'mongodb';
+import inschrijvingController, { getAllInschrijvingen } from './InschrijvingController';
+import { InternalServerError, TransactionError } from '../shared/RequestError';
+import { IsKlantCollection } from '../types/EntityTpes/KlantTypes';
+import { InschrijvingCollection } from '../types/EntityTpes/InschrijvingTypes';
+import { HondCollection } from 'src/types/EntityTpes/HondTypes';
+import { getKlantCollection } from 'src/utils/db';
+import { getCurrentTime } from 'src/shared/functions';
+import bcrypt from 'bcrypt';
+import { DeepPartial } from 'react-hook-form';
 
 export const getAllKlanten = async (): Promise<IsKlantCollection[]> => {
   const collection = await getKlantCollection();
+  const arr = await collection.find({ deleted_at: undefined }).toArray();
   return collection.find({ deleted_at: undefined }).toArray();
 };
 
@@ -40,14 +40,21 @@ export const getHondOwner = async (
   });
 };
 
-export const save = async (
-  klant: IsKlantCollection
-): Promise<IsKlantCollection> => {
+const saveMany = async (klanten: IsKlantCollection[]): Promise<IsKlantCollection[]> => {
   const collection = await getKlantCollection();
-  const { insertedId } = await collection.insertOne({
-    ...klant,
-    password: await bcrypt.hash(klant.password, 10),
-  });
+  const mappedKlanten = [];
+  for (const klant of klanten) {
+    mappedKlanten.push({ ...klant, password: await bcrypt.hash(klant.password, 10) });
+  }
+  const { insertedIds } = await collection.insertMany(mappedKlanten);
+  if (!insertedIds) throw new InternalServerError();
+
+  return klanten;
+};
+
+const save = async (klant: IsKlantCollection): Promise<IsKlantCollection> => {
+  const collection = await getKlantCollection();
+  const { insertedId } = await collection.insertOne(klant);
   if (!insertedId) throw new InternalServerError();
 
   return klant;
@@ -80,9 +87,9 @@ export const addKlantInschrijving = async (
       { session }
     );
   } catch (e: any) {
-    throw new TransactionError("addKlantInschrijving", 500, {
+    throw new TransactionError('addKlantInschrijving', 500, {
       ...e,
-      message: "Er is iets fout gegaan.",
+      message: 'Er is iets fout gegaan.',
     });
   }
 };
@@ -138,12 +145,12 @@ export const removeInschrijving = async (
 export const deleteAll = async (): Promise<void> => {
   const collection = await getKlantCollection();
 
-  if (process.env.NODE_ENV === "test") {
+  if (process.env.NODE_ENV === 'test') {
     collection.deleteMany({});
   }
 };
 
-export const KLANT = "KlantController";
+export const KLANT = 'KlantController';
 
 const klantController: IsKlantController = {
   deleteAll,
@@ -153,6 +160,7 @@ const klantController: IsKlantController = {
   addKlantInschrijving,
   update,
   save,
+  saveMany,
   getHondOwner,
   getKlantByEmail,
   getKlantById,
@@ -173,11 +181,9 @@ export type IsKlantController = {
     inschrijving: InschrijvingCollection,
     session: ClientSession
   ) => Promise<void>;
-  update: (
-    _id: ObjectId,
-    data: IsKlantCollection
-  ) => Promise<IsKlantCollection>;
+  update: (_id: ObjectId, data: IsKlantCollection) => Promise<IsKlantCollection>;
   save: (klant: IsKlantCollection) => Promise<IsKlantCollection>;
+  saveMany: (klanten: IsKlantCollection[]) => Promise<IsKlantCollection[]>;
   getHondOwner: (hond: HondCollection) => Promise<IsKlantCollection | null>;
   getKlantByEmail: (email: string) => Promise<IsKlantCollection | null>;
   getKlantById: (_id: ObjectId) => Promise<IsKlantCollection | null>;

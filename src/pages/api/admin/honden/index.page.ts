@@ -1,18 +1,15 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { HOND } from "src/controllers/HondController";
+import { NextApiRequest, NextApiResponse } from 'next';
+import { HOND } from 'src/controllers/HondController';
 import {
   getPaginatedData,
   PaginatedRequestQuery,
   PaginatedResponse,
-} from "src/shared/RequestHelper";
-import {
-  mapToHondenOverviewResult,
-  PaginatedKlantHond,
-} from "src/mappers/honden";
-import { KlantHond } from "src/types/EntityTpes/HondTypes";
-import { GenericRequest } from "src/pages/api/auth/login.page";
-import { closeClient } from "src/utils/db";
-import { logError } from "src/controllers/ErrorLogController";
+} from 'src/shared/RequestHelper';
+import { mapToHondenOverviewResult, PaginatedKlantHond } from 'src/mappers/honden';
+import { KlantHond } from 'src/types/EntityTpes/HondTypes';
+import { GenericRequest } from 'src/pages/api/auth/login.page';
+import { logError } from 'src/controllers/ErrorLogController';
+import { adminApi } from 'src/services/Authenticator';
 
 type ListHondenRequest = {
   query: PaginatedRequestQuery;
@@ -20,9 +17,16 @@ type ListHondenRequest = {
 };
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method === "GET")
+  try {
+    adminApi({ req, res });
+
+    if (req.method != 'GET') return res.status(405).send('Not Allowed');
+
     return getHondenOverview(req as GenericRequest<ListHondenRequest>, res);
-  return res.status(405).send("Not allowed");
+  } catch (e: any) {
+    await logError('honden', req, e);
+    return res.status(e.code).send(e.message);
+  }
 };
 
 const getHondenOverview = async (
@@ -31,15 +35,11 @@ const getHondenOverview = async (
 ) => {
   try {
     const data = await getPaginatedData<KlantHond>(req.query, req.url, HOND);
-
     const result = mapToHondenOverviewResult(data);
-
-    closeClient();
 
     return res.status(200).send(result);
   } catch (e: any) {
-    await logError("honden", req, e);
-    closeClient();
+    await logError('honden', req, e);
     return res.status(e.code).send(e.message);
   }
 };

@@ -7,7 +7,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const rassen = await getRasOptions();
 
-  closeClient();
+  //closeClient(;
 
   return res.status(200).send(rassen);
 };

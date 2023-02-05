@@ -127,11 +127,14 @@ export const clearAllData = async () => {
     await Factory.getController(RAS).deleteAll();
     await Factory.getController(TRAINING).deleteAll();
     await Factory.getController(ERRORLOG).deleteAll();
+    // await closeClient(;
   }
 };
 
 export async function getData(controller: string): Promise<IsKlantCollection[]>;
-export async function getData(controller: string): Promise<IsKlantCollection[]>;
+export async function getData(
+  controller: string
+): Promise<InschrijvingCollection[]>;
 export async function getData(controller: string): Promise<KlantHond[]>;
 export async function getData(controller: string): Promise<RasCollection[]>;
 export async function getData(controller: string) {

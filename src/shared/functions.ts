@@ -1,6 +1,6 @@
-import moment from "moment";
-import { getTrainingDaysCollection } from "src/utils/db";
-import { TrainingDaysCollection } from "../types/EntityTpes/TrainingType";
+import moment from 'moment';
+import { getTrainingDaysCollection } from 'src/utils/db';
+import { TrainingDaysCollection } from '../types/EntityTpes/TrainingType';
 
 interface HelperInterface {
   getDisabledDays: (training: string) => Promise<string[]>;
@@ -13,7 +13,7 @@ export const getDisabledDays = async (traning: string) => {
   const date = new Date();
 
   //today is always disabled to prevent any new inschrijvingen or reservations for the current day
-  const disabledDays = [date.toISOString().split(".")[0].split("T")[0]];
+  const disabledDays = [date.toISOString().split('.')[0].split('T')[0]];
 
   const temp = new Date();
   const endDate = new Date(temp.getFullYear(), temp.getMonth() + 2, 0);
@@ -25,7 +25,7 @@ export const getDisabledDays = async (traning: string) => {
 
   while (true) {
     const newDate = new Date(date.setDate(date.getDate() + 1));
-    const dateString = newDate.toISOString().split(".")[0].split("T")[0];
+    const dateString = newDate.toISOString().split('.')[0].split('T')[0];
 
     if (!enabledDays.includes(new Date(dateString).toISOString())) {
       disabledDays.push(dateString);
@@ -36,17 +36,15 @@ export const getDisabledDays = async (traning: string) => {
 
 export const capitalize = (string: string) => {
   return string
-    .split(" ")
+    .split(' ')
     .map(
-      (word) =>
-        word.substring(0, 1).toUpperCase() +
-        word.substring(1).toLocaleLowerCase()
+      (word) => word.substring(0, 1).toUpperCase() + word.substring(1).toLocaleLowerCase()
     )
-    .join(" ");
+    .join(' ');
 };
 
 export const getCurrentTime = () => {
-  const currentMoment = moment().format("YYYY-MM-DD HH:mm:ss");
+  const currentMoment = moment().format('YYYY-MM-DD HH:mm:ss');
   return toLocalTime(currentMoment);
 };
 
@@ -55,12 +53,26 @@ export const toLocalTime = (date: string): Date => {
 };
 
 export const createRandomConfirmCode = (length: number = 50) => {
-  const options = "abcdefghijklmnopqrstuvwxyz0123456789";
+  const options = 'abcdefghijklmnopqrstuvwxyz0123456789';
   const code = new Array(length).fill(0).map((_) => {
     const index = Math.floor(Math.random() * options.length);
     return Math.random() > 0.5 ? options[index].toUpperCase() : options[index];
   });
-  return code.join("");
+  return code.join('');
+};
+
+export const getAge = (date: Date) =>
+  moment(date)
+    .fromNow()
+    .replace('years ago', 'jaar')
+    .replace('a month ago', '1 maand')
+    .replace('days ago', 'dagen');
+
+export const toReadableDate = (date: Date): string =>
+  date.toISOString().replace('T', ' ').split('.')[0];
+
+export const pick = <T>(arr: T[]): T => {
+  return arr[Math.floor(Math.random() * arr.length)];
 };
 
 const helper: HelperInterface = {

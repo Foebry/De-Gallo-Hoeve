@@ -28,7 +28,7 @@ const getTrainingData = async (req: NextApiRequest, res: NextApiResponse) => {
     bullets: data.bullets,
   };
 
-  closeClient();
+  //closeClient(;
 
   return res.status(200).send(result);
 };
@@ -51,7 +51,7 @@ const updateTrainingData = async (
 
   await update(training._id, training);
 
-  closeClient();
+  //closeClient(;
 
   return res.status(200).send(training);
 };

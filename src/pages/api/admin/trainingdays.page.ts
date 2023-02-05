@@ -14,7 +14,7 @@ const getAvailableDays = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const result = data.map((day) => day.date.toISOString().split("T")[0]);
 
-  closeClient();
+  //closeClient(;
 
   return res.status(200).send(result);
 };
@@ -49,7 +49,7 @@ const setAvailabelDays = async (req: NextApiRequest, res: NextApiResponse) => {
   );
 
   // verwijder inschrijvingen met data uit deleteTrainingDays vervolgens deze klanten verwittigen.
-  closeClient();
+  //closeClient(;
 
   return res.status(200).send(selected);
 };

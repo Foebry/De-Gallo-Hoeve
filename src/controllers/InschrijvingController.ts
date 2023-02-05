@@ -1,23 +1,19 @@
-import { ClientSession, ObjectId } from "mongodb";
-import { getCurrentTime } from "src/shared/functions";
+import { ClientSession, ObjectId } from 'mongodb';
+import { getCurrentTime } from 'src/shared/functions';
 import {
   CollectionOptions,
   getInschrijvingCollection,
   startSession,
   startTransaction,
-} from "src/utils/db";
-import {
-  CASCADEFULL,
-  CASCADEKLANT,
-  CASCADETRAINING,
-} from "../services/Factory";
-import { InternalServerError, TransactionError } from "../shared/RequestError";
-import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
-import { addKlantInschrijving } from "./KlantController";
+} from 'src/utils/db';
+import { CASCADEFULL, CASCADEKLANT, CASCADETRAINING } from '../services/Factory';
+import { InternalServerError, TransactionError } from '../shared/RequestError';
+import { InschrijvingCollection } from '../types/EntityTpes/InschrijvingTypes';
+import { addKlantInschrijving } from './KlantController';
 import {
   addInschrijving as addTrainingInschrijving,
   removeInschrijving as removeTrainingInschrijving,
-} from "./TrainingController";
+} from './TrainingController';
 
 export const getAllInschrijvingen = async (
   options?: CollectionOptions
@@ -38,9 +34,7 @@ export const getInschrijvingenByIds = async (
   ids: ObjectId[]
 ): Promise<InschrijvingCollection[]> => {
   const collection = await getInschrijvingCollection();
-  return collection
-    .find({ _id: { $in: ids }, deleted_at: undefined })
-    .toArray();
+  return collection.find({ _id: { $in: ids }, deleted_at: undefined }).toArray();
 };
 
 export const save = async (
@@ -59,6 +53,17 @@ export const save = async (
   await addTrainingInschrijving(training, inschrijving, session);
 
   return inschrijving;
+};
+
+export const saveMany = async (
+  inschrijvingen: InschrijvingCollection[]
+): Promise<InschrijvingCollection[]> => {
+  const collection = await getInschrijvingCollection();
+
+  const { insertedIds } = await collection.insertMany(inschrijvingen);
+  if (!insertedIds) throw new InternalServerError();
+
+  return inschrijvingen;
 };
 
 const update = async (
@@ -86,11 +91,7 @@ const update = async (
 
       // if inschrijving changed training
       if (inschrijving.training !== data.training) {
-        removeTrainingInschrijving(
-          inschrijving.training,
-          inschrijving,
-          session
-        );
+        removeTrainingInschrijving(inschrijving.training, inschrijving, session);
         addTrainingInschrijving(data.training, inschrijving, session);
       }
     }, transactionOptions);
@@ -129,9 +130,7 @@ const hardDelete = async (
   }
 };
 
-const softDelete = async (
-  inschrijving: InschrijvingCollection
-): Promise<void> => {
+const softDelete = async (inschrijving: InschrijvingCollection): Promise<void> => {
   const collection = await getInschrijvingCollection();
   const deletedInschrijving = { ...inschrijving, deleted_at: getCurrentTime() };
 
@@ -144,7 +143,7 @@ const softDelete = async (
 
 const deleteAll = async (): Promise<void> => {
   const collection = await getInschrijvingCollection();
-  if (process.env.NODE_ENV === "test") {
+  if (process.env.NODE_ENV === 'test') {
     collection.deleteMany({});
   }
 };
@@ -154,6 +153,7 @@ const inschrijvingController: IsInschrijvingController = {
   getInschrijvingById,
   getInschrijvingenByIds,
   save,
+  saveMany,
   update,
   hardDelete,
   softDelete,
@@ -162,29 +162,25 @@ const inschrijvingController: IsInschrijvingController = {
 
 export interface IsInschrijvingController {
   getAllInschrijvingen: () => Promise<InschrijvingCollection[]>;
-  getInschrijvingById: (
-    _id: ObjectId
-  ) => Promise<InschrijvingCollection | null>;
-  getInschrijvingenByIds: (
-    ids: ObjectId[]
-  ) => Promise<InschrijvingCollection[]>;
+  getInschrijvingById: (_id: ObjectId) => Promise<InschrijvingCollection | null>;
+  getInschrijvingenByIds: (ids: ObjectId[]) => Promise<InschrijvingCollection[]>;
   save: (
     inschrijving: InschrijvingCollection,
     session?: ClientSession
   ) => Promise<InschrijvingCollection>;
+  saveMany: (
+    inschrijvingen: InschrijvingCollection[]
+  ) => Promise<InschrijvingCollection[]>;
   update: (
     inschrijving: InschrijvingCollection,
     update: InschrijvingCollection
   ) => Promise<InschrijvingCollection>;
-  hardDelete: (
-    inschrijving: InschrijvingCollection,
-    cascade: string
-  ) => Promise<void>;
+  hardDelete: (inschrijving: InschrijvingCollection, cascade: string) => Promise<void>;
   softDelete: (inschrijving: InschrijvingCollection) => Promise<void>;
   deleteAll: () => Promise<void>;
 }
 
-export const INSCHRIJVING = "InschrijvingController";
+export const INSCHRIJVING = 'InschrijvingController';
 
 export default inschrijvingController;
 function removeKlantInschrijving(
@@ -192,5 +188,5 @@ function removeKlantInschrijving(
   _id: ObjectId,
   session: ClientSession
 ) {
-  throw new Error("Function not implemented.");
+  throw new Error('Function not implemented.');
 }

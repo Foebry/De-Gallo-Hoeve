@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import { getCurrentTime } from "src/shared/functions";
 import { getKlantCollection } from "src/utils/db";
 import { InternalServerError } from "../shared/RequestError";
-import { HondCollection } from "../types/EntityTpes/HondTypes";
+import { HondCollection, KlantHond } from "../types/EntityTpes/HondTypes";
 import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
 import { getAllKlanten, getKlantById } from "./KlantController";
 
@@ -20,12 +20,17 @@ const save = async (
   return hond;
 };
 
-const getAllHonden = async (): Promise<HondCollection[]> => {
+const getAllHonden = async (): Promise<KlantHond[]> => {
   const klanten = await getAllKlanten();
   return klanten
-    .map((klant) => klant.honden)
+    .map((klant) =>
+      klant.honden.map((hond) => ({
+        ...hond,
+        klant: { _id: klant._id, naam: `${klant.vnaam} ${klant.lnaam}` },
+      }))
+    )
     .reduce((honden, hond) => [...honden, ...hond], [])
-    .filter((hond) => !hond.deleted_at);
+    .filter((klantHond) => !klantHond.deleted_at);
 };
 
 export const getHondenByKlantId = async (
@@ -104,6 +109,9 @@ export const getHondById = async (
   );
 };
 
+export const fullName = (klant: IsKlantCollection) =>
+  `${klant.vnaam} ${klant.lnaam}`;
+
 const hondController: IsHondController = {
   getHondById,
   softDelete,
@@ -129,7 +137,7 @@ export type IsHondController = {
     hond_id: ObjectId
   ) => Promise<HondCollection | null>;
   getHondenByKlantId: (klant_id: ObjectId) => Promise<HondCollection[]>;
-  getAllHonden: () => Promise<HondCollection[]>;
+  getAllHonden: () => Promise<KlantHond[]>;
   save: (
     klant: IsKlantCollection,
     hond: HondCollection

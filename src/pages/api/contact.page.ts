@@ -15,12 +15,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const data = req.body;
     await mailer.contact(data);
 
-    closeClient();
+    //closeClient(;
 
     return res.status(200).send({ message: "Bericht ontvangen!" });
   } catch (e: any) {
     await logError("contact", req, e);
-    closeClient();
+    //closeClient(;
     return res.status(e.code).json(e.response);
   }
 };

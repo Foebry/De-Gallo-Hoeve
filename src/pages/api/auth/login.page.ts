@@ -40,13 +40,13 @@ const login = async (
     createJWT(res, klant);
     setClientCookie(res, klant);
 
-    closeClient();
+    //closeClient(;
 
     return res.send({});
   } catch (e: any) {
     req.body.password = await bcrypt.hash(req.body.password, 10);
     await logError("login", req, e);
-    closeClient();
+    //closeClient(;
     return res.status(e.code).json(e.response);
   }
 };

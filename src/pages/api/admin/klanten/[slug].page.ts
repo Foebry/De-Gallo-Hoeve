@@ -1,17 +1,23 @@
-import { ObjectId } from "mongodb";
-import { NextApiRequest, NextApiResponse } from "next";
-import { getInschrijvingenByIds } from "src/controllers/InschrijvingController";
-import { getKlantById } from "src/controllers/KlantController";
-import { mapToKlantDetail } from "src/mappers/klanten";
-import { KlantNotFoundError } from "src/shared/RequestError";
-import { closeClient } from "src/utils/db";
-import { GenericRequest } from "../../auth/login.page";
-import { DetailRequest } from "../inschrijvingen/[slug].page";
+import { ObjectId } from 'mongodb';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { getInschrijvingenByIds } from 'src/controllers/InschrijvingController';
+import { getKlantById } from 'src/controllers/KlantController';
+import { mapToKlantDetail } from 'src/mappers/klanten';
+import { adminApi } from 'src/services/Authenticator';
+import { KlantNotFoundError, NotAllowedError } from 'src/shared/RequestError';
+import { GenericRequest } from '../../auth/login.page';
+import { DetailRequest } from '../inschrijvingen/[slug].page';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method === "GET")
+  try {
+    adminApi({ req, res });
+
+    if (req.method !== 'GET') throw new NotAllowedError();
+
     return getKlantDetail(req as GenericRequest<DetailRequest>, res);
-  return res.status(405).send({ message: "Not Allowed" });
+  } catch (e: any) {
+    return res.status(e.code).json(e.response);
+  }
 };
 type KlantDetailResponse = {};
 
@@ -19,18 +25,20 @@ const getKlantDetail = async (
   req: GenericRequest<DetailRequest>,
   res: NextApiResponse<KlantDetailResponse>
 ) => {
-  const { slug: _id } = req.query;
+  try {
+    const { slug: _id } = req.query;
 
-  const klant = await getKlantById(new ObjectId(_id));
-  if (!klant) throw new KlantNotFoundError();
+    const klant = await getKlantById(new ObjectId(_id));
+    if (!klant) throw new KlantNotFoundError();
 
-  const inschrijvingen = await getInschrijvingenByIds(klant.inschrijvingen);
+    const inschrijvingen = await getInschrijvingenByIds(klant.inschrijvingen);
 
-  const result = mapToKlantDetail(klant, inschrijvingen);
+    const result = mapToKlantDetail(klant, inschrijvingen);
 
-  closeClient();
-
-  return res.status(200).send(result);
+    return res.status(200).send(result);
+  } catch (e: any) {
+    return res.status(e.code).json(e.response);
+  }
 };
 
 export default handler;

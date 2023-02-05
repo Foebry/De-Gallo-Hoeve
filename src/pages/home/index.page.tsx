@@ -173,7 +173,7 @@ export default Index;
 export const getStaticProps = async () => {
   const priveTraining = await getPriveTraining();
 
-  closeClient();
+  //closeClient(;
 
   return {
     props: {

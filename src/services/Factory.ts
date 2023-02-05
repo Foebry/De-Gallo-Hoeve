@@ -51,14 +51,6 @@ import {
   TrainingType,
 } from "../types/EntityTpes/TrainingType";
 import { NewRas, RasCollection } from "../types/EntityTpes/RasTypes";
-import axios from "axios";
-import { IsRegisterPayload } from "tests/auth/types";
-import {
-  closeClient,
-  getConfirmCollection,
-  getInschrijvingCollection,
-  getTrainingCollection,
-} from "src/utils/db";
 import errorLogController, {
   ErrorLogController,
 } from "src/controllers/ErrorLogController";
@@ -137,132 +129,7 @@ const createRas = (ras: NewRas): RasCollection => ({
   updated_at: getCurrentTime(),
 });
 
-export const createRandomKlant = async (
-  options?: any
-): Promise<IsRegisterPayload> => {
-  await process.nextTick(() => {});
-  const { data } = await axios.get(
-    "https://www.randomuser.me/api/?format=json&nat=fr"
-  );
-  const randomKlant = {
-    _id: new ObjectId(),
-    roles: "",
-    created_at: moment().local().format(),
-    email: data.results[0].email,
-    gemeente: data.results[0].location.city,
-    gsm: data.results[0].phone,
-    honden: [],
-    inschrijvingen: [],
-    lnaam: data.results[0].name.last,
-    nr: data.results[0].location.street.number,
-    password: "aBcDeFgH1!",
-    postcode: Math.floor(Math.random() * 100000),
-    reservaties: [],
-    straat: data.results[0].location.street.name,
-    updated_at: moment().local().format(),
-    verified: false,
-    vnaam: data.results[0].name.first,
-    bus: data.results[0].location.street.bus ?? null,
-    ...options,
-  };
-  return {
-    ...randomKlant,
-    save: async (): Promise<IsKlantCollection> => {
-      const klant = {
-        ...randomKlant,
-        password: await brcypt.hash(randomKlant.password, 10),
-      };
-      const savedKlant = await Factory.getController(KLANT).save(klant);
-      return savedKlant;
-    },
-  };
-};
-
-export const createRandomHond = async (): Promise<HondCollection> => {
-  // await process.nextTick(() => {});
-  const { data } = await axios.get(
-    "https://www.randomuser.me/api/?format=json&nat=fr"
-  );
-  const now = moment().local().toDate();
-  return {
-    geslacht: data.results[0].gender === "female" ? "Teef" : "Reu",
-    geboortedatum: data.results[0].dob.date,
-    naam: data.results[0].name.first,
-    ras: "labrador retriever",
-    _id: new ObjectId(),
-    created_at: now,
-    updated_at: now,
-  };
-};
-
-export const createRandomInschrijving = (
-  klant: IsKlantCollection,
-  hond: HondCollection
-): RandomInschrijving => {
-  const now = moment().local().toDate();
-  const randomInschrijving = {
-    _id: new ObjectId(),
-    created_at: now,
-    datum: moment("2022-09-24").local().toDate(),
-    hond: { id: hond._id, naam: hond.naam },
-    klant: { id: klant._id, vnaam: klant.vnaam, lnaam: klant.lnaam },
-    training: "prive" as TrainingType,
-    updated_at: now,
-  };
-  return {
-    ...randomInschrijving,
-    save: async () => {
-      const collection = await getInschrijvingCollection();
-      await collection.insertOne(randomInschrijving);
-      return randomInschrijving;
-    },
-  };
-};
-
-export const createRandomTraining = (naam: string): RandomTraining => {
-  const currentTime = getCurrentTime();
-  const randomTraining = {
-    _id: new ObjectId(),
-    naam: naam as TrainingType,
-    prijs: Math.round(Math.random() * 20),
-    inschrijvingen: [] as ObjectId[],
-    bullets: [],
-    content: "",
-    default_content: [],
-    image: "",
-    subtitle: "Random training",
-    prijsExcl: 20.66,
-    gratisVerplaatsingBinnen: 10,
-    kmHeffing: 0.3,
-    created_at: currentTime,
-    updated_at: currentTime,
-  } as PriveTrainingCollection;
-  return {
-    ...randomTraining,
-    save: async () => {
-      const collection = await getTrainingCollection();
-      await collection.insertOne(randomTraining);
-      return randomTraining;
-    },
-  };
-};
-
-export const createRandomConfirm = (
-  klant?: IsKlantCollection
-): ConfirmCollection => ({
-  _id: new ObjectId(),
-  code: createRandomConfirmCode(),
-  created_at: getCurrentTime(),
-  klant_id: klant?._id ?? new ObjectId(),
-  valid_to: toLocalTime(moment(getCurrentTime()).add(1, "hour").format()),
-});
-
 const Factory = {
-  createRandomTraining,
-  createRandomInschrijving,
-  createRandomHond,
-  createRandomKlant,
-  createRandomConfirm,
   createRas,
   createKlant,
   createHond,
