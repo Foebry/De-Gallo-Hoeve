@@ -98,6 +98,7 @@ describe('/honden', () => {
 
       const { body: superAdminBody } = await listRequest
         .get('/api/admin/honden')
+        .query({ amount })
         .auth(bearerSuperAdmin, { type: 'bearer' })
         .expect(200);
 

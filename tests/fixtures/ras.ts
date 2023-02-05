@@ -1,7 +1,6 @@
 import { RasCollection } from '@/types/EntityTpes/RasTypes';
 import { faker } from '@faker-js/faker';
 import { ObjectId } from 'mongodb';
-import { getCurrentTime } from 'src/shared/functions';
 
 enum RasSoort {
   GROOT = 'groot',
@@ -14,13 +13,9 @@ type RasOptions = Partial<{
 }>;
 
 export const createRandomRas = (options?: RasOptions): RasCollection => {
-  const currentTime = getCurrentTime();
   return {
     _id: new ObjectId(),
     naam: options?.naam ?? faker.animal.dog(),
-    created_at: currentTime,
-    updated_at: currentTime,
-    deleted_at: undefined,
     soort: options?.soort ?? 'groot',
   };
 };

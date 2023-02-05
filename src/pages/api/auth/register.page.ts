@@ -16,8 +16,13 @@ import { logError } from 'src/controllers/ErrorLogController';
 import { startSession, startTransaction } from 'src/utils/db';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method === 'POST') return register(req, res);
-  throw new NotAllowedError();
+  try {
+    if (req.method !== 'POST') throw new NotAllowedError();
+
+    return register(req, res);
+  } catch (e: any) {
+    return res.status(e.code).json(e.response);
+  }
 };
 
 const register = async (req: NextApiRequest, res: NextApiResponse) => {

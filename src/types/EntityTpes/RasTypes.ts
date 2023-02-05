@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { ObjectId } from 'mongodb';
 
 export interface NewRas {
   naam: string;
@@ -7,9 +7,6 @@ export interface NewRas {
 
 export interface RasCollection extends NewRas {
   _id: ObjectId;
-  created_at: Date;
-  updated_at: Date;
-  deleted_at?: Date;
 }
 
 export interface UpdateRas {

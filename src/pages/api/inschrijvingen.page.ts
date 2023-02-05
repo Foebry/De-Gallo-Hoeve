@@ -1,7 +1,7 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { validate, validateCsrfToken } from "src/services/Validator";
-import { inschrijvingSchema } from "src/types/schemas";
-import { secureApi, verifiedUserApi } from "src/services/Authenticator";
+import { NextApiRequest, NextApiResponse } from 'next';
+import { validate, validateCsrfToken } from 'src/services/Validator';
+import { inschrijvingSchema } from 'src/types/schemas';
+import { secureApi, verifiedUserApi } from 'src/services/Authenticator';
 import {
   EmailNotVerifiedError,
   HondNotFoundError,
@@ -10,40 +10,40 @@ import {
   TrainingNotFoundError,
   TrainingVolzetError,
   TransactionError,
-} from "src/shared/RequestError";
-import { getKlantById } from "src/controllers/KlantController";
-import mailer from "src/utils/Mailer";
-import { ObjectId } from "mongodb";
-import { getKlantHond } from "src/controllers/HondController";
+} from 'src/shared/RequestError';
+import { getKlantById } from 'src/controllers/KlantController';
+import mailer from 'src/utils/Mailer';
+import { ObjectId } from 'mongodb';
+import { getKlantHond } from 'src/controllers/HondController';
 import {
   getTrainingByName,
   klantReedsIngeschreven,
   trainingVolzet,
-} from "src/controllers/TrainingController";
-import Factory from "src/services/Factory";
-import { IsInschrijvingBody } from "src/types/requestTypes";
-import { logError } from "src/controllers/ErrorLogController";
-import { save } from "src/controllers/InschrijvingController";
-import { startSession, startTransaction } from "src/utils/db";
-import { mapInschrijvingen } from "src/mappers/Inschrijvingen";
+} from 'src/controllers/TrainingController';
+import Factory from 'src/services/Factory';
+import { IsInschrijvingBody } from 'src/types/requestTypes';
+import { logError } from 'src/controllers/ErrorLogController';
+import { save } from 'src/controllers/InschrijvingController';
+import { startSession, startTransaction } from 'src/utils/db';
+import { mapInschrijvingen } from 'src/mappers/Inschrijvingen';
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method === "GET") return getInschrijvingen(req, res);
-  if (req.method === "POST") return postInschrijving(req, res);
-  return res.status(405).json({ code: 405, message: "Not Allowed" });
+  if (req.method === 'GET') return getInschrijvingen(req, res);
+  if (req.method === 'POST') return postInschrijving(req, res);
+  return res.status(405).json({ code: 405, message: 'Not Allowed' });
 };
 
 const getInschrijvingen = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const { _id: klantId } = secureApi({ req, res });
     const klant = await getKlantById(new ObjectId(klantId));
-    if (!klant) throw new KlantNotFoundError("Klant niet gevonden");
+    if (!klant) throw new KlantNotFoundError('Klant niet gevonden');
 
     const inschrijvingen = klant.inschrijvingen;
 
     return res.status(200).send(inschrijvingen);
   } catch (e: any) {
-    await logError("inschrijving", req, e);
+    await logError('inschrijving', req, e);
     return res.status(e.code).send(e.response);
   }
 };
@@ -101,16 +101,14 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const data = mapInschrijvingen(inschrijvingen, isFirstInschrijving, prijs);
 
-    await mailer.sendMail("inschrijving", { naam, email, ...data });
-    await mailer.sendMail("inschrijving-headsup", {
+    await mailer.sendMail('inschrijving', { naam, email, ...data });
+    await mailer.sendMail('inschrijving-headsup', {
       email: process.env.MAIL_TO,
-      _ids: ids.join(","),
+      _ids: ids.join(','),
     });
-    //closeClient(;
-    return res.status(201).json({ message: "Inschrijving ontvangen!" });
+    return res.status(201).json({ message: 'Inschrijving ontvangen!' });
   } catch (e: any) {
-    await logError("inschrijving", req, e);
-    //closeClient(;
+    await logError('inschrijving', req, e);
     return res.status(e.code).send(e.response);
   }
 };

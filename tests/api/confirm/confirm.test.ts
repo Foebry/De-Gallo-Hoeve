@@ -1,8 +1,4 @@
-import { createServer, IncomingMessage, RequestListener } from 'http';
-import { NextApiHandler } from 'next';
-import { apiResolver } from 'next/dist/server/api-utils/node';
 import { clearAllData } from 'src/utils/MongoDb';
-// import request from 'supertest';
 import handler from 'src/pages/api/confirm/[code].page';
 import { getController } from 'src/services/Factory';
 import { CONFIRM } from 'src/types/EntityTpes/ConfirmTypes';

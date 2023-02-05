@@ -1,20 +1,18 @@
-import { ObjectId } from "mongodb";
-import { NextApiRequest, NextApiResponse } from "next";
-import { closeClient, getTrainingDaysCollection } from "src/utils/db";
+import { ObjectId } from 'mongodb';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { closeClient, getTrainingDaysCollection } from 'src/utils/db';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method === "GET") return getAvailableDays(req, res);
-  if (req.method === "POST") return setAvailabelDays(req, res);
-  return res.status(405).send("Not Allowed");
+  if (req.method === 'GET') return getAvailableDays(req, res);
+  if (req.method === 'POST') return setAvailabelDays(req, res);
+  return res.status(405).send('Not Allowed');
 };
 
 const getAvailableDays = async (req: NextApiRequest, res: NextApiResponse) => {
   const collection = await getTrainingDaysCollection();
   const data = await collection.find({ date: { $gt: new Date() } }).toArray();
 
-  const result = data.map((day) => day.date.toISOString().split("T")[0]);
-
-  //closeClient(;
+  const result = data.map((day) => day.date.toISOString().split('T')[0]);
 
   return res.status(200).send(result);
 };
@@ -22,11 +20,10 @@ const getAvailableDays = async (req: NextApiRequest, res: NextApiResponse) => {
 const setAvailabelDays = async (req: NextApiRequest, res: NextApiResponse) => {
   const { selected } = req.body;
   const collection = await getTrainingDaysCollection();
-  // await client.connect();
 
   const data = await collection.find({ date: { $gt: new Date() } }).toArray();
   const currentTrainingDays = data.map((day) => ({
-    date: day.date.toISOString().split("T")[0],
+    date: day.date.toISOString().split('T')[0],
     _id: day._id,
   }));
 

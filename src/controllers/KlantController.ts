@@ -7,11 +7,9 @@ import { HondCollection } from 'src/types/EntityTpes/HondTypes';
 import { getKlantCollection } from 'src/utils/db';
 import { getCurrentTime } from 'src/shared/functions';
 import bcrypt from 'bcrypt';
-import { DeepPartial } from 'react-hook-form';
 
 export const getAllKlanten = async (): Promise<IsKlantCollection[]> => {
   const collection = await getKlantCollection();
-  const arr = await collection.find({ deleted_at: undefined }).toArray();
   return collection.find({ deleted_at: undefined }).toArray();
 };
 
@@ -40,6 +38,13 @@ export const getHondOwner = async (
   });
 };
 
+/**
+ *
+ * @param klanten IsKlantCollection[]
+ * This function should only be used during test cases.
+ * Will hash all klanten passwords before saving.
+ * @returns IsKlantCollection[]
+ */
 const saveMany = async (klanten: IsKlantCollection[]): Promise<IsKlantCollection[]> => {
   const collection = await getKlantCollection();
   const mappedKlanten = [];

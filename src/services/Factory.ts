@@ -1,69 +1,51 @@
-import moment from "moment";
-import { ObjectId } from "mongodb";
-import ConfirmController, {
-  IsConfirmController,
-} from "../controllers/ConfirmController";
+import moment from 'moment';
+import { ObjectId } from 'mongodb';
+import ConfirmController, { IsConfirmController } from '../controllers/ConfirmController';
 import ContentController, {
   CONTENT,
   IsContentController,
-} from "../controllers/ContentController";
-import HondController, {
-  HOND,
-  IsHondController,
-} from "../controllers/HondController";
+} from '../controllers/ContentController';
+import HondController, { HOND, IsHondController } from '../controllers/HondController';
 import InschrijvingController, {
   INSCHRIJVING,
   IsInschrijvingController,
-} from "../controllers/InschrijvingController";
+} from '../controllers/InschrijvingController';
 import KlantController, {
   IsKlantController,
   KLANT,
-} from "../controllers/KlantController";
-import RasController, {
-  IsRasController,
-  RAS,
-} from "../controllers/rasController";
+} from '../controllers/KlantController';
+import RasController, { IsRasController, RAS } from '../controllers/rasController';
 import TrainingController, {
   IsTrainingController,
   TRAINING,
-} from "../controllers/TrainingController";
-import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
-import {
-  IsInschrijvingBodyInschrijving,
-  IsNewKlantData,
-} from "../types/requestTypes";
-import brcypt from "bcrypt";
+} from '../controllers/TrainingController';
+import { IsKlantCollection } from '../types/EntityTpes/KlantTypes';
+import { IsInschrijvingBodyInschrijving, IsNewKlantData } from '../types/requestTypes';
+import brcypt from 'bcrypt';
 import {
   capitalize,
   createRandomConfirmCode,
   getCurrentTime,
   toLocalTime,
-} from "../shared/functions";
-import { HondCollection, NewHond } from "../types/EntityTpes/HondTypes";
-import {
-  CONFIRM,
-  ConfirmCollection,
-  NewConfirm,
-} from "../types/EntityTpes/ConfirmTypes";
-import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
-import {
-  PriveTrainingCollection,
-  TrainingType,
-} from "../types/EntityTpes/TrainingType";
-import { NewRas, RasCollection } from "../types/EntityTpes/RasTypes";
+} from '../shared/functions';
+import { HondCollection, NewHond } from '../types/EntityTpes/HondTypes';
+import { CONFIRM, ConfirmCollection, NewConfirm } from '../types/EntityTpes/ConfirmTypes';
+import { InschrijvingCollection } from '../types/EntityTpes/InschrijvingTypes';
+import { PriveTrainingCollection, TrainingType } from '../types/EntityTpes/TrainingType';
+import { NewRas, RasCollection } from '../types/EntityTpes/RasTypes';
 import errorLogController, {
   ErrorLogController,
-} from "src/controllers/ErrorLogController";
-import { ERRORLOG } from "../types/EntityTpes/ErrorLogTypes";
+} from 'src/controllers/ErrorLogController';
+import { ERRORLOG } from '../types/EntityTpes/ErrorLogTypes';
 
-export type CONFIRM = "ConfirmController";
-export type CONTENT = "ContentController";
-export type HOND = "HondController";
-export type INSCHRIJVING = "InschrijvingController";
-export type KLANT = "KlantController";
-export type RAS = "RasController";
-export type TRAINING = "TrainingController";
-export type ERRORLOG = "ErrorLogController";
+export type CONFIRM = 'ConfirmController';
+export type CONTENT = 'ContentController';
+export type HOND = 'HondController';
+export type INSCHRIJVING = 'InschrijvingController';
+export type KLANT = 'KlantController';
+export type RAS = 'RasController';
+export type TRAINING = 'TrainingController';
+export type ERRORLOG = 'ErrorLogController';
 
 const createInschrijving = (
   inschrijving: IsInschrijvingBodyInschrijving,
@@ -84,7 +66,7 @@ const createConfirm = (confirm: NewConfirm): ConfirmCollection => ({
   ...confirm,
   _id: new ObjectId(),
   code: createRandomConfirmCode(),
-  valid_to: moment(confirm.created_at).local().add(1, "day").toDate(),
+  valid_to: moment(confirm.created_at).local().add(1, 'day').toDate(),
 });
 
 const createHond = (hond: NewHond) => ({
@@ -98,11 +80,9 @@ const createHond = (hond: NewHond) => ({
   updated_at: getCurrentTime(),
 });
 
-const createKlant = async (
-  klant: IsNewKlantData
-): Promise<IsKlantCollection> => ({
+const createKlant = async (klant: IsNewKlantData): Promise<IsKlantCollection> => ({
   _id: new ObjectId(),
-  roles: "0",
+  roles: '0',
   verified: false,
   inschrijvingen: [],
   reservaties: [],
@@ -125,8 +105,6 @@ const createRas = (ras: NewRas): RasCollection => ({
   _id: new ObjectId(),
   naam: ras.naam,
   soort: ras.soort,
-  created_at: getCurrentTime(),
-  updated_at: getCurrentTime(),
 });
 
 const Factory = {
@@ -177,9 +155,9 @@ export function getController(type: ControllerType) {
 }
 export default Factory;
 const cascadeOptions = {
-  CASCADEFULL: "CASCADEFULL",
-  CASCADEKLANT: "CASCADEKLANT",
-  CASCADETRAINING: "CASCADETRAINING",
+  CASCADEFULL: 'CASCADEFULL',
+  CASCADEKLANT: 'CASCADEKLANT',
+  CASCADETRAINING: 'CASCADETRAINING',
 };
 export const { CASCADEFULL, CASCADEKLANT, CASCADETRAINING } = cascadeOptions;
 

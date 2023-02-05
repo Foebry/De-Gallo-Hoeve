@@ -35,15 +35,19 @@ const getInschrijvingOverview = async (
   req: GenericRequest<ListInschrijvingRequest>,
   res: NextApiResponse<PaginatedResponse<PaginatedInschrijving>>
 ) => {
-  const data = await getPaginatedData<InschrijvingCollection>(
-    req.query,
-    req.url,
-    INSCHRIJVING
-  );
+  try {
+    const data = await getPaginatedData<InschrijvingCollection>(
+      req.query,
+      req.url,
+      INSCHRIJVING
+    );
 
-  const result = mapToAdminInschrijvingenOverviewResult(data);
+    const result = mapToAdminInschrijvingenOverviewResult(data);
 
-  return res.status(200).send(result);
+    return res.status(200).send(result);
+  } catch (e: any) {
+    return res.status(e.code).json(e.response);
+  }
 };
 
 export default handler;

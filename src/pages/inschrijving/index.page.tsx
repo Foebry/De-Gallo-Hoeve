@@ -1,37 +1,30 @@
-import { GetServerSidePropsContext } from "next";
-import { useRouter } from "next/router";
-import React, { useEffect, useMemo, useState } from "react";
-import { Controller, FieldValues, useForm } from "react-hook-form";
-import useMutation, {
-  structureInschrijvingenPayload,
-} from "src/hooks/useMutation";
-import { POST_INSCHRIJVING } from "src/types/apiTypes";
-import { INDEX, LOGIN } from "src/types/linkTypes";
-import FormSteps from "src/components/form/FormSteps";
-import Form from "src/components/form/Form";
-import Button, { SubmitButton } from "src/components/buttons/Button";
-import { DatePicker } from "react-trip-date";
-import Contactgegevens from "src/components/inschrijving/Contactgegevens";
-import { toast } from "react-toastify";
-import { OptionsOrGroups } from "react-select";
-import { optionInterface } from "src/components/register/HondGegevens";
-import HondGegevens from "src/components/inschrijving/HondGegevens";
-import {
-  getFreeTimeSlots,
-  getHondOptions,
-  getRasOptions,
-} from "src/utils/MongoDb";
-import { ObjectId } from "mongodb";
-import { getDisabledDays } from "src/shared/functions";
-import { generateCsrf } from "src/services/Validator";
-import { securepage } from "src/services/Authenticator";
-import Skeleton from "src/components/website/skeleton";
-import { getPriveTraining } from "src/controllers/TrainingController";
-import getData from "src/hooks/useApi";
-import Head from "next/head";
-import { closeClient } from "src/utils/db";
+import { GetServerSidePropsContext } from 'next';
+import { useRouter } from 'next/router';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Controller, FieldValues, useForm } from 'react-hook-form';
+import useMutation, { structureInschrijvingenPayload } from 'src/hooks/useMutation';
+import { POST_INSCHRIJVING } from 'src/types/apiTypes';
+import { INDEX, LOGIN } from 'src/types/linkTypes';
+import FormSteps from 'src/components/form/FormSteps';
+import Form from 'src/components/form/Form';
+import Button, { SubmitButton } from 'src/components/buttons/Button';
+import { DatePicker } from 'react-trip-date';
+import Contactgegevens from 'src/components/inschrijving/Contactgegevens';
+import { toast } from 'react-toastify';
+import { OptionsOrGroups } from 'react-select';
+import { optionInterface } from 'src/components/register/HondGegevens';
+import HondGegevens from 'src/components/inschrijving/HondGegevens';
+import { getFreeTimeSlots, getHondOptions, getRasOptions } from 'src/utils/MongoDb';
+import { ObjectId } from 'mongodb';
+import { getDisabledDays } from 'src/shared/functions';
+import { generateCsrf } from 'src/services/Validator';
+import { securepage } from 'src/services/Authenticator';
+import Skeleton from 'src/components/website/skeleton';
+import { getPriveTraining } from 'src/controllers/TrainingController';
+import getData from 'src/hooks/useApi';
+import Head from 'next/head';
 
-type TrainingType = "prive" | "groep";
+type TrainingType = 'prive' | 'groep';
 
 interface LessenProps {
   honden: OptionsOrGroups<any, optionInterface>[];
@@ -79,7 +72,7 @@ const Groepslessen: React.FC<LessenProps> = ({
 
   useEffect(() => {
     (async () => {
-      const { data: mijnInschrijvingen } = await getData("/api/inschrijvingen");
+      const { data: mijnInschrijvingen } = await getData('/api/inschrijvingen');
       if (!mijnInschrijvingen) {
         setIsFirstInschrijving(true);
         return;
@@ -92,8 +85,8 @@ const Groepslessen: React.FC<LessenProps> = ({
 
   const steps = useMemo(() => {
     return klant_id
-      ? ["Selecteer datum(s)", "Selecteer hond"]
-      : ["Selecteer datum(s)", "Gegevens hond", "Contactgegevens"];
+      ? ['Selecteer datum(s)', 'Selecteer hond']
+      : ['Selecteer datum(s)', 'Gegevens hond', 'Contactgegevens'];
   }, [klant_id]);
 
   const handleNextPageClick = () => {
@@ -101,18 +94,16 @@ const Groepslessen: React.FC<LessenProps> = ({
     if (hasDatesSelected && activeStep === 0) {
       setActiveStep(activeStep + 1);
     } else if (activeStep === 0 && !hasDatesSelected) {
-      toast.error("Gelieve minstens 1 datum te kiezen");
+      toast.error('Gelieve minstens 1 datum te kiezen');
     }
   };
 
   const handleDelete = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    const index = parseInt(e.currentTarget.dataset.id ?? "-1");
+    const index = parseInt(e.currentTarget.dataset.id ?? '-1');
     if (index >= 0) {
       const el = selectedDates[index];
-      setSelectedDates(() =>
-        selectedDates.filter((date: string) => date !== el)
-      );
-      setValue("inschrijvingen", {
+      setSelectedDates(() => selectedDates.filter((date: string) => date !== el));
+      setValue('inschrijvingen', {
         ...getValues().inschrijvingen,
         [index]: null,
       });
@@ -182,16 +173,14 @@ const Groepslessen: React.FC<LessenProps> = ({
                                   new Date(a).getTime() - new Date(b).getTime()
                               )
                             );
-                            setValue("inschrijvingen", []);
+                            setValue('inschrijvingen', []);
                           }}
                           disabledBeforeToday={true}
                           numberOfSelectableDays={5}
                           startOfWeek={1}
                           disabledDays={disabledDays}
                           selectedDays={selectedDates}
-                          disabledAfterDate={
-                            disabledDays?.[disabledDays?.length - 1]
-                          }
+                          disabledAfterDate={disabledDays?.[disabledDays?.length - 1]}
                         />
                       )}
                     />
@@ -217,18 +206,12 @@ const Groepslessen: React.FC<LessenProps> = ({
             </Form>
             {activeStep > 0 && (
               <div className="absolute left-10 top-20">
-                <Button
-                  label="vorige"
-                  onClick={() => setActiveStep(activeStep - 1)}
-                />
+                <Button label="vorige" onClick={() => setActiveStep(activeStep - 1)} />
               </div>
             )}
             <div className="absolute right-10 top-20">
               {activeStep === 1 ? (
-                <SubmitButton
-                  label="verzend"
-                  onClick={() => onSubmit(getValues())}
-                />
+                <SubmitButton label="verzend" onClick={() => onSubmit(getValues())} />
               ) : (
                 <Button label="volgende" onClick={handleNextPageClick} />
               )}
@@ -244,7 +227,7 @@ export default Groepslessen;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   // const { type } = ctx.query;
-  const type = "prive";
+  const type = 'prive';
   if (!type) return { redirect: { permanent: false, destination: INDEX } };
 
   const klant_id = await securepage(ctx);
@@ -261,8 +244,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const timeslots = await getFreeTimeSlots();
   const training = await getPriveTraining();
 
-  //closeClient(;
-
   return {
     props: {
       rassen,
@@ -272,7 +253,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       csrf,
       type,
       timeslots,
-      prijsExcl: training?.prijsExcl ?? "",
+      prijsExcl: training?.prijsExcl ?? '',
     },
   };
 };
