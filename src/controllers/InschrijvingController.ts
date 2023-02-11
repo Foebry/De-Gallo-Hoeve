@@ -85,7 +85,7 @@ const update = async (
     await session.withTransaction(async () => {
       const { upsertedCount } = await collection.updateOne(
         { _id: inschrijving._id },
-        updateInschrijving
+        { $set: updateInschrijving }
       );
       if (upsertedCount !== 1) throw new InternalServerError();
 
@@ -136,7 +136,7 @@ const softDelete = async (inschrijving: InschrijvingCollection): Promise<void> =
 
   const { modifiedCount } = await collection.updateOne(
     { _id: inschrijving._id },
-    deletedInschrijving
+    { $set: deletedInschrijving }
   );
   if (modifiedCount !== 1) throw new InternalServerError();
 };

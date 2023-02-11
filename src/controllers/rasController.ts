@@ -44,8 +44,8 @@ export const update = async (
 
   const updateRas = { ...data, updated_at: getCurrentTime() };
 
-  const { upsertedCount } = await collection.updateOne({ _id }, updateRas);
-  if (upsertedCount !== 1) throw new InternalServerError();
+  const { modifiedCount } = await collection.updateOne({ _id }, { $set: updateRas });
+  if (modifiedCount !== 1) throw new InternalServerError();
 
   return data;
 };
@@ -60,8 +60,11 @@ export const softDelete = async (ras: RasCollection): Promise<void> => {
   const collection = await getRasCollection();
   const deleteRas = { ...ras, deleted_at: getCurrentTime() };
 
-  const { upsertedCount } = await collection.updateOne({ _id: ras._id }, deleteRas);
-  if (upsertedCount !== 1) throw new InternalServerError();
+  const { modifiedCount } = await collection.updateOne(
+    { _id: ras._id },
+    { $set: deleteRas }
+  );
+  if (modifiedCount !== 1) throw new InternalServerError();
 };
 
 export const deleteAll = async (): Promise<void> => {
