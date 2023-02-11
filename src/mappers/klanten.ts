@@ -1,7 +1,8 @@
-import { ObjectId } from "mongodb";
-import { PaginatedData, PaginatedResponse } from "src/shared/RequestHelper";
-import { InschrijvingCollection } from "src/types/EntityTpes/InschrijvingTypes";
-import { IsKlantCollection } from "src/types/EntityTpes/KlantTypes";
+import { ObjectId } from 'mongodb';
+import { toReadableDate } from 'src/shared/functions';
+import { PaginatedData, PaginatedResponse } from 'src/shared/RequestHelper';
+import { InschrijvingCollection } from 'src/types/EntityTpes/InschrijvingTypes';
+import { IsKlantCollection } from 'src/types/EntityTpes/KlantTypes';
 
 export const mapToAdminKlantenOverviewResult = (
   data: PaginatedData<IsKlantCollection>
@@ -18,13 +19,10 @@ export const mapToAdminKlantenOverviewResult = (
       bus: klant.bus ?? undefined,
       postcode: klant.postcode.toString(),
       gemeente: klant.gemeente,
-      created_at: klant.created_at
-        .toISOString()
-        .replace("T", " ")
-        .split(".")[0],
+      created_at: klant.created_at.toISOString().replace('T', ' ').split('.')[0],
+      updated_at: toReadableDate(klant.updated_at),
       verified_at:
-        klant.verified_at?.toISOString().replace("T", " ").split(".")[0] ??
-        undefined,
+        klant.verified_at?.toISOString().replace('T', ' ').split('.')[0] ?? undefined,
     })),
     pagination: {
       currentPage: data.pagination.currentPage,
@@ -59,12 +57,12 @@ export const mapToKlantDetail = (
   })),
   roles: klant.roles,
   verified: klant.verified,
-  verified_at: klant.verified_at?.toISOString().replace("T", " ").split(".")[0],
-  created_at: klant.created_at.toISOString().replace("T", " ").split(".")[0],
+  verified_at: klant.verified_at?.toISOString().replace('T', ' ').split('.')[0],
+  created_at: klant.created_at.toISOString().replace('T', ' ').split('.')[0],
   inschrijvingen: inschrijvingen
     .map((inschrijving) => ({
       _id: inschrijving._id,
-      datum: inschrijving.datum.toISOString().replace("T", " ").split(".")[0],
+      datum: inschrijving.datum.toISOString().replace('T', ' ').split('.')[0],
       training: inschrijving.training,
       hond: inschrijving.hond.naam,
     }))
@@ -86,10 +84,10 @@ export interface PaginatedKlant {
   verified_at: string | undefined;
 }
 
-type Format = "DD-MM-YYYY hh:ii:ss" | "DD-MM-YYYY hh:ii:ss.mmm";
+type Format = 'DD-MM-YYYY hh:ii:ss' | 'DD-MM-YYYY hh:ii:ss.mmm';
 
 const formatDate = (date: Date, format: Format) => {
-  return format === "DD-MM-YYYY hh:ii:ss"
+  return format === 'DD-MM-YYYY hh:ii:ss'
     ? `${date.getDate()}-${date.getMonth()}-${date.getFullYear()} ${date.getUTCHours()}:${date.getMinutes()}:${date.getUTCSeconds()}`
-    : "";
+    : '';
 };

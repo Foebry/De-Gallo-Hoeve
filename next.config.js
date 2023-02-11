@@ -2,14 +2,14 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ["www.wdev2.be", "res.cloudinary.com"],
+    domains: ['www.wdev2.be', 'res.cloudinary.com'],
   },
-  pageExtensions: ["page.tsx", "page.ts"],
+  pageExtensions: ['page.tsx', 'page.ts'],
   rewrites: async () => {
     return [
       {
-        destination: "/",
-        source: "/home/",
+        destination: '/',
+        source: '/home/',
       },
     ];
   },

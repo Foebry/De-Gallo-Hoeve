@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es6",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -8,7 +8,7 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "esnext",
+    "module": "commonjs",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -20,7 +20,7 @@
       "@controllers/*": ["controllers/*"],
       "@helpers/*": ["helpers/*"],
       "@middlewares/*": ["middlewares/*"],
-      "@/types/*": ["types/*"],
+      "@/types/*": ["src/types/*"],
       "@auth/*": ["auth/*"],
       "@/pages/*": ["pages/"],
       "@/hooks/*": ["hooks/"]

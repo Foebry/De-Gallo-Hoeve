@@ -1,43 +1,26 @@
-import moment from "moment";
-import { getKlantByEmail } from "src/controllers/KlantController";
-import client from "src/utils/MongoDb";
-import { generateCsrf } from "src/services/Validator";
-import { IsRegisterPayload, IsRegisterResponseBody } from "./auth/types";
+import { createServer, IncomingMessage, RequestListener } from 'http';
+import { NextApiHandler } from 'next';
+import { apiResolver } from 'next/dist/server/api-utils/node';
+import request from 'supertest';
 
-export const generateRegisterResponseBodyFromPayload = async (
-  payload: IsRegisterPayload
-): Promise<IsRegisterResponseBody> => {
-  await client.connect();
-  const klant = await getKlantByEmail(payload.email);
-  const response = {
-    roles: "",
-    verified: false,
-    inschrijvingen: [],
-    reservaties: [],
-    created_at: moment(klant!.created_at).local().toDate(),
-    updated_at: klant!.updated_at,
-    email: klant!.email,
-    vnaam: klant!.vnaam,
-    lnaam: klant!.lnaam,
-    gsm: klant!.gsm,
-    straat: klant!.straat,
-    nr: klant!.nr,
-    gemeente: klant!.gemeente,
-    postcode: klant!.postcode,
-    password: klant!.password,
-    honden: klant!.honden,
-    _id: klant!._id,
-    bus: klant!.bus,
+export const getRequest = (handler: NextApiHandler) => {
+  const listener: RequestListener = async (req: IncomingMessage, res) => {
+    const queryParams = req.url?.split('?')[1]?.split('&');
+    const query = queryParams
+      ?.map((param) => ({
+        [param.split('=')[0]]: param.split('=')[1],
+      }))
+      .reduce((curr, acc) => {
+        return { ...acc, ...curr };
+      }, {});
+    return apiResolver(
+      req,
+      res,
+      query ?? {},
+      handler,
+      { previewModeEncryptionKey: '', previewModeId: '', previewModeSigningKey: '' },
+      false
+    );
   };
-  return response;
-};
-
-export const generateRegisterPayloadFromKlantData = (
-  payload: IsRegisterPayload
-) => {
-  return {
-    ...payload,
-    created_at: payload.created_at,
-    csrf: generateCsrf(),
-  };
+  return request(createServer(listener));
 };

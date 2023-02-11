@@ -2,13 +2,15 @@
   "name": "de-gallo-hoeve",
   "version": "0.1.0",
   "private": true,
+  "main": "index.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "network": "next dev -H 192.168.0.239",
-    "test": "jest --detectOpenHandles"
+    "test": "jest --runInBand",
+    "admin": "node ./scripts/cli"
   },
   "dependencies": {
     "@sendgrid/mail": "^7.7.0",
@@ -29,6 +31,7 @@
     "next": "^12.1.6",
     "node-mocks-http": "^1.11.0",
     "nookies": "^2.5.2",
+    "pino": "^8.10.0",
     "react": "18.1.0",
     "react-app-rewired": "^2.2.1",
     "react-datepicker": "^4.8.0",
@@ -42,9 +45,11 @@
     "sqlite3": "^5.0.8",
     "supertest": "^6.2.4",
     "ts-jest": "^29.0.0",
+    "ts-node": "^10.9.1",
     "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@faker-js/faker": "^7.6.0",
     "@types/base-64": "^1.0.0",
     "@types/bcrypt": "^5.0.0",
     "@types/cookie": "^0.5.1",

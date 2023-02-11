@@ -1,22 +1,23 @@
+import { ObjectId } from "mongodb";
 import { NextApiRequest } from "next";
-import { getCurrentTime } from "src/services/Factory";
+import { GenericRequest } from "src/pages/api/auth/login.page";
+import { getCurrentTime } from "src/shared/functions";
 import { InternalServerError } from "src/shared/RequestError";
 import { NewErrorLog } from "src/types/EntityTpes/ErrorLogTypes";
-import client from "src/utils/MongoDb";
+import { getErrorLogCollection } from "src/utils/db";
 
-const getErrorLogCollection = () => {
-  const database = process.env.MONGODB_DATABASE;
-  return client.db(database).collection("ErrorLog");
-};
-
-export const save = async (errorLog: NewErrorLog): Promise<void> => {
-  const { acknowledged } = await getErrorLogCollection().insertOne(errorLog);
+const save = async (errorLog: NewErrorLog): Promise<void> => {
+  const collection = await getErrorLogCollection();
+  const { acknowledged } = await collection.insertOne({
+    _id: new ObjectId(),
+    ...errorLog,
+  });
   if (!acknowledged) throw new InternalServerError();
 };
 
-export const logError = (
+export const logError = async (
   endpoint: string,
-  request: NextApiRequest,
+  request: GenericRequest<any>,
   error: any
 ) => {
   const errorLog = {
@@ -29,3 +30,26 @@ export const logError = (
   };
   save(errorLog);
 };
+
+const deleteAll = async (): Promise<void> => {
+  if (process.env.NODE_ENV === "test") {
+    const collection = await getErrorLogCollection();
+    await collection.deleteMany({});
+  }
+};
+
+const errorLogController: ErrorLogController = {
+  logError,
+  deleteAll,
+};
+
+export type ErrorLogController = {
+  logError: (
+    endpoint: string,
+    request: NextApiRequest,
+    error: any
+  ) => Promise<void>;
+  deleteAll: () => Promise<void>;
+};
+
+export default errorLogController;
