@@ -8,9 +8,12 @@ import { getKlantCollection } from 'src/utils/db';
 import { getCurrentTime } from 'src/shared/functions';
 import bcrypt from 'bcrypt';
 
-export const getAllKlanten = async (): Promise<IsKlantCollection[]> => {
+export const getAllKlanten = async (
+  includeDeleted: boolean = false
+): Promise<IsKlantCollection[]> => {
   const collection = await getKlantCollection();
-  return collection.find({ deleted_at: undefined }).toArray();
+  const filter = includeDeleted ? {} : { deleted_at: undefined };
+  return collection.find(filter).toArray();
 };
 
 export const getKlantById = async (
@@ -70,8 +73,9 @@ export const update = async (
   data: IsKlantCollection
 ): Promise<IsKlantCollection> => {
   const collection = await getKlantCollection();
-  const { upsertedCount } = await collection.updateOne({ _id }, data);
-  if (upsertedCount !== 1) throw new InternalServerError();
+  const updatedKlant = { ...data, updated_at: getCurrentTime() };
+  const { modifiedCount } = await collection.updateOne({ _id }, { $set: updatedKlant });
+  if (modifiedCount !== 1) throw new InternalServerError();
 
   return data;
 };
@@ -141,7 +145,10 @@ export const removeInschrijving = async (
   const collection = await getKlantCollection();
   const { modifiedCount } = await collection.updateOne(
     { _id: klant_id },
-    { $pull: { inschrijvingen: inschrijving_id } },
+    {
+      $pull: { inschrijvingen: inschrijving_id },
+      $set: { updated_at: getCurrentTime() },
+    },
     { session }
   );
   if (modifiedCount !== 1) throw new InternalServerError();
