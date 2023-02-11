@@ -1,10 +1,10 @@
-import { ObjectId } from "mongodb";
-import { getCurrentTime } from "src/shared/functions";
-import { getKlantCollection } from "src/utils/db";
-import { InternalServerError } from "../shared/RequestError";
-import { HondCollection, KlantHond } from "../types/EntityTpes/HondTypes";
-import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
-import { getAllKlanten, getKlantById } from "./KlantController";
+import { ObjectId } from 'mongodb';
+import { getCurrentTime } from 'src/shared/functions';
+import { getKlantCollection } from 'src/utils/db';
+import { InternalServerError } from '../shared/RequestError';
+import { HondCollection, KlantHond } from '../types/EntityTpes/HondTypes';
+import { IsKlantCollection } from '../types/EntityTpes/KlantTypes';
+import { getAllKlanten, getKlantById } from './KlantController';
 
 const save = async (
   klant: IsKlantCollection,
@@ -60,11 +60,11 @@ const update = async (
   const klantCollection = await getKlantCollection();
   const updateHond = { ...data, updated_at: getCurrentTime() };
 
-  const { upsertedCount } = await klantCollection.updateOne(
+  const { modifiedCount } = await klantCollection.updateOne(
     { _id: klant._id, honden: { $elemMatch: { _id: hond_id } } },
-    updateHond
+    { $set: updateHond }
   );
-  if (upsertedCount !== 1) throw new InternalServerError();
+  if (modifiedCount !== 1) throw new InternalServerError();
 
   return updateHond;
 };
@@ -97,9 +97,7 @@ const softDelete = async (
   if (modifiedCount !== 1) throw new InternalServerError();
 };
 
-export const getHondById = async (
-  _id: ObjectId
-): Promise<HondCollection | null> => {
+export const getHondById = async (_id: ObjectId): Promise<HondCollection | null> => {
   const collection = await getKlantCollection();
   const klant = await collection.findOne({ honden: { $elemMatch: { _id } } });
   return (
@@ -109,8 +107,7 @@ export const getHondById = async (
   );
 };
 
-export const fullName = (klant: IsKlantCollection) =>
-  `${klant.vnaam} ${klant.lnaam}`;
+export const fullName = (klant: IsKlantCollection) => `${klant.vnaam} ${klant.lnaam}`;
 
 const hondController: IsHondController = {
   getHondById,
@@ -132,17 +129,11 @@ export type IsHondController = {
     _id: ObjectId,
     hondData: HondCollection
   ) => Promise<HondCollection>;
-  getKlantHond: (
-    klant_id: ObjectId,
-    hond_id: ObjectId
-  ) => Promise<HondCollection | null>;
+  getKlantHond: (klant_id: ObjectId, hond_id: ObjectId) => Promise<HondCollection | null>;
   getHondenByKlantId: (klant_id: ObjectId) => Promise<HondCollection[]>;
   getAllHonden: () => Promise<KlantHond[]>;
-  save: (
-    klant: IsKlantCollection,
-    hond: HondCollection
-  ) => Promise<HondCollection>;
+  save: (klant: IsKlantCollection, hond: HondCollection) => Promise<HondCollection>;
 };
 
 export default hondController;
-export const HOND = "HondController";
+export const HOND = 'HondController';

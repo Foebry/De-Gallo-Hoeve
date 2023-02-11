@@ -1,17 +1,15 @@
-import moment from "moment";
-import { Code, ObjectId } from "mongodb";
-import { InternalServerError } from "../shared/RequestError";
-import { ConfirmCollection } from "../types/EntityTpes/ConfirmTypes";
-import { getConfirmCollection } from "src/utils/db";
+import moment from 'moment';
+import { Code, ObjectId } from 'mongodb';
+import { InternalServerError } from '../shared/RequestError';
+import { ConfirmCollection } from '../types/EntityTpes/ConfirmTypes';
+import { getConfirmCollection } from 'src/utils/db';
 import {
   createRandomConfirmCode,
   getCurrentTime,
   toLocalTime,
-} from "src/shared/functions";
+} from 'src/shared/functions';
 
-export const save = async (
-  confirm: ConfirmCollection
-): Promise<ConfirmCollection> => {
+export const save = async (confirm: ConfirmCollection): Promise<ConfirmCollection> => {
   const controller = await getConfirmCollection();
   const { acknowledged } = await controller.insertOne(confirm);
   if (!acknowledged) throw new InternalServerError();
@@ -50,16 +48,14 @@ export const updateConfirm = async (
   data: ConfirmCollection
 ): Promise<void> => {
   const collection = await getConfirmCollection();
-  const { upsertedCount } = await collection.updateOne({ _id }, data);
-  if (upsertedCount !== 1) throw new InternalServerError();
+  const { modifiedCount } = await collection.updateOne({ _id }, { $set: data });
+  if (modifiedCount !== 1) throw new InternalServerError();
 };
 
-export const reset = async (
-  confirm: ConfirmCollection
-): Promise<ConfirmCollection> => {
+export const reset = async (confirm: ConfirmCollection): Promise<ConfirmCollection> => {
   const collection = await getConfirmCollection();
   const newCode = createRandomConfirmCode();
-  const valid_to = toLocalTime(moment(getCurrentTime()).add(1, "day").format());
+  const valid_to = toLocalTime(moment(getCurrentTime()).add(1, 'day').format());
   await collection.updateOne(
     { _id: confirm._id },
     {
@@ -81,7 +77,7 @@ export const deleteByKlantId = async (klant_id: ObjectId): Promise<void> => {
 export const deleteAll = async (): Promise<void> => {
   const collection = await getConfirmCollection();
 
-  if (process.env.NODE_ENV === "test") {
+  if (process.env.NODE_ENV === 'test') {
     collection.deleteMany({});
   }
 };
@@ -104,9 +100,7 @@ export type IsConfirmController = {
   reset: (confirm: ConfirmCollection) => Promise<ConfirmCollection>;
   updateConfirm: (_id: ObjectId, data: ConfirmCollection) => Promise<void>;
   getConfirmByCode: (code: string) => Promise<ConfirmCollection | null>;
-  getConfirmByKlantId: (
-    klant_id: ObjectId
-  ) => Promise<ConfirmCollection | null>;
+  getConfirmByKlantId: (klant_id: ObjectId) => Promise<ConfirmCollection | null>;
   getConfirmById: (_id: ObjectId) => Promise<ConfirmCollection | null>;
   getAllConfirm: () => Promise<ConfirmCollection[]>;
   save: (confirm: ConfirmCollection) => Promise<ConfirmCollection>;

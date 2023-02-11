@@ -1,8 +1,8 @@
-import { ObjectId } from "mongodb";
-import { InternalServerError } from "../shared/RequestError";
-import { ContentCollection } from "../types/EntityTpes/ContentTypes";
-import { getContentCollection } from "src/utils/db";
-import { getCurrentTime } from "src/shared/functions";
+import { ObjectId } from 'mongodb';
+import { InternalServerError } from '../shared/RequestError';
+import { ContentCollection } from '../types/EntityTpes/ContentTypes';
+import { getContentCollection } from 'src/utils/db';
+import { getCurrentTime } from 'src/shared/functions';
 
 export const findAllContent = async (): Promise<ContentCollection[]> => {
   const collection = await getContentCollection();
@@ -20,12 +20,12 @@ export const editContent = async (
   data: ContentCollection
 ): Promise<ContentCollection> => {
   const collection = await getContentCollection();
-
-  const { upsertedCount } = await collection.updateOne(
+  const updatedContent = { ...data, updated_at: getCurrentTime() };
+  const { modifiedCount } = await collection.updateOne(
     { _id: data._id },
-    { ...data, updated_at: getCurrentTime() }
+    { $set: updatedContent }
   );
-  if (upsertedCount !== 1) throw new InternalServerError();
+  if (modifiedCount !== 1) throw new InternalServerError();
 
   return data;
 };
@@ -51,7 +51,7 @@ export const softDelete = async (content: ContentCollection): Promise<void> => {
 export const deleteAll = async (): Promise<void> => {
   const collection = await getContentCollection();
 
-  if (process.env.NODE_ENV === "test") {
+  if (process.env.NODE_ENV === 'test') {
     collection.deleteMany({});
   }
 };
@@ -75,4 +75,4 @@ export type IsContentController = {
 };
 
 export default contentController;
-export const CONTENT = "ContentController";
+export const CONTENT = 'ContentController';
