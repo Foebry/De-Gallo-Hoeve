@@ -1,18 +1,14 @@
-import { nanoid } from "nanoid";
-import React from "react";
-import {
-  Control,
-  FieldValues,
-  UseFormGetValues,
-  UseFormRegister,
-} from "react-hook-form";
-import { OptionsOrGroups } from "react-select";
-import { InschrijvingErrorInterface } from "src/pages/inschrijving/index.page";
-import DayCard from "../Cards/DayCard";
-import { optionInterface } from "../register/HondGegevens";
-import { Body } from "../Typography/Typography";
+import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
+import { nanoid } from 'nanoid';
+import React from 'react';
+import { Control, FieldValues, UseFormGetValues, UseFormRegister } from 'react-hook-form';
+import { OptionsOrGroups } from 'react-select';
+import { InschrijvingErrorInterface } from 'src/pages/inschrijving/index.page';
+import DayCard from '../Cards/DayCard';
+import { optionInterface } from '../register/HondGegevens';
+import { Body } from '../Typography/Typography';
 
-type TrainingType = "prive" | "groep";
+type TrainingType = 'prive' | 'groep';
 
 interface Props {
   control: Control<FieldValues, any>;
@@ -25,7 +21,7 @@ interface Props {
   honden?: OptionsOrGroups<any, optionInterface>[];
   type: TrainingType;
   handleDelete: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
-  timeslots: any;
+  available: TrainingDayDto[];
 }
 
 const HondGegevens: React.FC<Props> = ({
@@ -36,10 +32,18 @@ const HondGegevens: React.FC<Props> = ({
   selectedDates = [],
   type,
   handleDelete,
-  timeslots,
+  available,
   errors,
   setErrors,
 }) => {
+  const timeslots = available
+    .map((trainingDay) => ({
+      [trainingDay.date.split('T')[0]]: trainingDay.timeslots.map((timeslot) => ({
+        value: timeslot,
+        label: timeslot,
+      })),
+    }))
+    .reduce((acc, curr) => ({ ...acc, ...curr }), {});
   return (
     <>
       {selectedDates.length > 0 ? (
@@ -58,7 +62,8 @@ const HondGegevens: React.FC<Props> = ({
               errors={errors}
               setErrors={setErrors}
               handleDelete={handleDelete}
-              timeslots={timeslots[date] ?? timeslots.default}
+              timeslots={timeslots[date]}
+              // timeslots={timeslots[date] ?? timeslots.default}
             />
           ))
       ) : (

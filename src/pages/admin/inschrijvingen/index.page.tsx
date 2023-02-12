@@ -1,26 +1,27 @@
-import { nanoid } from "nanoid";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import React, { useEffect, useMemo, useState } from "react";
-import { GrEdit, GrView } from "react-icons/gr";
-import { MdDelete } from "react-icons/md";
-import { toast } from "react-toastify";
-import Dashboard from "src/components/admin/dashboard";
-import FormRow from "src/components/form/FormRow";
-import Table from "src/components/Table/Table";
-import getData from "src/hooks/useApi";
-import { PaginatedInschrijving } from "src/mappers/Inschrijvingen";
-import { ADMIN_INSCHRIJVINGEN_OVERVIEW } from "src/types/apiTypes";
-import { apiOptionsInterface, ApiResult } from "../klanten/index.page";
+import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
+import { nanoid } from 'nanoid';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { useEffect, useMemo, useState } from 'react';
+import { GrEdit, GrView } from 'react-icons/gr';
+import { MdDelete } from 'react-icons/md';
+import { toast } from 'react-toastify';
+import Dashboard from 'src/components/admin/dashboard';
+import FormRow from 'src/components/form/FormRow';
+import Table from 'src/components/Table/Table';
+import getData from 'src/hooks/useApi';
+import { PaginatedInschrijving } from 'src/mappers/Inschrijvingen';
+import { ADMIN_INSCHRIJVINGEN_OVERVIEW } from 'src/types/apiTypes';
+import { apiOptionsInterface, ApiResult } from '../klanten/index.page';
 
 const Inschrijvingen = () => {
   const headers: string[] = [
-    "datum",
-    "training",
-    "klant",
-    "hond",
-    "aangemaakt op",
-    "actions",
+    'datum',
+    'training',
+    'klant',
+    'hond',
+    'aangemaakt op',
+    'actions',
   ];
   const [options, setOptions] = useState<apiOptionsInterface>({});
   const [apiData, setApiData] = useState<ApiResult<PaginatedInschrijving>>({
@@ -40,6 +41,7 @@ const Inschrijvingen = () => {
         ? ADMIN_INSCHRIJVINGEN_OVERVIEW + `?id=${ids}`
         : ADMIN_INSCHRIJVINGEN_OVERVIEW;
       const { data } = await getData(url);
+      // setApiData(data.map((trainingDayDto: TrainingDayDto) => trainingDayDto.date));
       setApiData(data);
     })();
   }, [router.query.id]);
@@ -94,7 +96,7 @@ const Inschrijvingen = () => {
       setApiData(data);
     }
     if (error) {
-      toast.warning("Fout bij laden van inschrijvingen");
+      toast.warning('Fout bij laden van inschrijvingen');
     }
   };
   return (
@@ -105,7 +107,7 @@ const Inschrijvingen = () => {
       <Table
         rows={inschrijvingen}
         columns={headers}
-        colWidths={["15", "10", "12.5", "12.5", "10", "15"]}
+        colWidths={['15', '10', '12.5', '12.5', '10', '15']}
         pagination={apiData.pagination}
         onPaginationClick={onPaginationClick}
       />

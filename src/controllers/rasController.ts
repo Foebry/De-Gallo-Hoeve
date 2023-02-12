@@ -3,6 +3,7 @@ import { InternalServerError } from '../shared/RequestError';
 import { RasCollection } from '../types/EntityTpes/RasTypes';
 import { getRasCollection } from 'src/utils/db';
 import { getCurrentTime } from 'src/shared/functions';
+import { Option } from 'src/utils/MongoDb';
 
 export const getRasByName = async (naam: string): Promise<RasCollection | null> => {
   const collection = await getRasCollection();
@@ -79,6 +80,14 @@ export const getRandomRasNaam = async (): Promise<string> => {
   return rassen[random].naam;
 };
 
+const getRasOptions = async () => {
+  const rassen = await getAllRassen();
+  return rassen.map(({ _id: value, naam: label }) => ({
+    value: value.toString(),
+    label,
+  }));
+};
+
 export const RAS = 'RasController';
 
 const rasController: IsRasController = {
@@ -90,6 +99,7 @@ const rasController: IsRasController = {
   getAllRassen,
   getRasById,
   getRasByName,
+  getRasOptions,
   save,
   saveMany,
 };
@@ -103,6 +113,7 @@ export type IsRasController = {
   getAllRassen: () => Promise<RasCollection[]>;
   getRasById: (_id: ObjectId) => Promise<RasCollection | null>;
   getRasByName: (naam: string) => Promise<RasCollection | null>;
+  getRasOptions: () => Promise<Option[]>;
   save: (ras: RasCollection) => Promise<RasCollection>;
   saveMany: (rassen: RasCollection[]) => Promise<RasCollection[]>;
 };
