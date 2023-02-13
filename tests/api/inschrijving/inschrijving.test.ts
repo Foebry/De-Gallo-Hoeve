@@ -20,6 +20,7 @@ import { createRandomTraining } from 'tests/fixtures/training';
 import { createRandomInschrijving } from 'tests/fixtures/inschrijving';
 import { closeClient } from 'src/utils/db';
 import { getRequest } from 'tests/helpers';
+import logger from 'src/utils/logger';
 
 describe('/inschrijving', () => {
   beforeEach(async () => await clearAllData());
@@ -289,6 +290,12 @@ describe('/inschrijving', () => {
         .expect(201);
       expect(body.message).toBe('Inschrijving ontvangen!');
       expect(mockedSendMail).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('getAvailableForInschrijving', () => {
+    it.skip('Should return available and disabled data for trainingdays', async () => {
+      logger.info('test');
     });
   });
 });

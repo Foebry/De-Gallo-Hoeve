@@ -35,7 +35,6 @@ const getAvailableDays = async (req: NextApiRequest, res: NextApiResponse) => {
     // const result = data.map((day) => day.date.toISOString().split('T')[0]);
 
     const result = mapToAvailableTrainingDays(data);
-    console.log({ result });
 
     return res.status(200).send(result);
   } catch (error: any) {
@@ -44,23 +43,9 @@ const getAvailableDays = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 const setAvailabelDays = async (req: NextApiRequest, res: NextApiResponse) => {
-  console.log({ tatus: 'inside handler' });
   const { selected } = req.body;
-  console.log({ selected });
-  selected.forEach((dto: TrainingDayDto) => {
-    if (dto.date === '2023-03-02T00:00:00.000Z')
-      console.log({ timeslots: dto.timeslots });
-  });
-  const currentTrainingDays = await getEnabledTrainingDays();
-  // const currentTrainingDays = await collection
-  //   .find({ date: { $gt: new Date() } })
-  //   .toArray();
 
-  // const currentTrainingDays = data.map((day) => ({
-  //   date: day.date.toISOString().split('T')[0],
-  //   _id: day._id,
-  //   timeslots: day.timeslots,
-  // }));
+  const currentTrainingDays = await getEnabledTrainingDays();
 
   const deletedTrainingDays = currentTrainingDays.filter(
     (day) =>
@@ -68,14 +53,12 @@ const setAvailabelDays = async (req: NextApiRequest, res: NextApiResponse) => {
         .map((newDay: TrainingDayDto) => newDay.date.split('T')[0])
         .includes(day.date.toISOString().split('T')[0])
   );
-  console.log({ deletedTrainingDays });
   const daysToAdd = selected.filter(
     (newDay: TrainingDayDto) =>
       !currentTrainingDays
         .map((day) => day.date.toISOString().split('T')[0])
         .includes(newDay.date.split('T')[0])
   );
-  console.log({ daysToAdd });
   const daysToUpdate = currentTrainingDays
     .filter(
       (curr) =>
@@ -96,33 +79,19 @@ const setAvailabelDays = async (req: NextApiRequest, res: NextApiResponse) => {
           dto.date.split('T')[0] === curr.date.toISOString().split('T')[0]
       ).timeslots,
     }));
-  console.log({ daysToUpdate });
 
   if (deletedTrainingDays.length) {
     const _ids = deletedTrainingDays.map((day) => day._id);
     await deleteMany(_ids);
   }
-  // await getController(TRAININGDAY).deleteMany(
-  //   deletedTrainingDays.map((day) => day._id)
-  // );
-  // await collection.deleteMany({
-  //   _id: { $in: deletedTrainingDays.map((day) => day._id) },
-  // });
 
   if (daysToAdd.length) {
     const trainingDays = daysToAdd.map((day: TrainingDayDto) => createTrainingDay(day));
     await saveMany(trainingDays);
   }
 
-  // await collection.insertMany(
-  //   daysToAdd.map((day: TrainingDayDto) => createTrainingDay(day))
-  // );
   for (const trainingDay of daysToUpdate) {
     await getController(TRAININGDAY).updateOne(trainingDay);
-    // await collection.updateOne(
-    //   { _id: new ObjectId(trainingDay._id) },
-    //   { $set: { timeslots: trainingDay.timeslots } }
-    // );
   }
 
   // verwijder inschrijvingen met data uit deleteTrainingDays vervolgens deze klanten verwittigen.
