@@ -3,7 +3,6 @@ import { validate, validateCsrfToken } from 'src/services/Validator';
 import { inschrijvingSchema } from 'src/types/schemas';
 import { secureApi, verifiedUserApi } from 'src/services/Authenticator';
 import {
-  EmailNotVerifiedError,
   HondNotFoundError,
   KlantNotFoundError,
   ReedsIngeschrevenError,

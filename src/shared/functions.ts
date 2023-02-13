@@ -3,38 +3,9 @@ import { TRAININGDAY } from 'src/controllers/TrainingDayController';
 import { getController } from 'src/services/Factory';
 
 interface HelperInterface {
-  // getDisabledDays: (training: string) => Promise<string[]>;
   capitalize: (string: string) => string;
   createRandomConfirmCode: () => string;
 }
-
-// export const getDisabledDays = async (traning: string) => {
-//   const trainingDayController = getController(TRAININGDAY);
-//   const date = new Date();
-
-//   //today is always disabled to prevent any new inschrijvingen or reservations for the current day
-//   const disabledDays = [date.toISOString().split('.')[0].split('T')[0]];
-//   const trainingDays = trainingDayController.AvailableTrainingDays();
-//   const temp = new Date();
-//   const endDate = new Date(temp.getFullYear(), temp.getMonth() + 2, 0);
-
-//   // const trainingDays = (await trainingDaysCollection
-//   //   .find({ date: { $gt: new Date(temp) } })
-//   //   .toArray()) as TrainingDaysCollection[];
-//   // console.log({ trainingDays });
-
-//   const enabledDays = trainingDays.map((day) => day.date.toISOString());
-
-//   while (true) {
-//     const newDate = new Date(date.setDate(date.getDate() + 1));
-//     const dateString = newDate.toISOString().split('.')[0].split('T')[0];
-
-//     if (!enabledDays.includes(new Date(dateString).toISOString())) {
-//       disabledDays.push(dateString);
-//     }
-//     if (newDate.getTime() > endDate.getTime()) return disabledDays;
-//   }
-// };
 
 export const capitalize = (string: string) => {
   return string
@@ -80,7 +51,6 @@ export const pick = <T>(arr: T[]): T => {
 const helper: HelperInterface = {
   createRandomConfirmCode,
   capitalize,
-  // getDisabledDays,
 };
 
 export default helper;
