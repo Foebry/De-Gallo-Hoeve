@@ -80,7 +80,7 @@ export const getRandomRasNaam = async (): Promise<string> => {
   return rassen[random].naam;
 };
 
-const getRasOptions = async () => {
+export const getRasOptions = async () => {
   const rassen = await getAllRassen();
   return rassen.map(({ _id: value, naam: label }) => ({
     value: value.toString(),
