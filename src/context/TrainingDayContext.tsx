@@ -67,9 +67,13 @@ const TrainingDayProvider: React.FC<{ children: any }> = ({ children }) => {
   };
 
   const saveTrainingDays = async () => {
-    const { error, data } = await save('/api/admin/trainingdays', {
-      selected: trainingDays,
-    });
+    const { error, data } = await save(
+      '/api/admin/trainingdays',
+      {
+        selected: trainingDays,
+      },
+      { method: 'PUT' }
+    );
     if (error) toast.error(error);
     if (data) {
       toast.success('save succesvol');

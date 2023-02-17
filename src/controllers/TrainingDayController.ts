@@ -9,14 +9,14 @@ import { INSCHRIJVING } from './InschrijvingController';
 
 export const getEnabledTrainingDays = async (): Promise<TrainingDaysCollection[]> => {
   const collection = await getTrainingDaysCollection();
-  return collection.find({ date: { $gt: new Date() } }).toArray();
+  return collection.find({ date: { $gt: new Date() } }, { sort: { date: 1 } }).toArray();
 };
 
 const getAvailableForInschrijving = async (): Promise<AvailableForInschrijving> => {
   const inschrijvingController = getController(INSCHRIJVING);
-  const date = new Date();
-  const disabled = [date.toISOString()];
   let enabledDays = await getEnabledTrainingDays();
+  const date = new Date(enabledDays[0].date);
+  const disabled: string[] = [];
   const endDate = enabledDays.reverse()[0].date.toISOString();
   const enabledDateString = enabledDays.map(
     (day) => day.date.toISOString().split('T')[0]
@@ -80,12 +80,16 @@ const getAvailableForInschrijving = async (): Promise<AvailableForInschrijving> 
   );
 
   return {
-    disabled: disabled.map((dateString) => dateString.split('T')[0]),
-    available: available.map((trainingDay) => ({
-      date: trainingDay.date.toISOString().split('T')[0],
-      timeslots: trainingDay.timeslots,
-      _id: trainingDay._id.toString(),
-    })),
+    disabled: disabled
+      .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+      .map((dateString) => dateString.split('T')[0]),
+    available: available
+      .sort((a, b) => a.date.getTime() - b.date.getTime())
+      .map((trainingDay) => ({
+        date: trainingDay.date.toISOString().split('T')[0],
+        timeslots: trainingDay.timeslots,
+        _id: trainingDay._id.toString(),
+      })),
   };
 };
 
@@ -108,6 +112,13 @@ export const deleteMany = async (_ids: ObjectId[]): Promise<void> => {
   await collection.deleteMany({ _id: { $in: _ids } });
 };
 
+export const deleteAll = async (): Promise<void> => {
+  if (process.env.NODE_ENV === 'test') {
+    const collection = await getTrainingDaysCollection();
+    await collection.deleteMany({});
+  }
+};
+
 export const saveMany = async (
   trainingDays: TrainingDaysCollection[]
 ): Promise<TrainingDaysCollection[]> => {
@@ -121,6 +132,7 @@ const trainingDayController: IsTrainingDayController = {
   getEnabledTrainingDays,
   updateOne,
   deleteMany,
+  deleteAll,
   saveMany,
 };
 
@@ -134,6 +146,7 @@ export type IsTrainingDayController = {
   getEnabledTrainingDays: () => Promise<TrainingDaysCollection[]>;
   updateOne: (trainingDay: TrainingDaysCollection) => Promise<void>;
   deleteMany: (_ids: ObjectId[]) => Promise<void>;
+  deleteAll: () => Promise<void>;
   saveMany: (trainingDays: TrainingDaysCollection[]) => Promise<TrainingDaysCollection[]>;
 };
 

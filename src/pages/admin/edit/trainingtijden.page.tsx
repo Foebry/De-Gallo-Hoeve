@@ -11,7 +11,9 @@ import { TrainingDayContext } from 'src/context/TrainingDayContext';
 import TrainingDay from './components/TrainingDay';
 import { TiDelete, TiRefresh } from 'react-icons/ti';
 
-const Trainingtijden = () => {
+type Props = {};
+
+const Trainingtijden: React.FC<Props> = () => {
   const trainingDagen = useGetTrainingDays();
   const [saveTrainingDays] = useSaveTrainingDays();
 

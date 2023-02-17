@@ -67,6 +67,15 @@ const Groepslessen: React.FC<LessenProps> = ({
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [isFirstInschrijving, setIsFirstInschrijving] = useState<boolean>(true);
+  const latestAvailableDate = available
+    .map((dto) => new Date(dto.date))
+    .sort((a, b) => b.getTime() - a.getTime())
+    .map((date) => date.toISOString().split('T')[0])[0];
+
+  const firstAvailable = available
+    .map((dto) => new Date(dto.date))
+    .sort((a, b) => a.getTime() - b.getTime())
+    .map((date) => date.toISOString().split('T')[0])[0];
 
   const router = useRouter();
   const { handleSubmit, control, getValues, register, setValue } = useForm();
@@ -165,32 +174,46 @@ const Groepslessen: React.FC<LessenProps> = ({
                     <Controller
                       name="dates"
                       control={control}
-                      render={({ field: { onChange } }) => (
-                        <DatePicker
-                          onChange={(e) => {
-                            onChange(e);
-                            setSelectedDates(
-                              getValues().dates.sort(
-                                (a: string, b: string) =>
-                                  new Date(a).getTime() - new Date(b).getTime()
-                              )
-                            );
-                            setValue('inschrijvingen', []);
-                          }}
-                          disabledBeforeToday={true}
-                          numberOfSelectableDays={5}
-                          startOfWeek={1}
-                          disabledDays={disabledDays}
-                          selectedDays={selectedDates}
-                          disabledAfterDate={
-                            available
-                              .map((trainingDayDto) => trainingDayDto.date)
-                              .sort(
-                                (a, b) => new Date(b).getTime() - new Date(a).getTime()
-                              )[0]
-                          }
-                        />
-                      )}
+                      render={({ field: { onChange } }) => {
+                        console.log(selectedDates);
+                        return (
+                          <DatePicker
+                            onChange={(e) => {
+                              onChange(e);
+                              setSelectedDates(
+                                getValues().dates.sort(
+                                  (a: string, b: string) =>
+                                    new Date(a).getTime() - new Date(b).getTime()
+                                )
+                              );
+                              setValue('inschrijvingen', []);
+                            }}
+                            disabledBeforeToday={true}
+                            numberOfSelectableDays={5}
+                            startOfWeek={1}
+                            disabledDays={disabledDays}
+                            selectedDays={selectedDates}
+                            disabledAfterDate={latestAvailableDate}
+                            disabledBeforeDate={firstAvailable}
+                            components={{
+                              titleOfWeek: {
+                                titles: ['Zo', 'Ma', 'Di', 'Woe', 'Do', 'Vr', 'Za'],
+                              },
+                              // header: {
+                              //   monthIcons: {},
+                              // },
+                            }}
+                            // disabledA
+                            // disabledAfterDate={
+                            //   available
+                            //     .map((trainingDayDto) => trainingDayDto.date)
+                            //     .sort(
+                            //       (a, b) => new Date(b).getTime() - new Date(a).getTime()
+                            //     )[0]
+                            // }
+                          />
+                        );
+                      }}
                     />
                   </>
                 ) : activeStep === 1 ? (

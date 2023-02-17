@@ -48,6 +48,10 @@ export const pick = <T>(arr: T[]): T => {
   return arr[Math.floor(Math.random() * arr.length)];
 };
 
+export const unique = <T>(arr: T[]): T[] => {
+  return new Array(...new Set(arr));
+};
+
 const helper: HelperInterface = {
   createRandomConfirmCode,
   capitalize,

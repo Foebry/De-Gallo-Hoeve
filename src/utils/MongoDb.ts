@@ -13,7 +13,8 @@ import { KlantHond } from 'src/types/EntityTpes/HondTypes';
 import { RasCollection } from 'src/types/EntityTpes/RasTypes';
 import { ERRORLOG } from 'src/types/EntityTpes/ErrorLogTypes';
 import { InschrijvingCollection } from 'src/types/EntityTpes/InschrijvingTypes';
-import { getInschrijvingCollection, getTrainingCollection } from './db';
+import { getTrainingCollection } from './db';
+import { TRAININGDAY } from 'src/controllers/TrainingDayController';
 
 export interface Option {
   value: string;
@@ -90,6 +91,7 @@ export const clearAllData = async () => {
     await Factory.getController(RAS).deleteAll();
     await Factory.getController(TRAINING).deleteAll();
     await Factory.getController(ERRORLOG).deleteAll();
+    await Factory.getController(TRAININGDAY).deleteAll();
   }
 };
 

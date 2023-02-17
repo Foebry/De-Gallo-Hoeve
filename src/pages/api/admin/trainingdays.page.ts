@@ -1,5 +1,4 @@
 import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
-import { ObjectId } from 'mongodb';
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
   deleteMany,
@@ -10,19 +9,17 @@ import {
 import { mapToAvailableTrainingDays } from 'src/mappers/trainingDays';
 import { adminApi } from 'src/services/Authenticator';
 import { createTrainingDay, getController } from 'src/services/Factory';
-import { NotAllowedError, TrainingNotFoundError } from 'src/shared/RequestError';
-import { closeClient, getTrainingDaysCollection } from 'src/utils/db';
-import logger from 'src/utils/logger';
+import { NotAllowedError } from 'src/shared/RequestError';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     adminApi({ req, res });
 
-    if (req.method !== 'GET' && req.method !== 'POST') throw new NotAllowedError();
+    if (req.method !== 'GET' && req.method !== 'PUT') throw new NotAllowedError();
 
     if (req.method === 'GET') return getAvailableDays(req, res);
 
-    if (req.method === 'POST') return setAvailabelDays(req, res);
+    if (req.method === 'PUT') return setAvailabelDays(req, res);
   } catch (error: any) {
     return res.status(error.code).json(error.response);
   }
