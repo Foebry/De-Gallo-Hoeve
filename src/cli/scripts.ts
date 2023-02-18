@@ -1,8 +1,9 @@
 import path from 'path';
+import logger from 'src/utils/logger';
 const job = (obj: Record<string, any>) => {
   if (!Object.keys(obj).includes('script')) return;
 
-  console.log(`running script ${obj['script']}`);
+  logger.info(`running script ${obj['script']}`);
   const script = path.join('../../src/cronjobs/scripts', obj.script);
 
   try {
@@ -11,7 +12,7 @@ const job = (obj: Record<string, any>) => {
     } else require(script).handler(obj['target-env']);
   } catch (error: any) {
     if (error.code === 'MODULE_NOT_FOUND') {
-      console.log(`ERROR: Could not locate script ${obj.script}`);
+      logger.error(`Could not locate script ${obj.script}`);
       process.exit();
     }
   }

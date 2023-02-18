@@ -14,15 +14,17 @@ import { toast } from 'react-toastify';
 import { OptionsOrGroups } from 'react-select';
 import { optionInterface } from 'src/components/register/HondGegevens';
 import HondGegevens from 'src/components/inschrijving/HondGegevens';
-import { getFreeTimeSlots, getHondOptions, getRasOptions } from 'src/utils/MongoDb';
-import { ObjectId } from 'mongodb';
-import { getDisabledDays } from 'src/shared/functions';
 import { generateCsrf } from 'src/services/Validator';
 import { securepage } from 'src/services/Authenticator';
 import Skeleton from 'src/components/website/skeleton';
-import { getPriveTraining } from 'src/controllers/TrainingController';
+import { TRAINING } from 'src/controllers/TrainingController';
 import getData from 'src/hooks/useApi';
 import Head from 'next/head';
+import { TRAININGDAY } from 'src/controllers/TrainingDayController';
+import { getController } from 'src/services/Factory';
+import { RAS } from 'src/controllers/rasController';
+import { HOND } from 'src/controllers/HondController';
+import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
 
 type TrainingType = 'prive' | 'groep';
 
@@ -33,7 +35,7 @@ interface LessenProps {
   rassen: OptionsOrGroups<any, optionInterface>[];
   csrf: string;
   type: TrainingType;
-  timeslots: any;
+  available: TrainingDayDto[];
   prijsExcl: number;
 }
 
@@ -56,7 +58,7 @@ const Groepslessen: React.FC<LessenProps> = ({
   rassen,
   csrf,
   type,
-  timeslots,
+  available,
   prijsExcl,
 }) => {
   const [errors, setErrors] = useState<InschrijvingErrorInterface>({});
@@ -65,6 +67,15 @@ const Groepslessen: React.FC<LessenProps> = ({
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [isFirstInschrijving, setIsFirstInschrijving] = useState<boolean>(true);
+  const latestAvailableDate = available
+    .map((dto) => new Date(dto.date))
+    .sort((a, b) => b.getTime() - a.getTime())
+    .map((date) => date.toISOString().split('T')[0])[0];
+
+  const firstAvailable = available
+    .map((dto) => new Date(dto.date))
+    .sort((a, b) => a.getTime() - b.getTime())
+    .map((date) => date.toISOString().split('T')[0])[0];
 
   const router = useRouter();
   const { handleSubmit, control, getValues, register, setValue } = useForm();
@@ -163,26 +174,46 @@ const Groepslessen: React.FC<LessenProps> = ({
                     <Controller
                       name="dates"
                       control={control}
-                      render={({ field: { onChange } }) => (
-                        <DatePicker
-                          onChange={(e) => {
-                            onChange(e);
-                            setSelectedDates(
-                              getValues().dates.sort(
-                                (a: string, b: string) =>
-                                  new Date(a).getTime() - new Date(b).getTime()
-                              )
-                            );
-                            setValue('inschrijvingen', []);
-                          }}
-                          disabledBeforeToday={true}
-                          numberOfSelectableDays={5}
-                          startOfWeek={1}
-                          disabledDays={disabledDays}
-                          selectedDays={selectedDates}
-                          disabledAfterDate={disabledDays?.[disabledDays?.length - 1]}
-                        />
-                      )}
+                      render={({ field: { onChange } }) => {
+                        console.log(selectedDates);
+                        return (
+                          <DatePicker
+                            onChange={(e) => {
+                              onChange(e);
+                              setSelectedDates(
+                                getValues().dates.sort(
+                                  (a: string, b: string) =>
+                                    new Date(a).getTime() - new Date(b).getTime()
+                                )
+                              );
+                              setValue('inschrijvingen', []);
+                            }}
+                            disabledBeforeToday={true}
+                            numberOfSelectableDays={5}
+                            startOfWeek={1}
+                            disabledDays={disabledDays}
+                            selectedDays={selectedDates}
+                            disabledAfterDate={latestAvailableDate}
+                            disabledBeforeDate={firstAvailable}
+                            components={{
+                              titleOfWeek: {
+                                titles: ['Zo', 'Ma', 'Di', 'Woe', 'Do', 'Vr', 'Za'],
+                              },
+                              // header: {
+                              //   monthIcons: {},
+                              // },
+                            }}
+                            // disabledA
+                            // disabledAfterDate={
+                            //   available
+                            //     .map((trainingDayDto) => trainingDayDto.date)
+                            //     .sort(
+                            //       (a, b) => new Date(b).getTime() - new Date(a).getTime()
+                            //     )[0]
+                            // }
+                          />
+                        );
+                      }}
                     />
                   </>
                 ) : activeStep === 1 ? (
@@ -197,7 +228,7 @@ const Groepslessen: React.FC<LessenProps> = ({
                     honden={honden}
                     type={type}
                     handleDelete={handleDelete}
-                    timeslots={timeslots}
+                    available={available}
                   />
                 ) : activeStep === 2 ? (
                   <Contactgegevens control={control} />
@@ -227,6 +258,11 @@ export default Groepslessen;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   // const { type } = ctx.query;
+  const trainingDayController = getController(TRAININGDAY);
+  const rasController = getController(RAS);
+  const hondController = getController(HOND);
+  const trainingController = getController(TRAINING);
+
   const type = 'prive';
   if (!type) return { redirect: { permanent: false, destination: INDEX } };
 
@@ -237,22 +273,22 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       redirect: { permanent: false, destination: LOGIN },
     };
   }
-  const honden = await getHondOptions(klant_id as ObjectId);
+  const { disabled, available } =
+    await trainingDayController.getAvailableForInschrijving();
+  const training = await trainingController.getPriveTraining();
+  const rassen = await rasController.getRasOptions();
+  const honden = await hondController.getHondOptions(klant_id);
   const csrf = generateCsrf();
-  const disabledDays = await getDisabledDays(type);
-  const rassen = await getRasOptions();
-  const timeslots = await getFreeTimeSlots();
-  const training = await getPriveTraining();
 
   return {
     props: {
       rassen,
       honden,
-      disabledDays,
+      disabledDays: disabled,
       klant_id: klant_id?.toString() ?? null,
       csrf,
       type,
-      timeslots,
+      available,
       prijsExcl: training?.prijsExcl ?? '',
     },
   };

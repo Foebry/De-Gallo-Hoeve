@@ -13,7 +13,8 @@ import { KlantHond } from 'src/types/EntityTpes/HondTypes';
 import { RasCollection } from 'src/types/EntityTpes/RasTypes';
 import { ERRORLOG } from 'src/types/EntityTpes/ErrorLogTypes';
 import { InschrijvingCollection } from 'src/types/EntityTpes/InschrijvingTypes';
-import { getInschrijvingCollection, getTrainingCollection } from './db';
+import { getTrainingCollection } from './db';
+import { TRAININGDAY } from 'src/controllers/TrainingDayController';
 
 export interface Option {
   value: string;
@@ -45,57 +46,41 @@ export const getIndexData = async () => {
   }
 };
 
-export const getRasOptions = async () => {
-  const rassen = await getAllRassen();
-  return rassen.map(({ _id: value, naam: label }) => ({
-    value: value.toString(),
-    label,
-  })) as Option[];
-};
+// export const getFreeTimeSlots = async () => {
+//   const all = [
+//     '10:00',
+//     '11:00',
+//     '12:00',
+//     '13:00',
+//     '14:00',
+//     '15:00',
+//     '16:00',
+//     '17:00',
+//   ].map((el) => ({ label: el, value: el }));
+//   const collection = await getInschrijvingCollection();
+//   const inschrijvingen = await collection
+//     .find({ training: 'prive', datum: { $gt: new Date() } })
+//     .toArray();
 
-export const getHondOptions = async (klant_id: ObjectId) => {
-  const honden = await getHondenByKlantId(klant_id);
-  return honden.map(({ _id: value, naam: label }) => ({
-    value: value?.toString(),
-    label,
-  })) as Option[];
-};
-
-export const getFreeTimeSlots = async () => {
-  const all = [
-    '10:00',
-    '11:00',
-    '12:00',
-    '13:00',
-    '14:00',
-    '15:00',
-    '16:00',
-    '17:00',
-  ].map((el) => ({ label: el, value: el }));
-  const collection = await getInschrijvingCollection();
-  const inschrijvingen = await collection
-    .find({ training: 'prive', datum: { $gt: new Date() } })
-    .toArray();
-
-  const timeSlots = inschrijvingen.reduce((prev, curr) => {
-    const [date, time] = curr.datum.toISOString().split('T');
-    const keys = Object.keys(prev);
-    if (keys.includes(date)) {
-      return {
-        ...prev,
-        [date]: prev[date].filter((el: Option) => el.label !== time.substring(0, 5)),
-      };
-    } else
-      return {
-        ...prev,
-        [date]: all.filter((el: Option) => el.label !== time.substring(0, 5)),
-      };
-  }, {} as any);
-  return {
-    ...timeSlots,
-    default: all,
-  };
-};
+//   const timeSlots = inschrijvingen.reduce((prev, curr) => {
+//     const [date, time] = curr.datum.toISOString().split('T');
+//     const keys = Object.keys(prev);
+//     if (keys.includes(date)) {
+//       return {
+//         ...prev,
+//         [date]: prev[date].filter((el: Option) => el.label !== time.substring(0, 5)),
+//       };
+//     } else
+//       return {
+//         ...prev,
+//         [date]: all.filter((el: Option) => el.label !== time.substring(0, 5)),
+//       };
+//   }, {} as any);
+//   return {
+//     ...timeSlots,
+//     default: all,
+//   };
+// };
 
 export const clearAllData = async () => {
   if (process.env.NODE_ENV === 'test') {
@@ -106,6 +91,7 @@ export const clearAllData = async () => {
     await Factory.getController(RAS).deleteAll();
     await Factory.getController(TRAINING).deleteAll();
     await Factory.getController(ERRORLOG).deleteAll();
+    await Factory.getController(TRAININGDAY).deleteAll();
   }
 };
 

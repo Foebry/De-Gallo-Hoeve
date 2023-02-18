@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { getCurrentTime } from 'src/shared/functions';
 import { getKlantCollection } from 'src/utils/db';
+import { Option } from 'src/utils/MongoDb';
 import { InternalServerError } from '../shared/RequestError';
 import { HondCollection, KlantHond } from '../types/EntityTpes/HondTypes';
 import { IsKlantCollection } from '../types/EntityTpes/KlantTypes';
@@ -109,12 +110,21 @@ export const getHondById = async (_id: ObjectId): Promise<HondCollection | null>
 
 export const fullName = (klant: IsKlantCollection) => `${klant.vnaam} ${klant.lnaam}`;
 
+const getHondOptions = async (klantId: ObjectId): Promise<Option[]> => {
+  const honden = await getHondenByKlantId(klantId);
+  return honden.map(({ _id: value, naam: label }) => ({
+    value: value?.toString(),
+    label,
+  }));
+};
+
 const hondController: IsHondController = {
   getHondById,
   softDelete,
   hardDelete,
   update,
   getKlantHond,
+  getHondOptions,
   getHondenByKlantId,
   getAllHonden,
   save,
@@ -130,6 +140,7 @@ export type IsHondController = {
     hondData: HondCollection
   ) => Promise<HondCollection>;
   getKlantHond: (klant_id: ObjectId, hond_id: ObjectId) => Promise<HondCollection | null>;
+  getHondOptions: (klant_id: ObjectId) => Promise<Option[]>;
   getHondenByKlantId: (klant_id: ObjectId) => Promise<HondCollection[]>;
   getAllHonden: () => Promise<KlantHond[]>;
   save: (klant: IsKlantCollection, hond: HondCollection) => Promise<HondCollection>;

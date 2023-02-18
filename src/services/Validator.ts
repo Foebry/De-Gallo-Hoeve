@@ -1,7 +1,7 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { AnySchema } from "yup";
-import { compare, hash } from "./Authenticator";
-import { InvalidCsrfError, ValidationError } from "../shared/RequestError";
+import { NextApiRequest, NextApiResponse } from 'next';
+import { AnySchema } from 'yup';
+import { compare, hash } from './Authenticator';
+import { InvalidCsrfError, ValidationError } from '../shared/RequestError';
 
 interface OptionsInterface {
   schema: AnySchema;
@@ -31,11 +31,16 @@ const validationHelper: ValidationHelperInterface = {
     try {
       req.body = await schema.validate(payload, validationOptions);
     } catch (error: any) {
-      const response = error.errors.reduce((prev: any, el: any) => {
-        const [key, value] = Object.entries(el)[0];
-        return { ...prev, [key]: value };
-      });
-      throw new ValidationError(undefined, { ...response, message });
+      let response = {};
+      if (error.errors.length > 1) {
+        response = error.errors.reduce((prev: any, curr: any) => {
+          const [key, value] = Object.entries(curr)[0];
+          return { ...prev, [key]: value };
+        });
+      } else {
+        response = { message: error.errors[0] };
+      }
+      throw new ValidationError(message, response);
     }
   },
 
@@ -44,7 +49,7 @@ const validationHelper: ValidationHelperInterface = {
   salt: undefined,
 
   validateCsrfToken: async ({ req }) => {
-    const secret = "DEF";
+    const secret = 'DEF';
     if (!req.body.csrf || !compare(req.body.csrf, secret)) {
       throw new InvalidCsrfError();
     }
@@ -52,7 +57,7 @@ const validationHelper: ValidationHelperInterface = {
 
   generateCsrf: () => {
     // const secret = `${process.env.CSRF_SECRET}`;
-    const secret = "DEF";
+    const secret = 'DEF';
     return hash(Math.random().toString(32).substring(2), secret);
   },
 };
