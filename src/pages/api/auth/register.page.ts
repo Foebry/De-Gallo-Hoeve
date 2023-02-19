@@ -55,6 +55,7 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
           email: process.env.MAIL_TO ?? savedKlant.email,
           vnaam: savedKlant.vnaam,
           code,
+          domain: getDomain(req),
         });
         await mailer.sendMail('register-headsup', {
           email: process.env.MAIL_TO,
