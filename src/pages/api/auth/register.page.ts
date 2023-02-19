@@ -52,7 +52,7 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
         const { code } = await getController(CONFIRM).save(confirm);
 
         await mailer.sendMail('register', {
-          email: savedKlant.email,
+          email: process.env.MAIL_TO ?? savedKlant.email,
           vnaam: savedKlant.vnaam,
           code,
         });
