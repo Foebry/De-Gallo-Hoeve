@@ -1,3 +1,4 @@
+import { logError } from 'src/controllers/ErrorLogController';
 import logger from './logger';
 
 interface Mailer {
@@ -16,6 +17,7 @@ const send = async (msg: any) => {
       logger.info('Email sent');
     })
     .catch((error: any) => {
+      logError('email', undefined, error);
       logger.error(error);
     });
 };
@@ -29,24 +31,9 @@ export const getTemplateId = (type: string): string => {
     ? 'd-26a342a4849645dbb53266ec8e4c0ff5'
     : type === 'inschrijving-headsup'
     ? 'd-32b2e43b878e480192fc34b41a640979'
+    : type === 'inschrijving-annulatie-admin'
+    ? 'd-302fd6359b784bb0983be6328420059b'
     : '';
-  // let templateId: string;
-  // switch (type) {
-  //   case "register":
-  //     templateId = "d-749bfb287b074dc68c8de14ac73ae240";
-  //     break;
-  //   case "contact":
-  //     templateId = "a";
-  //     break;
-  //   case "inschrijving":
-  //     templateId = "d-454de7c4904a4e11a3583562345443b1 ";
-  //     break;
-  //   default:
-  //     templateId = "";
-  //     break;
-  // }
-
-  // return templateId;
 };
 
 const mailer: Mailer = {

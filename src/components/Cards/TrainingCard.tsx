@@ -1,11 +1,11 @@
-import { useRouter } from "next/router";
-import React from "react";
-import { INSCHRIJVING } from "src/types/linkTypes";
-import Button from "../buttons/Button";
-import FormRow from "../form/FormRow";
-import { Body } from "../Typography/Typography";
-import { GiCheckMark } from "react-icons/gi";
-import Image from "next/image";
+import { useRouter } from 'next/router';
+import React from 'react';
+import { INSCHRIJVING } from 'src/types/linkTypes';
+import Button from '../buttons/Button';
+import FormRow from '../form/FormRow';
+import { Body } from '../Typography/Typography';
+import { GiCheckMark } from 'react-icons/gi';
+import Image from 'next/image';
 
 interface TrainingProps {
   type: string;
@@ -41,23 +41,18 @@ const TrainingCard: React.FC<TrainingProps> = ({
           />
         </div>
         <div className="px-2 flex flex-col gap-2">
-          <Body>
-            Heeft u een nieuwe pup en wil u ondersteuning bij de puppytraining?
-          </Body>
+          <Body>Heeft u een nieuwe pup en wil u ondersteuning bij de puppytraining?</Body>
           <Body>Wil u wat meer oefening op clicker training?</Body>
           <Body>
-            Graag wat hulp bij de training voor basis commando&apos;s (zitten,
-            liggen, rechtstaan, ...)
+            Graag wat hulp bij de training voor basis commando&apos;s (zitten, liggen,
+            rechtstaan, ...)
           </Body>
           <Body>Wandelt uw hond niet correct aan de lijn?</Body>
           <Body>
-            Eerder op zoek naar gevorderde trainingen voor bewaking, politie of
-            defensie? (blaffen en stil zijn op commando, leren bijten en lossen,
-            ...)
+            Eerder op zoek naar gevorderde trainingen voor bewaking, politie of defensie?
+            (blaffen en stil zijn op commando, leren bijten en lossen, ...)
           </Body>
-          <Body>
-            Vertoond uw hond gedragsproblemen, ook hiermee kunnen wij u helpen
-          </Body>
+          <Body>Vertoond uw hond gedragsproblemen, ook hiermee kunnen wij u helpen</Body>
           <Body>En nog zoveel meer ...</Body>
         </div>
         <ul className="pl-5 md:pl-20 mt-10">
@@ -71,15 +66,15 @@ const TrainingCard: React.FC<TrainingProps> = ({
           </li>
           <li className="flex gap-2">
             <GiCheckMark />
-            <Body>€ 0.30 / kilometer</Body>
+            <Body>€ {kmHeffing} / kilometer</Body>
           </li>
           <li className="flex gap-2">
             <GiCheckMark />
-            <Body>gratis verplaatsing binnen 10 kilometer</Body>
+            <Body>gratis verplaatsing binnen {gratisVerplaatsingBinnen} kilometer</Body>
           </li>
           <li className="flex gap-2">
             <GiCheckMark />
-            <Body>€ {Math.round(20.66 * 1.21).toFixed(2)} incl.btw / uur</Body>
+            <Body>€ {Math.round(price * 1.21).toFixed(2)} incl.btw / uur</Body>
           </li>
         </ul>
       </div>
@@ -88,10 +83,7 @@ const TrainingCard: React.FC<TrainingProps> = ({
           className="mx-auto"
           label="Aanvragen"
           onClick={() =>
-            router.push(
-              { pathname: INSCHRIJVING, query: { type } },
-              INSCHRIJVING
-            )
+            router.push({ pathname: INSCHRIJVING, query: { type } }, INSCHRIJVING)
           }
         />
       </FormRow>

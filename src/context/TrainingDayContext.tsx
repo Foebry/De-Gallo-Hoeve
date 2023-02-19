@@ -1,10 +1,11 @@
 import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
 import { nanoid } from 'nanoid';
-import { createContext, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { toast } from 'react-toastify';
 import getData from 'src/hooks/useApi';
 import useMutation from 'src/hooks/useMutation';
 import { defaultTrainingTimeSlots } from 'src/mappers/trainingDays';
+import { ModalContext } from './ModalContext';
 
 type TrainingDayContext = {
   trainingDays: TrainingDayDto[];
@@ -34,6 +35,7 @@ const TrainingDayProvider: React.FC<{ children: any }> = ({ children }) => {
   const [trainingDays, setTrainingDays] = useState<TrainingDayDto[]>([]);
   const [hasLoaded, setHasLoaded] = useState<boolean>(false);
   const save = useMutation();
+  const { updateModal } = useContext(ModalContext);
 
   const getTrainingDays = async () => {
     if (hasLoaded) return sortAscending(trainingDays);
@@ -66,15 +68,22 @@ const TrainingDayProvider: React.FC<{ children: any }> = ({ children }) => {
     setTrainingDays(() => sortAscending([...remainingTrainingDays, ...newTrainingDays]));
   };
 
-  const saveTrainingDays = async () => {
+  const saveTrainingDays = async (confirmed?: boolean) => {
     const { error, data } = await save(
       '/api/admin/trainingdays',
       {
         selected: trainingDays,
+        confirmed,
       },
       { method: 'PUT' }
     );
-    if (error) toast.error(error);
+    if (error) {
+      if (error.code === 409) {
+        updateModal(error.message, () => saveTrainingDays);
+      } else {
+        toast.error(error.message);
+      }
+    }
     if (data) {
       toast.success('save succesvol');
       setTrainingDays(data);

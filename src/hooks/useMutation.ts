@@ -33,9 +33,9 @@ const useMutation = (
       });
       return { data, error: undefined };
     } catch (error: any) {
-      const data = error.response.data;
+      const data = { message: error.response.data.message, code: error.response.status };
       setErrors?.({ ...errors, ...data });
-      toast.error(data.message);
+      // toast.error(data.message);
       return { data: undefined, error: data };
     }
   };

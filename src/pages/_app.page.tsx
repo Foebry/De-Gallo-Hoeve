@@ -5,6 +5,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import AppProvider from '../context/appContext';
 import Head from 'next/head';
 import TrainingDayProvider from 'src/context/TrainingDayContext';
+import Modal from 'src/components/Modal';
+import ModalProvider from 'src/context/ModalContext';
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -12,12 +14,15 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Head>
         <link rel="icon" type="image/x-icon" href="/favicon.ico"></link>
       </Head>
-      <TrainingDayProvider>
-        <AppProvider>
-          <ToastContainer position="top-right" />
-          <Component {...pageProps} />
-        </AppProvider>
-      </TrainingDayProvider>
+      <ModalProvider>
+        <TrainingDayProvider>
+          <AppProvider>
+            <Modal />
+            <ToastContainer position="top-right" />
+            <Component {...pageProps} />
+          </AppProvider>
+        </TrainingDayProvider>
+      </ModalProvider>
     </>
   );
 }
