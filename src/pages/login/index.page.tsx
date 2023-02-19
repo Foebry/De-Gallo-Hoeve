@@ -1,20 +1,20 @@
-import React, { useState } from "react";
-import { Body } from "src/components/Typography/Typography";
-import Form from "src/components/form/Form";
-import FormInput from "src/components/form/FormInput";
-import { REGISTER, INDEX } from "src/types/linkTypes";
-import { SubmitButton } from "src/components/buttons/Button";
-import FormRow from "src/components/form/FormRow";
-import { useRouter } from "next/router";
-import { useForm, Controller } from "react-hook-form";
-import useMutation from "src/hooks/useMutation";
-import { LOGINAPI } from "src/types/apiTypes";
-import { GetServerSidePropsContext } from "next";
-import nookies from "nookies";
-import validator, { generateCsrf } from "src/services/Validator";
-import Skeleton from "src/components/website/skeleton";
-import Link from "next/link";
-import Head from "next/head";
+import React, { useState } from 'react';
+import { Body } from 'src/components/Typography/Typography';
+import Form from 'src/components/form/Form';
+import FormInput from 'src/components/form/FormInput';
+import { REGISTER, INDEX } from 'src/types/linkTypes';
+import { SubmitButton } from 'src/components/buttons/Button';
+import FormRow from 'src/components/form/FormRow';
+import { useRouter } from 'next/router';
+import { useForm, Controller } from 'react-hook-form';
+import useMutation from 'src/hooks/useMutation';
+import { LOGINAPI } from 'src/types/apiTypes';
+import { GetServerSidePropsContext } from 'next';
+import nookies from 'nookies';
+import validator, { generateCsrf } from 'src/services/Validator';
+import Skeleton from 'src/components/website/skeleton';
+import Link from 'next/link';
+import Head from 'next/head';
 
 export interface LoginErrorInterface {
   email: string;
@@ -29,8 +29,8 @@ interface LoginPropsInterface {
 const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
   const [disabled, setDisabled] = useState<boolean>(false);
   const [formErrors, setFormErrors] = useState<LoginErrorInterface>({
-    email: "",
-    password: "",
+    email: '',
+    password: '',
   });
 
   const router = useRouter();
@@ -104,7 +104,7 @@ const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
                 />
                 <FormRow>
                   <Body>
-                    Nog geen account?{"	"}
+                    Nog geen account?{'	'}
                     <span className="text-green-200 underline">
                       <Link href={REGISTER}>registreer</Link>
                     </span>
@@ -133,6 +133,7 @@ const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
 export default Login;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  console.log('hi from SSP login');
   const redirect = validator.redirect ?? null;
   const csrf = generateCsrf();
 

@@ -6,15 +6,14 @@ import {
   PaginatedResponse,
 } from 'src/shared/RequestHelper';
 import { mapToRassenOverviewResult, PaginatedRas } from 'src/mappers/rassen';
-import { GenericRequest } from 'src/pages/api/auth/login.page';
 import { RasCollection } from 'src/types/EntityTpes/RasTypes';
 import { adminApi } from 'src/services/Authenticator';
 import { NotAllowedError } from 'src/shared/RequestError';
 
-type RassenOverviewRequest = {
+interface RassenOverviewRequest extends NextApiRequest {
   query: PaginatedRequestQuery;
   url: string;
-};
+}
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -22,14 +21,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     if (req.method !== 'GET') throw new NotAllowedError();
 
-    return getRassenOverview(req as GenericRequest<RassenOverviewRequest>, res);
+    return getRassenOverview(req as RassenOverviewRequest, res);
   } catch (e: any) {
     return res.status(e.code).json(e.response);
   }
 };
 
 const getRassenOverview = async (
-  req: GenericRequest<RassenOverviewRequest>,
+  req: RassenOverviewRequest,
   res: NextApiResponse<PaginatedResponse<PaginatedRas>>
 ) => {
   try {

@@ -11,7 +11,6 @@ import {
   InschrijvingNotFoundError,
   NotAllowedError,
 } from 'src/shared/RequestError';
-import { GenericRequest } from 'src/pages/api/auth/login.page';
 import { logError } from 'src/controllers/ErrorLogController';
 import { adminApi } from 'src/services/Authenticator';
 
@@ -25,14 +24,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     if (req.method !== 'GET') throw new NotAllowedError();
 
-    return getInschrijvingDetail(req as GenericRequest<DetailRequest>, res);
+    return getInschrijvingDetail(req as DetailRequest, res);
   } catch (e: any) {
     return res.status(e.code).json(e.response);
   }
 };
 
 const getInschrijvingDetail = async (
-  req: GenericRequest<DetailRequest>,
+  req: DetailRequest,
   res: NextApiResponse<DetailInschrijvingResponse>
 ) => {
   const { slug: _id } = req.query;
