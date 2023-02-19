@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { NextApiRequest } from 'next';
 import { TRAININGDAY } from 'src/controllers/TrainingDayController';
 import { getController } from 'src/services/Factory';
 
@@ -50,6 +51,10 @@ export const pick = <T>(arr: T[]): T => {
 
 export const unique = <T>(arr: T[]): T[] => {
   return new Array(...new Set(arr));
+};
+
+export const getDomain = (req: NextApiRequest): string | undefined => {
+  return req.headers.host;
 };
 
 const helper: HelperInterface = {
