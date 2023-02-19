@@ -69,7 +69,7 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
       throw new TransactionError(e.name, e.code, e.response);
     }
   } catch (e: any) {
-    req.body.password = await bcrypt.hash(req.body.password, 10);
+    req.body.password = req.body.password ? await bcrypt.hash(req.body.password, 10) : '';
     await logError('register', req, e);
     return res.status(e.code).json(e.response);
   }

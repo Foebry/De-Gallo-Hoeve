@@ -33,7 +33,7 @@ const useMutation = (
       });
       return { data, error: undefined };
     } catch (error: any) {
-      const data = { message: error.response.data.message, code: error.response.status };
+      const data = { ...error.response.data, code: error.response.status };
       setErrors?.({ ...errors, ...data });
       // toast.error(data.message);
       return { data: undefined, error: data };

@@ -3,9 +3,9 @@ import { array, boolean, date, number, object, string } from 'yup';
 const login = object({
   csrf: string().required({ message: 'Er is een probleem' }),
   email: string()
-    .email({ email: 'invalid email' })
-    .required({ email: 'email is required' }),
-  password: string().required({ password: 'password is required' }),
+    .email({ email: 'ongeldige email' })
+    .required({ email: 'email is verplicht' }),
+  password: string().required({ password: 'password is verplicht' }),
 });
 
 const register = object({
@@ -39,13 +39,15 @@ const register = object({
     .matches(/^[a-z ,.'-éëèçêïü]+$/i, {
       message: { straat: 'Kan enkel letters bevatten' },
     }),
-  nr: number().required({ nr: 'verplicht veld' }),
+  nr: number().required({ nr: 'verplicht veld' }).typeError({ nr: 'cijfer...' }),
   gemeente: string()
     .required({ gemeente: 'verplicht veld' })
     .matches(/^[a-z ,.'-éëèçêïü]+$/i, {
       message: { gemeente: 'Kan enkel letters bevatten' },
     }),
-  postcode: number().required({ postcode: 'verplicht veld' }),
+  postcode: number()
+    .required({ postcode: 'verplicht veld' })
+    .typeError({ postcode: 'Kan enkel cijfers bevatten' }),
   honden: array(
     object({
       ras: string().test('is-set', '${path} verplicht', function (item) {

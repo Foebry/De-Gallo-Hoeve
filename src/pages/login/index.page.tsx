@@ -15,6 +15,7 @@ import validator, { generateCsrf } from 'src/services/Validator';
 import Skeleton from 'src/components/website/skeleton';
 import Link from 'next/link';
 import Head from 'next/head';
+import { toast } from 'react-toastify';
 
 export interface LoginErrorInterface {
   email: string;
@@ -41,7 +42,8 @@ const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
     let data;
     if (!disabled) {
       setDisabled(() => true);
-      const { data: response } = await login(LOGINAPI, { ...values, csrf });
+      const { data: response, error } = await login(LOGINAPI, { ...values, csrf });
+      if (error) toast.error(error.message);
       data = response;
     }
 

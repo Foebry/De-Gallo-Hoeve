@@ -1,22 +1,22 @@
-import React, { Dispatch, useEffect, useState } from "react";
-import Form from "src/components/form/Form";
-import { useRouter } from "next/router";
-import { INDEX, LOGIN } from "src/types/linkTypes";
-import { useFieldArray, useForm } from "react-hook-form";
-import PersoonlijkeGegevens from "src/components/register/PersoonlijkeGegevens";
-import Step2, { optionInterface } from "src/components/register/HondGegevens";
-import { OptionsOrGroups } from "react-select";
-import { REGISTERAPI } from "src/types/apiTypes";
-import useMutation, { structureHondenPayload } from "src/hooks/useMutation";
-import FormSteps from "src/components/form/FormSteps";
-import { GetServerSidePropsContext } from "next";
-import nookies from "nookies";
-import { toast } from "react-toastify";
-import Button, { SubmitButton } from "src/components/buttons/Button";
-import { generateCsrf } from "src/services/Validator";
-import { useAppContext } from "src/context/appContext";
-import Skeleton from "src/components/website/skeleton";
-import Head from "next/head";
+import React, { Dispatch, useEffect, useState } from 'react';
+import Form from 'src/components/form/Form';
+import { useRouter } from 'next/router';
+import { INDEX, LOGIN } from 'src/types/linkTypes';
+import { useFieldArray, useForm } from 'react-hook-form';
+import PersoonlijkeGegevens from 'src/components/register/PersoonlijkeGegevens';
+import Step2, { optionInterface } from 'src/components/register/HondGegevens';
+import { OptionsOrGroups } from 'react-select';
+import { REGISTERAPI } from 'src/types/apiTypes';
+import useMutation, { structureHondenPayload } from 'src/hooks/useMutation';
+import FormSteps from 'src/components/form/FormSteps';
+import { GetServerSidePropsContext } from 'next';
+import nookies from 'nookies';
+import { toast } from 'react-toastify';
+import Button, { SubmitButton } from 'src/components/buttons/Button';
+import { generateCsrf } from 'src/services/Validator';
+import { useAppContext } from 'src/context/appContext';
+import Skeleton from 'src/components/website/skeleton';
+import Head from 'next/head';
 
 export interface RegisterHondErrorInterface {
   naam?: string;
@@ -53,33 +53,24 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
   const { control, handleSubmit, getValues } = useForm();
   const { fields, remove, append } = useFieldArray({
     control,
-    name: "honden",
+    name: 'honden',
   });
   const [disabled, setDisabled] = useState<boolean>(false);
   const [activeStep, setActiveStep] = useState<number>(0);
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
-  const [rassen, setRassen] = useState<OptionsOrGroups<any, optionInterface>[]>(
-    []
-  );
+  const [rassen, setRassen] = useState<OptionsOrGroups<any, optionInterface>[]>([]);
   const step1 = [
-    "vnaam",
-    "lnaam",
-    "email",
-    "straat",
-    "nr",
-    "bus",
-    "gemeente",
-    "postcode",
-    "telefoon",
+    'vnaam',
+    'lnaam',
+    'email',
+    'straat',
+    'nr',
+    'bus',
+    'gemeente',
+    'postcode',
+    'telefoon',
   ];
-  const step2 = [
-    "naam",
-    "ras_id",
-    "gelacht",
-    "chip_nr",
-    "geboortedatum",
-    "honden",
-  ];
+  const step2 = ['naam', 'ras_id', 'gelacht', 'chip_nr', 'geboortedatum', 'honden'];
 
   const setErrors = (step: number) => {
     setErrorSteps([...errorSteps, step]);
@@ -87,8 +78,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
   };
   const handleErrors = (error: any) => {
     if (Object.keys(error).some((r) => step1.indexOf(r) >= 0)) setErrors(0);
-    else if (Object.keys(error).some((r) => step2.indexOf(r) >= 1))
-      setErrors(1);
+    else if (Object.keys(error).some((r) => step2.indexOf(r) >= 1)) setErrors(1);
   };
 
   const validatePassword = (
@@ -98,22 +88,22 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
     if (!password.match(/[a-z]+/))
       setFormErrors({
         ...formErrors,
-        password: "Minstens 1 kleine letter",
+        password: 'Minstens 1 kleine letter',
       });
     else if (!password.match(/[A-Z]+/))
       setFormErrors({
         ...formErrors,
-        password: "Minstens 1 hoofdletter",
+        password: 'Minstens 1 hoofdletter',
       });
     else if (!password.match(/[&é@#§è!çà$£µ%ù?./<>°}{"'^*+-=~},;]+/))
       setFormErrors({
         ...formErrors,
-        password: "Minstens 1 speciaal teken",
+        password: 'Minstens 1 speciaal teken',
       });
     else if (!password.match(/[0-9]+/))
-      setFormErrors({ ...formErrors, password: "Minstens 1 cijfer" });
+      setFormErrors({ ...formErrors, password: 'Minstens 1 cijfer' });
     else if (password.length < 8)
-      setFormErrors({ ...formErrors, password: "Minstens 8 characters" });
+      setFormErrors({ ...formErrors, password: 'Minstens 8 characters' });
   };
 
   const onSubmit = async (values: any) => {
@@ -121,7 +111,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
     if (values.password !== values.password_verification) {
       setFormErrors({
         ...formErrors,
-        password_verification: "Komt niet overeen.",
+        password_verification: 'Komt niet overeen.',
       });
       return;
     }
@@ -130,10 +120,13 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
       setDisabled(() => true);
       const { data, error } = await register(REGISTERAPI, { ...payload, csrf });
       if (data) {
-        toast.success("Registratie succesvol!");
+        toast.success('Registratie succesvol!');
         router.push(LOGIN);
       }
-      if (error) handleErrors(error);
+      if (error) {
+        handleErrors(error);
+        toast.error(error.message);
+      }
       setDisabled(() => false);
     }
   };
@@ -162,7 +155,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
               activeStep={activeStep}
               errorSteps={errorSteps}
               setActiveStep={setActiveStep}
-              steps={["Persoonlijke gegevens", "Honden gegevens"]}
+              steps={['Persoonlijke gegevens', 'Honden gegevens']}
             />
           </div>
           <div>
@@ -198,23 +191,14 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
             </Form>
             {activeStep === 1 && (
               <div className="absolute left-10 top-20">
-                <Button
-                  label="vorige"
-                  onClick={() => setActiveStep(activeStep - 1)}
-                />
+                <Button label="vorige" onClick={() => setActiveStep(activeStep - 1)} />
               </div>
             )}
             <div className="absolute right-10 top-20">
               {activeStep === 1 ? (
-                <SubmitButton
-                  label="verzend"
-                  onClick={() => onSubmit(getValues())}
-                />
+                <SubmitButton label="verzend" onClick={() => onSubmit(getValues())} />
               ) : (
-                <Button
-                  label="volgende"
-                  onClick={() => setActiveStep(activeStep + 1)}
-                />
+                <Button label="volgende" onClick={() => setActiveStep(activeStep + 1)} />
               )}
             </div>
           </div>
