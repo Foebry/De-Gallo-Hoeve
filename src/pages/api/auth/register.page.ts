@@ -14,6 +14,7 @@ import { IsRegisterBody } from 'src/types/requestTypes';
 import { CONFIRM } from 'src/types/EntityTpes/ConfirmTypes';
 import { logError } from 'src/controllers/ErrorLogController';
 import { startSession, startTransaction } from 'src/utils/db';
+import { getDomain } from 'src/shared/functions';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -58,6 +59,7 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
         await mailer.sendMail('register-headsup', {
           email: process.env.MAIL_TO,
           klant_id: savedKlant._id.toString(),
+          domain: getDomain(req),
         });
       }, transactionOptions);
 
