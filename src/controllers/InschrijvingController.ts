@@ -37,11 +37,11 @@ export const getInschrijvingenByIds = async (
   return collection.find({ _id: { $in: ids }, deleted_at: undefined }).toArray();
 };
 
-const getInschrijvingenByDates = async (
+export const getInschrijvingenByDates = async (
   dates: Date[]
 ): Promise<InschrijvingCollection[]> => {
   const collection = await getInschrijvingCollection();
-  return collection.find({ datum: { $in: [...dates] } }).toArray();
+  return collection.find({ datum: { $in: [...dates] }, deleted_at: undefined }).toArray();
 };
 
 const getInschrijvingenBetweenDates = async (

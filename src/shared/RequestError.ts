@@ -197,3 +197,17 @@ export class InternalServerError extends HttpError {
     this.code = 500;
   }
 }
+
+export class ConflictError extends HttpError {
+  code: number;
+  constructor(name: string, message: string, response?: any) {
+    super(name, message, response);
+    this.code = 409;
+  }
+}
+
+export class ConfirmationNeededError extends ConflictError {
+  constructor(response?: Record<string, any>) {
+    super('ConfirmationNeededError', 'Confirmation is needed', response);
+  }
+}

@@ -11,12 +11,3 @@ export const defaultTrainingTimeSlots = [
   '16:00',
   '17:00',
 ];
-
-export const mapToAvailableTrainingDays = (
-  data: TrainingDaysCollection[]
-): TrainingDayDto[] =>
-  data.map((trainingDay) => ({
-    date: trainingDay.date.toISOString(),
-    _id: trainingDay._id.toString(),
-    timeslots: trainingDay.timeslots ?? defaultTrainingTimeSlots,
-  }));
