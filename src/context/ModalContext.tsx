@@ -20,7 +20,6 @@ const ModalProvider: React.FC<{ children: any }> = ({ children }) => {
 
   const updateModal = (msg?: string, cb?: (confirmed: boolean) => any) => {
     setMessage(msg);
-    console.log('callback in modal', cb);
     setCallback(cb);
   };
 

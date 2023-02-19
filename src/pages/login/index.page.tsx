@@ -133,7 +133,6 @@ const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
 export default Login;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  console.log('hi from SSP login');
   const redirect = validator.redirect ?? null;
   const csrf = generateCsrf();
 

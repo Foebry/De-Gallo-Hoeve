@@ -36,7 +36,6 @@ export const cancelInschrijving = async (inschrijving: InschrijvingCollection) =
       await removeInschrijvingFromKlant(inschrijving.klant.id, inschrijving._id, session);
     }, transactionOptions);
   } catch (error: any) {
-    console.log(error);
     throw new TransactionError('TransactionError', 422, {
       message: 'Something went wrong cancelling inschrijving',
     });
