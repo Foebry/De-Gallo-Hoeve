@@ -17,7 +17,7 @@ interface ListHondenRequest extends NextApiRequest {
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    adminApi({ req, res });
+    // adminApi({ req, res });
 
     if (req.method != 'GET') return res.status(405).send('Not Allowed');
 

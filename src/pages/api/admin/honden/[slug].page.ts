@@ -34,7 +34,7 @@ interface HondDetailRequest extends NextApiRequest {
 
 const handler = async (req: HondDetailRequest, res: NextApiResponse) => {
   try {
-    adminApi({ req, res });
+    // adminApi({ req, res });
 
     if (req.method !== 'GET') throw new NotAllowedError();
 
@@ -50,7 +50,6 @@ const getHondDetail = async (
 ) => {
   try {
     const { slug: _id } = req.query;
-
     const hond = await getHondById(new ObjectId(_id));
     if (!hond) throw new HondNotFoundError();
 

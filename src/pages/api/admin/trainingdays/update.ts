@@ -4,6 +4,7 @@ import {
   INSCHRIJVING,
 } from 'src/controllers/InschrijvingController';
 import { deleteMany, saveMany, TRAININGDAY } from 'src/controllers/TrainingDayController';
+import { adminApi } from 'src/services/Authenticator';
 import { createTrainingDay, getController } from 'src/services/Factory';
 import { ConfirmationNeededError } from 'src/shared/RequestError';
 import mailer from 'src/utils/Mailer';
@@ -17,6 +18,7 @@ import { EditRequest, EditResponse } from './schemas';
 
 export const setAvailabelDays = async (req: EditRequest, res: EditResponse) => {
   try {
+    adminApi({ req, res });
     const { selected, confirmed } = req.body;
 
     const { currentTrainingDays, deletedTrainingDays, daysToAdd, daysToUpdate } =

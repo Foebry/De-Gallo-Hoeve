@@ -20,7 +20,7 @@ export interface DetailRequest extends NextApiRequest {
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    adminApi({ req, res });
+    // adminApi({ req, res });
 
     if (req.method !== 'GET') throw new NotAllowedError();
 
