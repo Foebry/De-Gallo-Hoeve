@@ -20,7 +20,7 @@ const handler = (req: NextApiRequest, res: NextApiResponse) => {
 interface LoginRequest extends NextApiRequest {
   body: { email: string; password: string };
 }
-export type GenericRequest<T> = T;
+export type GenericRequest<T extends NextApiRequest> = T;
 
 const login = async (req: GenericRequest<LoginRequest>, res: NextApiResponse) => {
   try {

@@ -48,9 +48,11 @@ export const Title4: React.FC<Props> = ({ children, className }) => {
   );
 };
 
-export const Caption: React.FC<Props> = ({ children }) => {
+export const Caption: React.FC<Props> = ({ className, children }) => {
   return (
-    <h4 className="text-center text-xl text-black-200 mt-2.5 mb-5 capitalize underline">
+    <h4
+      className={`${className} text-center text-xl text-black-200 mt-2.5 mb-5 capitalize underline`}
+    >
       {children}
     </h4>
   );
