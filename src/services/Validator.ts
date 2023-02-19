@@ -36,9 +36,14 @@ const validationHelper: ValidationHelperInterface = {
         response = error.errors.reduce((prev: any, curr: any) => {
           const [key, value] = Object.entries(curr)[0];
           return { ...prev, [key]: value };
-        });
+        }, {});
       } else {
-        response = { message: error.errors[0] };
+        console.log('inside els clause');
+        response = error.errors.reduce((prev: any, curr: any) => {
+          const [key, value] = Object.entries(curr)[0];
+          return { ...prev, [key]: value };
+        }, {});
+        // response = { ...error.errors, message };
       }
       throw new ValidationError(message, response);
     }

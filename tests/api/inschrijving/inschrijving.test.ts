@@ -371,7 +371,6 @@ describe('/inschrijving', () => {
       inschrijvingen1[0].datum = new Date(
         `${trainingDays[1].date.toISOString().split('T')[0]}T11:00:00.000Z`
       );
-      console.log({ datum: inschrijvingen1[0].datum });
       inschrijvingen1[1].datum = new Date(
         `${trainingDays[2].date.toISOString().split('T')[0]}T10:00:00.000Z`
       );

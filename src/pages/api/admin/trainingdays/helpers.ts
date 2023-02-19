@@ -83,7 +83,7 @@ export const getDatesFromDeletedAndUpdatedTrainingDays = (
       });
     })
     .filter(notEmpty)
-    .reduce((acc, curr) => [...acc, ...curr]);
+    .reduce((acc, curr) => [...acc, ...curr], []);
 
   return [...allDates, ...moreDates];
 };
