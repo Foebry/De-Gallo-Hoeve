@@ -5,6 +5,7 @@ import { getController } from 'src/services/Factory';
 import { getCurrentTime } from 'src/shared/functions';
 import { InternalServerError } from 'src/shared/RequestError';
 import { getTrainingDaysCollection } from 'src/utils/db';
+import { createRandomTrainingDays } from 'tests/fixtures/trainingDay';
 import { INSCHRIJVING } from './InschrijvingController';
 
 export const getEnabledTrainingDays = async (): Promise<TrainingDaysCollection[]> => {
@@ -15,14 +16,16 @@ export const getEnabledTrainingDays = async (): Promise<TrainingDaysCollection[]
 const getAvailableForInschrijving = async (): Promise<AvailableForInschrijving> => {
   const inschrijvingController = getController(INSCHRIJVING);
   let enabledDays = await getEnabledTrainingDays();
-  const date = new Date(enabledDays[0].date);
+  let processing = true;
+  const date = enabledDays.length ? new Date(enabledDays[0]?.date) : new Date();
   const disabled: string[] = [];
-  const endDate = enabledDays.reverse()[0].date.toISOString();
+  const endDate = enabledDays.reverse()[0]?.date.toISOString() ?? date.toISOString();
   const enabledDateString = enabledDays.map(
     (day) => day.date.toISOString().split('T')[0]
   );
+  if (!enabledDays.length) processing = false;
 
-  while (true) {
+  while (processing) {
     const newDate = new Date(date.setDate(date.getDate() + 1));
     if (newDate > new Date(endDate)) break;
     const dateString = newDate.toISOString().split('T')[0];
@@ -79,6 +82,15 @@ const getAvailableForInschrijving = async (): Promise<AvailableForInschrijving> 
     (trainingDay) => !disabled.includes(trainingDay.date.toISOString())
   );
 
+  if (!disabled.length && !available.length) {
+    const today = new Date();
+    disabled.push(new Date().toISOString().split('T')[0]);
+    const trainingDay = createRandomTrainingDays(1)[0];
+    trainingDay.date = today;
+
+    available.push(trainingDay);
+  }
+
   return {
     disabled: disabled
       .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
@@ -119,12 +131,22 @@ export const deleteAll = async (): Promise<void> => {
   }
 };
 
+export const hardDelete = async (trainingDay: TrainingDaysCollection): Promise<void> => {
+  const collection = await getTrainingDaysCollection();
+  await collection.deleteOne(trainingDay);
+};
+
 export const saveMany = async (
   trainingDays: TrainingDaysCollection[]
 ): Promise<TrainingDaysCollection[]> => {
   const collection = await getTrainingDaysCollection();
   await collection.insertMany(trainingDays);
   return trainingDays;
+};
+
+export const getAllTrainingDays = async () => {
+  const collection = await getTrainingDaysCollection();
+  return collection.find({}).toArray();
 };
 
 const trainingDayController: IsTrainingDayController = {
@@ -134,6 +156,7 @@ const trainingDayController: IsTrainingDayController = {
   deleteMany,
   deleteAll,
   saveMany,
+  hardDelete,
 };
 
 type AvailableForInschrijving = {
@@ -148,6 +171,7 @@ export type IsTrainingDayController = {
   deleteMany: (_ids: ObjectId[]) => Promise<void>;
   deleteAll: () => Promise<void>;
   saveMany: (trainingDays: TrainingDaysCollection[]) => Promise<TrainingDaysCollection[]>;
+  hardDelete: (trainingDay: TrainingDaysCollection) => Promise<void>;
 };
 
 export default trainingDayController;

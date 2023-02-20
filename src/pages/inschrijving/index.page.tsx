@@ -175,7 +175,6 @@ const Groepslessen: React.FC<LessenProps> = ({
                       name="dates"
                       control={control}
                       render={({ field: { onChange } }) => {
-                        console.log(selectedDates);
                         return (
                           <DatePicker
                             onChange={(e) => {
