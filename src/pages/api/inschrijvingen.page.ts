@@ -3,7 +3,6 @@ import { validate, validateCsrfToken } from 'src/services/Validator';
 import { inschrijvingSchema } from 'src/types/schemas';
 import { secureApi, verifiedUserApi } from 'src/services/Authenticator';
 import {
-  EmailNotVerifiedError,
   HondNotFoundError,
   KlantNotFoundError,
   ReedsIngeschrevenError,
@@ -26,6 +25,7 @@ import { logError } from 'src/controllers/ErrorLogController';
 import { save } from 'src/controllers/InschrijvingController';
 import { startSession, startTransaction } from 'src/utils/db';
 import { mapInschrijvingen } from 'src/mappers/Inschrijvingen';
+import { getDomain } from 'src/shared/functions';
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') return getInschrijvingen(req, res);
@@ -101,10 +101,15 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const data = mapInschrijvingen(inschrijvingen, isFirstInschrijving, prijs);
 
-    await mailer.sendMail('inschrijving', { naam, email, ...data });
+    await mailer.sendMail('inschrijving', {
+      naam,
+      email: process.env.MAIL_TO ?? email,
+      ...data,
+    });
     await mailer.sendMail('inschrijving-headsup', {
       email: process.env.MAIL_TO,
       _ids: ids.join(','),
+      domain: getDomain(req),
     });
     return res.status(201).json({ message: 'Inschrijving ontvangen!' });
   } catch (e: any) {

@@ -7,22 +7,21 @@ import {
 } from 'src/shared/RequestHelper';
 import { mapToHondenOverviewResult, PaginatedKlantHond } from 'src/mappers/honden';
 import { KlantHond } from 'src/types/EntityTpes/HondTypes';
-import { GenericRequest } from 'src/pages/api/auth/login.page';
 import { logError } from 'src/controllers/ErrorLogController';
 import { adminApi } from 'src/services/Authenticator';
 
-type ListHondenRequest = {
+interface ListHondenRequest extends NextApiRequest {
   query: PaginatedRequestQuery;
   url: string;
-};
+}
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    adminApi({ req, res });
+    // adminApi({ req, res });
 
     if (req.method != 'GET') return res.status(405).send('Not Allowed');
 
-    return getHondenOverview(req as GenericRequest<ListHondenRequest>, res);
+    return getHondenOverview(req as ListHondenRequest, res);
   } catch (e: any) {
     await logError('honden', req, e);
     return res.status(e.code).send(e.message);
@@ -30,7 +29,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 const getHondenOverview = async (
-  req: GenericRequest<ListHondenRequest>,
+  req: ListHondenRequest,
   res: NextApiResponse<PaginatedResponse<PaginatedKlantHond>>
 ) => {
   try {

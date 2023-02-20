@@ -31,12 +31,21 @@ import {
 import { HondCollection, NewHond } from '../types/EntityTpes/HondTypes';
 import { CONFIRM, ConfirmCollection, NewConfirm } from '../types/EntityTpes/ConfirmTypes';
 import { InschrijvingCollection } from '../types/EntityTpes/InschrijvingTypes';
-import { PriveTrainingCollection, TrainingType } from '../types/EntityTpes/TrainingType';
+import {
+  PriveTrainingCollection,
+  TrainingDaysCollection,
+  TrainingType,
+} from '../types/EntityTpes/TrainingType';
 import { NewRas, RasCollection } from '../types/EntityTpes/RasTypes';
 import errorLogController, {
   ErrorLogController,
 } from 'src/controllers/ErrorLogController';
 import { ERRORLOG } from '../types/EntityTpes/ErrorLogTypes';
+import TrainingDayController, {
+  IsTrainingDayController,
+  TRAININGDAY,
+} from 'src/controllers/TrainingDayController';
+import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
 
 export type CONFIRM = 'ConfirmController';
 export type CONTENT = 'ContentController';
@@ -45,6 +54,7 @@ export type INSCHRIJVING = 'InschrijvingController';
 export type KLANT = 'KlantController';
 export type RAS = 'RasController';
 export type TRAINING = 'TrainingController';
+export type TRAININGDAY = 'TrainingDayController';
 export type ERRORLOG = 'ErrorLogController';
 
 const createInschrijving = (
@@ -107,12 +117,23 @@ const createRas = (ras: NewRas): RasCollection => ({
   soort: ras.soort,
 });
 
+export const createTrainingDay = (
+  trainingDayDto: TrainingDayDto
+): TrainingDaysCollection => ({
+  _id: new ObjectId(),
+  created_at: getCurrentTime(),
+  date: new Date(trainingDayDto.date),
+  timeslots: trainingDayDto.timeslots,
+  updated_at: getCurrentTime(),
+});
+
 const Factory = {
   createRas,
   createKlant,
   createHond,
   createConfirm,
   createInschrijving,
+  createTrainingDay,
   getController,
 };
 
@@ -124,6 +145,7 @@ export type ControllerType =
   | KLANT
   | RAS
   | TRAINING
+  | TRAININGDAY
   | ERRORLOG;
 
 export type PaginatedControllerType = HOND | INSCHRIJVING | KLANT | RAS;
@@ -135,6 +157,7 @@ export function getController(type: INSCHRIJVING): IsInschrijvingController;
 export function getController(type: KLANT): IsKlantController;
 export function getController(type: RAS): IsRasController;
 export function getController(type: TRAINING): IsTrainingController;
+export function getController(type: TRAININGDAY): IsTrainingDayController;
 export function getController(type: ERRORLOG): ErrorLogController;
 export function getController(type: ControllerType) {
   return type === CONFIRM
@@ -151,6 +174,8 @@ export function getController(type: ControllerType) {
     ? RasController
     : type === ERRORLOG
     ? errorLogController
+    : type === TRAININGDAY
+    ? TrainingDayController
     : TrainingController;
 }
 export default Factory;

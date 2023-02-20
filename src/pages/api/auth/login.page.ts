@@ -10,24 +10,24 @@ import {
 } from 'src/shared/RequestError';
 import { createJWT, setClientCookie } from 'src/services/Authenticator';
 import { logError } from 'src/controllers/ErrorLogController';
-import { closeClient } from 'src/utils/db';
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method === 'POST') return login(req as GenericRequest<LoginRequest>, res);
+  if (req.method === 'POST') return login(req as LoginRequest, res);
   else throw new NotAllowedError();
 };
 
 interface LoginRequest extends NextApiRequest {
   body: { email: string; password: string };
 }
-export type GenericRequest<T> = T;
 
-const login = async (req: GenericRequest<LoginRequest>, res: NextApiResponse) => {
+const login = async (req: LoginRequest, res: NextApiResponse) => {
   try {
     await validateCsrfToken({ req, res });
-    await validate({ req, res }, { schema: loginSchema });
+    await validate(
+      { req, res },
+      { schema: loginSchema, message: 'email of password onjuist' }
+    );
     const { email, password } = req.body;
-
     const klant = await getKlantByEmail(email.toLowerCase());
     if (!klant) throw new InvalidEmailError();
     const match = await bcrypt.compare(password, klant.password);
@@ -38,7 +38,7 @@ const login = async (req: GenericRequest<LoginRequest>, res: NextApiResponse) =>
 
     return res.send({});
   } catch (e: any) {
-    req.body.password = await bcrypt.hash(req.body.password, 10);
+    req.body.password = req.body.password ? await bcrypt.hash(req.body.password, 10) : '';
     await logError('login', req, e);
     return res.status(e.code).json(e.response);
   }
