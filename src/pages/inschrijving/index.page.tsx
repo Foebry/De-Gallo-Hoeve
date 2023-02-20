@@ -139,6 +139,7 @@ const Groepslessen: React.FC<LessenProps> = ({
       });
       if (error) {
         if (error.code === 401) router.push(LOGIN);
+        else toast.error(error.message);
       }
       if (data) {
         toast.success(data.message);
