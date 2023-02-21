@@ -26,6 +26,24 @@ import { save } from 'src/controllers/InschrijvingController';
 import { startSession, startTransaction } from 'src/utils/db';
 import { mapInschrijvingen } from 'src/mappers/Inschrijvingen';
 import { getDomain } from 'src/shared/functions';
+import { TrainingType } from '@/types/EntityTpes/TrainingType';
+import { Geslacht } from '@/types/EntityTpes/HondTypes';
+
+type InschrijvingDto = {
+  datum: string;
+  hond_id: string;
+  hond_naam: string;
+  hond_geslacht: Geslacht;
+};
+
+interface PostInschrijvingRequest extends NextApiRequest {
+  body: {
+    klant_id: string;
+    training: TrainingType;
+    inschrijvingen: InschrijvingDto[];
+    prijs: number;
+  };
+}
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') return getInschrijvingen(req, res);
@@ -48,18 +66,19 @@ const getInschrijvingen = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
+const postInschrijving = async (req: PostInschrijvingRequest, res: NextApiResponse) => {
   try {
     verifiedUserApi({ req, res });
 
     await validateCsrfToken({ req, res });
     await validate({ req, res }, { schema: inschrijvingSchema });
 
-    const { klant_id, training, inschrijvingen, prijs, isFirstInschrijving } =
-      req.body as IsInschrijvingBody;
+    const { klant_id, training, inschrijvingen, prijs } = req.body;
 
     const klant = await getKlantById(new ObjectId(klant_id));
     if (!klant) throw new KlantNotFoundError();
+
+    const isFirstInschrijving = !klant.inschrijvingen.length;
 
     const selectedTraining = await getTrainingByName(training);
     if (!selectedTraining) throw new TrainingNotFoundError();
