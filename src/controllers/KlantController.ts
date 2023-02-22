@@ -90,7 +90,7 @@ export const addKlantInschrijving = async (
     await collection.updateOne(
       { _id },
       {
-        $addToSet: { inschrijvingeng: inschrijving._id },
+        $addToSet: { inschrijvingen: inschrijving._id },
         $set: { updated_at: getCurrentTime() },
       },
       { session }

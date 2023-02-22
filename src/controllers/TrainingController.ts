@@ -140,6 +140,7 @@ export const klantReedsIngeschreven = async (
     datum: moment(inschrijving.datum).local().toDate(),
     training,
     'klant.id': klant._id,
+    deleted_at: undefined,
   });
 
   return inschrijvingFound ? true : false;
@@ -151,7 +152,7 @@ export const trainingVolzet = async (
 ): Promise<boolean> => {
   const inschrijvingCollection = await getInschrijvingCollection();
   const inschrijvingen = await inschrijvingCollection
-    .find({ datum: moment(datum).local().toDate() })
+    .find({ datum: moment(datum).local().toDate(), deleted_at: undefined })
     .toArray();
 
   if (training.naam === 'groep')

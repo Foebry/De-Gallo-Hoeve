@@ -66,7 +66,7 @@ const Groepslessen: React.FC<LessenProps> = ({
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
   const [disabled, setDisabled] = useState<boolean>(false);
-  const [isFirstInschrijving, setIsFirstInschrijving] = useState<boolean>(true);
+  // const [isFirstInschrijving, setIsFirstInschrijving] = useState<boolean>(true);
   const latestAvailableDate = available
     .map((dto) => new Date(dto.date))
     .sort((a, b) => b.getTime() - a.getTime())
@@ -81,18 +81,18 @@ const Groepslessen: React.FC<LessenProps> = ({
   const { handleSubmit, control, getValues, register, setValue } = useForm();
   const inschrijving = useMutation(errors, setErrors);
 
-  useEffect(() => {
-    (async () => {
-      const { data: mijnInschrijvingen } = await getData('/api/inschrijvingen');
-      if (!mijnInschrijvingen) {
-        setIsFirstInschrijving(true);
-        return;
-      } else {
-        if (mijnInschrijvingen.length > 0) setIsFirstInschrijving(false);
-        else setIsFirstInschrijving(true);
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     const { data: mijnInschrijvingen } = await getData('/api/inschrijvingen');
+  //     if (!mijnInschrijvingen) {
+  //       setIsFirstInschrijving(true);
+  //       return;
+  //     } else {
+  //       if (mijnInschrijvingen.length > 0) setIsFirstInschrijving(false);
+  //       else setIsFirstInschrijving(true);
+  //     }
+  //   })();
+  // }, []);
 
   const steps = useMemo(() => {
     return klant_id
@@ -114,10 +114,10 @@ const Groepslessen: React.FC<LessenProps> = ({
     if (index >= 0) {
       const el = selectedDates[index];
       setSelectedDates(() => selectedDates.filter((date: string) => date !== el));
-      setValue('inschrijvingen', {
-        ...getValues().inschrijvingen,
-        [index]: null,
-      });
+      setValue(
+        'inschrijvingen',
+        getValues().inschrijvingen.filter((_: any, idx: number) => idx !== index)
+      );
     }
   };
 
@@ -135,7 +135,7 @@ const Groepslessen: React.FC<LessenProps> = ({
         klant_id,
         training: type,
         prijs: prijsExcl,
-        isFirstInschrijving,
+        // isFirstInschrijving,git
       });
       if (error) {
         if (error.code === 401) router.push(LOGIN);
