@@ -49,7 +49,9 @@ const getInschrijvingenBetweenDates = async (
   endDate: Date
 ): Promise<InschrijvingCollection[]> => {
   const collection = await getInschrijvingCollection();
-  return collection.find({ datum: { $gt: startDate, $lt: endDate } }).toArray();
+  return collection
+    .find({ datum: { $gt: startDate, $lt: endDate }, deleted_at: undefined })
+    .toArray();
 };
 
 export const save = async (
