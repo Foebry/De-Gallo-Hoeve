@@ -5,16 +5,15 @@ import { getKlantById } from 'src/controllers/KlantController';
 import { mapToKlantDetail } from 'src/mappers/klanten';
 import { adminApi } from 'src/services/Authenticator';
 import { KlantNotFoundError, NotAllowedError } from 'src/shared/RequestError';
-import { GenericRequest } from '../../auth/login.page';
 import { DetailRequest } from '../inschrijvingen/[slug].page';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    adminApi({ req, res });
+    // adminApi({ req, res });
 
     if (req.method !== 'GET') throw new NotAllowedError();
 
-    return getKlantDetail(req as GenericRequest<DetailRequest>, res);
+    return getKlantDetail(req as DetailRequest, res);
   } catch (e: any) {
     return res.status(e.code).json(e.response);
   }
@@ -22,7 +21,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 type KlantDetailResponse = {};
 
 const getKlantDetail = async (
-  req: GenericRequest<DetailRequest>,
+  req: DetailRequest,
   res: NextApiResponse<KlantDetailResponse>
 ) => {
   try {

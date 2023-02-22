@@ -1,15 +1,16 @@
 import path from 'path';
+import logger from 'src/utils/logger';
 const job = (obj: Record<string, any>) => {
   if (!Object.keys(obj).includes('job')) return;
 
-  console.log(`running job ${obj['job']}`);
+  logger.info(`running job ${obj['job']}`);
   const job = path.join('../../src/cronjobs/jobs', obj.job);
 
   try {
     require(job).handler(obj['target-env']);
   } catch (error: any) {
     if (error.code === 'MODULE_NOT_FOUND') {
-      console.log(`ERROR: Could not locate job ${obj.job}`);
+      logger.info(`ERROR: Could not locate job ${obj.job}`);
       process.exit();
     }
   }

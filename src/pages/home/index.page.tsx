@@ -172,9 +172,9 @@ export const getStaticProps = async () => {
 
   return {
     props: {
-      prijsExcl: priveTraining?.prijsExcl,
-      kmHeffing: priveTraining?.kmHeffing,
-      gratisVerplaatsingBinnen: priveTraining?.gratisVerplaatsingBinnen,
+      prijsExcl: priveTraining?.prijsExcl ?? null,
+      kmHeffing: priveTraining?.kmHeffing ?? null,
+      gratisVerplaatsingBinnen: priveTraining?.gratisVerplaatsingBinnen ?? null,
     },
     revalidate: 86400,
   };

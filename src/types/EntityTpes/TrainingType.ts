@@ -1,6 +1,7 @@
-import { ObjectId } from "mongodb";
+import { ObjectId } from 'mongodb';
+import { BaseEntityType } from './BaseEntityType';
 
-export type TrainingType = "prive" | "groep";
+export type TrainingType = 'prive' | 'groep';
 
 export interface PriveTrainingCollection {
   _id: ObjectId;
@@ -19,10 +20,15 @@ export interface PriveTrainingCollection {
   deleted_at?: Date;
 }
 
-export interface TrainingDaysCollection {
-  _id: ObjectId;
+// export interface TrainingDaysCollection {
+//   _id: ObjectId;
+//   date: Date;
+// }
+
+export type TrainingDaysCollection = BaseEntityType & {
   date: Date;
-}
+  timeslots: string[];
+};
 
 export interface GroepTrainingCollection extends PriveTrainingCollection {
   max_inschrijvingen: number;
@@ -35,4 +41,4 @@ export interface UpdateTraining {
   max_inschrijvingen?: number;
 }
 
-export type TRAINING = "TrainingController";
+export type TRAINING = 'TrainingController';

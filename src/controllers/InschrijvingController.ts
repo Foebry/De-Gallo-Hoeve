@@ -37,6 +37,23 @@ export const getInschrijvingenByIds = async (
   return collection.find({ _id: { $in: ids }, deleted_at: undefined }).toArray();
 };
 
+export const getInschrijvingenByDates = async (
+  dates: Date[]
+): Promise<InschrijvingCollection[]> => {
+  const collection = await getInschrijvingCollection();
+  return collection.find({ datum: { $in: [...dates] }, deleted_at: undefined }).toArray();
+};
+
+const getInschrijvingenBetweenDates = async (
+  startDate: Date,
+  endDate: Date
+): Promise<InschrijvingCollection[]> => {
+  const collection = await getInschrijvingCollection();
+  return collection
+    .find({ datum: { $gt: startDate, $lt: endDate }, deleted_at: undefined })
+    .toArray();
+};
+
 export const save = async (
   inschrijving: InschrijvingCollection,
   session?: ClientSession
@@ -152,6 +169,8 @@ const inschrijvingController: IsInschrijvingController = {
   getAllInschrijvingen,
   getInschrijvingById,
   getInschrijvingenByIds,
+  getInschrijvingenByDates,
+  getInschrijvingenBetweenDates,
   save,
   saveMany,
   update,
@@ -164,6 +183,11 @@ export interface IsInschrijvingController {
   getAllInschrijvingen: () => Promise<InschrijvingCollection[]>;
   getInschrijvingById: (_id: ObjectId) => Promise<InschrijvingCollection | null>;
   getInschrijvingenByIds: (ids: ObjectId[]) => Promise<InschrijvingCollection[]>;
+  getInschrijvingenByDates: (dates: Date[]) => Promise<InschrijvingCollection[]>;
+  getInschrijvingenBetweenDates: (
+    startDate: Date,
+    endDate: Date
+  ) => Promise<InschrijvingCollection[]>;
   save: (
     inschrijving: InschrijvingCollection,
     session?: ClientSession

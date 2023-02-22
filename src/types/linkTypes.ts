@@ -18,7 +18,7 @@ const linkTypes = {
   ADMINLISTDOGS: '/admin/honden/',
   ADMINLISTBREEDS: '/admin/rassen',
   ADMINLISTTRAININGS: '/admin/trainingen',
-  ADMINSCRIPTS: '/admin/scripts',
+  ADMINEDITTRAININGTIMES: '/admin/edit/trainingtijden',
 };
 
 export const {
@@ -41,5 +41,5 @@ export const {
   ADMINLISTSUBSCRIPTIONS,
   ADMINLISTTRAININGS,
   ADMINLISTUSERS,
-  ADMINSCRIPTS,
+  ADMINEDITTRAININGTIMES,
 } = linkTypes;

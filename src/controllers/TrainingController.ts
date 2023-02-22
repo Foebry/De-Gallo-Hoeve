@@ -1,19 +1,17 @@
-import moment from "moment";
-import { ClientSession, ObjectId } from "mongodb";
-import { InternalServerError, TransactionError } from "../shared/RequestError";
-import { InschrijvingCollection } from "../types/EntityTpes/InschrijvingTypes";
-import { IsKlantCollection } from "../types/EntityTpes/KlantTypes";
+import moment from 'moment';
+import { ClientSession, ObjectId } from 'mongodb';
+import { InternalServerError, TransactionError } from '../shared/RequestError';
+import { InschrijvingCollection } from '../types/EntityTpes/InschrijvingTypes';
+import { IsKlantCollection } from '../types/EntityTpes/KlantTypes';
 import {
   GroepTrainingCollection,
   PriveTrainingCollection,
   TrainingType,
-} from "../types/EntityTpes/TrainingType";
-import inschrijvingController, {
-  getInschrijvingById,
-} from "./InschrijvingController";
-import { notEmpty } from "src/shared/RequestHelper";
-import { getInschrijvingCollection, getTrainingCollection } from "src/utils/db";
-import { getCurrentTime } from "src/shared/functions";
+} from '../types/EntityTpes/TrainingType';
+import inschrijvingController, { getInschrijvingById } from './InschrijvingController';
+import { notEmpty } from 'src/shared/RequestHelper';
+import { getInschrijvingCollection, getTrainingCollection } from 'src/utils/db';
+import { getCurrentTime } from 'src/shared/functions';
 
 export async function getTrainingByName(
   naam: TrainingType
@@ -25,14 +23,14 @@ export async function getTrainingByName(naam: TrainingType) {
   const collection = await getTrainingCollection();
   const training = await collection.findOne({ naam });
   if (!training) return null;
-  if (training && naam === "groep") return training as GroepTrainingCollection;
+  if (training && naam === 'groep') return training as GroepTrainingCollection;
   return training as PriveTrainingCollection;
 }
 
 export const getPriveTraining = async () => {
   const collection = await getTrainingCollection();
   return collection.findOne({
-    naam: "prive",
+    naam: 'prive',
   });
 };
 
@@ -48,7 +46,7 @@ export async function getTrainingById(
   const collection = await getTrainingCollection();
   const training = await collection.findOne({ _id });
   if (!training) return null;
-  if (training.naam === "groep") return training as GroepTrainingCollection;
+  if (training.naam === 'groep') return training as GroepTrainingCollection;
   return training as PriveTrainingCollection;
 }
 
@@ -70,9 +68,9 @@ export const addInschrijving = async (
       { session }
     );
   } catch (e: any) {
-    throw new TransactionError("TransactionError", 500, {
+    throw new TransactionError('TransactionError', 500, {
       ...e,
-      message: "Er is iets fout gegaan",
+      message: 'Er is iets fout gegaan',
     });
   }
 };
@@ -83,17 +81,18 @@ export const removeInschrijving = async (
   session?: ClientSession
 ): Promise<void> => {
   const collection = await getTrainingCollection();
-  const { modifiedCount } = await collection.updateOne(
-    { naam: training, $pull: { inschrijvingen: inschrijving._id } },
-    { updated_at: getCurrentTime },
+  await collection.updateOne(
+    { naam: training },
+    {
+      $pull: { inschrijvingen: inschrijving._id },
+      $set: { updated_at: getCurrentTime() },
+    },
     { session }
   );
-  if (modifiedCount !== 1) throw new InternalServerError();
+  // if (modifiedCount !== 1) throw new InternalServerError();
 };
 
-export const hardDelete = async (
-  training: PriveTrainingCollection
-): Promise<void> => {
+export const hardDelete = async (training: PriveTrainingCollection): Promise<void> => {
   const collection = await getTrainingCollection();
   const inschrijvingIds = training.inschrijvingen;
 
@@ -110,9 +109,7 @@ export const hardDelete = async (
   );
 };
 
-export const softDelete = async (
-  training: PriveTrainingCollection
-): Promise<void> => {
+export const softDelete = async (training: PriveTrainingCollection): Promise<void> => {
   const collection = await getTrainingCollection();
   const inschrijvingIds = training.inschrijvingen;
 
@@ -142,7 +139,8 @@ export const klantReedsIngeschreven = async (
   const inschrijvingFound = await collection.findOne({
     datum: moment(inschrijving.datum).local().toDate(),
     training,
-    "klant.id": klant._id,
+    'klant.id': klant._id,
+    deleted_at: undefined,
   });
 
   return inschrijvingFound ? true : false;
@@ -154,13 +152,12 @@ export const trainingVolzet = async (
 ): Promise<boolean> => {
   const inschrijvingCollection = await getInschrijvingCollection();
   const inschrijvingen = await inschrijvingCollection
-    .find({ datum: moment(datum).local().toDate() })
+    .find({ datum: moment(datum).local().toDate(), deleted_at: undefined })
     .toArray();
 
-  if (training.naam === "groep")
+  if (training.naam === 'groep')
     return (
-      inschrijvingen.length >=
-      (training as GroepTrainingCollection)!.max_inschrijvingen
+      inschrijvingen.length >= (training as GroepTrainingCollection)!.max_inschrijvingen
     );
   return inschrijvingen.length > 0;
 };
@@ -251,4 +248,4 @@ export type IsTrainingController = {
 };
 
 export default trainingController;
-export const TRAINING = "TrainingController";
+export const TRAINING = 'TrainingController';

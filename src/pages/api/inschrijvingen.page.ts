@@ -3,7 +3,6 @@ import { validate, validateCsrfToken } from 'src/services/Validator';
 import { inschrijvingSchema } from 'src/types/schemas';
 import { secureApi, verifiedUserApi } from 'src/services/Authenticator';
 import {
-  EmailNotVerifiedError,
   HondNotFoundError,
   KlantNotFoundError,
   ReedsIngeschrevenError,
@@ -26,6 +25,25 @@ import { logError } from 'src/controllers/ErrorLogController';
 import { save } from 'src/controllers/InschrijvingController';
 import { startSession, startTransaction } from 'src/utils/db';
 import { mapInschrijvingen } from 'src/mappers/Inschrijvingen';
+import { getDomain } from 'src/shared/functions';
+import { TrainingType } from '@/types/EntityTpes/TrainingType';
+import { Geslacht } from '@/types/EntityTpes/HondTypes';
+
+type InschrijvingDto = {
+  datum: string;
+  hond_id: string;
+  hond_naam: string;
+  hond_geslacht: Geslacht;
+};
+
+interface PostInschrijvingRequest extends NextApiRequest {
+  body: {
+    klant_id: string;
+    training: TrainingType;
+    inschrijvingen: InschrijvingDto[];
+    prijs: number;
+  };
+}
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') return getInschrijvingen(req, res);
@@ -48,18 +66,19 @@ const getInschrijvingen = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
+const postInschrijving = async (req: PostInschrijvingRequest, res: NextApiResponse) => {
   try {
     verifiedUserApi({ req, res });
 
     await validateCsrfToken({ req, res });
     await validate({ req, res }, { schema: inschrijvingSchema });
 
-    const { klant_id, training, inschrijvingen, prijs, isFirstInschrijving } =
-      req.body as IsInschrijvingBody;
+    const { klant_id, training, inschrijvingen, prijs } = req.body;
 
     const klant = await getKlantById(new ObjectId(klant_id));
     if (!klant) throw new KlantNotFoundError();
+
+    const isFirstInschrijving = !klant.inschrijvingen.length;
 
     const selectedTraining = await getTrainingByName(training);
     if (!selectedTraining) throw new TrainingNotFoundError();
@@ -101,10 +120,15 @@ const postInschrijving = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const data = mapInschrijvingen(inschrijvingen, isFirstInschrijving, prijs);
 
-    await mailer.sendMail('inschrijving', { naam, email, ...data });
+    await mailer.sendMail('inschrijving', {
+      naam,
+      email: process.env.MAIL_TO ?? email,
+      ...data,
+    });
     await mailer.sendMail('inschrijving-headsup', {
       email: process.env.MAIL_TO,
       _ids: ids.join(','),
+      domain: getDomain(req),
     });
     return res.status(201).json({ message: 'Inschrijving ontvangen!' });
   } catch (e: any) {

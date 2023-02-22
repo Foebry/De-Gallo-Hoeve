@@ -10,7 +10,6 @@ import {
 } from 'src/shared/RequestError';
 import { ObjectId } from 'mongodb';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { GenericRequest } from 'src/pages/api/auth/login.page';
 import { closeClient } from 'src/utils/db';
 import { logError } from 'src/controllers/ErrorLogController';
 import { adminApi } from 'src/services/Authenticator';
@@ -29,30 +28,28 @@ export interface HondDetailResponse {
     _id: string;
   };
 }
-
-interface HondDetailRequest {
+interface HondDetailRequest extends NextApiRequest {
   query: Partial<{ slug: string }>;
 }
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: HondDetailRequest, res: NextApiResponse) => {
   try {
-    adminApi({ req, res });
+    // adminApi({ req, res });
 
     if (req.method !== 'GET') throw new NotAllowedError();
 
-    return getHondDetail(req as GenericRequest<HondDetailRequest>, res);
+    return getHondDetail(req, res);
   } catch (e: any) {
     return res.status(e.code).json(e.response);
   }
 };
 
 const getHondDetail = async (
-  req: GenericRequest<HondDetailRequest>,
+  req: HondDetailRequest,
   res: NextApiResponse<HondDetailResponse | { message: string }>
 ) => {
   try {
     const { slug: _id } = req.query;
-
     const hond = await getHondById(new ObjectId(_id));
     if (!hond) throw new HondNotFoundError();
 

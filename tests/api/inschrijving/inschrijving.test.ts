@@ -14,12 +14,26 @@ import Mailer from '../../../src/utils/Mailer';
 import { KLANT } from 'src/controllers/KlantController';
 import { TRAINING } from 'src/controllers/TrainingController';
 import { INSCHRIJVING } from 'src/controllers/InschrijvingController';
-import { createRandomHond } from 'tests/fixtures/hond';
+import { createRandomHond, createRandomHonden } from 'tests/fixtures/hond';
 import { createRandomKlant } from 'tests/fixtures/klant';
 import { createRandomTraining } from 'tests/fixtures/training';
-import { createRandomInschrijving } from 'tests/fixtures/inschrijving';
+import {
+  createRandomInschrijving,
+  createRandomInschrijvingen,
+} from 'tests/fixtures/inschrijving';
 import { closeClient } from 'src/utils/db';
 import { getRequest } from 'tests/helpers';
+import logger from 'src/utils/logger';
+import { createRandomTrainingDays } from 'tests/fixtures/trainingDay';
+import { defaultTrainingTimeSlots } from 'src/mappers/trainingDays';
+import { TRAININGDAY } from 'src/controllers/TrainingDayController';
+import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
+import {
+  getCurrentTime,
+  toLocalTime,
+  toReadableDate,
+  unique,
+} from 'src/shared/functions';
 
 describe('/inschrijving', () => {
   beforeEach(async () => await clearAllData());
@@ -262,7 +276,7 @@ describe('/inschrijving', () => {
     });
     it('Should correctly subscribe for the selected training at the selected time', async () => {
       const training = await getController(TRAINING).save(createRandomTraining());
-      const hond = await createRandomHond();
+      const hond = createRandomHond();
       const klant = await getController(KLANT).save(
         createRandomKlant({ verified: true, honden: [hond] })
       );
@@ -289,6 +303,117 @@ describe('/inschrijving', () => {
         .expect(201);
       expect(body.message).toBe('Inschrijving ontvangen!');
       expect(mockedSendMail).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('getAvailableForInschrijving', () => {
+    it('Should return available and disabled data for trainingdays', async () => {
+      const randomKlant1 = createRandomKlant({
+        verified: true,
+        honden: createRandomHonden(3),
+      });
+      const randomKlant2 = createRandomKlant({
+        verified: true,
+        honden: [createRandomHond()],
+      });
+      const trainingDays = createRandomTrainingDays(5);
+      trainingDays[0].date = new Date('2025-01-01');
+      trainingDays[0].timeslots = [];
+      trainingDays[1].date = new Date('2025-01-06');
+      trainingDays[1].timeslots = ['11:00'];
+      trainingDays[2].date = new Date('2025-01-15');
+      trainingDays[2].timeslots = ['10:00', '17:00'];
+      trainingDays[3].date = new Date('2025-02-01');
+      trainingDays[3].timeslots = ['11:00', '13:00', '14:00'];
+      trainingDays[4].date = new Date('2025-02-03');
+      trainingDays[4].timeslots = defaultTrainingTimeSlots;
+
+      const disabled = [
+        '2025-01-01',
+        '2025-01-02',
+        '2025-01-03',
+        '2025-01-04',
+        '2025-01-05',
+        '2025-01-06',
+        '2025-01-07',
+        '2025-01-08',
+        '2025-01-09',
+        '2025-01-10',
+        '2025-01-11',
+        '2025-01-12',
+        '2025-01-13',
+        '2025-01-14',
+        '2025-01-16',
+        '2025-01-17',
+        '2025-01-18',
+        '2025-01-19',
+        '2025-01-20',
+        '2025-01-21',
+        '2025-01-22',
+        '2025-01-23',
+        '2025-01-24',
+        '2025-01-25',
+        '2025-01-26',
+        '2025-01-27',
+        '2025-01-28',
+        '2025-01-29',
+        '2025-01-30',
+        '2025-01-31',
+        '2025-02-02',
+      ];
+
+      await getController(KLANT).saveMany([randomKlant1, randomKlant2]);
+      await getController(TRAININGDAY).saveMany(trainingDays);
+
+      const inschrijvingen1 = createRandomInschrijvingen(randomKlant1, 3);
+      const inschrijvingen2 = createRandomInschrijvingen(randomKlant2, 2);
+
+      inschrijvingen1[0].datum = new Date(
+        `${trainingDays[1].date.toISOString().split('T')[0]}T11:00:00.000Z`
+      );
+      inschrijvingen1[1].datum = new Date(
+        `${trainingDays[2].date.toISOString().split('T')[0]}T10:00:00.000Z`
+      );
+      inschrijvingen1[2].datum = new Date(
+        `${trainingDays[3].date.toISOString().split('T')[0]}T13:00:00.000Z`
+      );
+      inschrijvingen2[0].datum = new Date(
+        `${trainingDays[4].date.toISOString().split('T')[0]}T10:00:00.000Z`
+      );
+      inschrijvingen2[1].datum = new Date(
+        `${trainingDays[4].date.toISOString().split('T')[0]}T17:00:00.000Z`
+      );
+
+      await getController(INSCHRIJVING).saveMany([
+        ...inschrijvingen1,
+        ...inschrijvingen2,
+      ]);
+
+      const available = [
+        {
+          date: trainingDays[2].date.toISOString().split('T')[0],
+          timeslots: ['17:00'],
+        },
+        {
+          date: trainingDays[3].date.toISOString().split('T')[0],
+          timeslots: ['11:00', '14:00'],
+        },
+        {
+          date: trainingDays[4].date.toISOString().split('T')[0],
+          timeslots: defaultTrainingTimeSlots.filter(
+            (item) => item !== '10:00' && item !== '17:00'
+          ),
+        },
+      ];
+
+      const result = await getController(TRAININGDAY).getAvailableForInschrijving();
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          disabled,
+          available: available.map((date) => expect.objectContaining(date)),
+        })
+      );
     });
   });
 });

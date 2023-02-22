@@ -14,6 +14,7 @@ import { IsRegisterBody } from 'src/types/requestTypes';
 import { CONFIRM } from 'src/types/EntityTpes/ConfirmTypes';
 import { logError } from 'src/controllers/ErrorLogController';
 import { startSession, startTransaction } from 'src/utils/db';
+import { getDomain } from 'src/shared/functions';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -51,13 +52,15 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
         const { code } = await getController(CONFIRM).save(confirm);
 
         await mailer.sendMail('register', {
-          email: savedKlant.email,
+          email: process.env.MAIL_TO ?? savedKlant.email,
           vnaam: savedKlant.vnaam,
           code,
+          domain: getDomain(req),
         });
         await mailer.sendMail('register-headsup', {
           email: process.env.MAIL_TO,
           klant_id: savedKlant._id.toString(),
+          domain: getDomain(req),
         });
       }, transactionOptions);
 
@@ -66,7 +69,7 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
       throw new TransactionError(e.name, e.code, e.response);
     }
   } catch (e: any) {
-    req.body.password = await bcrypt.hash(req.body.password, 10);
+    req.body.password = req.body.password ? await bcrypt.hash(req.body.password, 10) : '';
     await logError('register', req, e);
     return res.status(e.code).json(e.response);
   }

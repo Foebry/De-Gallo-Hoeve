@@ -1,11 +1,15 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode } from 'react';
+import Link from 'next/link';
 
 export interface Props {
   children: ReactNode;
-  to?: string;
   onClick?: () => void;
   className?: string;
   color?: string;
+}
+
+interface LinkProps extends Props {
+  to: string;
 }
 
 export const Title1: React.FC<Props> = ({ children, className, color }) => {
@@ -28,15 +32,27 @@ export const Title2: React.FC<Props> = ({ children, className }) => {
   );
 };
 
-export const Title3: React.FC<Props> = ({ children }) => {
+export const Title3: React.FC<Props> = ({ children, className }) => {
   return (
-    <h3 className="text-2xl text-center text-black-200 my-2.5">{children}</h3>
+    <h3 className={`${className} text-2xl text-center text-black-200 py-2.5`}>
+      {children}
+    </h3>
   );
 };
 
-export const Caption: React.FC<Props> = ({ children }) => {
+export const Title4: React.FC<Props> = ({ children, className }) => {
   return (
-    <h4 className="text-center text-xl text-black-200 mt-2.5 mb-5 capitalize underline">
+    <h4 className={`${className} text-xl text-center text-black-200 my-1.5`}>
+      {children}
+    </h4>
+  );
+};
+
+export const Caption: React.FC<Props> = ({ className, children }) => {
+  return (
+    <h4
+      className={`${className} text-center text-xl text-black-200 mt-2.5 mb-5 capitalize underline`}
+    >
       {children}
     </h4>
   );
@@ -44,20 +60,19 @@ export const Caption: React.FC<Props> = ({ children }) => {
 
 export const Body: React.FC<Props> = ({ children, className, color }) => {
   return (
-    <p className={`${className} text-${color ?? "black-100"} text-base mb-2`}>
+    <p className={`${className} text-${color ?? 'black-100'} text-base mb-2`}>
       {children}
     </p>
   );
 };
 
-export const Link: React.FC<Props> = ({ children, to }) => {
+export const EbmeddedLink: React.FC<LinkProps> = ({ children, to }) => {
   return (
-    <a
-      href={to}
-      className="text-center text-green-500 underline hover:cursor-pointer"
-    >
-      {children}
-    </a>
+    <Link href={to}>
+      <span className="text-center text-green-500 underline hover:cursor-pointer">
+        {children}
+      </span>
+    </Link>
   );
 };
 
@@ -71,9 +86,7 @@ export const FootNote: React.FC<Props> = ({ children }) => {
 
 export const FormError: React.FC<Props> = ({ children, className }) => {
   return (
-    <p
-      className={`${className} absolute left-1 -bottom-3.5 text-red-600 text-xs`}
-    >
+    <p className={`${className} absolute left-1 -bottom-3.5 text-red-600 text-xs`}>
       {children}
     </p>
   );

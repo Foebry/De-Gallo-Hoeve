@@ -90,7 +90,7 @@ export const addKlantInschrijving = async (
     await collection.updateOne(
       { _id },
       {
-        $addToSet: { inschrijvingeng: inschrijving._id },
+        $addToSet: { inschrijvingen: inschrijving._id },
         $set: { updated_at: getCurrentTime() },
       },
       { session }
@@ -143,7 +143,7 @@ export const removeInschrijving = async (
   session: ClientSession
 ): Promise<void> => {
   const collection = await getKlantCollection();
-  const { modifiedCount } = await collection.updateOne(
+  await collection.updateOne(
     { _id: klant_id },
     {
       $pull: { inschrijvingen: inschrijving_id },
@@ -151,7 +151,6 @@ export const removeInschrijving = async (
     },
     { session }
   );
-  if (modifiedCount !== 1) throw new InternalServerError();
 };
 
 export const deleteAll = async (): Promise<void> => {
