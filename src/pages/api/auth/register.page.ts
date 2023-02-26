@@ -12,9 +12,9 @@ import Factory, { getController } from 'src/services/Factory';
 import { getKlantByEmail, KLANT } from 'src/controllers/KlantController';
 import { IsRegisterBody } from 'src/types/requestTypes';
 import { CONFIRM } from 'src/types/EntityTpes/ConfirmTypes';
-import { logError } from 'src/controllers/ErrorLogController';
 import { startSession, startTransaction } from 'src/utils/db';
 import { getDomain } from 'src/shared/functions';
+import { logError } from '../logError/repo';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {

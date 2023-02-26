@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import mailer from 'src/utils/Mailer';
 import { validate } from 'src/services/Validator';
 import { contactSchema } from 'src/types/schemas';
-import { logError } from 'src/controllers/ErrorLogController';
+import { logError } from './logError/repo';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') res.status(405).send({ message: 'Not Allowed' });
