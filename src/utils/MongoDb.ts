@@ -15,6 +15,7 @@ import { ERRORLOG } from 'src/types/EntityTpes/ErrorLogTypes';
 import { InschrijvingCollection } from 'src/types/EntityTpes/InschrijvingTypes';
 import { getTrainingCollection } from './db';
 import { TRAININGDAY } from 'src/controllers/TrainingDayController';
+import { deleteAll as deleteAllErrorLogs } from 'src/pages/api/logError/repo';
 
 export interface Option {
   value: string;
@@ -90,7 +91,7 @@ export const clearAllData = async () => {
     await Factory.getController(INSCHRIJVING).deleteAll();
     await Factory.getController(RAS).deleteAll();
     await Factory.getController(TRAINING).deleteAll();
-    await Factory.getController(ERRORLOG).deleteAll();
+    await deleteAllErrorLogs();
     await Factory.getController(TRAININGDAY).deleteAll();
   }
 };

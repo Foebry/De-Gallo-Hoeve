@@ -37,9 +37,6 @@ import {
   TrainingType,
 } from '../types/EntityTpes/TrainingType';
 import { NewRas, RasCollection } from '../types/EntityTpes/RasTypes';
-import errorLogController, {
-  ErrorLogController,
-} from 'src/controllers/ErrorLogController';
 import { ERRORLOG } from '../types/EntityTpes/ErrorLogTypes';
 import TrainingDayController, {
   IsTrainingDayController,
@@ -158,7 +155,6 @@ export function getController(type: KLANT): IsKlantController;
 export function getController(type: RAS): IsRasController;
 export function getController(type: TRAINING): IsTrainingController;
 export function getController(type: TRAININGDAY): IsTrainingDayController;
-export function getController(type: ERRORLOG): ErrorLogController;
 export function getController(type: ControllerType) {
   return type === CONFIRM
     ? ConfirmController
@@ -172,8 +168,6 @@ export function getController(type: ControllerType) {
     ? KlantController
     : type === RAS
     ? RasController
-    : type === ERRORLOG
-    ? errorLogController
     : type === TRAININGDAY
     ? TrainingDayController
     : TrainingController;
