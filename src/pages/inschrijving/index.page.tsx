@@ -258,38 +258,48 @@ export default Groepslessen;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   // const { type } = ctx.query;
-  const trainingDayController = getController(TRAININGDAY);
-  const rasController = getController(RAS);
-  const hondController = getController(HOND);
-  const trainingController = getController(TRAINING);
+  try {
+    const trainingDayController = getController(TRAININGDAY);
+    const rasController = getController(RAS);
+    const hondController = getController(HOND);
+    const trainingController = getController(TRAINING);
 
-  const type = 'prive';
-  if (!type) return { redirect: { permanent: false, destination: INDEX } };
+    const type = 'prive';
+    if (!type) return { redirect: { permanent: false, destination: INDEX } };
 
-  const klant_id = await securepage(ctx);
+    const klant_id = await securepage(ctx);
 
-  if (!klant_id) {
+    if (!klant_id) {
+      return {
+        redirect: { permanent: false, destination: LOGIN },
+      };
+    }
+    const { disabled, available } =
+      await trainingDayController.getAvailableForInschrijving();
+    const training = await trainingController.getPriveTraining();
+    const rassen = await rasController.getRasOptions();
+    const honden = await hondController.getHondOptions(klant_id);
+    const csrf = generateCsrf();
+
     return {
-      redirect: { permanent: false, destination: LOGIN },
+      props: {
+        rassen,
+        honden,
+        disabledDays: disabled,
+        klant_id: klant_id?.toString() ?? null,
+        csrf,
+        type,
+        available,
+        prijsExcl: training?.prijsExcl ?? '',
+      },
+    };
+  } catch (e: any) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/error',
+      },
+      props: {},
     };
   }
-  const { disabled, available } =
-    await trainingDayController.getAvailableForInschrijving();
-  const training = await trainingController.getPriveTraining();
-  const rassen = await rasController.getRasOptions();
-  const honden = await hondController.getHondOptions(klant_id);
-  const csrf = generateCsrf();
-
-  return {
-    props: {
-      rassen,
-      honden,
-      disabledDays: disabled,
-      klant_id: klant_id?.toString() ?? null,
-      csrf,
-      type,
-      available,
-      prijsExcl: training?.prijsExcl ?? '',
-    },
-  };
 };
