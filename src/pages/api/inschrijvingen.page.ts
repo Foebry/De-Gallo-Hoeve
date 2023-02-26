@@ -21,13 +21,13 @@ import {
 } from 'src/controllers/TrainingController';
 import Factory from 'src/services/Factory';
 import { IsInschrijvingBody } from 'src/types/requestTypes';
-import { logError } from 'src/controllers/ErrorLogController';
 import { save } from 'src/controllers/InschrijvingController';
 import { startSession, startTransaction } from 'src/utils/db';
 import { mapInschrijvingen } from 'src/mappers/Inschrijvingen';
 import { getDomain } from 'src/shared/functions';
 import { TrainingType } from '@/types/EntityTpes/TrainingType';
 import { Geslacht } from '@/types/EntityTpes/HondTypes';
+import { logError } from './logError/repo';
 
 type InschrijvingDto = {
   datum: string;

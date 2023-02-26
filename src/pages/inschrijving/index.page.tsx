@@ -25,6 +25,7 @@ import { getController } from 'src/services/Factory';
 import { RAS } from 'src/controllers/rasController';
 import { HOND } from 'src/controllers/HondController';
 import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
+import { ObjectId } from 'mongodb';
 
 type TrainingType = 'prive' | 'groep';
 

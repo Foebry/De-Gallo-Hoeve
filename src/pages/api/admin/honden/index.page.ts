@@ -7,8 +7,8 @@ import {
 } from 'src/shared/RequestHelper';
 import { mapToHondenOverviewResult, PaginatedKlantHond } from 'src/mappers/honden';
 import { KlantHond } from 'src/types/EntityTpes/HondTypes';
-import { logError } from 'src/controllers/ErrorLogController';
 import { adminApi } from 'src/services/Authenticator';
+import { logError } from '../../logError/repo';
 
 interface ListHondenRequest extends NextApiRequest {
   query: PaginatedRequestQuery;

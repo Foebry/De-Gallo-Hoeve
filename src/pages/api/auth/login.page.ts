@@ -9,7 +9,7 @@ import {
   NotAllowedError,
 } from 'src/shared/RequestError';
 import { createJWT, setClientCookie } from 'src/services/Authenticator';
-import { logError } from 'src/controllers/ErrorLogController';
+import { logError } from '../logError/repo';
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') return login(req as LoginRequest, res);
