@@ -11,8 +11,8 @@ import {
 import { ObjectId } from 'mongodb';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { closeClient } from 'src/utils/db';
-import { logError } from 'src/controllers/ErrorLogController';
 import { adminApi } from 'src/services/Authenticator';
+import { logError } from '../../logError/repo';
 
 export interface HondDetailResponse {
   _id: string;

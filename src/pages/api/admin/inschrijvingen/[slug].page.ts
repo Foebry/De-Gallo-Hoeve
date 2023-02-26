@@ -11,8 +11,8 @@ import {
   InschrijvingNotFoundError,
   NotAllowedError,
 } from 'src/shared/RequestError';
-import { logError } from 'src/controllers/ErrorLogController';
 import { adminApi } from 'src/services/Authenticator';
+import { logError } from '../../logError/repo';
 
 export interface DetailRequest extends NextApiRequest {
   query: { slug: string };

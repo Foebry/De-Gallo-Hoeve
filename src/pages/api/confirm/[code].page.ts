@@ -11,8 +11,8 @@ import {
   InvalidConfirmCodeError,
   KlantNotFoundError,
 } from 'src/shared/RequestError';
-import { logError } from 'src/controllers/ErrorLogController';
 import { ConfirmCollection } from '@/types/EntityTpes/ConfirmTypes';
+import { logError } from '../logError/repo';
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') return confirm(req, res);

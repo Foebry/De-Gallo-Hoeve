@@ -1,4 +1,4 @@
-import { logError } from 'src/controllers/ErrorLogController';
+import { logError } from 'src/pages/api/logError/repo';
 import logger from './logger';
 
 interface Mailer {
