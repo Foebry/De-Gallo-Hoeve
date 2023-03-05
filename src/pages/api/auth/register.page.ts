@@ -11,10 +11,10 @@ import { registerSchema } from 'src/types/schemas';
 import Factory, { getController } from 'src/services/Factory';
 import { getKlantByEmail, KLANT } from 'src/controllers/KlantController';
 import { IsRegisterBody } from 'src/types/requestTypes';
-import { CONFIRM } from 'src/types/EntityTpes/ConfirmTypes';
 import { startSession, startTransaction } from 'src/utils/db';
 import { getDomain } from 'src/shared/functions';
 import { logError } from '../logError/repo';
+import { createRandomConfirmCode } from '../confirm/[code]/repo';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -45,11 +45,7 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
       const transactionOptions = startTransaction();
       await session.withTransaction(async () => {
         const savedKlant = await getController(KLANT).save(klant);
-        const confirm = Factory.createConfirm({
-          klant_id: klant._id,
-          created_at: klant.created_at,
-        });
-        const { code } = await getController(CONFIRM).save(confirm);
+        const code = createRandomConfirmCode(savedKlant._id);
 
         await mailer.sendMail('register', {
           email: process.env.MAIL_TO ?? savedKlant.email,

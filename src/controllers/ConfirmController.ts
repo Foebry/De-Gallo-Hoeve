@@ -1,13 +1,13 @@
 import moment from 'moment';
-import { Code, ObjectId } from 'mongodb';
+import { ObjectId } from 'mongodb';
 import { InternalServerError } from '../shared/RequestError';
 import { ConfirmCollection } from '../types/EntityTpes/ConfirmTypes';
 import { getConfirmCollection } from 'src/utils/db';
+import { getCurrentTime, toLocalTime } from 'src/shared/functions';
 import {
   createRandomConfirmCode,
-  getCurrentTime,
-  toLocalTime,
-} from 'src/shared/functions';
+  getKlantIdFromConfirmCode,
+} from 'src/pages/api/confirm/[code]/repo';
 
 export const save = async (confirm: ConfirmCollection): Promise<ConfirmCollection> => {
   const controller = await getConfirmCollection();
@@ -36,13 +36,6 @@ export const getConfirmByKlantId = async (
   return collection.findOne({ klant_id });
 };
 
-export const getConfirmByCode = async (
-  code: string
-): Promise<ConfirmCollection | null> => {
-  const collection = await getConfirmCollection();
-  return collection.findOne({ code });
-};
-
 export const updateConfirm = async (
   _id: ObjectId,
   data: ConfirmCollection
@@ -54,24 +47,18 @@ export const updateConfirm = async (
 
 export const reset = async (confirm: ConfirmCollection): Promise<ConfirmCollection> => {
   const collection = await getConfirmCollection();
-  const newCode = createRandomConfirmCode();
-  const valid_to = toLocalTime(moment(getCurrentTime()).add(1, 'day').format());
+  const [klant_id, valid_to] = getKlantIdFromConfirmCode(confirm.code);
+  const newCode = createRandomConfirmCode(klant_id);
   await collection.updateOne(
     { _id: confirm._id },
     {
       $set: {
-        valid_to,
+        valid_to: new Date(valid_to),
         code: newCode,
       },
     }
   );
-  return { ...confirm, valid_to, code: newCode };
-};
-
-export const deleteByKlantId = async (klant_id: ObjectId): Promise<void> => {
-  const collection = await getConfirmCollection();
-  const { deletedCount } = await collection.deleteOne({ klant_id });
-  if (deletedCount !== 1) throw new InternalServerError();
+  return { ...confirm, valid_to: new Date(valid_to), code: newCode };
 };
 
 export const deleteAll = async (): Promise<void> => {
@@ -84,10 +71,8 @@ export const deleteAll = async (): Promise<void> => {
 
 const confirmController: IsConfirmController = {
   deleteAll,
-  deleteByKlantId,
   reset,
   updateConfirm,
-  getConfirmByCode,
   getConfirmByKlantId,
   getConfirmById,
   getAllConfirm,
@@ -96,10 +81,8 @@ const confirmController: IsConfirmController = {
 
 export type IsConfirmController = {
   deleteAll: () => Promise<void>;
-  deleteByKlantId: (klant_id: ObjectId) => Promise<void>;
   reset: (confirm: ConfirmCollection) => Promise<ConfirmCollection>;
   updateConfirm: (_id: ObjectId, data: ConfirmCollection) => Promise<void>;
-  getConfirmByCode: (code: string) => Promise<ConfirmCollection | null>;
   getConfirmByKlantId: (klant_id: ObjectId) => Promise<ConfirmCollection | null>;
   getConfirmById: (_id: ObjectId) => Promise<ConfirmCollection | null>;
   getAllConfirm: () => Promise<ConfirmCollection[]>;

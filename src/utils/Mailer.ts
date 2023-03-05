@@ -33,16 +33,18 @@ export const getTemplateId = (type: string): string => {
     ? 'd-32b2e43b878e480192fc34b41a640979'
     : type === 'inschrijving-annulatie-admin'
     ? 'd-302fd6359b784bb0983be6328420059b'
+    : type === 'resetConfirm'
+    ? 'd-02f99049dfcd4fafbd96ecae9ec0b405'
     : '';
 };
 
 const mailer: Mailer = {
-  sendMail: async (type, { email, ...templateData }) => {
+  sendMail: async (type, { email, ...dynamic_template_data }) => {
     await send({
       to: email,
       from: process.env.MAIL_FROM,
       templateId: getTemplateId(type),
-      dynamic_template_data: { ...templateData },
+      dynamic_template_data,
     });
   },
 

@@ -1,26 +1,26 @@
+import { FrontEndErrorCodes } from './functions';
+
 export class HttpError extends Error {
   response: any;
-  constructor(name: string, message: string, response: any) {
+  code: number;
+  constructor(name: string, message: string, response: any, code: number) {
     super(name);
     this.name = name;
     this.message = message;
-    this.response = { message, ...response } ?? { message };
+    this.code = code;
+    this.response = { message, errorCode: this.name, ...response, code: this.code };
   }
 }
 
 export class TransactionError extends HttpError {
-  code: number;
   constructor(name: string, code: number, response: any) {
-    super(name, '', response);
-    this.code = code;
+    super(name, '', response, code);
   }
 }
 
 export class BadRequestError extends HttpError {
-  code: number;
   constructor(name: string, message: string, response?: any) {
-    super(name, message, response);
-    this.code = 400;
+    super(name, message, { errorCode: name, ...response }, 400);
   }
 }
 
@@ -42,11 +42,15 @@ export class InvalidCsrfError extends BadRequestError {
   }
 }
 
+export class InvalidConfirmCodeFormat extends BadRequestError {
+  constructor() {
+    super('InvalidConfirmCodeFormat', 'invalid confirm code');
+  }
+}
+
 export class EntityNotFoundError extends HttpError {
-  code: number;
   constructor(name: string, message: string, response?: any) {
-    super(name, message, response);
-    this.code = 404;
+    super(name, message, response, 404);
   }
 }
 
@@ -105,10 +109,8 @@ export class ExpiredConfirmCodeError extends EntityNotFoundError {
 }
 
 export class UnprocessablePayloadError extends HttpError {
-  code: number;
   constructor(name: string, message: string, response?: any) {
-    super(name, message, response);
-    this.code = 422;
+    super(name, message, response, 422);
   }
 }
 
@@ -153,61 +155,57 @@ export class TrainingVolzetError extends UnprocessablePayloadError {
 }
 
 export class AuthorizationError extends HttpError {
-  code: number;
-  constructor(name: string, message: string, response?: any) {
-    super(name, message, response);
-    this.code = 401;
+  constructor(name: string, message: string, response?: any, code: number = 401) {
+    super(name, message, response, code);
   }
 }
 
 export class UnauthorizedAccessError extends AuthorizationError {
-  constructor() {
-    super('UnauthorizedAccessError', 'Niet Toegestaan');
+  constructor(code: number) {
+    super('UnauthorizedAccessError', 'Niet Toegestaan', (code = 401));
   }
 }
 
 export class EmailNotVerifiedError extends AuthorizationError {
   constructor() {
-    super('EmailNotVerifiedError', 'Gelieve uw email te verifiëren');
-    this.code = 403;
+    super('EmailNotVerifiedError', 'Gelieve uw email te verifiëren', 403);
   }
 }
 
 export class NotLoggedInError extends AuthorizationError {
   constructor() {
-    super('NotLoggedInError', 'Not Logged In');
-    this.code = 403;
-
-    // res.status(401).json({ code: 401, message: "Unauthorized Access" });
+    super('NotLoggedInError', 'Not Logged In', 403);
   }
 }
 
 export class NotAllowedError extends HttpError {
-  code: number;
   constructor() {
-    super('NotAllowedError', 'Not Allowed', {});
-    this.code = 405;
+    super('NotAllowedError', 'Not Allowed', {}, 405);
   }
 }
 
 export class InternalServerError extends HttpError {
-  code: number;
   constructor() {
-    super('InternalServerError', 'Internal Server Error', {});
-    this.code = 500;
+    super('InternalServerError', 'Internal Server Error', {}, 500);
   }
 }
 
 export class ConflictError extends HttpError {
-  code: number;
   constructor(name: string, message: string, response?: any) {
-    super(name, message, response);
-    this.code = 409;
+    super(name, message, response, 409);
   }
 }
 
 export class ConfirmationNeededError extends ConflictError {
   constructor(response?: Record<string, any>) {
     super('ConfirmationNeededError', 'Confirmation is needed', response);
+  }
+}
+
+export class KlantAlreadyVerifiedError extends ConflictError {
+  constructor() {
+    super('KlantAlreadyVerifiedError', 'U bent reeds geverifiëerd', {
+      errorCode: FrontEndErrorCodes.KlantAlreadyVerified,
+    });
   }
 }

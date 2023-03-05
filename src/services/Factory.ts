@@ -22,12 +22,7 @@ import TrainingController, {
 import { IsKlantCollection } from '../types/EntityTpes/KlantTypes';
 import { IsInschrijvingBodyInschrijving, IsNewKlantData } from '../types/requestTypes';
 import brcypt from 'bcrypt';
-import {
-  capitalize,
-  createRandomConfirmCode,
-  getCurrentTime,
-  toLocalTime,
-} from '../shared/functions';
+import { capitalize, getCurrentTime, toLocalTime } from '../shared/functions';
 import { HondCollection, NewHond } from '../types/EntityTpes/HondTypes';
 import { CONFIRM, ConfirmCollection, NewConfirm } from '../types/EntityTpes/ConfirmTypes';
 import { InschrijvingCollection } from '../types/EntityTpes/InschrijvingTypes';
@@ -43,6 +38,7 @@ import TrainingDayController, {
   TRAININGDAY,
 } from 'src/controllers/TrainingDayController';
 import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
+import { createRandomConfirmCode } from 'src/pages/api/confirm/[code]/repo';
 
 export type CONFIRM = 'ConfirmController';
 export type CONTENT = 'ContentController';
@@ -72,7 +68,7 @@ const createInschrijving = (
 const createConfirm = (confirm: NewConfirm): ConfirmCollection => ({
   ...confirm,
   _id: new ObjectId(),
-  code: createRandomConfirmCode(),
+  code: createRandomConfirmCode(confirm.klant_id),
   valid_to: moment(confirm.created_at).local().add(1, 'day').toDate(),
 });
 

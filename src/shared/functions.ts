@@ -1,11 +1,9 @@
 import moment from 'moment';
+import { ObjectId } from 'mongodb';
 import { NextApiRequest } from 'next';
-import { TRAININGDAY } from 'src/controllers/TrainingDayController';
-import { getController } from 'src/services/Factory';
 
 interface HelperInterface {
   capitalize: (string: string) => string;
-  createRandomConfirmCode: () => string;
 }
 
 export const capitalize = (string: string) => {
@@ -24,15 +22,6 @@ export const getCurrentTime = () => {
 
 export const toLocalTime = (date: string): Date => {
   return new Date(moment.utc(date).local().toString());
-};
-
-export const createRandomConfirmCode = (length: number = 50) => {
-  const options = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  const code = new Array(length).fill(0).map((_) => {
-    const index = Math.floor(Math.random() * options.length);
-    return Math.random() > 0.5 ? options[index].toUpperCase() : options[index];
-  });
-  return code.join('');
 };
 
 export const getAge = (date: Date) =>
@@ -57,8 +46,13 @@ export const getDomain = (req: NextApiRequest): string | undefined => {
   return req.headers.host;
 };
 
+export enum FrontEndErrorCodes {
+  KlantNotFound = 'rwm3hf15rcd',
+  KlantAlreadyVerified = 'k1r5c6vgirp',
+  ExpiredConfirmCode = 'e7turmpp5tn',
+}
+
 const helper: HelperInterface = {
-  createRandomConfirmCode,
   capitalize,
 };
 
