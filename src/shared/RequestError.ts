@@ -161,14 +161,14 @@ export class AuthorizationError extends HttpError {
 }
 
 export class UnauthorizedAccessError extends AuthorizationError {
-  constructor(code: number) {
-    super('UnauthorizedAccessError', 'Niet Toegestaan', (code = 401));
+  constructor(response?: any) {
+    super('UnauthorizedAccessError', 'Niet Toegestaan', response, 401);
   }
 }
 
 export class EmailNotVerifiedError extends AuthorizationError {
-  constructor() {
-    super('EmailNotVerifiedError', 'Gelieve uw email te verifiëren', 403);
+  constructor(response?: any) {
+    super('EmailNotVerifiedError', 'Gelieve uw email te verifiëren', response, 403);
   }
 }
 
