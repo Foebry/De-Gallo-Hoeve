@@ -1,7 +1,7 @@
 import mailer from 'src/utils/Mailer';
-import { ContactRequestBody } from './schemas';
+import { ContactTemplateData } from './schemas';
 
-export const sendContactMail = async (body: ContactRequestBody) => {
+export const sendContactMail = async (body: ContactTemplateData) => {
   const templateData = {
     ...body,
     mailFrom: body.email,

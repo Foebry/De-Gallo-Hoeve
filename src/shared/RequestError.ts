@@ -38,7 +38,7 @@ export class InschrijvingKlantChangedError extends BadRequestError {
 
 export class InvalidCsrfError extends BadRequestError {
   constructor() {
-    super('InvalidCsrfError', 'Probeer later opnieuw...');
+    super('InvalidCsrfError', 'Er is iets fout gegaan, probeer later opnieuw...');
   }
 }
 
