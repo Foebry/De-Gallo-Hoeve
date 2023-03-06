@@ -65,7 +65,7 @@ describe('/inschrijving', () => {
 
       expect(response.statusCode).toBe(400);
       expect(response.body).toStrictEqual({
-        message: 'Probeer later opnieuw...',
+        message: 'Er is iets fout gegaan, probeer later opnieuw...',
       });
     });
     it('Should throw UnauthorizedError when not logged in', async () => {
