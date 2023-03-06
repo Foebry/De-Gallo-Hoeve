@@ -1,109 +1,82 @@
 import { clearAllData } from 'src/utils/MongoDb';
-import handler from 'src/pages/api/confirm/[code].page';
+import handler from 'src/pages/api/confirm/[code]/index.page';
 import { getController } from 'src/services/Factory';
-import { CONFIRM } from 'src/types/EntityTpes/ConfirmTypes';
-import { getConfirmByCode } from 'src/controllers/ConfirmController';
-import { KLANT } from 'src/controllers/KlantController';
-import { createRandomConfirm } from 'tests/fixtures/confirm';
+import { getKlantById, KLANT } from 'src/controllers/KlantController';
 import { createRandomKlant } from 'tests/fixtures/klant';
 import { closeClient } from 'src/utils/db';
 import { faker } from '@faker-js/faker';
 import { getRequest } from 'tests/helpers';
+import { createRandomConfirmCode } from 'src/pages/api/confirm/[code]/repo';
+import Mailer from 'src/utils/Mailer';
+import * as errorLog from 'src/pages/api/logError/repo';
 
 describe('/confirm', () => {
   beforeEach(async () => {
+    jest.clearAllMocks();
     await clearAllData();
   });
   afterAll(async () => {
+    jest.clearAllMocks();
     await clearAllData();
     await closeClient();
   });
   const request = getRequest(handler);
+  const mockedSendMail = jest.spyOn(Mailer, 'sendMail').mockImplementation();
+  const mockedErrorLog = jest.spyOn(errorLog, 'logError').mockImplementation();
 
   describe('/GET', () => {
-    it('Should throw InvalidConfirmCodeError', async () => {
-      const randomConfirm = createRandomConfirm();
-
-      const { body } = await request
-        .get('/api/confirm/')
-        .query({ code: randomConfirm.code })
-        .expect(404);
-
-      expect(body).toStrictEqual({ message: 'Code niet gevonden' });
-    });
-
     it('Should throw ExpiredConfirmCodeError', async () => {
       const randomKlant = createRandomKlant();
-      const randomConfirm = createRandomConfirm(randomKlant);
-
-      randomConfirm.valid_to = faker.date.past(2);
-
-      await getController(CONFIRM).save(randomConfirm);
-
-      const { body } = await request
-        .get(`/api/confirm/`)
-        .query({ code: randomConfirm.code })
-        .expect(404);
-
-      expect(body).toStrictEqual({
-        message: 'Confirm code expired',
+      const code = createRandomConfirmCode(randomKlant._id, {
+        valid_to: faker.date.past(2),
       });
+
+      await request.get(`/api/confirm/`).query({ code }).expect(307);
     });
 
-    it('Should delete confirmCode and redirect to login', async () => {
+    it('Should verify klant and redirect to login', async () => {
       const randomKlant = createRandomKlant();
-      const randomConfirm = createRandomConfirm(randomKlant);
+      const code = createRandomConfirmCode(randomKlant._id);
 
       await getController(KLANT).save(randomKlant);
-      await getController(CONFIRM).save(randomConfirm);
 
-      await request.get(`/api/confirm/`).query({ code: randomConfirm.code }).expect(307);
+      await request.get(`/api/confirm/`).query({ code }).expect(307);
 
-      const confirm = await getConfirmByCode(randomConfirm.code);
-      expect(confirm).toBeNull();
+      const verifiedKlant = await getKlantById(randomKlant._id);
+      expect(verifiedKlant?.verified).toBe(true);
     });
   });
 
   describe('/PUT', () => {
-    it('should throw InvalidConfirmCodeError', async () => {
-      const randomConfirm = createRandomConfirm();
+    it('should throw klantNotFoundError', async () => {
+      const randomKlant = createRandomKlant();
+      const code = createRandomConfirmCode(randomKlant._id);
 
-      const response = await request
-        .put(`/api/confirm/`)
-        .query({ code: randomConfirm.code })
-        .expect(404);
-
-      expect(response.body).toStrictEqual({
-        message: 'Code niet gevonden',
-      });
+      await request.put(`/api/confirm/`).query({ code }).expect(404);
     });
 
-    it('should throw KlantNotFoundError', async () => {
-      const randomConfirm = createRandomConfirm();
-      await getController(CONFIRM).save(randomConfirm);
+    it('should throw klantAlreadyVerifiedError', async () => {
+      const randomKlant = createRandomKlant({ verified: true });
+      const code = createRandomConfirmCode(randomKlant._id);
 
-      const response = await request
-        .put(`/api/confirm/`)
-        .query({ code: randomConfirm.code })
-        .expect(404);
+      await getController(KLANT).save(randomKlant);
 
-      expect(response.body).toStrictEqual({ message: 'Klant niet gevonden' });
+      await request.put('/api/confirm/').query({ code }).expect(409);
     });
 
     it('Should reset confirmCode', async () => {
       const randomKlant = createRandomKlant();
-      const randomConfirm = createRandomConfirm(randomKlant);
+      const code = createRandomConfirmCode(randomKlant._id);
 
       await getController(KLANT).save(randomKlant);
-      await getController(CONFIRM).save(randomConfirm);
+      const resetTemplateData = expect.objectContaining({
+        email: 'sander.fabry@gmail.com',
+        vnaam: randomKlant.vnaam,
+      });
 
-      const { body } = await request
-        .put(`/api/confirm/`)
-        .query({ code: randomConfirm.code })
-        .expect(200);
-
-      expect(body.code).toBeDefined();
-      expect(body.code !== randomConfirm.code).toBe(true);
+      await request.put(`/api/confirm/`).query({ code }).expect(200);
+      expect(mockedSendMail).toHaveBeenCalledTimes(1);
+      expect(mockedSendMail).toHaveBeenCalledWith('resetConfirm', resetTemplateData);
     });
   });
 });
