@@ -3,7 +3,6 @@ import { getAllRassen, RAS } from 'src/controllers/rasController';
 import { getHondenByKlantId } from 'src/controllers/HondController';
 import Factory from '../services/Factory';
 import { getAllKlanten, KLANT } from 'src/controllers/KlantController';
-import { CONFIRM } from 'src/types/EntityTpes/ConfirmTypes';
 import { CONTENT } from 'src/controllers/ContentController';
 import { INSCHRIJVING } from 'src/controllers/InschrijvingController';
 import { TRAINING } from 'src/controllers/TrainingController';
@@ -85,7 +84,6 @@ export const getIndexData = async () => {
 
 export const clearAllData = async () => {
   if (process.env.NODE_ENV === 'test') {
-    await Factory.getController(CONFIRM).deleteAll();
     await Factory.getController(KLANT).deleteAll();
     await Factory.getController(CONTENT).deleteAll();
     await Factory.getController(INSCHRIJVING).deleteAll();

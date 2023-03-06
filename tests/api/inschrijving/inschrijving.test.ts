@@ -66,6 +66,8 @@ describe('/inschrijving', () => {
       expect(response.statusCode).toBe(400);
       expect(response.body).toStrictEqual({
         message: 'Probeer later opnieuw...',
+        code: 400,
+        errorCode: 'InvalidCsrfError',
       });
     });
     it('Should throw UnauthorizedError when not logged in', async () => {
@@ -77,7 +79,11 @@ describe('/inschrijving', () => {
       const response = await request.post(POST_INSCHRIJVING).send(payload);
 
       expect(response.statusCode).toBe(403);
-      expect(response.body).toStrictEqual({ message: 'Not Logged In' });
+      expect(response.body).toStrictEqual({
+        message: 'Not Logged In',
+        code: 403,
+        errorCode: 'NotLoggedInError',
+      });
     });
     it('Should throw ValidationError on wrong request Body', async () => {
       const payload = {};

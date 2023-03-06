@@ -20,3 +20,4 @@ jobs:
         env:
           URI: ${{secrets.URI}}
           MONGO_DATABASE: ${{secrets.MONGO_DATABASE}}
+          MAIL_TO: ${{secrets.MAIL_TO}}

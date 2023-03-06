@@ -1,3 +1,4 @@
+import { IsKlantCollection } from '@/types/EntityTpes/KlantTypes';
 import { logError } from 'src/pages/api/logError/repo';
 import logger from './logger';
 
@@ -33,16 +34,22 @@ export const getTemplateId = (type: string): string => {
     ? 'd-32b2e43b878e480192fc34b41a640979'
     : type === 'inschrijving-annulatie-admin'
     ? 'd-302fd6359b784bb0983be6328420059b'
+    : type === 'resetConfirm'
+    ? 'd-02f99049dfcd4fafbd96ecae9ec0b405'
     : '';
 };
 
+enum TemplateIds {
+  RESET_CONFIRM = 'resetConfirm',
+}
+
 const mailer: Mailer = {
-  sendMail: async (type, { email, ...templateData }) => {
+  sendMail: async (type, { email, ...dynamic_template_data }) => {
     await send({
       to: email,
       from: process.env.MAIL_FROM,
       templateId: getTemplateId(type),
-      dynamic_template_data: { ...templateData },
+      dynamic_template_data,
     });
   },
 
@@ -57,6 +64,27 @@ const mailer: Mailer = {
 
     // mailer.sendMail("contact", { naam, email, bericht });
   },
+};
+
+type ResetConfirmData = {
+  email: string;
+  vnaam: string;
+  code: string;
+  domain?: string;
+};
+
+export const sendResetConfirmMail = async (
+  klant: IsKlantCollection,
+  code: string,
+  domain: string | undefined
+) => {
+  const resetConfirmTemplateData: ResetConfirmData = {
+    email: process.env.MAIL_TO ?? klant.email,
+    vnaam: klant.vnaam,
+    code,
+    domain: domain ?? 'https://degallohoeve.be',
+  };
+  await mailer.sendMail(TemplateIds.RESET_CONFIRM, resetConfirmTemplateData);
 };
 
 export default mailer;
