@@ -71,7 +71,7 @@ export const softDelete = async (ras: RasCollection): Promise<void> => {
 export const deleteAll = async (): Promise<void> => {
   const collection = await getRasCollection();
 
-  collection.deleteMany({});
+  await collection.deleteMany({});
 };
 
 export const getRandomRasNaam = async (): Promise<string> => {
