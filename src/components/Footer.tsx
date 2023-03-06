@@ -14,7 +14,6 @@ import { useState } from 'react';
 import useMutation from '../hooks/useMutation';
 import { CONTACTAPI } from '../types/apiTypes';
 import { FormTextBox } from './form/FormTextBox';
-import { generateCsrf } from 'src/services/Validator';
 
 interface Props {}
 
@@ -38,7 +37,7 @@ const Footer: React.FC<Props> = ({}) => {
       setDisabled(() => true);
       const { data, error } = await contact(CONTACTAPI, {
         ...payload,
-        csrf: generateCsrf(),
+        csrf: 'MmJiM2pwNHQ1dg==$c0tKJd-G-aePggUzDLC6H28lsl2iNCjnGBQ5i0vpzdw',
       });
       if (data) {
         toast.success(data.message);
