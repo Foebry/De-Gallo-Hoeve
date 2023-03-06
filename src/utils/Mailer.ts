@@ -1,3 +1,4 @@
+import { IsKlantCollection } from '@/types/EntityTpes/KlantTypes';
 import { logError } from 'src/pages/api/logError/repo';
 import logger from './logger';
 
@@ -38,6 +39,10 @@ export const getTemplateId = (type: string): string => {
     : '';
 };
 
+enum TemplateIds {
+  RESET_CONFIRM = 'resetConfirm',
+}
+
 const mailer: Mailer = {
   sendMail: async (type, { email, ...dynamic_template_data }) => {
     await send({
@@ -59,6 +64,27 @@ const mailer: Mailer = {
 
     // mailer.sendMail("contact", { naam, email, bericht });
   },
+};
+
+type ResetConfirmData = {
+  email: string;
+  vnaam: string;
+  code: string;
+  domain?: string;
+};
+
+export const sendResetConfirmMail = async (
+  klant: IsKlantCollection,
+  code: string,
+  domain: string | undefined
+) => {
+  const resetConfirmTemplateData: ResetConfirmData = {
+    email: process.env.MAIL_TO ?? klant.email,
+    vnaam: klant.vnaam,
+    code,
+    domain: domain ?? 'https://degallohoeve.be',
+  };
+  await mailer.sendMail(TemplateIds.RESET_CONFIRM, resetConfirmTemplateData);
 };
 
 export default mailer;

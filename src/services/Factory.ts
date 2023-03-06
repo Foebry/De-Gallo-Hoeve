@@ -1,6 +1,5 @@
 import moment from 'moment';
 import { ObjectId } from 'mongodb';
-import ConfirmController, { IsConfirmController } from '../controllers/ConfirmController';
 import ContentController, {
   CONTENT,
   IsContentController,
@@ -143,7 +142,6 @@ export type ControllerType =
 
 export type PaginatedControllerType = HOND | INSCHRIJVING | KLANT | RAS;
 
-export function getController(type: CONFIRM): IsConfirmController;
 export function getController(type: CONTENT): IsContentController;
 export function getController(type: HOND): IsHondController;
 export function getController(type: INSCHRIJVING): IsInschrijvingController;
@@ -152,9 +150,7 @@ export function getController(type: RAS): IsRasController;
 export function getController(type: TRAINING): IsTrainingController;
 export function getController(type: TRAININGDAY): IsTrainingDayController;
 export function getController(type: ControllerType) {
-  return type === CONFIRM
-    ? ConfirmController
-    : type === CONTENT
+  return type === CONTENT
     ? ContentController
     : type === HOND
     ? HondController

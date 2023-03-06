@@ -40,30 +40,22 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const klant = await Factory.createKlant(klantData);
 
-    try {
-      const session = await startSession();
-      const transactionOptions = startTransaction();
-      await session.withTransaction(async () => {
-        const savedKlant = await getController(KLANT).save(klant);
-        const code = createRandomConfirmCode(savedKlant._id);
+    const savedKlant = await getController(KLANT).save(klant);
+    const code = createRandomConfirmCode(savedKlant._id);
 
-        await mailer.sendMail('register', {
-          email: process.env.MAIL_TO ?? savedKlant.email,
-          vnaam: savedKlant.vnaam,
-          code,
-          domain: getDomain(req),
-        });
-        await mailer.sendMail('register-headsup', {
-          email: process.env.MAIL_TO,
-          klant_id: savedKlant._id.toString(),
-          domain: getDomain(req),
-        });
-      }, transactionOptions);
+    await mailer.sendMail('register', {
+      email: process.env.MAIL_TO ?? savedKlant.email,
+      vnaam: savedKlant.vnaam,
+      code,
+      domain: getDomain(req),
+    });
+    await mailer.sendMail('register-headsup', {
+      email: process.env.MAIL_TO,
+      klant_id: savedKlant._id.toString(),
+      domain: getDomain(req),
+    });
 
-      return res.status(201).send(klant);
-    } catch (e: any) {
-      throw new TransactionError(e.name, e.code, e.response);
-    }
+    return res.status(201).send(klant);
   } catch (e: any) {
     req.body.password = req.body.password ? await bcrypt.hash(req.body.password, 10) : '';
     await logError('register', req, e);

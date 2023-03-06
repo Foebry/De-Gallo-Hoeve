@@ -6,7 +6,7 @@ import {
   KlantAlreadyVerifiedError,
   KlantNotFoundError,
 } from 'src/shared/RequestError';
-import mailer from 'src/utils/Mailer';
+import mailer, { sendResetConfirmMail } from 'src/utils/Mailer';
 import { logError } from '../../logError/repo';
 import { createRandomConfirmCode, getKlantIdFromConfirmCode } from './repo';
 import { ResetRequest } from './schemas';
@@ -23,12 +23,7 @@ export const reset = async (req: ResetRequest, res: NextApiResponse) => {
 
     const newCode = createRandomConfirmCode(klant._id);
 
-    await mailer.sendMail('resetConfirm', {
-      email: process.env.MAIL_TO ?? klant.email,
-      vnaam: klant.vnaam,
-      code: newCode,
-      domain: getDomain(req),
-    });
+    await sendResetConfirmMail(klant, newCode, getDomain(req));
 
     return res.status(200).json({});
   } catch (e: any) {

@@ -155,7 +155,7 @@ export class TrainingVolzetError extends UnprocessablePayloadError {
 }
 
 export class AuthorizationError extends HttpError {
-  constructor(name: string, message: string, response?: any, code: number = 401) {
+  constructor(name: string, message: string, response: any, code: number) {
     super(name, message, response, code);
   }
 }
@@ -174,7 +174,7 @@ export class EmailNotVerifiedError extends AuthorizationError {
 
 export class NotLoggedInError extends AuthorizationError {
   constructor() {
-    super('NotLoggedInError', 'Not Logged In', 403);
+    super('NotLoggedInError', 'Not Logged In', {}, 403);
   }
 }
 

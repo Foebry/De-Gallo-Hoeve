@@ -15,7 +15,7 @@ export const confirm = async (req: ConfirmRequest, res: NextApiResponse) => {
 
     if (klant.verified) return res.redirect('/login');
     if (new Date().getTime() > validTo)
-      res.redirect(`/errors?${FrontEndErrorCodes.ExpiredConfirmCode}`);
+      return res.redirect(`/errors?${FrontEndErrorCodes.ExpiredConfirmCode}`);
 
     await setVerified(klant);
 
