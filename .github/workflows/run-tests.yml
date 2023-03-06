@@ -2,6 +2,8 @@ name: Run tests
 on: 
   pull_request:
     branches: [main, develop, accept]
+  push:
+    branches: [main, develop, accept]
 
 jobs:
   Explore-GitHub-Actions:

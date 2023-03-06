@@ -28,7 +28,7 @@ describe('login', () => {
     const { body } = await request.post(LOGINAPI).send(loginPayload).expect(400);
 
     expect(body).toStrictEqual({
-      message: 'Probeer later opnieuw...',
+      message: 'Er is iets fout gegaan, probeer later opnieuw...',
       code: 400,
       errorCode: 'InvalidCsrfError',
     });
