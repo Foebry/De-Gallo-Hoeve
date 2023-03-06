@@ -4,7 +4,6 @@ import { RasCollection } from '../types/EntityTpes/RasTypes';
 import { getRasCollection } from 'src/utils/db';
 import { getCurrentTime } from 'src/shared/functions';
 import { Option } from 'src/utils/MongoDb';
-import logger from 'src/utils/logger';
 
 export const getRasByName = async (naam: string): Promise<RasCollection | null> => {
   const collection = await getRasCollection();
