@@ -21,7 +21,7 @@ const ApiTypes = {
   ADMIN_RASSEN_OVERIEW: '/api/admin/rassen',
   ADMIN_RAS_DETAIL: '/api/admin/ras/',
   ADMIN_TRAINING_DAGEN: '/api/admin/trainingdays',
-  FEEDBACK_API: '/api/customer-feedback/',
+  FEEDBACK_API: '/api/feedback',
 };
 
 export const {

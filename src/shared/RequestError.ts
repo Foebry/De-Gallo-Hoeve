@@ -60,6 +60,12 @@ export class InvalidConfirmCodeError extends EntityNotFoundError {
   }
 }
 
+export class LinkExpiredError extends EntityNotFoundError {
+  constructor() {
+    super('LinkExpiredError', 'Deze link is niet meer gelding');
+  }
+}
+
 export class KlantNotFoundError extends EntityNotFoundError {
   constructor(response?: any) {
     super('KlantNotFoundError', 'Klant niet gevonden', response);

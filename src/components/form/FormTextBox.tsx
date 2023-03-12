@@ -1,7 +1,14 @@
-import React, { Dispatch, SetStateAction, useRef, useState } from "react";
-import useFormInputEffect from "../../hooks/layout/useFormInputEffect";
-import { ContactErrorInterface } from "../Footer";
-import TextAreaAutoSize from "react-textarea-autosize";
+import React, {
+  CSSProperties,
+  Dispatch,
+  HTMLAttributes,
+  SetStateAction,
+  useRef,
+  useState,
+} from 'react';
+import useFormInputEffect from '../../hooks/layout/useFormInputEffect';
+import { ContactErrorInterface } from '../Footer';
+import TextAreaAutoSize from 'react-textarea-autosize';
 
 export interface FormTextBoxProps {
   label: string;
@@ -11,6 +18,7 @@ export interface FormTextBoxProps {
   onChange: (e: React.FormEvent<HTMLTextAreaElement>) => void;
   errors: ContactErrorInterface;
   setErrors: Dispatch<SetStateAction<ContactErrorInterface>>;
+  style: CSSProperties;
 }
 
 export const FormTextBox: React.FC<FormTextBoxProps> = ({
@@ -21,6 +29,7 @@ export const FormTextBox: React.FC<FormTextBoxProps> = ({
   onChange,
   errors,
   setErrors,
+  style,
 }) => {
   const labelRef = useRef<HTMLLabelElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -28,15 +37,20 @@ export const FormTextBox: React.FC<FormTextBoxProps> = ({
   const fieldName = name;
 
   useFormInputEffect({ labelRef, inputRef, value, hasFocus });
+
   return (
     <div
-      className={`mb-12 relative formInput`}
+      style={{
+        marginBottom: style.marginBottom ?? '48px',
+        position: style.position ?? 'relative',
+      }}
+      className={`formInput`}
       ref={inputRef}
       onFocus={() => setHasFocus(true)}
       onBlur={() => setHasFocus(false)}
     >
       <label
-        className="absolute pl-2.5 bottom-1 text-green-100 mr-5 capitalize pointer-events-none flex items-center gap-1 w-full"
+        className="absolute pl-2.5 bottom-1 text-green-100 mr-5 pointer-events-none flex items-center gap-1 w-full"
         htmlFor={id}
         ref={labelRef}
       >

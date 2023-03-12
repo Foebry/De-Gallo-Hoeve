@@ -1,57 +1,149 @@
-import { FEEDBACK_API } from '@/types/apiTypes';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import React, { useContext } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { SubmitButton } from 'src/components/buttons/Button';
 import Form from 'src/components/form/Form';
-import FormSteps from 'src/components/form/FormSteps';
+import FormRow from 'src/components/form/FormRow';
+import { FormTextBox } from 'src/components/form/FormTextBox';
 import EmptyNav from 'src/components/nav/EmptyNav';
-import useMutation from 'src/hooks/useMutation';
-import FeedbackRedirect from './components/feedback-redirect';
-import FeedbackService from './components/feedback-service';
-import FeedbackWebsite from './components/feedback-website';
-
-type FormValues = {};
+import { Title2, Title3 } from 'src/components/Typography/Typography';
+import Rating from './components/Rating';
+import { FeedbackBody as FormValues } from 'src/pages/api/feedback/schemas';
+import { FeedbackContext } from 'src/context/FeedbackContext';
 
 const Feedback: React.FC<{}> = () => {
   const router = useRouter();
-  const [disabled, setDisabled] = useState<boolean>(false);
-  const [activeStep, setActiveStep] = useState<number>(0);
-  const [errors, setErrors] = useState<FormValues>();
   const uniqueCode = router.query.code;
-  const sendFeedback = useMutation(errors, setErrors);
+  const { sendFeedback } = useContext(FeedbackContext);
 
   const { control, handleSubmit } = useForm<FormValues>();
 
   const onSubmit = async (values: FormValues) => {
-    if (!disabled) setDisabled(true);
-    const url = `${FEEDBACK_API}${uniqueCode}`;
-    const { data, error } = await sendFeedback(url, { ...values });
-    if (data) toast.success('Formulier goed ontvangen!');
-    if (error) toast.error('Er is iets misgegaan, probeer later opnieuw');
-    setDisabled(false);
+    await sendFeedback(values);
   };
+
+  enum Questions {
+    Tevreden = 'Hoe tevreden bent u over de trainingen?',
+    Communicatie = 'Hoe tevreden bent u over de communicatie?',
+    Hulpzaam = 'Hoe hulpzaam zijn de trainingen voor jou?',
+    Aanraden = 'Zou u ons aanraden aan vrienden / famillie?',
+    Gebruik = 'Vindt u onze website makkelijk te gebruiken?',
+  }
 
   return (
     <>
       <EmptyNav />
-      <div className="max-w-7xl mx-auto mt-20 md:px-5">
-        <FormSteps
-          activeStep={activeStep}
-          errorSteps={[]}
-          setActiveStep={setActiveStep}
-          steps={['service', 'website']}
-        />
-        <Form onSubmit={handleSubmit(onSubmit)}>
+      <div className="max-w-5xl mx-auto mt-20 md:px-5">
+        <Title2 className="text-green-200">
+          Bedankt dat u even de tijd wil nemen om ons te beoordelen!
+        </Title2>
+        <Title3>
+          Hieronder volgen een 5-tal vragen ivm onze service en website.
+          <br /> Gelieve aan te duiden wat voor u het best past bij de gestelde vraag.
+        </Title3>
+        <Form onSubmit={handleSubmit(onSubmit)} className="max-w-xl mb-20">
           <div className="max-w-4xl mx-auto mt-20 py-10">
-            {activeStep === 0 && (
-              <FeedbackService control={control} setActiveStep={setActiveStep} />
-            )}
-            {activeStep === 1 && (
-              <FeedbackWebsite control={control} setActiveStep={setActiveStep} />
-            )}
-            {activeStep === 2 && <FeedbackRedirect />}
+            <Controller
+              name="happiness"
+              control={control}
+              render={({ field: { value, onChange } }) => (
+                <Rating
+                  question={Questions.Tevreden}
+                  min="Helemaal niet"
+                  max="Zeer tevreden"
+                  value={value}
+                  onChange={onChange}
+                />
+              )}
+            />
+            <Controller
+              name="communication"
+              control={control}
+              render={({ field: { value, onChange } }) => (
+                <Rating
+                  question={Questions.Communicatie}
+                  min="helemaal niet"
+                  max="Zeer tevreden"
+                  value={value}
+                  onChange={onChange}
+                />
+              )}
+            />
+            <Controller
+              name="helpful"
+              control={control}
+              render={({ field: { value, onChange } }) => (
+                <Rating
+                  question={Questions.Hulpzaam}
+                  min="helemaal niet"
+                  max="Zeer hulpzaam"
+                  value={value}
+                  onChange={onChange}
+                />
+              )}
+            />
+            <Controller
+              name="usage"
+              control={control}
+              render={({ field: { value, onChange } }) => (
+                <Rating
+                  question={Questions.Gebruik}
+                  min="Helemaal niet"
+                  max="Zeer makkelijk"
+                  value={value}
+                  onChange={onChange}
+                />
+              )}
+            />
+            <Controller
+              name="recommend"
+              control={control}
+              render={({ field: { value, onChange } }) => (
+                <Rating
+                  question={Questions.Aanraden}
+                  min="Helemaal niet"
+                  max="zeker weten"
+                  value={value}
+                  onChange={onChange}
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name="missing"
+              render={({ field: { value, onChange } }) => (
+                <FormTextBox
+                  style={{ marginBottom: '100px' }}
+                  label="Hoe zouden we onze website nog kunnen verbeteren voor u?"
+                  name="missing"
+                  id="missing"
+                  value={value ?? ''}
+                  onChange={onChange}
+                  errors={{}}
+                  setErrors={() => {}}
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name="overall"
+              render={({ field: { value, onChange } }) => (
+                <FormTextBox
+                  style={{ marginBottom: '100px' }}
+                  label="Graag nog een korte algemene beoordeling (1 - 2 zinnen) over ons"
+                  name="overall"
+                  id="overall"
+                  value={value ?? ''}
+                  onChange={onChange}
+                  errors={{}}
+                  setErrors={() => {}}
+                />
+              )}
+            />
           </div>
+          <FormRow className="flex-row-reverse">
+            <SubmitButton label="Verstuur" />
+          </FormRow>
         </Form>
       </div>
     </>
