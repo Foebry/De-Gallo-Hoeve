@@ -19,11 +19,48 @@ export interface FeedbackRequest extends NextApiRequest {
 }
 
 export const FeedBackSchema = object({
-  happiness: number().required({ happiness: 'required' }).min(1).max(5),
-  communication: number().required({ communication: 'required' }).min(1).max(5),
-  helpful: number().required({ helpful: 'required' }).min(1).max(5),
-  usage: number().required({ useful: 'required' }).min(1).max(5),
-  recommend: number().required({ recommend: 'required' }).min(1).max(5),
+  happiness: number()
+    .required({
+      happiness: 'isRequired',
+      message: 'Gelieve alle verplichte velden (*) in te vullen',
+    })
+    .min(1)
+    .max(5),
+  communication: number()
+    .required({
+      communication: 'required',
+      message: 'Gelieve alle verplichte velden (*) in te vullen',
+    })
+    .min(1)
+    .max(5),
+  helpful: number()
+    .required({
+      helpful: 'required',
+      message: 'Gelieve alle verplichte velden (*) in te vullen',
+    })
+    .min(1)
+    .max(5),
+  usage: number()
+    .required({
+      usage: 'required',
+      message: 'Gelieve alle verplichte velden (*) in te vullen',
+    })
+    .min(1)
+    .max(5),
+  recommend: number()
+    .required({
+      recommend: 'required',
+      message: 'Gelieve alle verplichte velden (*) in te vullen',
+    })
+    .min(1)
+    .max(5),
   missing: string().optional(),
-  overall: string().optional(),
+  overall: string()
+    .required({
+      overall: 'required',
+      message: 'Gelieve alle verplichte velden (*) in te vullen',
+    })
+    .max(200, {
+      overall: 'Gelieve een maximum van 200 characters te hanteren',
+    }),
 });

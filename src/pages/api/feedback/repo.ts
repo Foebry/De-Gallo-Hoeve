@@ -9,6 +9,13 @@ export const getFeedbackById = async (
   return collection.findOne({ _id });
 };
 
+export const getFeedbackByCode = async (
+  code: string
+): Promise<FeedBackCollection | null> => {
+  const collection = await getFeedbackCollection();
+  return collection.findOne({ code });
+};
+
 export const saveFeedback = async (feedback: Feedback): Promise<void> => {
   const collection = await getFeedbackCollection();
   await collection.insertOne(feedback);

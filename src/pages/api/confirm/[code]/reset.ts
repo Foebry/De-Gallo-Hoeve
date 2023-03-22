@@ -1,21 +1,17 @@
 import { NextApiResponse } from 'next';
 import { getKlantById } from 'src/controllers/KlantController';
-import { FrontEndErrorCodes, getDomain } from 'src/shared/functions';
-import {
-  ConflictError,
-  KlantAlreadyVerifiedError,
-  KlantNotFoundError,
-} from 'src/shared/RequestError';
-import mailer, { sendResetConfirmMail } from 'src/utils/Mailer';
+import { getDomain } from 'src/shared/functions';
+import { KlantAlreadyVerifiedError, KlantNotFoundError } from 'src/shared/RequestError';
+import { sendResetConfirmMail } from 'src/utils/Mailer';
 import { logError } from '../../logError/repo';
-import { createRandomConfirmCode, getKlantIdFromConfirmCode } from './repo';
+import { createRandomConfirmCode, getIdAndExpirationTimeFromCode } from './repo';
 import { ResetRequest } from './schemas';
 
 export const reset = async (req: ResetRequest, res: NextApiResponse) => {
   try {
     const { code } = req.query;
 
-    const [klantId] = getKlantIdFromConfirmCode(code);
+    const [klantId] = getIdAndExpirationTimeFromCode(code);
     const klant = await getKlantById(klantId);
     if (!klant) throw new KlantNotFoundError();
 

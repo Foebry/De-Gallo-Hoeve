@@ -2,6 +2,7 @@ import React, {
   CSSProperties,
   Dispatch,
   HTMLAttributes,
+  ReactElement,
   SetStateAction,
   useRef,
   useState,
@@ -11,7 +12,7 @@ import { ContactErrorInterface } from '../Footer';
 import TextAreaAutoSize from 'react-textarea-autosize';
 
 export interface FormTextBoxProps {
-  label: string;
+  label: string | ReactElement;
   name: string;
   id: string;
   value: string;
@@ -19,6 +20,7 @@ export interface FormTextBoxProps {
   errors: ContactErrorInterface;
   setErrors: Dispatch<SetStateAction<ContactErrorInterface>>;
   style: CSSProperties;
+  required?: boolean;
 }
 
 export const FormTextBox: React.FC<FormTextBoxProps> = ({
@@ -30,6 +32,7 @@ export const FormTextBox: React.FC<FormTextBoxProps> = ({
   errors,
   setErrors,
   style,
+  required = false,
 }) => {
   const labelRef = useRef<HTMLLabelElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -55,6 +58,7 @@ export const FormTextBox: React.FC<FormTextBoxProps> = ({
         ref={labelRef}
       >
         {label}
+        {required && <span className="text-red-900">*</span>}
       </label>
       <TextAreaAutoSize
         className="block w-full text-xl outline-none border-b-[1px] border-b-grey-500 py-1 px-2.5 text-black-100"

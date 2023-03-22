@@ -215,3 +215,9 @@ export class KlantAlreadyVerifiedError extends ConflictError {
     });
   }
 }
+
+export class LinkAlreadyUsedError extends ConflictError {
+  constructor() {
+    super('LinkAlreadyUsedError', 'Deze link is niet meer geldig');
+  }
+}

@@ -1,39 +1,39 @@
 import { NextApiResponse } from 'next';
+import { getKlantById } from 'src/controllers/KlantController';
 import Feedback from 'src/entities/Feedback';
 import { validate } from 'src/services/Validator';
-import { LinkExpiredError } from 'src/shared/RequestError';
-import { getKlantIdFromConfirmCode } from '../confirm/[code]/repo';
-import { getFeedbackById, saveFeedback } from './repo';
+import { LinkAlreadyUsedError, LinkExpiredError } from 'src/shared/RequestError';
+import { getIdAndExpirationTimeFromCode } from '../confirm/[code]/repo';
+import { getFeedbackByCode, saveFeedback } from './repo';
 import { FeedbackRequest, FeedBackSchema } from './schemas';
 
 export const createFeedback = async (req: FeedbackRequest, res: NextApiResponse) => {
   try {
-    await validate(
-      { req, res },
-      {
-        schema: FeedBackSchema,
-        message: 'Gelieve alle verplichte vragen (*) te beantwoorden',
-      }
-    );
+    await validate({ req, res }, { schema: FeedBackSchema });
     const { code } = req.query;
     const { communication, happiness, helpful, overall, recommend, usage, missing } =
       req.body;
 
     const now = new Date().getTime();
-    const [_id, valid_to] = getKlantIdFromConfirmCode(code);
-    if (now > valid_to) throw new LinkExpiredError();
+    const [_id, expiration] = getIdAndExpirationTimeFromCode(code);
+    if (now > expiration) throw new LinkExpiredError();
 
-    const existingFeedback = await getFeedbackById(_id);
-    if (existingFeedback) throw new LinkExpiredError();
+    const klant = await getKlantById(_id);
+    if (!klant) throw new LinkExpiredError();
+
+    const existingFeedback = await getFeedbackByCode(code);
+    if (existingFeedback) throw new LinkAlreadyUsedError();
 
     const feedback = Feedback.Create(
+      code,
       happiness,
       communication,
       helpful,
       usage,
       recommend,
       missing,
-      overall
+      overall,
+      klant.vnaam
     );
     await saveFeedback(feedback);
 

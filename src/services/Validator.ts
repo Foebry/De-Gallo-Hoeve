@@ -34,8 +34,7 @@ const validationHelper: ValidationHelperInterface = {
       let response = {};
       if (error.errors.length > 1) {
         response = error.errors.reduce((prev: any, curr: any) => {
-          const [key, value] = Object.entries(curr)[0];
-          return { ...prev, [key]: value };
+          return { ...prev, ...curr };
         }, {});
       } else {
         response = error.errors.reduce((prev: any, curr: any) => {
