@@ -50,7 +50,7 @@ export const setAvailabelDays = async (req: EditRequest, res: EditResponse) => {
       );
       for (const record of orderedInschrijvingen) {
         const data = Object.values(record)[0];
-        data.email = process.env.MAIL_TO ?? data.email;
+        data.email = process.env.MAIL_TEST ?? data.email;
         await mailer.sendMail('inschrijving-annulatie-admin', data);
       }
     }
