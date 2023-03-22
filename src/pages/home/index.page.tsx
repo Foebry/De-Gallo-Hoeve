@@ -168,6 +168,7 @@ const Index: React.FC<IndexProps> = ({
 export default Index;
 
 export const getStaticProps = async () => {
+  console.log({ env: process.env.NODE_ENV });
   const priveTraining = await getPriveTraining();
 
   return {
