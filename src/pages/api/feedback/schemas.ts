@@ -1,4 +1,4 @@
-import { NextApiRequest } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next';
 import { number, object, string } from 'yup';
 
 export type FeedbackBody = {
@@ -11,12 +11,20 @@ export type FeedbackBody = {
   overall?: string;
 };
 
-export interface FeedbackRequest extends NextApiRequest {
+export interface CreateFeedbackRequest extends NextApiRequest {
   body: FeedbackBody;
   query: {
     code: string;
   };
 }
+
+export type FeedbackDto = {
+  name: string;
+  rating: number;
+  feedback: string;
+};
+
+export type ListFeedbackResponse = NextApiResponse<FeedbackDto[]>;
 
 export const FeedBackSchema = object({
   happiness: number()

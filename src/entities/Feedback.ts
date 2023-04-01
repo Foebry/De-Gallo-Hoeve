@@ -51,3 +51,13 @@ class Feedback extends BaseEntity {
 }
 
 export default Feedback;
+
+export const getRating = (feedback: FeedBackCollection): number => {
+  const rating =
+    feedback.communication +
+    feedback.happiness +
+    feedback.helpful +
+    feedback.recommend +
+    feedback.usage;
+  return Math.round(rating / 5 / 0.5) * 0.5;
+};

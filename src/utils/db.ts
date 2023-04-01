@@ -28,6 +28,7 @@ let client: MongoClient | null;
 
 const { URI, MONGODB_DATABASE: DATABASE } = process.env;
 const options: MongoClientOptions = {};
+export const FEEDBACK = 'feedbackController';
 
 export const connectClient = async () => {
   if (!client) {

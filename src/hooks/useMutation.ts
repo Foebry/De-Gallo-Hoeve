@@ -30,7 +30,7 @@ const useMutation = <T>(
   ): Promise<{
     data: any | undefined;
     loading: boolean;
-    error: (Partial<T> & { message: string }) | undefined;
+    error: (Partial<T> & { message: string; code: number }) | undefined;
   }> => {
     try {
       setIsLoading(true);

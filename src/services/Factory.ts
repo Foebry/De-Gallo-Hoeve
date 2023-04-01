@@ -38,6 +38,7 @@ import TrainingDayController, {
 } from 'src/controllers/TrainingDayController';
 import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
 import { createRandomConfirmCode } from 'src/pages/api/confirm/[code]/repo';
+import { FEEDBACK } from 'src/utils/db';
 
 export type CONFIRM = 'ConfirmController';
 export type CONTENT = 'ContentController';
@@ -48,6 +49,7 @@ export type RAS = 'RasController';
 export type TRAINING = 'TrainingController';
 export type TRAININGDAY = 'TrainingDayController';
 export type ERRORLOG = 'ErrorLogController';
+export type FEEDBACK = 'FeedbackController';
 
 const createInschrijving = (
   inschrijving: IsInschrijvingBodyInschrijving,
@@ -138,7 +140,8 @@ export type ControllerType =
   | RAS
   | TRAINING
   | TRAININGDAY
-  | ERRORLOG;
+  | ERRORLOG
+  | FEEDBACK;
 
 export type PaginatedControllerType = HOND | INSCHRIJVING | KLANT | RAS;
 

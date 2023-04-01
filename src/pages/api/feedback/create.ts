@@ -5,9 +5,12 @@ import { validate } from 'src/services/Validator';
 import { LinkAlreadyUsedError, LinkExpiredError } from 'src/shared/RequestError';
 import { getIdAndExpirationTimeFromCode } from '../confirm/[code]/repo';
 import { getFeedbackByCode, saveFeedback } from './repo';
-import { FeedbackRequest, FeedBackSchema } from './schemas';
+import { CreateFeedbackRequest, FeedBackSchema } from './schemas';
 
-export const createFeedback = async (req: FeedbackRequest, res: NextApiResponse) => {
+export const createFeedback = async (
+  req: CreateFeedbackRequest,
+  res: NextApiResponse
+) => {
   try {
     await validate({ req, res }, { schema: FeedBackSchema });
     const { code } = req.query;
@@ -35,9 +38,9 @@ export const createFeedback = async (req: FeedbackRequest, res: NextApiResponse)
       overall,
       klant.vnaam
     );
-    await saveFeedback(feedback);
+    const { insertedId: feedbackId } = await saveFeedback(feedback);
 
-    return res.status(201).send('OK');
+    return res.status(201).send({ ...feedback, _id: feedbackId.toString() });
   } catch (err: any) {
     return res.status(err.code).json(err.response);
   }

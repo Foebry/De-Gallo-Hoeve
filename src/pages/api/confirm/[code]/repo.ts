@@ -19,8 +19,7 @@ export const createRandomConfirmCode = (
 
 export const getIdAndExpirationTimeFromCode = (code: string): [ObjectId, number] => {
   try {
-    console.log({ code });
-    const [randomString, reversedId] = code.split('$');
+    const [randomString, reversedId] = code.replace('%24', '$').split('$');
     return [
       new ObjectId(reversedId.split('').reverse().join('')),
       parseInt(randomString, 36),
