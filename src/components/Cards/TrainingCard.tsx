@@ -66,7 +66,7 @@ const TrainingCard: React.FC<TrainingProps> = ({
           </li>
           <li className="flex gap-2">
             <GiCheckMark />
-            <Body>€ {kmHeffing} / kilometer</Body>
+            <Body>€ {kmHeffing.toFixed(2)} / kilometer</Body>
           </li>
           <li className="flex gap-2">
             <GiCheckMark />
