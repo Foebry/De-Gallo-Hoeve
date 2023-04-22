@@ -7,8 +7,9 @@ import { getPriveTraining } from 'src/controllers/TrainingController';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import getData from 'src/hooks/useApi';
-import FeedbackCard from './components/feedbackCard';
 import { nanoid } from 'nanoid';
+import FeedbackSection from './components/feedback/section';
+import { IndexData } from './types';
 
 interface Props {}
 
@@ -166,39 +167,13 @@ const Index: React.FC<Props> = () => {
         {/**
          * Feedback section
          */}
-        {feedback.length > 0 && (
-          <section className="bg-white pb-24 mx-auto md:px-5">
-            <Title2 className="text-green-200">Wat zeggen onze klanten?</Title2>
-            <div className="px-5 mx-auto max-w-7xl md:px-0 flex justify-center gap-10 overflow-hidden">
-              {feedback.map((fb) => (
-                <FeedbackCard
-                  key={fb.id}
-                  name={fb.name}
-                  rating={fb.rating}
-                  feedback={fb.feedback}
-                />
-              ))}
-            </div>
-          </section>
-        )}
+        <FeedbackSection feedback={feedback} />
       </Skeleton>
     </>
   );
 };
 
 const useGetIndexData = () => {
-  type FeedbackDto = {
-    name: string;
-    rating: number;
-    feedback: string;
-    id: string;
-  };
-  type IndexData = {
-    prijsExcl: number;
-    kmHeffing: number;
-    gratisVerplaatsingBinnen: number;
-    feedback: FeedbackDto[];
-  };
   const priveTrainingId = '62fa1f25bacc03711136ad5f';
   const [indexData, setIndexData] = useState<IndexData>({
     prijsExcl: 25.0,
@@ -209,19 +184,22 @@ const useGetIndexData = () => {
         id: nanoid(5),
         name: 'Sander',
         rating: 4.5,
-        feedback: 'Super! Top!',
+        feedback:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eu est non nisl euismod condimentum in vel nisi. Donec accumsan neque id tellus eleifend luctus. Curabitur sem metus, auctor vel tempus vitae, facilisis imperdiet nisi.',
       },
       {
         id: nanoid(5),
         name: 'Seppe',
         rating: 4.5,
-        feedback: 'Echt de max!',
+        feedback:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eu est non nisl euismod condimentum in vel nisi. Donec accumsan neque id tellus eleifend luctus. Curabitur sem metus, auctor vel tempus vitae, facilisis imperdiet nisi.',
       },
       {
         id: nanoid(5),
         name: 'Julie',
         rating: 4,
-        feedback: 'Woohoo!',
+        feedback:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eu est non nisl euismod condimentum in vel nisi. Donec accumsan neque id tellus eleifend luctus. Curabitur sem metus, auctor vel tempus vitae, facilisis imperdiet nisi.',
       },
       {
         id: nanoid(5),
