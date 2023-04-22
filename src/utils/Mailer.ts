@@ -1,4 +1,6 @@
 import { IsKlantCollection } from '@/types/EntityTpes/KlantTypes';
+import moment from 'moment';
+import { createRandomConfirmCode } from 'src/pages/api/confirm/[code]/repo';
 import { logError } from 'src/pages/api/logError/repo';
 import logger from './logger';
 
@@ -36,11 +38,14 @@ export const getTemplateId = (type: string): string => {
     ? 'd-302fd6359b784bb0983be6328420059b'
     : type === 'resetConfirm'
     ? 'd-02f99049dfcd4fafbd96ecae9ec0b405'
+    : type === 'customerFeedback'
+    ? 'd-5390df6e28734a3d884d08d1431e6d91'
     : '';
 };
 
 enum TemplateIds {
   RESET_CONFIRM = 'resetConfirm',
+  CUSTOMER_FEEDBACK = 'customerFeedback',
 }
 
 const mailer: Mailer = {
@@ -85,6 +90,26 @@ export const sendResetConfirmMail = async (
     domain: domain ?? 'https://degallohoeve.be',
   };
   await mailer.sendMail(TemplateIds.RESET_CONFIRM, resetConfirmTemplateData);
+};
+
+export const sendFeedBackMailsForKlanten = async (
+  klanten: IsKlantCollection[],
+  domain: string | undefined
+) => {
+  const mailsToSend = klanten.map((klant) => ({
+    vnaam: klant.vnaam,
+    amount: klant.inschrijvingen.length,
+    domain: domain ?? 'https://degallohoeve.be',
+    code: createRandomConfirmCode(klant._id, {
+      valid_to: moment().add(1, 'month').toDate(),
+    }),
+  }));
+
+  await Promise.all(
+    mailsToSend.map((templateData) =>
+      mailer.sendMail(TemplateIds.CUSTOMER_FEEDBACK, templateData)
+    )
+  );
 };
 
 export default mailer;

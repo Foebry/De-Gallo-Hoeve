@@ -7,11 +7,11 @@ import {
   ClientSession,
   MongoClientOptions,
 } from 'mongodb';
+import { IsKlantCollection } from 'src/common/domain/klant';
 import { ConfirmCollection } from 'src/types/EntityTpes/ConfirmTypes';
 import { ContentCollection } from 'src/types/EntityTpes/ContentTypes';
 import { ErrorLogCollection } from 'src/types/EntityTpes/ErrorLogTypes';
 import { InschrijvingCollection } from 'src/types/EntityTpes/InschrijvingTypes';
-import { IsKlantCollection } from 'src/types/EntityTpes/KlantTypes';
 import { RasCollection } from 'src/types/EntityTpes/RasTypes';
 import {
   GroepTrainingCollection,
