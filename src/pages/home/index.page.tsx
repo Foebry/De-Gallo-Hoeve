@@ -164,9 +164,6 @@ const Index: React.FC<Props> = () => {
             </div>
           </div>
         </section>
-        {/**
-         * Feedback section
-         */}
         <FeedbackSection feedback={feedback} />
       </Skeleton>
     </>

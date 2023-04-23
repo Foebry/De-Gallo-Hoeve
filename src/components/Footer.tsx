@@ -112,7 +112,8 @@ const Footer: React.FC<Props> = ({}) => {
                   control={control}
                   render={({ field: { value, onChange } }) => (
                     <FormTextBox
-                      label="bericht"
+                      style={{}}
+                      label="Bericht"
                       name="bericht"
                       id="bericht"
                       value={value}
