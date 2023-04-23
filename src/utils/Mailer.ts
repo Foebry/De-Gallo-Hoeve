@@ -40,12 +40,18 @@ export const getTemplateId = (type: string): string => {
     ? 'd-02f99049dfcd4fafbd96ecae9ec0b405'
     : type === 'customerFeedback'
     ? 'd-5390df6e28734a3d884d08d1431e6d91'
+    : type === TemplateIds.CONTACT
+    ? 'd-b46dde21b5e14253b390b49b4ac6c33f'
+    : type === TemplateIds.CONTACT_CONFIRM
+    ? 'd-ed7c6f5b2f164d4c99f5d5cd9de6a6c4'
     : '';
 };
 
 enum TemplateIds {
   RESET_CONFIRM = 'resetConfirm',
   CUSTOMER_FEEDBACK = 'customerFeedback',
+  CONTACT = 'contact',
+  CONTACT_CONFIRM = 'contact-confirm',
 }
 
 const mailer: Mailer = {
@@ -58,6 +64,10 @@ const mailer: Mailer = {
     });
   },
 
+  /**
+   * @deprecated
+   * Should use the sendMail function instead
+   */
   contact: async ({ naam, email, bericht }) => {
     await send({
       to: process.env.MAIL_FROM,
