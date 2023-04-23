@@ -5,18 +5,16 @@ import Skeleton from 'src/components/website/skeleton';
 import { GiCheckMark } from 'react-icons/gi';
 import { getPriveTraining } from 'src/controllers/TrainingController';
 import Head from 'next/head';
+import { useEffect, useState } from 'react';
+import getData from 'src/hooks/useApi';
+import { nanoid } from 'nanoid';
+import FeedbackSection from './components/feedback/section';
+import { IndexData } from './types';
 
-interface IndexProps {
-  prijsExcl: number;
-  kmHeffing: number;
-  gratisVerplaatsingBinnen: number;
-}
+interface Props {}
 
-const Index: React.FC<IndexProps> = ({
-  prijsExcl,
-  kmHeffing,
-  gratisVerplaatsingBinnen,
-}) => {
+const Index: React.FC<Props> = () => {
+  const { prijsExcl, kmHeffing, gratisVerplaatsingBinnen, feedback } = useGetIndexData();
   return (
     <>
       <Head>
@@ -28,6 +26,9 @@ const Index: React.FC<IndexProps> = ({
         ></meta>
       </Head>
       <Skeleton>
+        {/**
+         * Heading section WHO ARE WE
+         */}
         <section className="mb-40 block flex-wrap mt-10 items-center max-w-7xl justify-between mx-auto md:flex md:px-5">
           <div className="mx-auto w-1/2 flex flex-wrap rotate-135 gap-5 self-center md:w-4/12 md:mx-0 md:self-end relative mt-28">
             <div className="w-5/12 max-w-sm aspect-square border-4 border-green-200 overflow-hidden relative images">
@@ -91,6 +92,9 @@ const Index: React.FC<IndexProps> = ({
             </Body>
           </div>
         </section>
+        {/**
+         * Diensten section
+         */}
         <section className="bg-white pb-2 mx-auto md:px-5">
           <div className="px-5 mx-auto  max-w-7xl md:px-0">
             <Title2 className="text-green-200">Onze diensten</Title2>
@@ -160,9 +164,70 @@ const Index: React.FC<IndexProps> = ({
             </div>
           </div>
         </section>
+        <FeedbackSection feedback={feedback} />
       </Skeleton>
     </>
   );
+};
+
+const useGetIndexData = () => {
+  const priveTrainingId = '62fa1f25bacc03711136ad5f';
+  const [indexData, setIndexData] = useState<IndexData>({
+    prijsExcl: 25.0,
+    kmHeffing: 0.3,
+    gratisVerplaatsingBinnen: 10,
+    feedback: [
+      {
+        id: nanoid(5),
+        name: 'Sander',
+        rating: 4.5,
+        feedback:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eu est non nisl euismod condimentum in vel nisi. Donec accumsan neque id tellus eleifend luctus. Curabitur sem metus, auctor vel tempus vitae, facilisis imperdiet nisi.',
+      },
+      {
+        id: nanoid(5),
+        name: 'Seppe',
+        rating: 4.5,
+        feedback:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eu est non nisl euismod condimentum in vel nisi. Donec accumsan neque id tellus eleifend luctus. Curabitur sem metus, auctor vel tempus vitae, facilisis imperdiet nisi.',
+      },
+      {
+        id: nanoid(5),
+        name: 'Julie',
+        rating: 4,
+        feedback:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eu est non nisl euismod condimentum in vel nisi. Donec accumsan neque id tellus eleifend luctus. Curabitur sem metus, auctor vel tempus vitae, facilisis imperdiet nisi.',
+      },
+      {
+        id: nanoid(5),
+        name: 'Sigrid',
+        rating: 5,
+        feedback: 'Goed bezig!',
+      },
+      {
+        id: nanoid(5),
+        name: 'Alfred',
+        rating: 3.5,
+        feedback: 'Nuttige trainingen',
+      },
+    ],
+  });
+
+  useEffect(() => {
+    (async () => {
+      const { data: trainingData, error: trainingError } = await getData(
+        `/api/trainingen/${priveTrainingId}`
+      );
+      if (!trainingError)
+        setIndexData((indexData) => ({ ...indexData, ...trainingData }));
+
+      // const { data: feedbackData, error: feedbackError } = await getData('/api/feedback');
+      // if (!feedbackError)
+      //   setIndexData((indexData) => ({ ...indexData, feedback: feedbackData }));
+    })();
+  }, []);
+
+  return indexData;
 };
 
 export default Index;

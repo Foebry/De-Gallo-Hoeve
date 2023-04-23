@@ -42,6 +42,7 @@ import {
   IsKlantCollection,
   IsNewKlant,
 } from 'src/common/domain/klant';
+import { FEEDBACK } from 'src/utils/db';
 
 export type CONFIRM = 'ConfirmController';
 export type CONTENT = 'ContentController';
@@ -52,6 +53,7 @@ export type RAS = 'RasController';
 export type TRAINING = 'TrainingController';
 export type TRAININGDAY = 'TrainingDayController';
 export type ERRORLOG = 'ErrorLogController';
+export type FEEDBACK = 'FeedbackController';
 
 const createInschrijving = (
   inschrijving: IsInschrijvingBodyInschrijving,
@@ -150,7 +152,8 @@ export type ControllerType =
   | RAS
   | TRAINING
   | TRAININGDAY
-  | ERRORLOG;
+  | ERRORLOG
+  | FEEDBACK;
 
 export type PaginatedControllerType = HOND | INSCHRIJVING | KLANT | RAS;
 

@@ -23,6 +23,8 @@ const getTrainingData = async (req: NextApiRequest, res: NextApiResponse) => {
     image: data.image,
     prijsExcl: data.prijsExcl,
     bullets: data.bullets,
+    kmHeffing: data.kmHeffing,
+    gratisVerplaatsingBinnen: data.gratisVerplaatsingBinnen,
   };
 
   return res.status(200).send(result);

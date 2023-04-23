@@ -15,6 +15,7 @@ import { getTrainingCollection } from './db';
 import { TRAININGDAY } from 'src/controllers/TrainingDayController';
 import { deleteAll as deleteAllErrorLogs } from 'src/pages/api/logError/repo';
 import { IsKlantCollection } from 'src/common/domain/klant';
+import { deleteAll as deleteAllFeedback } from 'src/pages/api/feedback/repo';
 
 export interface Option {
   value: string;
@@ -91,6 +92,7 @@ export const clearAllData = async () => {
     await Factory.getController(TRAINING).deleteAll();
     await deleteAllErrorLogs();
     await Factory.getController(TRAININGDAY).deleteAll();
+    await deleteAllFeedback();
   }
 };
 

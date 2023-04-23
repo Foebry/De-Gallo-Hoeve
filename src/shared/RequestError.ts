@@ -60,6 +60,12 @@ export class InvalidConfirmCodeError extends EntityNotFoundError {
   }
 }
 
+export class LinkExpiredError extends EntityNotFoundError {
+  constructor() {
+    super('LinkExpiredError', 'Deze link is niet meer gelding');
+  }
+}
+
 export class KlantNotFoundError extends EntityNotFoundError {
   constructor(response?: any) {
     super('KlantNotFoundError', 'Klant niet gevonden', response);
@@ -207,6 +213,11 @@ export class KlantAlreadyVerifiedError extends ConflictError {
     super('KlantAlreadyVerifiedError', 'U bent reeds geverifiëerd', {
       errorCode: FrontEndErrorCodes.KlantAlreadyVerified,
     });
+  }
+}
+export class LinkAlreadyUsedError extends ConflictError {
+  constructor() {
+    super('LinkAlreadyUsedError', 'Deze link is niet meer geldig');
   }
 }
 
