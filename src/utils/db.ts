@@ -47,6 +47,20 @@ export const closeClient = async () => {
   } catch (e: any) {}
 };
 
+/**
+ * This function will give you access to a collection of your choice, however, there will be no type-safety on this collection.
+ * Therefor this function should b used ONLY in test cases when you are absolutely certain this is the correct function to use.
+ *
+ * An example of a scenario to use this function: -- test of script to add new key to collection. For customer-feedback, we wanted to implement a configuration to keep track of which email to send.
+ * However the typings were already in place so testing the script was pointless as all newly created test-klanten would already have the required key --
+ *
+ * @returns *untyped* collection
+ */
+export const getUntypedCollection = async (collection: string): Promise<Collection> => {
+  const client = await connectClient();
+  return client.db(DATABASE).collection(collection);
+};
+
 export const getConfirmCollection = async (): Promise<Collection<ConfirmCollection>> => {
   const client = await connectClient();
   return client.db(DATABASE).collection<ConfirmCollection>('confirm');

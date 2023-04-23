@@ -19,7 +19,7 @@ export const handler = async () => {
     logger.error(error.message);
   } finally {
     await closeClient();
-    process.exit();
+    return true;
   }
 };
 

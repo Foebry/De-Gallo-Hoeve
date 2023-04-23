@@ -1,13 +1,14 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getDomain } from 'src/shared/functions';
-import { sendFeedBackMailsForKlanten } from 'src/utils/Mailer';
-import { getKlantenForFeedback } from '../../admin/klanten/repo';
+import { NotAllowedError } from 'src/shared/RequestError';
+import sendFeedbackMails, { CronFeedbackEmailRequest } from './job';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const klanten = await getKlantenForFeedback();
-  await sendFeedBackMailsForKlanten(klanten, getDomain(req));
-
-  return res.status(200).send({ success: true });
+  try {
+    if (req.method !== 'GET') throw new NotAllowedError();
+    return sendFeedbackMails(req as CronFeedbackEmailRequest, res);
+  } catch (err: any) {
+    return res.status(err.status).json(err.response);
+  }
 };
 
 export default handler;

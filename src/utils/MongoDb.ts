@@ -7,7 +7,6 @@ import { CONTENT } from 'src/controllers/ContentController';
 import { INSCHRIJVING } from 'src/controllers/InschrijvingController';
 import { TRAINING } from 'src/controllers/TrainingController';
 import { PriveTrainingCollection } from 'src/types/EntityTpes/TrainingType';
-import { IsKlantCollection } from 'src/types/EntityTpes/KlantTypes';
 import { KlantHond } from 'src/types/EntityTpes/HondTypes';
 import { RasCollection } from 'src/types/EntityTpes/RasTypes';
 import { ERRORLOG } from 'src/types/EntityTpes/ErrorLogTypes';
@@ -15,6 +14,7 @@ import { InschrijvingCollection } from 'src/types/EntityTpes/InschrijvingTypes';
 import { getTrainingCollection } from './db';
 import { TRAININGDAY } from 'src/controllers/TrainingDayController';
 import { deleteAll as deleteAllErrorLogs } from 'src/pages/api/logError/repo';
+import { IsKlantCollection } from 'src/common/domain/klant';
 
 export interface Option {
   value: string;

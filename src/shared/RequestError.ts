@@ -209,3 +209,15 @@ export class KlantAlreadyVerifiedError extends ConflictError {
     });
   }
 }
+
+export class ForbiddenError extends HttpError {
+  constructor(name: string, message: string, response?: any) {
+    super(name, message, response, 403);
+  }
+}
+
+export class InsecureCronRequestError extends ForbiddenError {
+  constructor() {
+    super('InsecrureCronRequestError', 'invalid security-key');
+  }
+}

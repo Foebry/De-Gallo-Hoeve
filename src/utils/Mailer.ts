@@ -1,5 +1,5 @@
-import { IsKlantCollection } from '@/types/EntityTpes/KlantTypes';
 import moment from 'moment';
+import { getNextTresholdAmount, IsKlantCollection } from 'src/common/domain/klant';
 import { createRandomConfirmCode } from 'src/pages/api/confirm/[code]/repo';
 import { logError } from 'src/pages/api/logError/repo';
 import logger from './logger';
@@ -97,11 +97,12 @@ export const sendFeedBackMailsForKlanten = async (
   domain: string | undefined
 ) => {
   const mailsToSend = klanten.map((klant) => ({
+    email: klant.email,
     vnaam: klant.vnaam,
-    amount: klant.inschrijvingen.length,
+    amount: getNextTresholdAmount(klant),
     domain: domain ?? 'https://degallohoeve.be',
     code: createRandomConfirmCode(klant._id, {
-      valid_to: moment().add(1, 'month').toDate(),
+      valid_to: moment().add(1, 'year').toDate(),
     }),
   }));
 

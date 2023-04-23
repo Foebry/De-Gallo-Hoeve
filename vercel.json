@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/cron/sendFeedbackMails",
+      "path": "/api/cron/sendFeedbackMails?key=cron_feedback_email",
       "schedule": "0 12 * * *"
     }
   ]
