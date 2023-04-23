@@ -67,7 +67,7 @@ export const generateRegisterPayloadFromKlantData = (klant: IsKlantCollection) =
     ras: hond.ras,
     geboortedatum: hond.geboortedatum,
   })),
-  feedbackConfiguration: createDefaultFeedbackConfiguration(),
+  feedbackConfiguration: klant.feedbackConfiguration,
   csrf: generateCsrf(),
 });
 

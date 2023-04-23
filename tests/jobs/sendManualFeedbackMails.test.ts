@@ -18,9 +18,9 @@ describe('JOB - sendFeedbackMails', () => {
   const request = getRequest(handler);
   const mailMock = jest.spyOn(mailer, 'sendMail').mockImplementation();
   jest.spyOn(logger, 'info').mockImplementation();
-  beforeAll(async () => clearAllData());
+  beforeAll(async () => await clearAllData());
 
-  afterEach(async () => clearAllData());
+  afterEach(async () => await clearAllData());
 
   afterAll(async () => {
     await clearAllData();

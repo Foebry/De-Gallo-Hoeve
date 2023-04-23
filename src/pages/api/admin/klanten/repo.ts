@@ -6,8 +6,12 @@ export const getKlantenForFeedback = async () => {
   const inschrijvingCollection = await getInschrijvingCollection();
   const klantCollection = await getKlantCollection();
 
-  const yesterday = new Date(moment().subtract(1, 'day').toISOString().split('T')[0]);
-  const today = new Date(moment().toDate().toISOString().split('T')[0]);
+  const yesterday = new Date(
+    `${moment().subtract(1, 'day').toISOString().split('T')[0]}T00:00:00.000Z`
+  );
+  const today = new Date(
+    `${moment().toDate().toISOString().split('T')[0]}T00:00:00.000Z`
+  );
   const inschrijvingFilter = { datum: { $gt: yesterday, $lt: today } };
 
   const yesterdayInschrijvingen = await inschrijvingCollection
