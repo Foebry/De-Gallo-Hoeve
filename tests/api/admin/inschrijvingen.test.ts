@@ -21,7 +21,9 @@ import { KLANT } from 'src/controllers/KlantController';
 import { INSCHRIJVING } from 'src/controllers/InschrijvingController';
 
 describe('/admin/inschrijvingen', () => {
-  beforeEach(clearAllData);
+  beforeEach(async () => {
+    await clearAllData();
+  });
   afterAll(async () => {
     await clearAllData();
     await closeClient();

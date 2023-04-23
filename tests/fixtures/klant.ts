@@ -43,7 +43,7 @@ export const createRandomKlant = (options?: RandomKlantOptions): IsKlantCollecti
     created_at: now,
     updated_at: now,
     verified_at: options?.verified
-      ? faker.date.between(now, faker.date.soon(10))
+      ? faker.date.between(now, moment(now).add(10, 'days').toDate())
       : undefined,
     deleted_at: undefined,
     feedbackConfiguration: createDefaultFeedbackConfiguration(),

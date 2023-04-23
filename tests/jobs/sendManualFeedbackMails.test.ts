@@ -12,10 +12,12 @@ import mailer from 'src/utils/Mailer';
 import { faker } from '@faker-js/faker';
 import { createBearer } from 'src/services/Authenticator';
 import moment from 'moment';
+import logger from 'src/utils/logger';
 
 describe('JOB - sendFeedbackMails', () => {
   const request = getRequest(handler);
   const mailMock = jest.spyOn(mailer, 'sendMail').mockImplementation();
+  jest.spyOn(logger, 'info').mockImplementation();
   beforeAll(async () => clearAllData());
 
   afterEach(async () => clearAllData());

@@ -1,7 +1,3 @@
-import { createServer, IncomingMessage, RequestListener } from 'http';
-import { NextApiHandler } from 'next';
-import request from 'supertest';
-import { apiResolver } from 'next/dist/server/api-utils/node';
 import { clearAllData } from 'src/utils/MongoDb';
 import { POST_INSCHRIJVING } from 'src/types/apiTypes';
 import handler from 'src/pages/api/inschrijvingen.page';
@@ -23,17 +19,9 @@ import {
 } from 'tests/fixtures/inschrijving';
 import { closeClient } from 'src/utils/db';
 import { getRequest } from 'tests/helpers';
-import logger from 'src/utils/logger';
 import { createRandomTrainingDays } from 'tests/fixtures/trainingDay';
 import { defaultTrainingTimeSlots } from 'src/mappers/trainingDays';
 import { TRAININGDAY } from 'src/controllers/TrainingDayController';
-import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
-import {
-  getCurrentTime,
-  toLocalTime,
-  toReadableDate,
-  unique,
-} from 'src/shared/functions';
 
 describe('/inschrijving', () => {
   beforeEach(async () => await clearAllData());

@@ -10,14 +10,15 @@ import { createRandomKlant } from 'tests/fixtures/klant';
 import handler from 'src/pages/api/cron/sendFeedbackMails/index.page';
 import { getRequest } from 'tests/helpers';
 import mailer from 'src/utils/Mailer';
-import { faker } from '@faker-js/faker';
+import logger from 'src/utils/logger';
 
 describe('JOB - sendFeedbackMails', () => {
   const request = getRequest(handler);
+  jest.spyOn(logger, 'info').mockImplementation();
   const mailMock = jest.spyOn(mailer, 'sendMail').mockImplementation();
-  beforeAll(async () => clearAllData());
+  beforeAll(async () => await clearAllData());
 
-  afterEach(async () => clearAllData());
+  afterEach(async () => await clearAllData());
 
   afterAll(async () => {
     await clearAllData();
