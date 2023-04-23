@@ -1,7 +1,7 @@
 import { NextApiResponse } from 'next';
 import { getKlantById, setVerified } from 'src/controllers/KlantController';
 import { logError } from '../../logError/repo';
-import { getKlantIdFromConfirmCode } from './repo';
+import { getIdAndExpirationTimeFromCode } from './repo';
 import { ConfirmRequest } from './schemas';
 import { FrontEndErrorCodes } from 'src/shared/functions';
 
@@ -9,7 +9,7 @@ export const confirm = async (req: ConfirmRequest, res: NextApiResponse) => {
   try {
     const { code } = req.query;
 
-    const [klant_id, validTo] = getKlantIdFromConfirmCode(code);
+    const [klant_id, validTo] = getIdAndExpirationTimeFromCode(code);
     const klant = await getKlantById(klant_id);
     if (!klant) return res.redirect(`/error?${FrontEndErrorCodes.KlantNotFound}`);
 

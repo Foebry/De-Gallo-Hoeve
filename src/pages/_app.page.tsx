@@ -7,6 +7,7 @@ import Head from 'next/head';
 import TrainingDayProvider from 'src/context/TrainingDayContext';
 import Modal from 'src/components/Modal';
 import ModalProvider from 'src/context/ModalContext';
+import FeedbackProvider from 'src/context/FeedbackContext';
 import { ErrorBoundary } from 'react-error-boundary';
 import { FallBack } from 'src/pages/error.page';
 import useMutation from 'src/hooks/useMutation';
@@ -34,17 +35,19 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Head>
         <link rel="icon" type="image/x-icon" href="/favicon.ico"></link>
       </Head>
-      <ModalProvider>
-        <ErrorBoundary FallbackComponent={FallBack} onError={errorHandler}>
-          <TrainingDayProvider>
-            <AppProvider>
-              <Modal />
-              <ToastContainer position="top-right" />
-              <Component {...pageProps} />
-            </AppProvider>
-          </TrainingDayProvider>
-        </ErrorBoundary>
-      </ModalProvider>
+      <FeedbackProvider>
+        <ModalProvider>
+          <ErrorBoundary FallbackComponent={FallBack} onError={errorHandler}>
+            <TrainingDayProvider>
+              <AppProvider>
+                <Modal />
+                <ToastContainer position="top-right" />
+                <Component {...pageProps} />
+              </AppProvider>
+            </TrainingDayProvider>
+          </ErrorBoundary>
+        </ModalProvider>
+      </FeedbackProvider>
     </>
   );
 }

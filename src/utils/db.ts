@@ -13,6 +13,7 @@ import { ErrorLogCollection } from 'src/types/EntityTpes/ErrorLogTypes';
 import { InschrijvingCollection } from 'src/types/EntityTpes/InschrijvingTypes';
 import { IsKlantCollection } from 'src/types/EntityTpes/KlantTypes';
 import { RasCollection } from 'src/types/EntityTpes/RasTypes';
+import { FeedBackCollection } from 'src/entities/Feedback';
 import {
   GroepTrainingCollection,
   PriveTrainingCollection,
@@ -27,6 +28,7 @@ let client: MongoClient | null;
 
 const { URI, MONGODB_DATABASE: DATABASE } = process.env;
 const options: MongoClientOptions = {};
+export const FEEDBACK = 'feedbackController';
 
 export const connectClient = async () => {
   if (!client) {
@@ -96,6 +98,13 @@ export const getTrainingDaysCollection = async (): Promise<
 > => {
   const client = await connectClient();
   return client.db(DATABASE).collection<TrainingDaysCollection>('trainingDays');
+};
+
+export const getFeedbackCollection = async (): Promise<
+  Collection<FeedBackCollection>
+> => {
+  const client = await connectClient();
+  return client.db(DATABASE).collection<FeedBackCollection>('feedback');
 };
 
 export const startTransaction = (): TransactionOptions => {

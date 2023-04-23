@@ -1,8 +1,9 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { toast } from 'react-toastify';
 import { InschrijvingErrorInterface } from 'src/pages/inschrijving/index.page';
 import { LoginErrorInterface } from 'src/pages/login/index.page';
 import moment from 'moment';
+import { useState } from 'react';
 
 interface ApiError {
   response: {
@@ -14,29 +15,38 @@ type FormError = InschrijvingErrorInterface | LoginErrorInterface;
 
 type REQUESTMETHOD = 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
-const useMutation = (
+const useMutation = <T>(
   errors?: any,
   setErrors?: React.Dispatch<React.SetStateAction<any>>
 ) => {
-  const executerFunc = async (
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const executerFunc = async <T>(
     endpoint: string,
     payload: any,
-    options?: {
+    options?: Partial<{
       method: REQUESTMETHOD;
-    }
-  ) => {
+      params: any;
+    }>
+  ): Promise<{
+    data: any | undefined;
+    loading: boolean;
+    error: (Partial<T> & { message: string; code: number }) | undefined;
+  }> => {
     try {
+      setIsLoading(true);
       const { data } = await axios(endpoint, {
         method: options?.method ?? 'POST',
         data: payload,
         withCredentials: true,
+        params: options?.params ?? undefined,
       });
-      return { data, error: undefined };
+      setIsLoading(false);
+      return { data, error: undefined, loading: isLoading };
     } catch (error: any) {
       const data = { ...error.response.data, code: error.response.status };
-      setErrors?.({ ...errors, ...data });
+      setIsLoading(false);
       // toast.error(data.message);
-      return { data: undefined, error: data };
+      return { data: undefined, error: data, loading: isLoading };
     }
   };
   return executerFunc;

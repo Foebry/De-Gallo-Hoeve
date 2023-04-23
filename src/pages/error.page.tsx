@@ -47,7 +47,7 @@ const useGetErrorInfo = (router: NextRouter) => {
         { method: 'PUT' }
       );
       if (data) router.push('/');
-      else if (error) router.push(`/error?${error.errorCode}&code=${confirmCode}`);
+      else if (error) router.push(`/error?${error.code}&code=${confirmCode}`);
     } catch (e: any) {
       if (process.env.NODE_ENV === 'development') logger.error(e);
     }

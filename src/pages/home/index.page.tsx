@@ -160,6 +160,7 @@ const Index: React.FC<IndexProps> = ({
             </div>
           </div>
         </section>
+        <section className="bg-white pb-2 mx-auto md:px-5"></section>
       </Skeleton>
     </>
   );
