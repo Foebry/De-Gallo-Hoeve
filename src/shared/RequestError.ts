@@ -215,9 +215,20 @@ export class KlantAlreadyVerifiedError extends ConflictError {
     });
   }
 }
-
 export class LinkAlreadyUsedError extends ConflictError {
   constructor() {
     super('LinkAlreadyUsedError', 'Deze link is niet meer geldig');
+  }
+}
+
+export class ForbiddenError extends HttpError {
+  constructor(name: string, message: string, response?: any) {
+    super(name, message, response, 403);
+  }
+}
+
+export class InsecureCronRequestError extends ForbiddenError {
+  constructor() {
+    super('InsecrureCronRequestError', 'invalid security-key');
   }
 }

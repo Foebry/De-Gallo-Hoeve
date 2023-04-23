@@ -11,7 +11,6 @@ import { registerSchema } from 'src/types/schemas';
 import Factory, { getController } from 'src/services/Factory';
 import { getKlantByEmail, KLANT } from 'src/controllers/KlantController';
 import { IsRegisterBody } from 'src/types/requestTypes';
-import { startSession, startTransaction } from 'src/utils/db';
 import { getDomain } from 'src/shared/functions';
 import { logError } from '../logError/repo';
 import { createRandomConfirmCode } from '../confirm/[code]/repo';

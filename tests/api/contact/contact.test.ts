@@ -4,11 +4,14 @@ import { createRandomKlant } from 'tests/fixtures/klant';
 import { faker } from '@faker-js/faker';
 import Mailer from 'src/utils/Mailer';
 import { generateCsrf } from 'src/services/Validator';
-import { closeClient } from 'src/utils/db';
 import * as repo from 'src/pages/api/logError/repo';
+import { closeClient } from 'src/utils/db';
 
 describe('/contact', () => {
-  afterAll(() => jest.clearAllMocks());
+  afterAll(async () => {
+    jest.clearAllMocks();
+    await closeClient();
+  });
 
   beforeEach(() => jest.clearAllMocks());
 

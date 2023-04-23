@@ -1,12 +1,12 @@
 import { ClientSession, ObjectId, WithId } from 'mongodb';
 import inschrijvingController, { getAllInschrijvingen } from './InschrijvingController';
 import { InternalServerError, TransactionError } from '../shared/RequestError';
-import { IsKlantCollection } from '../types/EntityTpes/KlantTypes';
 import { InschrijvingCollection } from '../types/EntityTpes/InschrijvingTypes';
 import { HondCollection } from 'src/types/EntityTpes/HondTypes';
 import { getKlantCollection } from 'src/utils/db';
 import { getCurrentTime } from 'src/shared/functions';
 import bcrypt from 'bcrypt';
+import { IsKlantCollection } from 'src/common/domain/klant';
 
 export const getAllKlanten = async (
   includeDeleted: boolean = false

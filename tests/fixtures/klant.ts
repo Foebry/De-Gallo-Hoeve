@@ -1,9 +1,10 @@
 import { HondCollection } from '@/types/EntityTpes/HondTypes';
-import { IsKlantCollection } from '@/types/EntityTpes/KlantTypes';
 import { faker } from '@faker-js/faker';
 import moment from 'moment';
 import { ObjectId } from 'mongodb';
+import { IsKlantCollection } from 'src/common/domain/klant';
 import { getKlantByEmail } from 'src/controllers/KlantController';
+import { createDefaultFeedbackConfiguration } from 'src/services/Factory';
 import { generateCsrf } from 'src/services/Validator';
 import { capitalize, getCurrentTime } from 'src/shared/functions';
 import { IsRegisterPayload, IsRegisterResponseBody } from 'tests/api/auth/types';
@@ -42,9 +43,10 @@ export const createRandomKlant = (options?: RandomKlantOptions): IsKlantCollecti
     created_at: now,
     updated_at: now,
     verified_at: options?.verified
-      ? faker.date.between(now, faker.date.soon(10))
+      ? faker.date.between(now, moment(now).add(10, 'days').toDate())
       : undefined,
     deleted_at: undefined,
+    feedbackConfiguration: createDefaultFeedbackConfiguration(),
   };
 };
 
@@ -65,6 +67,7 @@ export const generateRegisterPayloadFromKlantData = (klant: IsKlantCollection) =
     ras: hond.ras,
     geboortedatum: hond.geboortedatum,
   })),
+  feedbackConfiguration: klant.feedbackConfiguration,
   csrf: generateCsrf(),
 });
 

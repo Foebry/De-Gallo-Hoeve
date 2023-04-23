@@ -63,7 +63,7 @@ describe('/', () => {
       await getController(KLANT).save(klant);
 
       const expiration = toLocalTime(
-        moment(getCurrentTime().toISOString()).add(1, 'month').toString()
+        moment(getCurrentTime().toISOString()).add(1, 'month').toISOString()
       );
       const feedbackCode = [
         `${expiration.getTime().toString(36)}`,

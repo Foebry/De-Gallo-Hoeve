@@ -1,5 +1,5 @@
-import { Geslacht } from "./EntityTpes/HondTypes";
-import { TrainingType } from "./EntityTpes/TrainingType";
+import { Geslacht } from './EntityTpes/HondTypes';
+import { TrainingType } from './EntityTpes/TrainingType';
 
 export interface IsLoginBody {
   email: string;

@@ -1,6 +1,6 @@
-import { ObjectId } from "mongodb";
+import { ObjectId } from 'mongodb';
 
-export type Geslacht = "Teef" | "Reu";
+export type Geslacht = 'Teef' | 'Reu';
 
 export interface HondCollection {
   _id: ObjectId;

@@ -1,12 +1,12 @@
 name: Run tests
-on: 
+on:
   pull_request:
     branches: [main, develop, accept]
   push:
     branches: [main, develop, accept]
 
 jobs:
-  Explore-GitHub-Actions:
+  Tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -14,7 +14,7 @@ jobs:
       - name: Setup Node-Environment
         uses: actions/setup-node@v3.5.1
         with:
-          node-version: "14.17.6"
+          node-version: '14.17.6'
       - name: Install Packages
         run: npm install
       - name: Integration Tests
@@ -23,3 +23,4 @@ jobs:
           URI: ${{secrets.URI}}
           MONGO_DATABASE: ${{secrets.MONGO_DATABASE}}
           MAIL_TO: ${{secrets.MAIL_TO}}
+          CRON_FEEDBACK_EMAIL_KEY: ${{secrets.CRON_FEEDBACK_EMAIL_KEY}}

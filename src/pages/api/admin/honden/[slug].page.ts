@@ -10,8 +10,6 @@ import {
 } from 'src/shared/RequestError';
 import { ObjectId } from 'mongodb';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { closeClient } from 'src/utils/db';
-import { adminApi } from 'src/services/Authenticator';
 import { logError } from '../../logError/repo';
 
 export interface HondDetailResponse {

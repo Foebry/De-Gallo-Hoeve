@@ -18,7 +18,6 @@ import TrainingController, {
   IsTrainingController,
   TRAINING,
 } from '../controllers/TrainingController';
-import { IsKlantCollection } from '../types/EntityTpes/KlantTypes';
 import { IsInschrijvingBodyInschrijving, IsNewKlantData } from '../types/requestTypes';
 import brcypt from 'bcrypt';
 import { capitalize, getCurrentTime, toLocalTime } from '../shared/functions';
@@ -38,6 +37,11 @@ import TrainingDayController, {
 } from 'src/controllers/TrainingDayController';
 import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
 import { createRandomConfirmCode } from 'src/pages/api/confirm/[code]/repo';
+import {
+  FeedbackConfiguration,
+  IsKlantCollection,
+  IsNewKlant,
+} from 'src/common/domain/klant';
 import { FEEDBACK } from 'src/utils/db';
 
 export type CONFIRM = 'ConfirmController';
@@ -73,18 +77,17 @@ const createConfirm = (confirm: NewConfirm): ConfirmCollection => ({
   valid_to: moment(confirm.created_at).local().add(1, 'day').toDate(),
 });
 
-const createHond = (hond: NewHond) => ({
+const createHond = (hond: NewHond): HondCollection => ({
   _id: new ObjectId(),
   naam: capitalize(hond.naam),
   geslacht: hond.geslacht,
-  // geboortedatum: moment(hond.geboortedatum).local().toDate(),
   geboortedatum: toLocalTime(hond.geboortedatum),
   ras: hond.ras,
   created_at: getCurrentTime(),
   updated_at: getCurrentTime(),
 });
 
-const createKlant = async (klant: IsNewKlantData): Promise<IsKlantCollection> => ({
+const createKlant = async (klant: IsNewKlant): Promise<IsKlantCollection> => ({
   _id: new ObjectId(),
   roles: '0',
   verified: false,
@@ -103,7 +106,16 @@ const createKlant = async (klant: IsNewKlantData): Promise<IsKlantCollection> =>
   gemeente: capitalize(klant.gemeente),
   postcode: klant.postcode,
   honden: klant.honden.map((hond) => createHond(hond)),
+  feedbackConfiguration: createDefaultFeedbackConfiguration(),
 });
+
+export const createDefaultFeedbackConfiguration = (): FeedbackConfiguration => {
+  const feedbackAfterTrainings = [1, 5, 10, 20, 50, 100];
+  return feedbackAfterTrainings.map((value) => ({
+    trainingCount: value,
+    triggered: false,
+  }));
+};
 
 const createRas = (ras: NewRas): RasCollection => ({
   _id: new ObjectId(),
