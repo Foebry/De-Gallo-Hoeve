@@ -13,7 +13,7 @@ interface ApiError {
 
 type FormError = InschrijvingErrorInterface | LoginErrorInterface;
 
-type REQUESTMETHOD = 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+type REQUESTMETHOD = 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'GET';
 
 const useMutation = <T>(
   errors?: any,
