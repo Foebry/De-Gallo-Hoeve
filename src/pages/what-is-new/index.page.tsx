@@ -52,6 +52,7 @@ const ChangeLog: React.FC<Props> = () => {
                 href="/error"
                 target="_blank"
                 className="text-green-200 underline cursor-pointer"
+                rel="noreferrer"
               >
                 algemene error-pagina
               </a>
@@ -61,6 +62,7 @@ const ChangeLog: React.FC<Props> = () => {
                 href={`/error?${FrontEndErrorCodes.KlantNotFound}`}
                 target="_blank"
                 className="text-green-200 underline cursor-pointer"
+                rel="noreferrer"
               >
                 foutieve bevesitingslink geklikt
               </a>
@@ -70,6 +72,7 @@ const ChangeLog: React.FC<Props> = () => {
                 href={`/error?${FrontEndErrorCodes.ExpiredConfirmCode}`}
                 target="_blank"
                 className="text-green-200 underline cursor-pointer"
+                rel="noreferrer"
               >
                 Bevestigings-link is vervallen
               </a>
@@ -96,6 +99,7 @@ const ChangeLog: React.FC<Props> = () => {
                 href="/customer-feedback/a"
                 target="_blank"
                 className="text-green-200 underline cursor-pointer"
+                rel="noreferrer"
               >
                 feedback-formulier
               </a>{' '}
