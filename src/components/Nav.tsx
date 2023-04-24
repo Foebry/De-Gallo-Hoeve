@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { ADMIN, INDEX, LOGIN, REGISTER } from "../types/linkTypes";
-import { Title3 } from "./Typography/Typography";
-import Image from "next/image";
-import { useRouter } from "next/router";
-import NavLink from "./NavLink";
-import { parseCookies } from "nookies";
-import jwt from "jsonwebtoken";
-import { Hamburger } from "./Hamburger";
-import { LOGOUT } from "../types/apiTypes";
-import useMutation from "../hooks/useMutation";
+import React, { useEffect, useState } from 'react';
+import { ADMIN, INDEX, LOGIN, REGISTER, CHANGELOG } from '../types/linkTypes';
+import { Title3 } from './Typography/Typography';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import NavLink from './NavLink';
+import { parseCookies } from 'nookies';
+import jwt from 'jsonwebtoken';
+import { Hamburger } from './Hamburger';
+import { LOGOUT } from '../types/apiTypes';
+import useMutation from '../hooks/useMutation';
 
 export const Nav = () => {
   const router = useRouter();
@@ -18,7 +18,7 @@ export const Nav = () => {
   const logout = useMutation();
 
   const onLogout = async () => {
-    await logout(LOGOUT, {}, { method: "DELETE" });
+    await logout(LOGOUT, {}, { method: 'DELETE' });
     router.push(INDEX);
   };
 
@@ -27,7 +27,7 @@ export const Nav = () => {
     const secret = process.env.NEXT_PUBLIC_COOKIE_SECRET;
     if (token) {
       const verifiedToken = jwt.verify(token, `${secret}`, {
-        algorithms: ["RS256", "HS256"],
+        algorithms: ['RS256', 'HS256'],
       });
       const payload = JSON.parse(JSON.stringify(verifiedToken));
       setUserName(payload.name);
@@ -57,6 +57,7 @@ export const Nav = () => {
             <Title3>De Gallo-Hoeve</Title3>
           </div>
         </div>
+        {process.env.NODE_ENV !== "production" && (<NavLink href={CHANGELOG} label="nieuw" />)}
         {userName ? (
           <div className="flex gap-10 items-center">
             <div className="hidden xs:block uppercase text-green-200 text-lg font-medium">

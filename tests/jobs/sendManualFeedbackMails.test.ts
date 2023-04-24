@@ -89,12 +89,12 @@ describe('JOB - sendFeedbackMails', () => {
       klantWithOneInschrijvingInFuture,
     ];
 
-    const trainingenKlantA = createRandomInschrijvingen(klantTrainingCount1, 1);
-    const trainingenKlantB = createRandomInschrijvingen(klantTrainingCount5, 5);
-    const trainingenKlantC = createRandomInschrijvingen(klantTrainingCount10, 10);
-    const trainingenKlantD = createRandomInschrijvingen(klantTrainingCount20, 20);
+    const trainingenKlantA = createRandomInschrijvingen(klantTrainingCount1, 2);
+    const trainingenKlantB = createRandomInschrijvingen(klantTrainingCount5, 6);
+    const trainingenKlantC = createRandomInschrijvingen(klantTrainingCount10, 11);
+    const trainingenKlantD = createRandomInschrijvingen(klantTrainingCount20, 21);
     const trainingenKlantE = createRandomInschrijvingen(klantTrainingCount49, 49);
-    const trainingenKlantF = createRandomInschrijvingen(klantTrainingCount100, 100);
+    const trainingenKlantF = createRandomInschrijvingen(klantTrainingCount100, 101);
     const allInschrijvingen = [
       ...trainingenKlantA,
       ...trainingenKlantB,
@@ -138,12 +138,21 @@ describe('JOB - sendFeedbackMails', () => {
     await inschrijivingController.saveMany([...allInschrijvingen, ...trainingenKlantG]);
     await klantController.saveMany(allKlanten);
 
+    const klantenToReceiveFeedbackMail = [
+      klantTrainingCount1,
+      klantTrainingCount5,
+      klantTrainingCount10,
+      klantTrainingCount20,
+      klantTrainingCount49,
+      klantTrainingCount100,
+    ];
+
     const { body } = await request
       .get('/api/cron/sendManualFeedbackMails')
       .auth(bearer, { type: 'bearer' })
       .send();
     expect(body).toEqual({ success: true });
-    expect(mailMock).toHaveBeenCalledTimes(6);
+    expect(mailMock).toHaveBeenCalledTimes(klantenToReceiveFeedbackMail.length);
     expect(mailMock).toHaveBeenCalledWith(
       'customerFeedback',
       expect.objectContaining({

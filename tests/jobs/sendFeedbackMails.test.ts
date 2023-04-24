@@ -66,12 +66,12 @@ describe('JOB - sendFeedbackMails', () => {
       klantTrainingCount100,
     ];
 
-    const trainingenKlantA = createRandomInschrijvingen(klantTrainingCount1, 1);
-    const trainingenKlantB = createRandomInschrijvingen(klantTrainingCount5, 5);
-    const trainingenKlantC = createRandomInschrijvingen(klantTrainingCount10, 10);
-    const trainingenKlantD = createRandomInschrijvingen(klantTrainingCount20, 20);
-    const trainingenKlantE = createRandomInschrijvingen(klantTrainingCount50, 50);
-    const trainingenKlantF = createRandomInschrijvingen(klantTrainingCount100, 100);
+    const trainingenKlantA = createRandomInschrijvingen(klantTrainingCount1, 2);
+    const trainingenKlantB = createRandomInschrijvingen(klantTrainingCount5, 6);
+    const trainingenKlantC = createRandomInschrijvingen(klantTrainingCount10, 11);
+    const trainingenKlantD = createRandomInschrijvingen(klantTrainingCount20, 21);
+    const trainingenKlantE = createRandomInschrijvingen(klantTrainingCount50, 51);
+    const trainingenKlantF = createRandomInschrijvingen(klantTrainingCount100, 101);
     const allInschrijvingen = [
       ...trainingenKlantA,
       ...trainingenKlantB,
@@ -116,19 +116,19 @@ describe('JOB - sendFeedbackMails', () => {
         [1, 5].includes(setting.trainingCount) ? { ...setting, triggered: true } : setting
       );
     klantTrainingCount20.feedbackConfiguration =
-      klantTrainingCount10.feedbackConfiguration.map((setting) =>
+      klantTrainingCount20.feedbackConfiguration.map((setting) =>
         [1, 5, 10].includes(setting.trainingCount)
           ? { ...setting, triggered: true }
           : setting
       );
     klantTrainingCount50.feedbackConfiguration =
-      klantTrainingCount10.feedbackConfiguration.map((setting) =>
+      klantTrainingCount50.feedbackConfiguration.map((setting) =>
         [1, 5, 10, 20].includes(setting.trainingCount)
           ? { ...setting, triggered: true }
           : setting
       );
     klantTrainingCount100.feedbackConfiguration =
-      klantTrainingCount10.feedbackConfiguration.map((setting) =>
+      klantTrainingCount100.feedbackConfiguration.map((setting) =>
         [1, 5, 10, 20, 50].includes(setting.trainingCount)
           ? { ...setting, triggered: true }
           : setting
@@ -137,13 +137,22 @@ describe('JOB - sendFeedbackMails', () => {
     await inschrijivingController.saveMany(allInschrijvingen);
     await klantController.saveMany(allKlanten);
 
+    const klantenToReceiveEmail = [
+      klantTrainingCount1,
+      klantTrainingCount5,
+      klantTrainingCount10,
+      klantTrainingCount20,
+      klantTrainingCount50,
+      klantTrainingCount100,
+    ];
+
     const { body } = await request
       .get('/api/cron/sendFeedbackMails')
       .query({ key: process.env.CRON_FEEDBACK_EMAIL_KEY })
       .send()
       .expect(200);
     expect(body).toEqual({ success: true });
-    expect(mailMock).toHaveBeenCalledTimes(6);
+    expect(mailMock).toHaveBeenCalledTimes(klantenToReceiveEmail.length);
     expect(mailMock).toHaveBeenCalledWith(
       'customerFeedback',
       expect.objectContaining({

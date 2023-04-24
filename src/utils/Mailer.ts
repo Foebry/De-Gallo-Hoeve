@@ -107,7 +107,9 @@ export const sendFeedBackMailsForKlanten = async (
   domain: string | undefined
 ) => {
   const mailsToSend = klanten.map((klant) => ({
-    email: klant.email,
+    email: ['production', 'test'].includes(process.env.NODE_ENV)
+      ? klant.email
+      : process.env.MAIL_TO,
     vnaam: klant.vnaam,
     amount: getNextTresholdAmount(klant),
     domain: domain ?? 'https://degallohoeve.be',

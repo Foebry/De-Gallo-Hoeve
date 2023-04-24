@@ -4,7 +4,7 @@ import { getInschrijvingenByIds } from 'src/controllers/InschrijvingController';
 import { getAllKlanten } from 'src/controllers/KlantController';
 
 export const nextThresholdShouldTrigger = (value: IsKlantCollection): boolean => {
-  const trainingAmount = value.inschrijvingen.length;
+  const trainingAmount = value.inschrijvingen.length - 1;
   const feedbackConfig = value.feedbackConfiguration;
   const treshold100 = feedbackConfig.find((setting) => setting.trainingCount === 100);
   const treshold50 = feedbackConfig.find((setting) => setting.trainingCount === 50);
