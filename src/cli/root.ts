@@ -15,11 +15,10 @@ const setup = async () => {
   );
 
   if (!args['target-env']) {
-    logger.error(
-      ' Please pick a target environment. Target environments can be [test - develop - accept - production]'
+    logger.warning(
+      ' No target environment was picked, falling back to test-environment. Target environments can be [test - develop - accept - production]'
     );
-
-    process.exit();
+    args['target-env'] = 'test';
   }
   require('dotenv').config({ path: `.env.${args['target-env']}.local` });
   if (!process.env.NODE_ENV) {

@@ -1,8 +1,9 @@
+import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { Nav } from 'src/components/Nav';
-import { EbmeddedLink, Title2, Title3 } from 'src/components/Typography/Typography';
+import { Title2, Title3 } from 'src/components/Typography/Typography';
 
 type Props = {};
 
@@ -10,6 +11,9 @@ const NotFoundPage: React.FC<Props> = ({}) => {
   const router = useRouter();
   return (
     <>
+      <Head>
+        <title>De Gallo-hoeve - 404</title>
+      </Head>
       <Nav />
       <div className="flex gap-20 justify-center py-72">
         <div>

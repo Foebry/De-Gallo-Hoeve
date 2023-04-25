@@ -1,19 +1,19 @@
-import { Title1, Body, Title2 } from "./Typography/Typography";
+import { Title1, Body, Title2 } from './Typography/Typography';
 import {
   IoLogoFacebook,
   IoLogoInstagram,
   IoMdMail,
   IoMdPhonePortrait,
-} from "react-icons/io";
-import Form from "./form/Form";
-import FormInput from "./form/FormInput";
-import { Controller, useForm } from "react-hook-form";
-import Link from "next/link";
-import { toast } from "react-toastify";
-import { useState } from "react";
-import useMutation from "../hooks/useMutation";
-import { CONTACTAPI } from "../types/apiTypes";
-import { FormTextBox } from "./form/FormTextBox";
+} from 'react-icons/io';
+import Form from './form/Form';
+import FormInput from './form/FormInput';
+import { Controller, useForm } from 'react-hook-form';
+import Link from 'next/link';
+import { toast } from 'react-toastify';
+import { useState } from 'react';
+import useMutation from '../hooks/useMutation';
+import { CONTACTAPI } from '../types/apiTypes';
+import { FormTextBox } from './form/FormTextBox';
 
 interface Props {}
 
@@ -35,12 +35,15 @@ const Footer: React.FC<Props> = ({}) => {
     const payload = values;
     if (!disabled) {
       setDisabled(() => true);
-      const { data, error } = await contact(CONTACTAPI, { ...payload });
+      const { data, error } = await contact(CONTACTAPI, {
+        ...payload,
+        csrf: 'MmJiM2pwNHQ1dg==$c0tKJd-G-aePggUzDLC6H28lsl2iNCjnGBQ5i0vpzdw',
+      });
       if (data) {
         toast.success(data.message);
-        setValue("naam", "");
-        setValue("email", "");
-        setValue("bericht", "");
+        setValue('naam', '');
+        setValue('email', '');
+        setValue('bericht', '');
       }
       setDisabled(() => false);
     }
@@ -58,9 +61,7 @@ const Footer: React.FC<Props> = ({}) => {
             </Body>
             <Body className="flex gap-2 items-center">
               <IoMdMail className="text-green-200 text-2xl" />
-              <Link href="mailto:info@degallohoeve.be">
-                info@degallohoeve.be
-              </Link>
+              <Link href="mailto:info@degallohoeve.be">info@degallohoeve.be</Link>
             </Body>
             <Body className="flex gap-2 items-center">
               <IoLogoInstagram className="text-green-200 text-2xl" />
@@ -111,7 +112,8 @@ const Footer: React.FC<Props> = ({}) => {
                   control={control}
                   render={({ field: { value, onChange } }) => (
                     <FormTextBox
-                      label="bericht"
+                      style={{}}
+                      label="Bericht"
                       name="bericht"
                       id="bericht"
                       value={value}
@@ -127,9 +129,7 @@ const Footer: React.FC<Props> = ({}) => {
         </div>
       </div>
       <div className="flex items-center justify-center w-full h-16 border-2 z-20">
-        <Body className="text-center">
-          &copy; Copyright 2022. All rights reserved.
-        </Body>
+        <Body className="text-center">&copy; Copyright 2022. All rights reserved.</Body>
       </div>
     </footer>
   );

@@ -1,0 +1,24 @@
+name: Run tests
+on:
+  pull_request:
+    branches: [main, develop, accept]
+
+jobs:
+  Tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node-Environment
+        uses: actions/setup-node@v3.5.1
+        with:
+          node-version: '14.17.6'
+      - name: Install Packages
+        run: npm install
+      - name: Integration Tests
+        run: npm run test:int
+        env:
+          URI: ${{secrets.URI}}
+          MONGO_DATABASE: ${{secrets.MONGO_DATABASE}}
+          MAIL_TO: ${{secrets.MAIL_TO}}
+          CRON_FEEDBACK_EMAIL_KEY: ${{secrets.CRON_FEEDBACK_EMAIL_KEY}}

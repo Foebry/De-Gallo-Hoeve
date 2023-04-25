@@ -28,7 +28,9 @@ describe('login', () => {
     const { body } = await request.post(LOGINAPI).send(loginPayload).expect(400);
 
     expect(body).toStrictEqual({
-      message: 'Probeer later opnieuw...',
+      message: 'Er is iets fout gegaan, probeer later opnieuw...',
+      code: 400,
+      errorCode: 'InvalidCsrfError',
     });
   });
   it('login with wrong email should throw InvalidEmailError', async () => {
@@ -42,6 +44,8 @@ describe('login', () => {
     expect(body).toStrictEqual({
       email: 'Onbekende email',
       message: 'Kan verzoek niet verwerken',
+      code: 422,
+      errorCode: 'UnrecognizedEmailError',
     });
   });
   it('Login with wrong password should throw InvalidPasswordError', async () => {
@@ -56,6 +60,8 @@ describe('login', () => {
     expect(body).toStrictEqual({
       password: 'Ongeldig wachtwoord',
       message: 'Kan verzoek niet verwerken',
+      code: 422,
+      errorCode: 'InvalidPasswordError',
     });
   });
   it('Login with correct credentials should create jwt token and frontend token', async () => {

@@ -82,6 +82,8 @@ describe('/register', () => {
       expect(body).toStrictEqual({
         message: 'Kan registratie niet verwerken',
         email: 'Email reeds in gebruik',
+        code: 422,
+        errorCode: 'EmailOccupiedError',
       });
     });
   });
@@ -98,6 +100,8 @@ describe('/register', () => {
     expect(body).toStrictEqual({
       email: 'ongeldige email',
       message: 'Registratie niet verwerkt',
+      code: 400,
+      errorCode: 'ValidationError',
     });
   });
 });

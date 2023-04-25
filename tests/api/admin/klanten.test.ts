@@ -18,7 +18,9 @@ import { createRandomInschrijvingen } from 'tests/fixtures/inschrijving';
 import { INSCHRIJVING } from 'src/controllers/InschrijvingController';
 
 describe('/admin/klanten', () => {
-  beforeEach(clearAllData);
+  beforeEach(async () => {
+    await clearAllData();
+  });
   afterAll(async () => {
     await clearAllData();
     await closeClient();

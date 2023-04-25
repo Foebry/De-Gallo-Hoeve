@@ -1,6 +1,5 @@
 import moment from 'moment';
 import { ObjectId } from 'mongodb';
-import ConfirmController, { IsConfirmController } from '../controllers/ConfirmController';
 import ContentController, {
   CONTENT,
   IsContentController,
@@ -19,15 +18,9 @@ import TrainingController, {
   IsTrainingController,
   TRAINING,
 } from '../controllers/TrainingController';
-import { IsKlantCollection } from '../types/EntityTpes/KlantTypes';
 import { IsInschrijvingBodyInschrijving, IsNewKlantData } from '../types/requestTypes';
 import brcypt from 'bcrypt';
-import {
-  capitalize,
-  createRandomConfirmCode,
-  getCurrentTime,
-  toLocalTime,
-} from '../shared/functions';
+import { capitalize, getCurrentTime, toLocalTime } from '../shared/functions';
 import { HondCollection, NewHond } from '../types/EntityTpes/HondTypes';
 import { CONFIRM, ConfirmCollection, NewConfirm } from '../types/EntityTpes/ConfirmTypes';
 import { InschrijvingCollection } from '../types/EntityTpes/InschrijvingTypes';
@@ -43,6 +36,13 @@ import TrainingDayController, {
   TRAININGDAY,
 } from 'src/controllers/TrainingDayController';
 import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
+import { createRandomConfirmCode } from 'src/pages/api/confirm/[code]/repo';
+import {
+  FeedbackConfiguration,
+  IsKlantCollection,
+  IsNewKlant,
+} from 'src/common/domain/klant';
+import { FEEDBACK } from 'src/utils/db';
 
 export type CONFIRM = 'ConfirmController';
 export type CONTENT = 'ContentController';
@@ -53,6 +53,7 @@ export type RAS = 'RasController';
 export type TRAINING = 'TrainingController';
 export type TRAININGDAY = 'TrainingDayController';
 export type ERRORLOG = 'ErrorLogController';
+export type FEEDBACK = 'FeedbackController';
 
 const createInschrijving = (
   inschrijving: IsInschrijvingBodyInschrijving,
@@ -72,22 +73,21 @@ const createInschrijving = (
 const createConfirm = (confirm: NewConfirm): ConfirmCollection => ({
   ...confirm,
   _id: new ObjectId(),
-  code: createRandomConfirmCode(),
+  code: createRandomConfirmCode(confirm.klant_id),
   valid_to: moment(confirm.created_at).local().add(1, 'day').toDate(),
 });
 
-const createHond = (hond: NewHond) => ({
+const createHond = (hond: NewHond): HondCollection => ({
   _id: new ObjectId(),
   naam: capitalize(hond.naam),
   geslacht: hond.geslacht,
-  // geboortedatum: moment(hond.geboortedatum).local().toDate(),
   geboortedatum: toLocalTime(hond.geboortedatum),
   ras: hond.ras,
   created_at: getCurrentTime(),
   updated_at: getCurrentTime(),
 });
 
-const createKlant = async (klant: IsNewKlantData): Promise<IsKlantCollection> => ({
+const createKlant = async (klant: IsNewKlant): Promise<IsKlantCollection> => ({
   _id: new ObjectId(),
   roles: '0',
   verified: false,
@@ -106,7 +106,16 @@ const createKlant = async (klant: IsNewKlantData): Promise<IsKlantCollection> =>
   gemeente: capitalize(klant.gemeente),
   postcode: klant.postcode,
   honden: klant.honden.map((hond) => createHond(hond)),
+  feedbackConfiguration: createDefaultFeedbackConfiguration(),
 });
+
+export const createDefaultFeedbackConfiguration = (): FeedbackConfiguration => {
+  const feedbackAfterTrainings = [1, 5, 10, 20, 50, 100];
+  return feedbackAfterTrainings.map((value) => ({
+    trainingCount: value,
+    triggered: false,
+  }));
+};
 
 const createRas = (ras: NewRas): RasCollection => ({
   _id: new ObjectId(),
@@ -143,11 +152,11 @@ export type ControllerType =
   | RAS
   | TRAINING
   | TRAININGDAY
-  | ERRORLOG;
+  | ERRORLOG
+  | FEEDBACK;
 
 export type PaginatedControllerType = HOND | INSCHRIJVING | KLANT | RAS;
 
-export function getController(type: CONFIRM): IsConfirmController;
 export function getController(type: CONTENT): IsContentController;
 export function getController(type: HOND): IsHondController;
 export function getController(type: INSCHRIJVING): IsInschrijvingController;
@@ -156,9 +165,7 @@ export function getController(type: RAS): IsRasController;
 export function getController(type: TRAINING): IsTrainingController;
 export function getController(type: TRAININGDAY): IsTrainingDayController;
 export function getController(type: ControllerType) {
-  return type === CONFIRM
-    ? ConfirmController
-    : type === CONTENT
+  return type === CONTENT
     ? ContentController
     : type === HOND
     ? HondController

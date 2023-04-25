@@ -10,6 +10,8 @@
     "lint": "next lint",
     "network": "next dev -H 192.168.0.239",
     "test": "jest --runInBand",
+    "test:unit": "jest --runInBand -- .spec.ts",
+    "test:int": "jest --runInBand -- .test.ts",
     "admin": "node ./scripts/cli"
   },
   "dependencies": {
@@ -40,6 +42,7 @@
     "react-hook-form": "^7.32.1",
     "react-icons": "^4.4.0",
     "react-select": "^5.3.2",
+    "react-spinners": "^0.13.8",
     "react-textarea-autosize": "^8.3.4",
     "react-toastify": "^9.0.8",
     "react-trip-date": "^1.10.0",

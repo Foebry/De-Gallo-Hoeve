@@ -1,7 +1,3 @@
-import { createServer, IncomingMessage, RequestListener } from 'http';
-import { NextApiHandler } from 'next';
-import request from 'supertest';
-import { apiResolver } from 'next/dist/server/api-utils/node';
 import { clearAllData } from 'src/utils/MongoDb';
 import { POST_INSCHRIJVING } from 'src/types/apiTypes';
 import handler from 'src/pages/api/inschrijvingen.page';
@@ -23,17 +19,9 @@ import {
 } from 'tests/fixtures/inschrijving';
 import { closeClient } from 'src/utils/db';
 import { getRequest } from 'tests/helpers';
-import logger from 'src/utils/logger';
 import { createRandomTrainingDays } from 'tests/fixtures/trainingDay';
 import { defaultTrainingTimeSlots } from 'src/mappers/trainingDays';
 import { TRAININGDAY } from 'src/controllers/TrainingDayController';
-import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
-import {
-  getCurrentTime,
-  toLocalTime,
-  toReadableDate,
-  unique,
-} from 'src/shared/functions';
 
 describe('/inschrijving', () => {
   beforeEach(async () => await clearAllData());
@@ -65,7 +53,9 @@ describe('/inschrijving', () => {
 
       expect(response.statusCode).toBe(400);
       expect(response.body).toStrictEqual({
-        message: 'Probeer later opnieuw...',
+        message: 'Er is iets fout gegaan, probeer later opnieuw...',
+        code: 400,
+        errorCode: 'InvalidCsrfError',
       });
     });
     it('Should throw UnauthorizedError when not logged in', async () => {
@@ -77,7 +67,11 @@ describe('/inschrijving', () => {
       const response = await request.post(POST_INSCHRIJVING).send(payload);
 
       expect(response.statusCode).toBe(403);
-      expect(response.body).toStrictEqual({ message: 'Not Logged In' });
+      expect(response.body).toStrictEqual({
+        message: 'Not Logged In',
+        code: 403,
+        errorCode: 'NotLoggedInError',
+      });
     });
     it('Should throw ValidationError on wrong request Body', async () => {
       const payload = {};
