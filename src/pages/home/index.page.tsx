@@ -7,7 +7,6 @@ import { getPriveTraining } from 'src/controllers/TrainingController';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import getData from 'src/hooks/useApi';
-import { nanoid } from 'nanoid';
 import FeedbackSection from './components/feedback/section';
 import { IndexData } from './types';
 
@@ -164,7 +163,7 @@ const Index: React.FC<Props> = () => {
             </div>
           </div>
         </section>
-        <FeedbackSection feedback={feedback} />
+        {feedback.length > 0 && <FeedbackSection feedback={feedback} />}
       </Skeleton>
     </>
   );
@@ -176,54 +175,23 @@ const useGetIndexData = () => {
     prijsExcl: 25.0,
     kmHeffing: 0.3,
     gratisVerplaatsingBinnen: 10,
-    feedback: [
-      {
-        id: nanoid(5),
-        name: 'Sander',
-        rating: 4.5,
-        feedback:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eu est non nisl euismod condimentum in vel nisi. Donec accumsan neque id tellus eleifend luctus. Curabitur sem metus, auctor vel tempus vitae, facilisis imperdiet nisi.',
-      },
-      {
-        id: nanoid(5),
-        name: 'Seppe',
-        rating: 4.5,
-        feedback:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eu est non nisl euismod condimentum in vel nisi. Donec accumsan neque id tellus eleifend luctus. Curabitur sem metus, auctor vel tempus vitae, facilisis imperdiet nisi.',
-      },
-      {
-        id: nanoid(5),
-        name: 'Julie',
-        rating: 4,
-        feedback:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eu est non nisl euismod condimentum in vel nisi. Donec accumsan neque id tellus eleifend luctus. Curabitur sem metus, auctor vel tempus vitae, facilisis imperdiet nisi.',
-      },
-      {
-        id: nanoid(5),
-        name: 'Sigrid',
-        rating: 5,
-        feedback: 'Goed bezig!',
-      },
-      {
-        id: nanoid(5),
-        name: 'Alfred',
-        rating: 3.5,
-        feedback: 'Nuttige trainingen',
-      },
-    ],
+    feedback: [],
   });
 
   useEffect(() => {
     (async () => {
-      const { data: trainingData, error: trainingError } = await getData(
-        `/api/trainingen/${priveTrainingId}`
-      );
+      const [priveTrainingResult, feedbackResult] = await Promise.all([
+        getData(`/api/trainingen/${priveTrainingId}`),
+        getData('/api/feedback'),
+      ]);
+      const { data: trainingData, error: trainingError } = priveTrainingResult;
+      const { data: feedbackData, error: feedbackError } = feedbackResult;
+
       if (!trainingError)
         setIndexData((indexData) => ({ ...indexData, ...trainingData }));
 
-      // const { data: feedbackData, error: feedbackError } = await getData('/api/feedback');
-      // if (!feedbackError)
-      //   setIndexData((indexData) => ({ ...indexData, feedback: feedbackData }));
+      if (!feedbackError)
+        setIndexData((indexData) => ({ ...indexData, feedback: feedbackData }));
     })();
   }, []);
 

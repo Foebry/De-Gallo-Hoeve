@@ -1,4 +1,3 @@
-import { nanoid } from 'nanoid';
 import React from 'react';
 import { Body, Title2, Title3, Title4 } from 'src/components/Typography/Typography';
 import Skeleton from 'src/components/website/skeleton';
@@ -133,5 +132,15 @@ const ChangeLog: React.FC<Props> = () => {
     </Skeleton>
   );
 };
+
+// export const getServerSideProps = () => {
+//   return {
+//     props: {},
+//     redirect: {
+//       destination: '/404',
+//       permanent: false,
+//     },
+//   };
+// };
 
 export default ChangeLog;

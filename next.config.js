@@ -1,3 +1,4 @@
+next.config.js;
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -5,7 +6,7 @@ const nextConfig = {
     domains: ['www.wdev2.be', 'res.cloudinary.com'],
   },
   pageExtensions: ['page.tsx', 'page.ts'],
-  rewrites: async () => {
+  async rewrites() {
     return [
       {
         destination: '/',
@@ -13,6 +14,15 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [whatsNewRedirect];
+  },
+};
+
+const whatsNewRedirect = {
+  destination: '/404',
+  source: '/what-is-new',
+  permanent: false,
 };
 
 module.exports = nextConfig;

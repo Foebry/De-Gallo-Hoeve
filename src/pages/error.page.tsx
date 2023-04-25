@@ -6,6 +6,7 @@ import { NextRouter, useRouter } from 'next/router';
 import { FrontEndErrorCodes } from 'src/shared/functions';
 import useMutation from 'src/hooks/useMutation';
 import logger from 'src/utils/logger';
+import Head from 'next/head';
 
 export const FallBack = () => {
   const router = useRouter();
@@ -13,6 +14,9 @@ export const FallBack = () => {
 
   return (
     <>
+      <Head>
+        <title>De Gallo-hoeve - Oeps..</title>
+      </Head>
       <Nav />
       <div className="flex gap-20 justify-center py-72">
         <div>

@@ -57,7 +57,7 @@ export const Nav = () => {
             <Title3>De Gallo-Hoeve</Title3>
           </div>
         </div>
-        {process.env.NODE_ENV !== "production" && (<NavLink href={CHANGELOG} label="nieuw" />)}
+        <NavLink href={CHANGELOG} label="nieuw" />
         {userName ? (
           <div className="flex gap-10 items-center">
             <div className="hidden xs:block uppercase text-green-200 text-lg font-medium">
