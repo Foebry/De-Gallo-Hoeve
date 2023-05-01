@@ -10,6 +10,7 @@ import React, {
 import useFormInputEffect from '../../hooks/layout/useFormInputEffect';
 import { ContactErrorInterface } from '../Footer';
 import TextAreaAutoSize from 'react-textarea-autosize';
+import { FormError } from '../Typography/Typography';
 
 export interface FormTextBoxProps {
   label: string | ReactElement;
@@ -17,7 +18,7 @@ export interface FormTextBoxProps {
   id: string;
   value: string;
   onChange: (e: React.FormEvent<HTMLTextAreaElement>) => void;
-  errors: ContactErrorInterface;
+  errors: Record<string, string>;
   setErrors: Dispatch<SetStateAction<ContactErrorInterface>>;
   style: CSSProperties;
   required?: boolean;
@@ -71,6 +72,7 @@ export const FormTextBox: React.FC<FormTextBoxProps> = ({
         value={value}
         autoComplete="off"
       ></TextAreaAutoSize>
+      <FormError>{errors?.[fieldName]}</FormError>
     </div>
   );
 };

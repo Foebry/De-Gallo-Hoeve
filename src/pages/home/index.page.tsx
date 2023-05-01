@@ -172,7 +172,7 @@ const Index: React.FC<Props> = () => {
 const useGetIndexData = () => {
   const priveTrainingId = '62fa1f25bacc03711136ad5f';
   const [indexData, setIndexData] = useState<IndexData>({
-    prijsExcl: 25.0,
+    prijsExcl: 20.66,
     kmHeffing: 0.3,
     gratisVerplaatsingBinnen: 10,
     feedback: [],
