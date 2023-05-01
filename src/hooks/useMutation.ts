@@ -46,7 +46,6 @@ const useMutation = <T>(
       let data = { ...error.response.data, code: error.response.status };
       if (typeof data.message !== 'string') data = { ...data, ...data.message };
       setIsLoading(false);
-      // toast.error(data.message);
       return { data: undefined, error: data, loading: isLoading };
     }
   };
