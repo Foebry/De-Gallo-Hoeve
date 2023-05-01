@@ -99,7 +99,7 @@ export const Nav = () => {
                 />
                 <NavLink
                   href={REGISTER}
-                  label="register"
+                  label="registreer"
                   className="hover:text-green-200 hover:bg-gray-100 uppercase text-md font-medium"
                 />
               </Hamburger>
