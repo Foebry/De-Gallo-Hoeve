@@ -189,19 +189,23 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
                 ) : null}
               </div>
             </Form>
-            {activeStep === 1 && (
+          </div>
+          {activeStep === 1 ? (
+            <>
               <div className="absolute left-10 top-20">
                 <Button label="vorige" onClick={() => setActiveStep(activeStep - 1)} />
               </div>
-            )}
-            <div className="absolute right-10 top-20">
-              {activeStep === 1 ? (
+              <div className="absolute right-10 top-20">
                 <SubmitButton label="verzend" onClick={() => onSubmit(getValues())} />
-              ) : (
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="absolute right-10">
                 <Button label="volgende" onClick={() => setActiveStep(activeStep + 1)} />
-              )}
-            </div>
-          </div>
+              </div>
+            </>
+          )}
         </section>
       </Skeleton>
     </>
