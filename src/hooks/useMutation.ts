@@ -43,7 +43,8 @@ const useMutation = <T>(
       setIsLoading(false);
       return { data, error: undefined, loading: isLoading };
     } catch (error: any) {
-      const data = { ...error.response.data, code: error.response.status };
+      let data = { ...error.response.data, code: error.response.status };
+      if (typeof data.message !== 'string') data = { ...data, ...data.message };
       setIsLoading(false);
       // toast.error(data.message);
       return { data: undefined, error: data, loading: isLoading };

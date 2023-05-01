@@ -8,9 +8,13 @@ import * as repo from 'src/pages/api/logError/repo';
 import { closeClient } from 'src/utils/db';
 
 describe('/contact', () => {
+  beforeAll(() => {
+    faker.setLocale('nl_BE');
+  });
   afterAll(async () => {
     jest.clearAllMocks();
     await closeClient();
+    faker.setLocale('en_GB');
   });
 
   beforeEach(() => jest.clearAllMocks());
@@ -35,6 +39,7 @@ describe('/contact', () => {
       const payload = {
         email,
         naam,
+        gsm: faker.phone.number(),
         bericht: faker.datatype.string(),
         csrf: generateCsrf(),
       };
@@ -44,12 +49,14 @@ describe('/contact', () => {
       const contactTemplateData = {
         mailFrom: email,
         naam,
+        gsm: payload.gsm,
         bericht: payload.bericht,
         email: 'sander.fabry@gmail.com',
       };
       const contactConfirmTemplateData = {
         email: payload.email,
         naam: payload.naam,
+        gsm: payload.gsm,
         bericht: payload.bericht,
       };
 

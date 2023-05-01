@@ -1,4 +1,4 @@
-import React, { Dispatch, ReactNode, SetStateAction } from "react";
+import React, { Dispatch, ReactNode, SetStateAction } from 'react';
 
 export interface FormProps {
   onSubmit: (e: any) => void;
@@ -11,12 +11,7 @@ export interface FormProps {
   steps?: string[];
 }
 
-const Form: React.FC<FormProps> = ({
-  onSubmit,
-  action,
-  children,
-  className = "",
-}) => {
+const Form: React.FC<FormProps> = ({ onSubmit, action, children, className = '' }) => {
   return (
     <div className="mx-auto relative">
       <form className={`${className} mx-auto`} onSubmit={onSubmit}>
@@ -24,7 +19,7 @@ const Form: React.FC<FormProps> = ({
         {action && (
           <div className="flex flex-row-reverse">
             <input
-              className="capitalize rounded-md py-1 px-2 text-grey-100 text-lg mb-2 bg-green-200 tracking-wide hover:cursor-pointer"
+              className="capitalize rounded-md py-1 px-2 text-grey-100 text-lg mb-2 mr-2 bg-green-200 tracking-wide hover:cursor-pointer"
               type="submit"
               value={action}
             />

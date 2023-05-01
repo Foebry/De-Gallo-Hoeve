@@ -15,7 +15,7 @@ export const contact = async (req: ContactRequest, res: NextApiResponse) => {
 
     const { csrf, ...data } = req.body;
     await sendContactMail(data);
-    return res.status(200).send({ message: 'Bericht ontvangen!' });
+    return res.status(200).send({});
   } catch (e: any) {
     await logError('contact', req, e);
     return res.status(e.code).json(e.response);

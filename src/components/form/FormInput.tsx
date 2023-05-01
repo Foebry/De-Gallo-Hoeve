@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { useRef } from "react";
-import useFormInputEffect from "../../hooks/layout/useFormInputEffect";
-import { FormError } from "../Typography/Typography";
+import React, { useEffect, useState } from 'react';
+import { useRef } from 'react';
+import useFormInputEffect from '../../hooks/layout/useFormInputEffect';
+import { FormError } from '../Typography/Typography';
 
 export interface FormInputProps {
   label: string;
@@ -24,13 +24,13 @@ const FormInput: React.FC<FormInputProps> = ({
   label,
   name,
   id,
-  type = "text",
+  type = 'text',
   placeholder,
   value,
   onChange,
   errors,
-  extra = "",
-  dataid = "",
+  extra = '',
+  dataid = '',
   setErrors,
   disabled = false,
 }) => {
@@ -50,7 +50,7 @@ const FormInput: React.FC<FormInputProps> = ({
     >
       <label
         className={`absolute pl-2.5 bottom-1 mr-5 capitalize pointer-events-none flex items-center gap-1 w-full ${
-          disabled ? "disabled text-black-100" : "text-green-100"
+          disabled ? 'disabled text-black-100' : 'text-green-100'
         }`}
         htmlFor={id}
         ref={labelRef}
@@ -59,7 +59,7 @@ const FormInput: React.FC<FormInputProps> = ({
       </label>
       <input
         className={`block w-full text-xl outline-none border-b-[1px] py-1 px-2.5 text-black-100 ${
-          disabled ? "bg-grey-100 rounded" : undefined
+          disabled ? 'bg-grey-100 rounded' : undefined
         }`}
         disabled={disabled}
         type={type}
