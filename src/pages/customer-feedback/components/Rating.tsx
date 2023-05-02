@@ -26,6 +26,9 @@ const Rating: React.FC<Props> = ({
   errors,
   name,
 }) => {
+  const isMobile = /iPhone|iPad|iPod|Android|webOS|BlackBerry|Windows Phone/i.test(
+    navigator.userAgent
+  );
   const [rating, setRating] = useState<number>(value ?? 0);
   const [chosenRating, setChosenRating] = useState<number>(value ?? 0);
   const [error, setError] = useState<string | undefined | number>(
@@ -41,7 +44,10 @@ const Rating: React.FC<Props> = ({
           rating >= index + 1 ? (
             <div className="relative" key={nanoid(5)}>
               {index === 0 && (
-                <span className="absolute -top-8 right-0 whitespace-nowrap font-semibold">
+                <span
+                  className="absolute -top-8 right-0 
+                whitespace-nowrap font-semibold"
+                >
                   {min}
                 </span>
               )}
@@ -52,7 +58,7 @@ const Rating: React.FC<Props> = ({
               )}
               <AiFillStar
                 fill="#FFD700"
-                className="text-4xl cursor-pointer"
+                className={isMobile ? 'text-4xl' : 'text-4xl cursor-pointer'}
                 key={nanoid(5)}
                 onMouseEnter={() => setRating(() => index + 1)}
                 onMouseLeave={() => setRating(() => chosenRating || 0)}
@@ -76,7 +82,7 @@ const Rating: React.FC<Props> = ({
                 </span>
               )}
               <AiOutlineStar
-                className="text-4xl cursor-pointer"
+                className={isMobile ? 'text-4xl' : 'text-4xl cursor-pointer'}
                 key={nanoid(5)}
                 onMouseEnter={() => setRating(() => index + 1)}
                 onMouseLeave={() => setRating(() => chosenRating || 0)}
