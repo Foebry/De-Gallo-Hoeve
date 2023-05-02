@@ -1,6 +1,4 @@
 import { faker } from '@faker-js/faker';
-import { closeClient } from 'src/utils/db';
-import { clearAllData } from 'src/utils/MongoDb';
 import listHandler from 'src/pages/api/admin/inschrijvingen/index.page';
 import byIdHandler from 'src/pages/api/admin/inschrijvingen/[slug].page';
 import { getRequest } from 'tests/helpers';
@@ -21,14 +19,6 @@ import { KLANT } from 'src/controllers/KlantController';
 import { INSCHRIJVING } from 'src/controllers/InschrijvingController';
 
 describe('/admin/inschrijvingen', () => {
-  beforeEach(async () => {
-    await clearAllData();
-  });
-  afterAll(async () => {
-    await clearAllData();
-    await closeClient();
-  });
-
   const listRequest = getRequest(listHandler);
   const byIdRequest = getRequest(byIdHandler);
 

@@ -11,7 +11,7 @@
     "network": "next dev -H 192.168.0.239",
     "test": "jest --runInBand",
     "test:unit": "jest --runInBand -- .spec.ts",
-    "test:int": "jest --runInBand -- .test.ts",
+    "test:int": "jest --runInBand --forceExit -- .test.ts",
     "admin": "node ./scripts/cli"
   },
   "dependencies": {

@@ -1,7 +1,6 @@
 import handler from 'src/pages/api/auth/register.page';
 import { REGISTERAPI } from 'src/types/apiTypes';
 import { getController } from 'src/services/Factory';
-import { clearAllData } from 'src/utils/MongoDb';
 import { capitalize } from 'src/shared/functions';
 import Mailer from 'src/utils/Mailer';
 import { createRandomHonden } from 'tests/fixtures/hond';
@@ -10,19 +9,9 @@ import {
   generateRegisterPayloadFromKlantData,
 } from 'tests/fixtures/klant';
 import { KLANT } from 'src/controllers/KlantController';
-import { closeClient } from 'src/utils/db';
 import { getRequest } from 'tests/helpers';
 
 describe('/register', () => {
-  beforeEach(async () => {
-    await clearAllData();
-  });
-  afterAll(async () => {
-    await clearAllData();
-    await closeClient();
-    jest.clearAllMocks();
-  });
-
   describe('/POST', () => {
     const request = getRequest(handler);
     const mockedSendMail = jest.spyOn(Mailer, 'sendMail');

@@ -1,21 +1,12 @@
-import { clearAllData } from 'src/utils/MongoDb';
 import { createRandomKlanten } from 'tests/fixtures/klant';
 import { handler } from 'src/cronjobs/scripts/updateKlantData';
 import { getAllKlanten } from 'src/controllers/KlantController';
 import { createDefaultFeedbackConfiguration } from 'src/services/Factory';
-import { closeClient, getUntypedCollection } from 'src/utils/db';
+import { getUntypedCollection } from 'src/utils/db';
 import logger from 'src/utils/logger';
 
 describe('SCRIPT - UpdateKlantData', () => {
   jest.spyOn(logger, 'info').mockImplementation();
-  beforeAll(async () => await clearAllData());
-
-  afterEach(async () => await clearAllData());
-
-  afterAll(async () => {
-    await clearAllData();
-    await closeClient();
-  });
 
   it('Should update all klanten with new key "feedbackConfiguration" which will hold the default Configuration', async () => {
     const collection = await getUntypedCollection('klant');

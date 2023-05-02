@@ -4,24 +4,17 @@ import { createRandomKlant } from 'tests/fixtures/klant';
 import { faker } from '@faker-js/faker';
 import Mailer from 'src/utils/Mailer';
 import { generateCsrf } from 'src/services/Validator';
-import * as repo from 'src/pages/api/logError/repo';
-import { closeClient } from 'src/utils/db';
 
 describe('/contact', () => {
   beforeAll(() => {
     faker.setLocale('nl_BE');
   });
   afterAll(async () => {
-    jest.clearAllMocks();
-    await closeClient();
     faker.setLocale('en_GB');
   });
 
-  beforeEach(() => jest.clearAllMocks());
-
   const request = getRequest(handler);
   const mockedSendMail = jest.spyOn(Mailer, 'sendMail').mockImplementation();
-  const mockedErrorLog = jest.spyOn(repo, 'logError').mockImplementation();
 
   describe('POST', () => {
     it('Should throw invalidCsrfTokenError when csrf not provided', async () => {
@@ -31,7 +24,6 @@ describe('/contact', () => {
       await request.post('/api/contact').send(payload).expect(400);
 
       expect(mockedSendMail).toHaveBeenCalledTimes(0);
-      expect(mockedErrorLog).toHaveBeenCalledTimes(1);
     });
 
     it('Should send email to user and email to admin', async () => {

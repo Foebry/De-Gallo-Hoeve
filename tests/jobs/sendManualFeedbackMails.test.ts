@@ -1,8 +1,6 @@
 import { INSCHRIJVING } from 'src/controllers/InschrijvingController';
 import { KLANT } from 'src/controllers/KlantController';
 import { getController } from 'src/services/Factory';
-import { closeClient } from 'src/utils/db';
-import { clearAllData } from 'src/utils/MongoDb';
 import { createRandomHond } from 'tests/fixtures/hond';
 import { createRandomInschrijvingen } from 'tests/fixtures/inschrijving';
 import { createRandomKlant, RoleOptions } from 'tests/fixtures/klant';
@@ -18,14 +16,8 @@ describe('JOB - sendFeedbackMails', () => {
   const request = getRequest(handler);
   const mailMock = jest.spyOn(mailer, 'sendMail').mockImplementation();
   jest.spyOn(logger, 'info').mockImplementation();
-  beforeAll(async () => await clearAllData());
 
-  afterEach(async () => await clearAllData());
-
-  afterAll(async () => {
-    await clearAllData();
-    await closeClient();
-  });
+  afterEach(jest.clearAllMocks);
 
   it('Should throw 401 when not adminRequest', async () => {
     const klant = createRandomKlant();

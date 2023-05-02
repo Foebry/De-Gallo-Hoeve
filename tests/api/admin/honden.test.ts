@@ -6,8 +6,6 @@ import byIdHandler from 'src/pages/api/admin/honden/[slug].page';
 import { createBearer } from 'src/services/Authenticator';
 import { getController } from 'src/services/Factory';
 import { getAge } from 'src/shared/functions';
-import { closeClient } from 'src/utils/db';
-import { clearAllData } from 'src/utils/MongoDb';
 import { createRandomHond, createRandomHonden } from 'tests/fixtures/hond';
 import {
   createRandomKlant,
@@ -18,14 +16,6 @@ import { createRandomRas } from 'tests/fixtures/ras';
 import { getRequest } from 'tests/helpers';
 
 describe('/honden', () => {
-  beforeEach(async () => {
-    await clearAllData();
-  });
-  afterAll(async () => {
-    await clearAllData();
-    await closeClient();
-  });
-
   const listRequest = getRequest(listHandler);
   const byIdRequest = getRequest(byIdHandler);
 
