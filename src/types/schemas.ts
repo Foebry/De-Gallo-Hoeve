@@ -112,22 +112,6 @@ const inschrijving = object({
   klant_id: string().optional().nullable(),
 });
 
-const anoniemeInschrijving = object({
-  inschrijvingen: array(
-    object({
-      datum: date().required({ datum: 'verplicht' }),
-      hond_naam: string().required({ hond_naam: 'verplicht' }),
-      hond_ras: number().required({ hond_ras: 'verplicht' }),
-      hond_geslacht: string().required({ hond_geslacht: 'verplicht' }),
-    })
-  )
-    .required({ message: 'Gelieve minstens 1 datum aan te duiden' })
-    .min(1, { datum: 'gelieve minimum 1 datum aan te duiden' }),
-  aanspreking: string().required({ aanspreking: 'verplicht' }),
-  naam: string().required({ naam: 'verplicht' }),
-  email: string().email({ email: 'Ongeldige email' }).required({ email: 'verplicht' }),
-});
-
 const boeking = object({
   csrf: string().required({ failure: 'Invalid form' }),
   klant_id: number().required(),
@@ -147,11 +131,24 @@ const boeking = object({
 });
 
 const contact = object({
-  naam: string().required({ naam: 'verplicht' }),
-  email: string().email({ email: 'Ongeldige email' }).required({ email: 'verplicht' }),
+  naam: string().required({ naam: 'verplicht', message: 'Gelieve een naam op te geven' }),
+  email: string()
+    .email({ email: 'Ongeldige email' })
+    .required({ message: 'Gelieve een email-adres op te geven', email: 'verplicht' }),
+  gsm: string()
+    .matches(/[^a-z,A-Z]/, {
+      message: {
+        gsm: 'invalid format',
+        message: 'Gsm-veld mag geen letters bevatten',
+      },
+    })
+    .required({
+      message: 'Gelieve een contact-nummer op te geven',
+      gsm: 'verplicht',
+    }),
   bericht: string()
-    .required({ bericht: 'verplicht' })
-    .min(5, { bericht: 'Bericht te kort' }),
+    .required({ message: 'Gelieve een bericht na te laten', bericht: 'verplicht' })
+    .min(5, { bericht: 'Dit bericht is helaas te kort' }),
 });
 
 const schemas = {
@@ -159,7 +156,6 @@ const schemas = {
   register,
   inschrijving,
   boeking,
-  anoniemeInschrijving,
   contact,
 };
 
@@ -167,7 +163,6 @@ export const {
   login: loginSchema,
   register: registerSchema,
   inschrijving: inschrijvingSchema,
-  anoniemeInschrijving: anoniemeInschrijvingSchema,
   boeking: boekingSchema,
   contact: contactSchema,
 } = schemas;
