@@ -46,7 +46,6 @@ const Feedback: React.FC<Props> = ({ userAgent }) => {
         {isLoading && <Spinner />}
         {!isLoading && (
           <>
-            <Body>isMobile: {isMobile.toString()}</Body>
             <Title3 className="text-green-200">
               Bedankt dat u even de tijd wil nemen om ons te beoordelen!
             </Title3>

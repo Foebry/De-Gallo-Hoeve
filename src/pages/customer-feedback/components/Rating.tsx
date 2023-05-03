@@ -28,10 +28,6 @@ const Rating: React.FC<Props> = ({
   name,
   isMobile,
 }) => {
-  // const isMobile = false;
-  // const isMobile = /iPhone|iPad|iPod|Android|webOS|BlackBerry|Windows Phone/i.test(
-  //   navigator.userAgent
-  // );
   const [rating, setRating] = useState<number>(value ?? 0);
   const [chosenRating, setChosenRating] = useState<number>(value ?? 0);
   const [error, setError] = useState<string | undefined | number>(
