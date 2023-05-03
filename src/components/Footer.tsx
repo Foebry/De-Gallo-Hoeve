@@ -48,7 +48,7 @@ const Footer: React.FC<Props> = ({}) => {
       }
       if (error) {
         toast.error(error.message);
-        setFormErrors(() => error as ContactErrorInterface);
+        setFormErrors(() => error);
       }
       setDisabled(() => false);
     }

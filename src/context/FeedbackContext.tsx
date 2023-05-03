@@ -30,7 +30,7 @@ const defaultValues: FeedbackContext = {
 export const FeedbackContext = createContext<FeedbackContext>(defaultValues);
 
 const FeedbackProvider: React.FC<{ children: any }> = ({ children }) => {
-  const mutate = useMutation();
+  const mutate = useMutation<FeedbackBody>();
   const router = useRouter();
   const api = FEEDBACK_API;
   const [disabled, setDisabled] = useState<boolean>(false);
@@ -41,7 +41,7 @@ const FeedbackProvider: React.FC<{ children: any }> = ({ children }) => {
     if (disabled) return;
     setDisabled(true);
     setIsLoading(true);
-    const { data, error } = await mutate<FeedbackBody>(api, body, { params: query });
+    const { data, error } = await mutate(api, body, { params: query });
     setIsLoading(false);
     if (error) {
       setDisabled(false);

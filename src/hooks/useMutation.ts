@@ -20,7 +20,7 @@ const useMutation = <T>(
   setErrors?: React.Dispatch<React.SetStateAction<any>>
 ) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const executerFunc = async <T>(
+  const executerFunc = async (
     endpoint: string,
     payload: any,
     options?: Partial<{

@@ -29,21 +29,24 @@ interface LoginPropsInterface {
 
 const Login: React.FC<LoginPropsInterface> = ({ redirect, csrf }) => {
   const [disabled, setDisabled] = useState<boolean>(false);
-  const [formErrors, setFormErrors] = useState<LoginErrorInterface>({
-    email: '',
-    password: '',
-  });
+  const [formErrors, setFormErrors] = useState<Partial<LoginErrorInterface>>({});
 
   const router = useRouter();
-  const login = useMutation(formErrors, setFormErrors);
+  const login = useMutation<LoginErrorInterface>();
   const { control, handleSubmit } = useForm();
 
   const onSubmit = async (values: any) => {
     let data;
     if (!disabled) {
       setDisabled(() => true);
-      const { data: response, error } = await login(LOGINAPI, { ...values, csrf });
-      if (error) toast.error(error.message);
+      const { data: response, error } = await login(LOGINAPI, {
+        ...values,
+        csrf,
+      });
+      if (error) {
+        toast.error(error.message);
+        setFormErrors(() => error);
+      }
       data = response;
     }
 

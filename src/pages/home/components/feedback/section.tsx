@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Ref, RefObject, useEffect, useRef, useState } from 'react';
 import { FeedbackDto } from 'src/common/api/types/feedback';
 import { Title2 } from 'src/components/Typography/Typography';
 import FeedbackCard from './card';
@@ -8,13 +8,14 @@ type Props = {
 };
 
 const FeedbackSection: React.FC<Props> = ({ feedback }) => {
-  const visibleFeedBack = useDetermineVisibleFeedback(feedback);
+  const sectionRef = useRef<HTMLElement>(null);
+  const [visibleFeedBack, maxVisible] = useDetermineVisibleFeedback(feedback, sectionRef);
 
   return (
-    <section className="bg-white pb-24 mx-auto md:px-5">
+    <section className="bg-white pb-24 mx-auto md:px-5" ref={sectionRef}>
       <Title2 className="text-green-200">Wat zeggen onze klanten?</Title2>
-      <div className="px-5 mx-auto max-w-7xl md:px-0 flex justify-center gap-10 mt-20 mb-30">
-        {visibleFeedBack.slice(0, 3).map((info) => (
+      <div className="px-5 mx-auto max-w-7xl md:px-0 flex flex-wrap justify-center gap-10 mt-20 mb-30">
+        {visibleFeedBack.slice(0, maxVisible).map((info) => (
           <FeedbackCard
             key={info.id}
             name={info.name}
@@ -27,25 +28,31 @@ const FeedbackSection: React.FC<Props> = ({ feedback }) => {
   );
 };
 
-const useDetermineVisibleFeedback = (feedback: FeedbackDto[]): FeedbackDto[] => {
+const useDetermineVisibleFeedback = (
+  feedback: FeedbackDto[],
+  sectionRef: RefObject<HTMLElement>
+): [feedback: FeedbackDto[], maxVisible: number] => {
   const [visibleFeedBack, setVisibleFeedBack] = useState<FeedbackDto[]>(feedback);
+  const minCardWidth = 300;
+  const gap = 40;
+  const sectionWidth = sectionRef.current?.offsetWidth ?? 0;
+  const maxVisible = Math.floor(sectionWidth / (minCardWidth + gap));
 
   const newVisibleFeedback = (currentFeedback: FeedbackDto[]): FeedbackDto[] => {
-    const currentVisible = currentFeedback.slice(0, 3);
-    const newFeedback = [...currentFeedback.slice(3), ...currentVisible];
+    const currentVisible = currentFeedback.slice(0, maxVisible);
+    const newFeedback = [...currentFeedback.slice(maxVisible), ...currentVisible];
     return newFeedback;
   };
 
   useEffect(() => {
     setTimeout(() => {
-      if (feedback.length <= 3) return feedback;
       const newFeedbackArray = newVisibleFeedback(visibleFeedBack);
       setVisibleFeedBack(() => newFeedbackArray);
-    }, 10_000);
+    }, 8_000);
     return;
-  }, [visibleFeedBack]);
+  }, [visibleFeedBack, sectionWidth, maxVisible]);
 
-  return visibleFeedBack;
+  return [visibleFeedBack, maxVisible];
 };
 
 export default FeedbackSection;
