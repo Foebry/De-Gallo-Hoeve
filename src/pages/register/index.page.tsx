@@ -49,7 +49,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
   const { retrieveRassen } = useAppContext();
   const [formErrors, setFormErrors] = useState<RegisterErrorInterface>({});
   const router = useRouter();
-  const register = useMutation(formErrors, setFormErrors);
+  const register = useMutation<Partial<RegisterErrorInterface>>();
   const { control, handleSubmit, getValues } = useForm();
   const { fields, remove, append } = useFieldArray({
     control,
@@ -126,6 +126,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
       if (error) {
         handleErrors(error);
         toast.error(error.message);
+        setFormErrors(error);
       }
       setDisabled(() => false);
     }

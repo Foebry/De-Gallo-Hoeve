@@ -13,7 +13,7 @@ type Props = {
 const FeedbackCard: React.FC<Props> = ({ name, rating, feedback }) => {
   const stars = getStarsFromRating(rating);
   return (
-    <div className="rounded border border-green-200 px-4 py-2 min-w-xs max-w-md">
+    <div className="rounded border border-green-200 px-4 py-2 w-76">
       <Title3 className="text-green-200">{name}</Title3>
       <div className="text-center flex justify-center gap-1 mb-5 mt-2">{stars}</div>
       <div>
