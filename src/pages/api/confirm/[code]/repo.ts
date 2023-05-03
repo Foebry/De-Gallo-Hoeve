@@ -2,6 +2,7 @@ import { ConfirmCollection } from '@/types/EntityTpes/ConfirmTypes';
 import { ObjectId } from 'mongodb';
 import { InternalServerError, InvalidConfirmCodeFormat } from 'src/shared/RequestError';
 import { getConfirmCollection } from 'src/utils/db';
+import logger from 'src/utils/logger';
 
 type ConfirmCodeOptions = { valid_to: Date };
 
@@ -25,7 +26,7 @@ export const getIdAndExpirationTimeFromCode = (code: string): [ObjectId, number]
       parseInt(randomString, 36),
     ];
   } catch (e) {
-    console.log({ e });
+    logger.error({ e });
     throw new InvalidConfirmCodeFormat();
   }
 };

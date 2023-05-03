@@ -24,14 +24,14 @@ export type CollectionOptions = {
   includeDeleted?: boolean;
 };
 
-let client: MongoClient | null;
+export let client: MongoClient | null = null;
 
 const { URI, MONGODB_DATABASE: DATABASE } = process.env;
 const options: MongoClientOptions = {};
 export const FEEDBACK = 'feedbackController';
 
 export const connectClient = async () => {
-  if (!client) {
+  if (client === null) {
     client = new MongoClient(URI!, options);
     try {
       await client.connect();
@@ -89,7 +89,6 @@ export const getInschrijvingCollection = async (): Promise<
 
 export const getKlantCollection = async (): Promise<Collection<IsKlantCollection>> => {
   const client = await connectClient();
-  const db = client.db(DATABASE);
   return client.db(DATABASE).collection<IsKlantCollection>('klant');
 };
 

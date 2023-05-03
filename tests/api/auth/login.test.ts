@@ -1,22 +1,13 @@
 import { LOGINAPI } from 'src/types/apiTypes';
 import { generateCsrf } from 'src/services/Validator';
 import handler from 'src/pages/api/auth/login.page';
-import { clearAllData } from 'src/utils/MongoDb';
 import { getController } from 'src/services/Factory';
 import { KLANT } from 'src/controllers/KlantController';
 import { createRandomKlant } from 'tests/fixtures/klant';
-import { closeClient } from 'src/utils/db';
 import bcrypt from 'bcrypt';
 import { getRequest } from 'tests/helpers';
 
 describe('login', () => {
-  beforeEach(async () => {
-    await clearAllData();
-  });
-  afterAll(async () => {
-    await clearAllData();
-    await closeClient();
-  });
   const request = getRequest(handler);
 
   it('login without csrf should result in bad request', async () => {

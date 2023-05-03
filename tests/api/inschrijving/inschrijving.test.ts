@@ -1,4 +1,3 @@
-import { clearAllData } from 'src/utils/MongoDb';
 import { POST_INSCHRIJVING } from 'src/types/apiTypes';
 import handler from 'src/pages/api/inschrijvingen.page';
 import { getController } from 'src/services/Factory';
@@ -17,20 +16,12 @@ import {
   createRandomInschrijving,
   createRandomInschrijvingen,
 } from 'tests/fixtures/inschrijving';
-import { closeClient } from 'src/utils/db';
 import { getRequest } from 'tests/helpers';
 import { createRandomTrainingDays } from 'tests/fixtures/trainingDay';
 import { defaultTrainingTimeSlots } from 'src/mappers/trainingDays';
 import { TRAININGDAY } from 'src/controllers/TrainingDayController';
 
 describe('/inschrijving', () => {
-  beforeEach(async () => await clearAllData());
-  afterAll(async () => {
-    jest.clearAllMocks();
-    await clearAllData();
-    await closeClient();
-  });
-
   const request = getRequest(handler);
 
   const mockedSendMail = jest.spyOn(Mailer, 'sendMail');

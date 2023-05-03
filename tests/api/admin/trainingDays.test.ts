@@ -4,8 +4,6 @@ import handler from 'src/pages/api/admin/trainingdays/index.page';
 import { createBearer } from 'src/services/Authenticator';
 import { getController } from 'src/services/Factory';
 import { KLANT } from 'src/controllers/KlantController';
-import { clearAllData } from 'src/utils/MongoDb';
-import { closeClient } from 'src/utils/db';
 import { TRAININGDAY } from 'src/controllers/TrainingDayController';
 import { createRandomTrainingDays } from 'tests/fixtures/trainingDay';
 import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
@@ -14,13 +12,6 @@ import { getCurrentTime } from 'src/shared/functions';
 
 describe('Admin trainingDays', () => {
   const request = getRequest(handler);
-
-  beforeEach(clearAllData);
-
-  afterAll(async () => {
-    await clearAllData();
-    await closeClient();
-  });
 
   describe('/ GET', () => {
     it('should return a list of activated TrainingDays', async () => {

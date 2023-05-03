@@ -1,6 +1,5 @@
 import { getAllKlanten, KLANT } from 'src/controllers/KlantController';
 import { createDefaultFeedbackConfiguration, getController } from 'src/services/Factory';
-import { closeClient } from 'src/utils/db';
 import logger from 'src/utils/logger';
 
 export const handler = async () => {
@@ -13,13 +12,12 @@ export const handler = async () => {
       klant.feedbackConfiguration = createDefaultFeedbackConfiguration();
       await getController(KLANT).update(klant._id, klant);
     }
-
     logger.info(`Script done...`);
+
+    return true;
   } catch (error: any) {
     logger.error(error.message);
-  } finally {
-    await closeClient();
-    return true;
+    return false;
   }
 };
 

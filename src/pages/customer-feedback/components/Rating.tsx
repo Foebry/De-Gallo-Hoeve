@@ -14,6 +14,7 @@ type Props = {
   fieldState?: any;
   name: string;
   errors: Partial<FeedbackBody>;
+  isMobile: boolean;
 };
 
 const Rating: React.FC<Props> = ({
@@ -25,12 +26,14 @@ const Rating: React.FC<Props> = ({
   required = true,
   errors,
   name,
+  isMobile,
 }) => {
   const [rating, setRating] = useState<number>(value ?? 0);
   const [chosenRating, setChosenRating] = useState<number>(value ?? 0);
   const [error, setError] = useState<string | undefined | number>(
     errors[name as keyof typeof errors]
   );
+
   return (
     <div>
       <Title4 className={`${error ? 'text-red-900' : 'text-green-200'} mb-10`}>
@@ -41,23 +44,27 @@ const Rating: React.FC<Props> = ({
           rating >= index + 1 ? (
             <div className="relative" key={nanoid(5)}>
               {index === 0 && (
-                <span className="absolute -top-8 right-0 whitespace-nowrap font-semibold">
+                <span
+                  className="absolute -top-8 -right-5 
+                whitespace-nowrap font-semibold"
+                >
                   {min}
                 </span>
               )}
               {index === 4 && (
-                <span className="absolute -top-8 left-0 whitespace-nowrap font-semibold">
+                <span className="absolute -top-8 -left-8 whitespace-nowrap font-semibold">
                   {max}
                 </span>
               )}
               <AiFillStar
                 fill="#FFD700"
-                className="text-4xl cursor-pointer"
+                className={isMobile ? 'text-4xl' : 'text-4xl cursor-pointer'}
                 key={nanoid(5)}
-                onMouseEnter={() => setRating(() => index + 1)}
-                onMouseLeave={() => setRating(() => chosenRating || 0)}
+                onMouseEnter={() => !isMobile && setRating(() => index + 1)}
+                onMouseLeave={() => !isMobile && setRating(() => chosenRating || 0)}
                 onClick={() => {
                   setChosenRating(() => index + 1);
+                  setRating(() => index + 1);
                   setError(undefined);
                   onChange(index + 1);
                 }}
@@ -66,22 +73,23 @@ const Rating: React.FC<Props> = ({
           ) : (
             <div className="relative" key={nanoid(5)}>
               {index === 0 && (
-                <span className="absolute -top-8 right-0 whitespace-nowrap font-semibold">
+                <span className="absolute -top-8 -right-5 whitespace-nowrap font-semibold">
                   {min}
                 </span>
               )}
               {index === 4 && (
-                <span className="absolute -top-8 left-0 whitespace-nowrap font-semibold">
+                <span className="absolute -top-8 -left-8 whitespace-nowrap font-semibold">
                   {max}
                 </span>
               )}
               <AiOutlineStar
-                className="text-4xl cursor-pointer"
+                className={isMobile ? 'text-4xl' : 'text-4xl cursor-pointer'}
                 key={nanoid(5)}
-                onMouseEnter={() => setRating(() => index + 1)}
-                onMouseLeave={() => setRating(() => chosenRating || 0)}
+                onMouseEnter={() => !isMobile && setRating(() => index + 1)}
+                onMouseLeave={() => !isMobile && setRating(() => chosenRating || 0)}
                 onClick={() => {
                   setChosenRating(() => index + 1);
+                  setRating(() => index + 1);
                   setError(undefined);
                   onChange(index + 1);
                 }}

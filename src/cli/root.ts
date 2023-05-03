@@ -1,3 +1,4 @@
+import { closeClient } from 'src/utils/db';
 import logger from 'src/utils/logger';
 import yargs from 'yargs';
 import job from './jobs';
@@ -31,6 +32,8 @@ const setup = async () => {
   job(args);
 
   script(args);
+
+  // closeClient();
 };
 
 setup();
