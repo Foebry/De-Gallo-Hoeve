@@ -1,5 +1,3 @@
-import { closeClient } from 'src/utils/db';
-import { clearAllData } from 'src/utils/MongoDb';
 import listHandler from 'src/pages/api/admin/rassen/index.page';
 import { getRequest } from 'tests/helpers';
 import { createRandomKlant, RoleOptions } from 'tests/fixtures/klant';
@@ -11,12 +9,6 @@ import { KLANT } from 'src/controllers/KlantController';
 import { RAS } from 'src/controllers/rasController';
 
 describe('/admin/rassen', () => {
-  beforeEach(clearAllData);
-  afterAll(async () => {
-    await clearAllData();
-    await closeClient();
-  });
-
   const listRequest = getRequest(listHandler);
 
   describe('GET /', () => {

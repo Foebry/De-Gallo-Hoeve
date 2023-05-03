@@ -1,7 +1,6 @@
 import { getAllKlanten, KLANT } from 'src/controllers/KlantController';
 import { getAllRassen, RAS } from 'src/controllers/rasController';
 import { getController } from 'src/services/Factory';
-import { closeClient } from 'src/utils/db';
 import logger from 'src/utils/logger';
 
 export const handler = async () => {
@@ -20,13 +19,12 @@ export const handler = async () => {
       klant.honden.forEach((hond) => (hond.ras = hond.ras.toLowerCase()));
       await getController(KLANT).update(klant._id, klant);
     }
-
     logger.info(`Script done...`);
+
+    return true;
   } catch (error: any) {
     logger.error(error.message);
-  } finally {
-    await closeClient();
-    process.exit();
+    return false;
   }
 };
 

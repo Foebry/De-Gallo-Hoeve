@@ -6,8 +6,6 @@ import { KLANT } from 'src/controllers/KlantController';
 import { getFeedbackById, saveFeedback } from 'src/pages/api/feedback/repo';
 import { createRandomFeedback } from 'tests/fixtures/feedback';
 import { getRating } from 'src/entities/Feedback';
-import { clearAllData } from 'src/utils/MongoDb';
-import { closeClient } from 'src/utils/db';
 import { createBearer } from 'src/services/Authenticator';
 import { FeedbackBody } from 'src/pages/api/feedback/schemas';
 import { faker } from '@faker-js/faker';
@@ -17,12 +15,6 @@ import moment from 'moment';
 
 describe('/', () => {
   const request = getRequest(handler);
-
-  beforeEach(clearAllData);
-  afterAll(async () => {
-    await clearAllData();
-    await closeClient();
-  });
 
   describe('GET', () => {
     it('Should return a list of feedback dtos', async () => {

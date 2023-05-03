@@ -7,7 +7,6 @@ import { getKlantByEmail } from 'src/controllers/KlantController';
 import { createDefaultFeedbackConfiguration } from 'src/services/Factory';
 import { generateCsrf } from 'src/services/Validator';
 import { capitalize, getCurrentTime } from 'src/shared/functions';
-import { IsRegisterPayload, IsRegisterResponseBody } from 'tests/api/auth/types';
 
 export enum RoleOptions {
   USER = '0',

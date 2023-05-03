@@ -1,28 +1,15 @@
-import { clearAllData } from 'src/utils/MongoDb';
 import handler from 'src/pages/api/confirm/[code]/index.page';
 import { getController } from 'src/services/Factory';
 import { getKlantById, KLANT } from 'src/controllers/KlantController';
 import { createRandomKlant } from 'tests/fixtures/klant';
-import { closeClient } from 'src/utils/db';
 import { faker } from '@faker-js/faker';
 import { getRequest } from 'tests/helpers';
 import { createRandomConfirmCode } from 'src/pages/api/confirm/[code]/repo';
 import Mailer from 'src/utils/Mailer';
-import * as errorLog from 'src/pages/api/logError/repo';
 
 describe('/confirm', () => {
-  beforeEach(async () => {
-    jest.clearAllMocks();
-    await clearAllData();
-  });
-  afterAll(async () => {
-    jest.clearAllMocks();
-    await clearAllData();
-    await closeClient();
-  });
   const request = getRequest(handler);
   const mockedSendMail = jest.spyOn(Mailer, 'sendMail').mockImplementation();
-  const mockedErrorLog = jest.spyOn(errorLog, 'logError').mockImplementation();
 
   describe('/GET', () => {
     it('Should throw ExpiredConfirmCodeError', async () => {
