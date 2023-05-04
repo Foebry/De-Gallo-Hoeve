@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { InsertOneResult, ObjectId } from 'mongodb';
 import Feedback, { FeedBackCollection } from 'src/entities/Feedback';
 import { getFeedbackCollection } from 'src/utils/db';
@@ -11,7 +12,10 @@ export const getFeedbackById = async (
 
 export const getAllFeedback = async (): Promise<FeedBackCollection[]> => {
   const collection = await getFeedbackCollection();
-  return collection.find({}, { sort: { created_at: -1 } }).toArray();
+  const daysAgo = moment().subtract(7, 'days').toDate();
+  return collection
+    .find({ created_at: { $lte: daysAgo } }, { sort: { created_at: -1 } })
+    .toArray();
 };
 
 export const getFeedbackByCode = async (
