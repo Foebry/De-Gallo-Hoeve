@@ -1,4 +1,4 @@
-import { Title1, Body, Title2 } from './Typography/Typography';
+import { Body, Title2 } from './Typography/Typography';
 import {
   IoLogoFacebook,
   IoLogoInstagram,
@@ -10,7 +10,7 @@ import FormInput from './form/FormInput';
 import { Controller, useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import useMutation from '../hooks/useMutation';
 import { CONTACTAPI } from '../types/apiTypes';
 import { FormTextBox } from './form/FormTextBox';
@@ -20,27 +20,35 @@ interface Props {}
 export interface ContactErrorInterface {
   naam?: string;
   email?: string;
+  gsm?: string;
   bericht?: string;
 }
 
 const Footer: React.FC<Props> = ({}) => {
-  const { control, handleSubmit, setValue } = useForm();
+  const { control, handleSubmit, reset: clearForm } = useForm();
+  const emptyState = useMemo(() => ({ naam: '', email: '', gsm: '', bericht: '' }), []);
 
   const [disabled, setDisabled] = useState<boolean>(false);
-  const [formErrors, setFormErrors] = useState<ContactErrorInterface>({});
+  const [formErrors, setFormErrors] = useState<Partial<ContactErrorInterface>>({});
 
-  const contact = useMutation(formErrors, setFormErrors);
+  const contact = useMutation<ContactErrorInterface>();
 
   const onSubmit = async (values: any) => {
     const payload = values;
     if (!disabled) {
       setDisabled(() => true);
-      const { data, error } = await contact(CONTACTAPI, { ...payload });
+      const { data, error } = await contact(CONTACTAPI, {
+        ...payload,
+        email: payload.email?.trim().toLowerCase(),
+        csrf: 'MmJiM2pwNHQ1dg==$c0tKJd-G-aePggUzDLC6H28lsl2iNCjnGBQ5i0vpzdw',
+      });
       if (data) {
-        toast.success(data.message);
-        setValue('naam', '');
-        setValue('email', '');
-        setValue('bericht', '');
+        toast.success('Bericht ontvangen!');
+        clearForm(emptyState);
+      }
+      if (error) {
+        toast.error(error.message);
+        setFormErrors(() => error);
       }
       setDisabled(() => false);
     }
@@ -105,11 +113,27 @@ const Footer: React.FC<Props> = ({}) => {
                   )}
                 />
                 <Controller
+                  name="gsm"
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <FormInput
+                      label="gsm"
+                      name="gsm"
+                      id="gsm"
+                      value={value}
+                      onChange={onChange}
+                      errors={formErrors}
+                      setErrors={setFormErrors}
+                    />
+                  )}
+                />
+                <Controller
                   name="bericht"
                   control={control}
                   render={({ field: { value, onChange } }) => (
                     <FormTextBox
-                      label="bericht"
+                      style={{}}
+                      label="Bericht"
                       name="bericht"
                       id="bericht"
                       value={value}

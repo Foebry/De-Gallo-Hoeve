@@ -18,6 +18,4 @@ const job = (obj: Record<string, any>) => {
   }
 };
 
-const description = () => {};
-
 export default job;

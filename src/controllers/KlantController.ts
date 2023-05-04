@@ -1,12 +1,12 @@
 import { ClientSession, ObjectId, WithId } from 'mongodb';
 import inschrijvingController, { getAllInschrijvingen } from './InschrijvingController';
 import { InternalServerError, TransactionError } from '../shared/RequestError';
-import { IsKlantCollection } from '../types/EntityTpes/KlantTypes';
 import { InschrijvingCollection } from '../types/EntityTpes/InschrijvingTypes';
 import { HondCollection } from 'src/types/EntityTpes/HondTypes';
 import { getKlantCollection } from 'src/utils/db';
 import { getCurrentTime } from 'src/shared/functions';
 import bcrypt from 'bcrypt';
+import { IsKlantCollection } from 'src/common/domain/klant';
 
 export const getAllKlanten = async (
   includeDeleted: boolean = false
@@ -126,15 +126,15 @@ export const setVerified = async (
 ): Promise<IsKlantCollection> => {
   const collection = await getKlantCollection();
   const verified = true;
-  const verified_at = getCurrentTime();
+  const now = getCurrentTime();
 
   const { modifiedCount } = await collection.updateOne(
     { _id: klant._id },
-    { $set: { verified, verified_at } }
+    { $set: { verified, verified_at: now, updated_at: now } }
   );
   if (modifiedCount !== 1) throw new InternalServerError();
 
-  return { ...klant, verified, verified_at };
+  return { ...klant, verified, verified_at: now, updated_at: now };
 };
 
 export const removeInschrijving = async (

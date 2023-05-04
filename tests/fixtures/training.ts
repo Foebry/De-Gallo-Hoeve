@@ -1,13 +1,13 @@
-import { PriveTrainingCollection } from "@/types/EntityTpes/TrainingType";
-import { faker } from "@faker-js/faker";
-import { ObjectId } from "mongodb";
-import { getCurrentTime } from "src/shared/functions";
+import { PriveTrainingCollection } from '@/types/EntityTpes/TrainingType';
+import { faker } from '@faker-js/faker';
+import { ObjectId } from 'mongodb';
+import { getCurrentTime } from 'src/shared/functions';
 
 export const createRandomTraining = (): PriveTrainingCollection => {
   const currentTime = getCurrentTime();
   return {
     _id: new ObjectId(),
-    naam: "prive",
+    naam: 'prive',
     inschrijvingen: [] as ObjectId[],
     bullets: [],
     content: faker.lorem.paragraph(),

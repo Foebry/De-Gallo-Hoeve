@@ -31,17 +31,12 @@ const validationHelper: ValidationHelperInterface = {
     try {
       req.body = await schema.validate(payload, validationOptions);
     } catch (error: any) {
-      let response = {};
-      if (error.errors.length > 1) {
-        response = error.errors.reduce((prev: any, curr: any) => {
-          const [key, value] = Object.entries(curr)[0];
-          return { ...prev, [key]: value };
-        }, {});
-      } else {
-        response = error.errors.reduce((prev: any, curr: any) => {
-          const [key, value] = Object.entries(curr)[0];
-          return { ...prev, [key]: value };
-        }, {});
+      const response: Record<string, any> = {};
+      for (const err of error.errors) {
+        const entries = Object.entries(err);
+        for (const [key, value] of entries) {
+          response[key] = value;
+        }
       }
       throw new ValidationError(message, response);
     }

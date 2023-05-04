@@ -7,12 +7,13 @@ import {
   ClientSession,
   MongoClientOptions,
 } from 'mongodb';
+import { IsKlantCollection } from 'src/common/domain/klant';
 import { ConfirmCollection } from 'src/types/EntityTpes/ConfirmTypes';
 import { ContentCollection } from 'src/types/EntityTpes/ContentTypes';
 import { ErrorLogCollection } from 'src/types/EntityTpes/ErrorLogTypes';
 import { InschrijvingCollection } from 'src/types/EntityTpes/InschrijvingTypes';
-import { IsKlantCollection } from 'src/types/EntityTpes/KlantTypes';
 import { RasCollection } from 'src/types/EntityTpes/RasTypes';
+import { FeedBackCollection } from 'src/entities/Feedback';
 import {
   GroepTrainingCollection,
   PriveTrainingCollection,
@@ -23,13 +24,14 @@ export type CollectionOptions = {
   includeDeleted?: boolean;
 };
 
-let client: MongoClient | null;
+export let client: MongoClient | null = null;
 
 const { URI, MONGODB_DATABASE: DATABASE } = process.env;
 const options: MongoClientOptions = {};
+export const FEEDBACK = 'feedbackController';
 
 export const connectClient = async () => {
-  if (!client) {
+  if (client === null) {
     client = new MongoClient(URI!, options);
     try {
       await client.connect();
@@ -45,6 +47,20 @@ export const closeClient = async () => {
   try {
     await clientToClose.close();
   } catch (e: any) {}
+};
+
+/**
+ * This function will give you access to a collection of your choice, however, there will be no type-safety on this collection.
+ * Therefor this function should b used ONLY in test cases when you are absolutely certain this is the correct function to use.
+ *
+ * An example of a scenario to use this function: -- test of script to add new key to collection. For customer-feedback, we wanted to implement a configuration to keep track of which email to send.
+ * However the typings were already in place so testing the script was pointless as all newly created test-klanten would already have the required key --
+ *
+ * @returns *untyped* collection
+ */
+export const getUntypedCollection = async (collection: string): Promise<Collection> => {
+  const client = await connectClient();
+  return client.db(DATABASE).collection(collection);
 };
 
 export const getConfirmCollection = async (): Promise<Collection<ConfirmCollection>> => {
@@ -73,7 +89,6 @@ export const getInschrijvingCollection = async (): Promise<
 
 export const getKlantCollection = async (): Promise<Collection<IsKlantCollection>> => {
   const client = await connectClient();
-  const db = client.db(DATABASE);
   return client.db(DATABASE).collection<IsKlantCollection>('klant');
 };
 
@@ -96,6 +111,13 @@ export const getTrainingDaysCollection = async (): Promise<
 > => {
   const client = await connectClient();
   return client.db(DATABASE).collection<TrainingDaysCollection>('trainingDays');
+};
+
+export const getFeedbackCollection = async (): Promise<
+  Collection<FeedBackCollection>
+> => {
+  const client = await connectClient();
+  return client.db(DATABASE).collection<FeedBackCollection>('feedback');
 };
 
 export const startTransaction = (): TransactionOptions => {

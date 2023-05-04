@@ -5,6 +5,8 @@ module.exports = {
   transform: {
     '^.+\\.ts?$': 'ts-jest',
   },
+  setupFilesAfterEnv: ['<rootDir>/tests/jest.integration.setup.ts'],
+  globalTeardown: '<rootDir>/tests/jest.globalTearDown.ts',
   verbose: true,
   transformIgnorePatterns: ['<rootDir>/node_modules/'],
   setupFiles: ['dotenv/config'],
@@ -12,5 +14,6 @@ module.exports = {
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
     '^tests/(.*)$': '<rootDir>/tests/$1',
+    '^@/types/(.*)$': '<rootDir>/src/types/$1',
   },
 };

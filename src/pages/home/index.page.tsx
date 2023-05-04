@@ -5,18 +5,15 @@ import Skeleton from 'src/components/website/skeleton';
 import { GiCheckMark } from 'react-icons/gi';
 import { getPriveTraining } from 'src/controllers/TrainingController';
 import Head from 'next/head';
+import { useEffect, useState } from 'react';
+import getData from 'src/hooks/useApi';
+import FeedbackSection from './components/feedback/section';
+import { IndexData } from './types';
 
-interface IndexProps {
-  prijsExcl: number;
-  kmHeffing: number;
-  gratisVerplaatsingBinnen: number;
-}
+interface Props {}
 
-const Index: React.FC<IndexProps> = ({
-  prijsExcl,
-  kmHeffing,
-  gratisVerplaatsingBinnen,
-}) => {
+const Index: React.FC<Props> = () => {
+  const { prijsExcl, kmHeffing, gratisVerplaatsingBinnen, feedback } = useGetIndexData();
   return (
     <>
       <Head>
@@ -28,6 +25,9 @@ const Index: React.FC<IndexProps> = ({
         ></meta>
       </Head>
       <Skeleton>
+        {/**
+         * Heading section WHO ARE WE
+         */}
         <section className="mb-40 block flex-wrap mt-10 items-center max-w-7xl justify-between mx-auto md:flex md:px-5">
           <div className="mx-auto w-1/2 flex flex-wrap rotate-135 gap-5 self-center md:w-4/12 md:mx-0 md:self-end relative mt-28">
             <div className="w-5/12 max-w-sm aspect-square border-4 border-green-200 overflow-hidden relative images">
@@ -91,6 +91,9 @@ const Index: React.FC<IndexProps> = ({
             </Body>
           </div>
         </section>
+        {/**
+         * Diensten section
+         */}
         <section className="bg-white pb-2 mx-auto md:px-5">
           <div className="px-5 mx-auto  max-w-7xl md:px-0">
             <Title2 className="text-green-200">Onze diensten</Title2>
@@ -160,9 +163,39 @@ const Index: React.FC<IndexProps> = ({
             </div>
           </div>
         </section>
+        {feedback.length > 0 && <FeedbackSection feedback={feedback} />}
       </Skeleton>
     </>
   );
+};
+
+const useGetIndexData = () => {
+  const priveTrainingId = '62fa1f25bacc03711136ad5f';
+  const [indexData, setIndexData] = useState<IndexData>({
+    prijsExcl: 20.66,
+    kmHeffing: 0.3,
+    gratisVerplaatsingBinnen: 10,
+    feedback: [],
+  });
+
+  useEffect(() => {
+    (async () => {
+      const [priveTrainingResult, feedbackResult] = await Promise.all([
+        getData(`/api/trainingen/${priveTrainingId}`),
+        getData('/api/feedback'),
+      ]);
+      const { data: trainingData, error: trainingError } = priveTrainingResult;
+      const { data: feedbackData, error: feedbackError } = feedbackResult;
+
+      if (!trainingError)
+        setIndexData((indexData) => ({ ...indexData, ...trainingData }));
+
+      if (!feedbackError)
+        setIndexData((indexData) => ({ ...indexData, feedback: feedbackData }));
+    })();
+  }, []);
+
+  return indexData;
 };
 
 export default Index;

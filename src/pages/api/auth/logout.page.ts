@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { destroyCookie } from 'nookies';
-import { closeClient } from 'src/utils/db';
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'DELETE') return logout(res);

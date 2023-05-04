@@ -1,22 +1,13 @@
 import { LOGINAPI } from 'src/types/apiTypes';
 import { generateCsrf } from 'src/services/Validator';
 import handler from 'src/pages/api/auth/login.page';
-import { clearAllData } from 'src/utils/MongoDb';
 import { getController } from 'src/services/Factory';
 import { KLANT } from 'src/controllers/KlantController';
 import { createRandomKlant } from 'tests/fixtures/klant';
-import { closeClient } from 'src/utils/db';
 import bcrypt from 'bcrypt';
 import { getRequest } from 'tests/helpers';
 
 describe('login', () => {
-  beforeEach(async () => {
-    await clearAllData();
-  });
-  afterAll(async () => {
-    await clearAllData();
-    await closeClient();
-  });
   const request = getRequest(handler);
 
   it('login without csrf should result in bad request', async () => {
@@ -28,7 +19,9 @@ describe('login', () => {
     const { body } = await request.post(LOGINAPI).send(loginPayload).expect(400);
 
     expect(body).toStrictEqual({
-      message: 'Probeer later opnieuw...',
+      message: 'Er is iets fout gegaan, probeer later opnieuw...',
+      code: 400,
+      errorCode: 'InvalidCsrfError',
     });
   });
   it('login with wrong email should throw InvalidEmailError', async () => {
@@ -42,6 +35,8 @@ describe('login', () => {
     expect(body).toStrictEqual({
       email: 'Onbekende email',
       message: 'Kan verzoek niet verwerken',
+      code: 422,
+      errorCode: 'UnrecognizedEmailError',
     });
   });
   it('Login with wrong password should throw InvalidPasswordError', async () => {
@@ -56,6 +51,8 @@ describe('login', () => {
     expect(body).toStrictEqual({
       password: 'Ongeldig wachtwoord',
       message: 'Kan verzoek niet verwerken',
+      code: 422,
+      errorCode: 'InvalidPasswordError',
     });
   });
   it('Login with correct credentials should create jwt token and frontend token', async () => {

@@ -1,5 +1,3 @@
-import { closeClient } from 'src/utils/db';
-import { clearAllData } from 'src/utils/MongoDb';
 import listHandler from 'src/pages/api/admin/rassen/index.page';
 import { getRequest } from 'tests/helpers';
 import { createRandomKlant, RoleOptions } from 'tests/fixtures/klant';
@@ -9,16 +7,8 @@ import { createRandomRassen } from 'tests/fixtures/ras';
 import { getController } from 'src/services/Factory';
 import { KLANT } from 'src/controllers/KlantController';
 import { RAS } from 'src/controllers/rasController';
-import { toReadableDate } from 'src/shared/functions';
-// import byIdHandler from 'src/pages/api/admin/rassen/'
 
 describe('/admin/rassen', () => {
-  beforeEach(clearAllData);
-  afterAll(async () => {
-    await clearAllData();
-    await closeClient();
-  });
-
   const listRequest = getRequest(listHandler);
 
   describe('GET /', () => {
@@ -27,12 +17,12 @@ describe('/admin/rassen', () => {
       const superAdmin = createRandomKlant({ roles: RoleOptions.SUPER_ADMIN });
       const bearerAdmin = createBearer(admin);
       const bearerSuperAdmin = createBearer(superAdmin);
-      const rassen = createRandomRassen(faker.datatype.number({ max: 20 }));
+      const rassen = createRandomRassen(faker.datatype.number({ max: 20, min: 1 }));
 
       await getController(KLANT).save(admin);
       await getController(RAS).saveMany(rassen);
 
-      const amount = faker.datatype.number({ max: 20 });
+      const amount = faker.datatype.number({ max: 20, min: 1 });
       const nextPage =
         rassen.length > amount ? `/api/admin/rassen/?page=2&amount=${amount}` : undefined;
 

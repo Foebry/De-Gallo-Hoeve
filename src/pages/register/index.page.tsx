@@ -49,7 +49,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
   const { retrieveRassen } = useAppContext();
   const [formErrors, setFormErrors] = useState<RegisterErrorInterface>({});
   const router = useRouter();
-  const register = useMutation(formErrors, setFormErrors);
+  const register = useMutation<Partial<RegisterErrorInterface>>();
   const { control, handleSubmit, getValues } = useForm();
   const { fields, remove, append } = useFieldArray({
     control,
@@ -126,6 +126,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
       if (error) {
         handleErrors(error);
         toast.error(error.message);
+        setFormErrors(error);
       }
       setDisabled(() => false);
     }
@@ -189,19 +190,23 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
                 ) : null}
               </div>
             </Form>
-            {activeStep === 1 && (
+          </div>
+          {activeStep === 1 ? (
+            <>
               <div className="absolute left-10 top-20">
                 <Button label="vorige" onClick={() => setActiveStep(activeStep - 1)} />
               </div>
-            )}
-            <div className="absolute right-10 top-20">
-              {activeStep === 1 ? (
+              <div className="absolute right-10 top-20">
                 <SubmitButton label="verzend" onClick={() => onSubmit(getValues())} />
-              ) : (
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="absolute right-10">
                 <Button label="volgende" onClick={() => setActiveStep(activeStep + 1)} />
-              )}
-            </div>
-          </div>
+              </div>
+            </>
+          )}
         </section>
       </Skeleton>
     </>
