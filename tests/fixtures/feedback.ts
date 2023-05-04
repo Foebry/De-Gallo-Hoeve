@@ -1,5 +1,6 @@
 import { IsKlantCollection } from '@/types/EntityTpes/KlantTypes';
 import { faker } from '@faker-js/faker';
+import moment from 'moment';
 import { ObjectId } from 'mongodb';
 import { FeedBackCollection } from 'src/entities/Feedback';
 import { getCurrentTime } from 'src/shared/functions';
@@ -12,7 +13,9 @@ export const createRandomFeedback = (klant: IsKlantCollection): FeedBackCollecti
     .reverse()
     .join('')}`,
   communication: faker.datatype.number({ min: 1, max: 5, precision: 0.5 }),
-  created_at: getCurrentTime(),
+  created_at: moment()
+    .subtract(faker.datatype.number({ min: 8, max: 365 }), 'days')
+    .toDate(),
   happiness: faker.datatype.number({ min: 1, max: 5, precision: 0.5 }),
   helpful: faker.datatype.number({ min: 1, max: 5, precision: 0.5 }),
   name: klant.vnaam,
