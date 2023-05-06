@@ -138,11 +138,11 @@ const Klanten = () => {
       <Dashboard>
         <FormRow className="flex-row-reverse">
           <FormSearch api="/api/admin/klanten?search=" onSearch={onSearch} />
-          <Button
+          {/* <Button
             label="verzend feedback mails"
             className="mb-2"
             onClick={onClickSendEmails}
-          />
+          /> */}
         </FormRow>
         <Table
           rows={klanten}
