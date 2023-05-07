@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import getData from 'src/hooks/useApi';
 import FeedbackSection from './components/feedback/section';
 import { IndexData } from './types';
+import { useApiContext } from 'src/context/api/ApiContext';
 
 interface Props {}
 
@@ -171,6 +172,7 @@ const Index: React.FC<Props> = () => {
 
 const useGetIndexData = () => {
   const priveTrainingId = '62fa1f25bacc03711136ad5f';
+  // const { getFeedback,  } = useApiContext();
   const [indexData, setIndexData] = useState<IndexData>({
     prijsExcl: 20.66,
     kmHeffing: 0.3,

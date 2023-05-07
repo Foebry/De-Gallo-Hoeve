@@ -1,42 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { ADMIN, INDEX, LOGIN, REGISTER, CHANGELOG } from '../types/linkTypes';
+import { ADMIN, INDEX, LOGIN, REGISTER } from '../types/linkTypes';
 import { Title3 } from './Typography/Typography';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import NavLink from './NavLink';
-import { parseCookies } from 'nookies';
-import jwt from 'jsonwebtoken';
 import { Hamburger } from './Hamburger';
 import { LOGOUT } from '../types/apiTypes';
 import useMutation from '../hooks/useMutation';
+import { REQUEST_METHOD } from 'src/utils/axios';
+import { useApiContext } from 'src/context/api/ApiContext';
+import { IsKlantCollection } from 'src/common/domain/klant';
 
 export const Nav = () => {
   const router = useRouter();
-  const [userName, setUserName] = useState<string>();
-  const [roles, setRoles] = useState<number>();
-  const cookies = parseCookies();
-  const logout = useMutation();
+  const { klant, clearData } = useGetKlantData();
+  const logout = useMutation<{}>(LOGOUT);
 
   const onLogout = async () => {
-    await logout(LOGOUT, {}, { method: 'DELETE' });
+    await logout({}, { method: REQUEST_METHOD.DELETE });
+    localStorage.clear();
+    clearData();
     router.push(INDEX);
   };
-
-  useEffect(() => {
-    const token = cookies.Client;
-    const secret = process.env.NEXT_PUBLIC_COOKIE_SECRET;
-    if (token) {
-      const verifiedToken = jwt.verify(token, `${secret}`, {
-        algorithms: ['RS256', 'HS256'],
-      });
-      const payload = JSON.parse(JSON.stringify(verifiedToken));
-      setUserName(payload.name);
-      setRoles(payload.roles);
-    } else {
-      setUserName(undefined);
-      setRoles(undefined);
-    }
-  }, [cookies]);
 
   return (
     <div className="relative mb-30 w-full shadow h-16 z-20 md:mb-0 md:block">
@@ -58,18 +43,18 @@ export const Nav = () => {
           </div>
         </div>
         {/* <NavLink href={CHANGELOG} label="nieuw" /> */}
-        {userName ? (
+        {klant ? (
           <div className="flex gap-10 items-center">
             <div className="hidden xs:block uppercase text-green-200 text-lg font-medium">
               <Title3>
-                <span className="capitalize">Hallo</span> {userName}
+                <span className="capitalize">Hallo</span> {klant.vnaam}
               </Title3>
             </div>
-            <Hamburger roles={roles!}>
+            <Hamburger roles={parseInt(klant.roles)}>
               <span className="block xs:hidden capitalize border rounded py-1 px-1.5 text-gray-100 bg-green-100 cursor-pointer w-full hover:text-green-200 hover:bg-gray-100 text-md font-medium">
-                Hallo {userName}
+                Hallo {klant.vnaam}
               </span>
-              {roles && roles > 0 && (
+              {parseInt(klant.roles) > 0 && (
                 <NavLink
                   href={ADMIN}
                   label="admin"
@@ -91,7 +76,7 @@ export const Nav = () => {
               <NavLink href={REGISTER} label="registreer" />
             </nav>
             <div className="block md:hidden">
-              <Hamburger roles={roles!}>
+              <Hamburger roles={0}>
                 <NavLink
                   href={LOGIN}
                   label="login"
@@ -109,4 +94,21 @@ export const Nav = () => {
       </div>
     </div>
   );
+};
+
+const useGetKlantData = () => {
+  const { getKlantData } = useApiContext();
+  const [klant, setKlant] = useState<IsKlantCollection | null>();
+
+  const clearData = () => setKlant(null);
+
+  useEffect(() => {
+    const klantId = localStorage.getItem('klantId');
+    (async () => {
+      if (!klantId) return null;
+      const klantData = await getKlantData(klantId);
+      setKlant(klantData);
+    })();
+  }, [getKlantData]);
+  return { klant, clearData };
 };

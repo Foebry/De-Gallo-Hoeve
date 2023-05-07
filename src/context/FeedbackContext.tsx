@@ -1,8 +1,9 @@
 import { FEEDBACK_API } from '@/types/apiTypes';
 import { useRouter } from 'next/router';
-import { createContext, useState } from 'react';
+import { createContext, Dispatch, SetStateAction, useContext, useState } from 'react';
 import { UseFormSetError } from 'react-hook-form';
 import { toast } from 'react-toastify';
+import { FeedbackDto } from 'src/common/api/types/feedback';
 import useMutation from 'src/hooks/useMutation';
 import { FeedbackBody } from 'src/pages/api/feedback/schemas';
 
@@ -14,6 +15,8 @@ type FeedbackContext = {
   ) => Promise<Partial<FeedbackBody> | void>;
   isLoading: boolean;
   errors: Partial<FeedbackBody>;
+  feedback: FeedbackDto[];
+  setFeedback: Dispatch<SetStateAction<FeedbackDto[]>>;
 };
 
 type FeedbackQuery = {
@@ -25,23 +28,25 @@ const defaultValues: FeedbackContext = {
   sendFeedback: async () => {},
   isLoading: false,
   errors: {},
+  feedback: [],
+  setFeedback: () => {},
 };
 
 export const FeedbackContext = createContext<FeedbackContext>(defaultValues);
 
 const FeedbackProvider: React.FC<{ children: any }> = ({ children }) => {
-  const mutate = useMutation<FeedbackBody>();
+  const mutate = useMutation<FeedbackBody>(FEEDBACK_API);
   const router = useRouter();
-  const api = FEEDBACK_API;
   const [disabled, setDisabled] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<Partial<FeedbackBody>>({});
+  const [feedback, setFeedback] = useState<FeedbackDto[]>([]);
 
   const sendFeedback = async (body: FeedbackBody, query: FeedbackQuery) => {
     if (disabled) return;
     setDisabled(true);
     setIsLoading(true);
-    const { data, error } = await mutate(api, body, { params: query });
+    const { data, error } = await mutate(body, { params: query });
     setIsLoading(false);
     if (error) {
       setDisabled(false);
@@ -62,6 +67,8 @@ const FeedbackProvider: React.FC<{ children: any }> = ({ children }) => {
         sendFeedback,
         isLoading,
         errors,
+        feedback,
+        setFeedback,
       }}
     >
       {children}
@@ -70,3 +77,5 @@ const FeedbackProvider: React.FC<{ children: any }> = ({ children }) => {
 };
 
 export default FeedbackProvider;
+
+export const useFeedbackContext = () => useContext(FeedbackContext);

@@ -34,9 +34,9 @@ const login = async (req: LoginRequest, res: NextApiResponse) => {
     if (!match) throw new InvalidPasswordError();
 
     createJWT(res, klant);
-    setClientCookie(res, klant);
+    // setClientCookie(res, klant);
 
-    return res.send({});
+    return res.send(klant);
   } catch (e: any) {
     req.body.password = req.body.password ? await bcrypt.hash(req.body.password, 10) : '';
     await logError('login', req, e);

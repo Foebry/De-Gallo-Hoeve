@@ -12,9 +12,12 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { FallBack } from 'src/pages/error.page';
 import useMutation from 'src/hooks/useMutation';
 import { useRouter } from 'next/router';
+import AxiosProvider from 'src/context/axiosContext';
+import UserProvider from 'src/context/app/UserContext';
+import ApiProvider from 'src/context/api/ApiContext';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const logError = useMutation();
+  const logError = useMutation<{}>('/api/logError');
   const router = useRouter();
   const errorHandler = (error: any, errorInfo: any) => {
     const page = router.route;
@@ -23,7 +26,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const handleError = async (page: string, error: any, errorInfo: any) => {
     try {
       if (process.env.NODE_ENV === 'production')
-        await logError('/api/logError', { page, error, errorInfo });
+        await logError({ page, error, errorInfo });
       else console.log(error, errorInfo);
     } catch (e: any) {
       if (process.env.NODE_ENV !== 'production') console.log(e);
@@ -35,19 +38,25 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Head>
         <link rel="icon" type="image/x-icon" href="/favicon.ico"></link>
       </Head>
-      <FeedbackProvider>
-        <ModalProvider>
-          <ErrorBoundary FallbackComponent={FallBack} onError={errorHandler}>
-            <TrainingDayProvider>
-              <AppProvider>
-                <Modal />
-                <ToastContainer position="top-right" />
-                <Component {...pageProps} />
-              </AppProvider>
-            </TrainingDayProvider>
-          </ErrorBoundary>
-        </ModalProvider>
-      </FeedbackProvider>
+      <AxiosProvider>
+        <UserProvider>
+          <ApiProvider>
+            <FeedbackProvider>
+              <ModalProvider>
+                <ErrorBoundary FallbackComponent={FallBack} onError={errorHandler}>
+                  <TrainingDayProvider>
+                    <AppProvider>
+                      <Modal />
+                      <ToastContainer position="top-right" />
+                      <Component {...pageProps} />
+                    </AppProvider>
+                  </TrainingDayProvider>
+                </ErrorBoundary>
+              </ModalProvider>
+            </FeedbackProvider>
+          </ApiProvider>
+        </UserProvider>
+      </AxiosProvider>
     </>
   );
 }
