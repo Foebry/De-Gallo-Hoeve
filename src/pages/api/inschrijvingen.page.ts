@@ -126,7 +126,7 @@ const postInschrijving = async (req: PostInschrijvingRequest, res: NextApiRespon
       ...data,
     });
     await mailer.sendMail('inschrijving-headsup', {
-      email: process.env.MAIL_TEST ?? process.env.MAIL_TO,
+      email: process.env.MAIL_TEST ?? process.env.MAIL_FROM,
       _ids: ids.join(','),
       domain: getDomain(req),
     });

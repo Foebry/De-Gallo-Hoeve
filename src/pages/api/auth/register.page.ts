@@ -49,7 +49,7 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
       domain: getDomain(req),
     });
     await mailer.sendMail('register-headsup', {
-      email: process.env.MAIL_TEST ?? process.env.MAIL_TO,
+      email: process.env.MAIL_TEST ?? process.env.MAIL_FROM,
       klant_id: savedKlant._id.toString(),
       domain: getDomain(req),
     });
