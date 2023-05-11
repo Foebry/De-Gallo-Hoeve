@@ -17,6 +17,7 @@ import { generateCsrf } from 'src/services/Validator';
 import { useAppContext } from 'src/context/appContext';
 import Skeleton from 'src/components/website/skeleton';
 import Head from 'next/head';
+import { useRasContext } from 'src/context/app/RasProvider';
 
 export interface RegisterHondErrorInterface {
   naam?: string;
@@ -46,10 +47,11 @@ interface RegisterProps {
 }
 
 const Register: React.FC<RegisterProps> = ({ csrf }) => {
-  const { retrieveRassen } = useAppContext();
+  // const { retrieveRassen } = useAppContext();
+  const { rasOptions } = useGetRegisterData();
   const [formErrors, setFormErrors] = useState<RegisterErrorInterface>({});
   const router = useRouter();
-  const register = useMutation<Partial<RegisterErrorInterface>>();
+  const register = useMutation<Partial<RegisterErrorInterface>>(REGISTERAPI);
   const { control, handleSubmit, getValues } = useForm();
   const { fields, remove, append } = useFieldArray({
     control,
@@ -58,7 +60,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
   const [disabled, setDisabled] = useState<boolean>(false);
   const [activeStep, setActiveStep] = useState<number>(0);
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
-  const [rassen, setRassen] = useState<OptionsOrGroups<any, optionInterface>[]>([]);
+  // const [rassen, setRassen] = useState<OptionsOrGroups<any, optionInterface>[]>([]);
   const step1 = [
     'vnaam',
     'lnaam',
@@ -132,12 +134,12 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
     }
   };
 
-  useEffect(() => {
-    (async () => {
-      const data = await retrieveRassen!();
-      setRassen(data);
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     const data = await retrieveRassen!();
+  //     setRassen(data);
+  //   })();
+  // }, []);
 
   return (
     <>
@@ -182,7 +184,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
                     fields={fields}
                     append={append}
                     remove={remove}
-                    options={rassen}
+                    options={rasOptions}
                     errors={formErrors}
                     setErrors={setFormErrors}
                     values={getValues}
@@ -214,6 +216,12 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
 };
 
 export default Register;
+
+const useGetRegisterData = () => {
+  const { getRassen, getRasOptions } = useRasContext();
+
+  return { rasOptions: getRasOptions() };
+};
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const csrf = generateCsrf();
