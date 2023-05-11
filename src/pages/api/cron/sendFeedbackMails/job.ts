@@ -20,7 +20,7 @@ const handler = async (req: CronFeedbackEmailRequest, res: NextApiResponse) => {
     const klantController = getController(KLANT);
     const klanten = await getKlantenForFeedback();
     logger.info(`found ${klanten.length} klanten to send feedback-email to`);
-    await sendFeedBackMailsForKlanten(klanten, 'https://degallohoeve.be');
+    await sendFeedBackMailsForKlanten(klanten, 'degallohoeve.be');
 
     klanten.forEach((klant) => updateFeedbackConfigurationForKlant(klant));
     await Promise.all(klanten.map((klant) => klantController.update(klant._id, klant)));

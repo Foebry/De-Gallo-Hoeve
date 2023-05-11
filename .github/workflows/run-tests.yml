@@ -20,5 +20,6 @@ jobs:
         env:
           URI: ${{secrets.URI}}
           MONGO_DATABASE: ${{secrets.MONGO_DATABASE}}
-          MAIL_TO: ${{secrets.MAIL_TO}}
+          MAIL_TEST: ${{secrets.MAIL_TEST}}
+          MAIL_FROM: ${{secrets.MAIL_FROM}}
           CRON_FEEDBACK_EMAIL_KEY: ${{secrets.CRON_FEEDBACK_EMAIL_KEY}}
