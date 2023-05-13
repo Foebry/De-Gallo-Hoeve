@@ -40,9 +40,9 @@ const Inschrijvingen = () => {
       const url = ids
         ? ADMIN_INSCHRIJVINGEN_OVERVIEW + `?id=${ids}`
         : ADMIN_INSCHRIJVINGEN_OVERVIEW;
-      const { data } = await getData(url);
+      const { data } = await getData<ApiResult<PaginatedInschrijving>>(url);
       // setApiData(data.map((trainingDayDto: TrainingDayDto) => trainingDayDto.date));
-      setApiData(data);
+      if (data) setApiData(data);
     })();
   }, [router.query.id]);
 
@@ -91,7 +91,7 @@ const Inschrijvingen = () => {
 
   const onPaginationClick = async (api?: string) => {
     if (!api) return;
-    const { data, error } = await getData(api);
+    const { data, error } = await getData<ApiResult<PaginatedInschrijving>>(api);
     if (!error && data) {
       setApiData(data);
     }

@@ -1,8 +1,6 @@
-import { Geslacht } from '@/types/EntityTpes/HondTypes';
 import { TrainingType } from '@/types/EntityTpes/TrainingType';
 import { createContext, useContext, useState } from 'react';
 import { IsKlantCollection } from 'src/common/domain/klant';
-import getData from 'src/hooks/useApi';
 import { useApiContext } from '../api/ApiContext';
 
 type Inschrijving = {
@@ -14,7 +12,7 @@ type contextType = {
   klant: IsKlantCollection | null;
   isLoggedIn: boolean;
   initializeKlant: (klant: IsKlantCollection) => void;
-  getInschrijvingenData: (ids: string[]) => Promise<Inschrijving[]>;
+  getInschrijvingenData: (ids: string[]) => Promise<Inschrijving[] | undefined>;
   clearData: () => void;
 };
 
@@ -32,7 +30,7 @@ export const UserContext = createContext<contextType>(defaultValues);
 
 const UserProvider: React.FC<{ children: any }> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [inschrijvingen, setInschrijvingen] = useState<Inschrijving[]>([]);
+  const [inschrijvingen, setInschrijvingen] = useState<Inschrijving[]>();
   const [klant, setKlant] = useState<IsKlantCollection | null>(null);
   const { getKlantData, getInschrijvingen } = useApiContext();
 

@@ -1,14 +1,14 @@
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
-import Dashboard from "src/components/admin/dashboard";
-import Button from "src/components/buttons/Button";
-import FormInput from "src/components/form/FormInput";
-import FormRow from "src/components/form/FormRow";
-import FormSection from "src/components/form/FormSection";
-import getData from "src/hooks/useApi";
-import { ADMIN_INSCHRIJVING_DETAIL } from "src/types/apiTypes";
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
+import Dashboard from 'src/components/admin/dashboard';
+import Button from 'src/components/buttons/Button';
+import FormInput from 'src/components/form/FormInput';
+import FormRow from 'src/components/form/FormRow';
+import FormSection from 'src/components/form/FormSection';
+import getData from 'src/hooks/useApi';
+import { ADMIN_INSCHRIJVING_DETAIL } from 'src/types/apiTypes';
 
 interface InschrijvingDetail {
   _id: string;
@@ -32,21 +32,21 @@ interface Hond {
 }
 
 const initialState: InschrijvingDetail = {
-  _id: "",
-  datum: "",
-  training: "",
+  _id: '',
+  datum: '',
+  training: '',
   klant: {
-    _id: "",
-    vnaam: "",
-    lnaam: "",
+    _id: '',
+    vnaam: '',
+    lnaam: '',
   },
   hond: {
-    _id: "",
-    naam: "",
-    ras: "",
+    _id: '',
+    naam: '',
+    ras: '',
   },
-  created_at: "",
-  updated_at: "",
+  created_at: '',
+  updated_at: '',
 };
 
 const InschrijvingDetail = () => {
@@ -59,7 +59,9 @@ const InschrijvingDetail = () => {
   useEffect(() => {
     (async () => {
       if (slug) {
-        const { data, error } = await getData(ADMIN_INSCHRIJVING_DETAIL + slug);
+        const { data, error } = await getData<InschrijvingDetail>(
+          ADMIN_INSCHRIJVING_DETAIL + slug
+        );
         if (data) setData(data);
         else if (error) {
           toast.error(error.message);
@@ -74,9 +76,9 @@ const InschrijvingDetail = () => {
     <Dashboard>
       <FormRow className="flex-row-reverse mb-10">
         {edit ? (
-          <Button label={"save"} onClick={() => setEdit(false)} />
+          <Button label={'save'} onClick={() => setEdit(false)} />
         ) : (
-          <Button label={"edit"} onClick={() => setEdit(true)} />
+          <Button label={'edit'} onClick={() => setEdit(true)} />
         )}
       </FormRow>
       <FormSection label="inschrijving gegevens">
@@ -90,7 +92,7 @@ const InschrijvingDetail = () => {
                 name="datum"
                 label="datum"
                 onChange={onChange}
-                value={value ?? data.datum ?? "onbekend"}
+                value={value ?? data.datum ?? 'onbekend'}
                 disabled={true}
               />
             )}
@@ -104,7 +106,7 @@ const InschrijvingDetail = () => {
                 name="training"
                 label="training"
                 onChange={onChange}
-                value={value ?? data.training ?? "onbekend"}
+                value={value ?? data.training ?? 'onbekend'}
                 disabled={true}
               />
             )}
@@ -118,7 +120,7 @@ const InschrijvingDetail = () => {
                 name="created_at"
                 label="aangemaakt op"
                 onChange={onChange}
-                value={value ?? data.created_at ?? "onbekend"}
+                value={value ?? data.created_at ?? 'onbekend'}
                 disabled={true}
               />
             )}
@@ -136,7 +138,7 @@ const InschrijvingDetail = () => {
                 label="voornaam"
                 name="klant.vnaam"
                 onChange={onChange}
-                value={value ?? data.klant?.vnaam ?? "onbekend"}
+                value={value ?? data.klant?.vnaam ?? 'onbekend'}
                 disabled={true}
               />
             )}
@@ -150,7 +152,7 @@ const InschrijvingDetail = () => {
                 label="achternaam"
                 name="klant.lnaam"
                 onChange={onChange}
-                value={value ?? data.klant?.lnaam ?? "onbekend"}
+                value={value ?? data.klant?.lnaam ?? 'onbekend'}
                 disabled={true}
               />
             )}
@@ -168,7 +170,7 @@ const InschrijvingDetail = () => {
                 label="naam"
                 name="hond.naam"
                 onChange={onChange}
-                value={value ?? data.hond?.naam ?? "onbekend"}
+                value={value ?? data.hond?.naam ?? 'onbekend'}
                 disabled={true}
               />
             )}
@@ -182,7 +184,7 @@ const InschrijvingDetail = () => {
                 label="ras"
                 name="hond.ras"
                 onChange={onChange}
-                value={value ?? data.hond?.ras ?? "onbekend"}
+                value={value ?? data.hond?.ras ?? 'onbekend'}
                 disabled={true}
               />
             )}

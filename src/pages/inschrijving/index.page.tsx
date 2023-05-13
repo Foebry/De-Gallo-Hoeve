@@ -25,6 +25,7 @@ import { getController } from 'src/services/Factory';
 import { RAS } from 'src/controllers/rasController';
 import { HOND } from 'src/controllers/HondController';
 import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
+import { InschrijvingCollection } from '@/types/EntityTpes/InschrijvingTypes';
 
 type TrainingType = 'prive' | 'groep';
 
@@ -79,7 +80,7 @@ const Groepslessen: React.FC<LessenProps> = ({
 
   const router = useRouter();
   const { handleSubmit, control, getValues, register, setValue } = useForm();
-  const inschrijving = useMutation(errors, setErrors);
+  const inschrijving = useMutation<InschrijvingCollection>('');
 
   // useEffect(() => {
   //   (async () => {
@@ -142,7 +143,7 @@ const Groepslessen: React.FC<LessenProps> = ({
         else toast.error(error.message);
       }
       if (data) {
-        toast.success(data.message);
+        toast.success(`inschrijving ontvangen!`);
         router.push(INDEX);
       }
       setDisabled(() => false);

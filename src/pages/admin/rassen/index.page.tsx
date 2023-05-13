@@ -1,20 +1,21 @@
-import { nanoid } from "nanoid";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import React, { useEffect, useMemo, useState } from "react";
-import { GrEdit, GrView } from "react-icons/gr";
-import { MdDelete } from "react-icons/md";
-import { toast } from "react-toastify";
-import Dashboard from "src/components/admin/dashboard";
-import Button from "src/components/buttons/Button";
-import FormRow from "src/components/form/FormRow";
-import FormSearch from "src/components/form/FormSearch";
-import Table from "src/components/Table/Table";
-import getData from "src/hooks/useApi";
-import { PaginatedRas } from "src/mappers/rassen";
-import { ADMIN_RASSEN_OVERIEW } from "src/types/apiTypes";
-import { ApiResult } from "../klanten/index.page";
-import { AiOutlinePlus } from "react-icons/ai";
+import { nanoid } from 'nanoid';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { useEffect, useMemo, useState } from 'react';
+import { GrEdit, GrView } from 'react-icons/gr';
+import { MdDelete } from 'react-icons/md';
+import { toast } from 'react-toastify';
+import Dashboard from 'src/components/admin/dashboard';
+import Button from 'src/components/buttons/Button';
+import FormRow from 'src/components/form/FormRow';
+import FormSearch from 'src/components/form/FormSearch';
+import Table from 'src/components/Table/Table';
+import getData from 'src/hooks/useApi';
+import { PaginatedRas } from 'src/mappers/rassen';
+import { ADMIN_RASSEN_OVERIEW } from 'src/types/apiTypes';
+import { ApiResult } from '../klanten/index.page';
+import { AiOutlinePlus } from 'react-icons/ai';
+import { RasCollection } from '@/types/EntityTpes/RasTypes';
 
 const Rassen = () => {
   const router = useRouter();
@@ -22,17 +23,21 @@ const Rassen = () => {
     data: [],
     pagination: { first: 0, last: 0, total: 0, currentPage: 0 },
   });
-  const headers: string[] = ["naam", "soort", "actions"];
+  const headers: string[] = ['naam', 'soort', 'actions'];
 
   const handleView = (id: string) => {
     router.push(`admin/rassen/${id}`);
   };
 
+  // const { data } = useGetRassenData();
+
   useEffect(() => {
     (async () => {
-      const { data, error } = await getData(ADMIN_RASSEN_OVERIEW);
+      const { data, error } = await getData<ApiResult<PaginatedRas>>(
+        ADMIN_RASSEN_OVERIEW
+      );
       if (data) setApiData(data);
-      if (error) toast.error("Error bij ophalen van rassen overzicht");
+      if (error) toast.error('Error bij ophalen van rassen overzicht');
     })();
   }, []);
 
@@ -67,20 +72,20 @@ const Rassen = () => {
 
   const onPaginationClick = async (api?: string) => {
     if (!api) return;
-    const { data, error } = await getData(api);
+    const { data, error } = await getData<ApiResult<PaginatedRas>>(api);
     if (data) setApiData(data);
-    if (error) toast.warning("Fout bij laden van rassen");
+    if (error) toast.warning('Fout bij laden van rassen');
   };
 
   const onSearch = async (searchValue: string) => {
-    const { data, error } = await getData(
+    const { data, error } = await getData<ApiResult<PaginatedRas>>(
       `/api/admin/rassen?search=${searchValue}`
     );
     if (!error && data) {
       setApiData(data);
     }
     if (error) {
-      toast.warning("Zoek opdracht mislukt");
+      toast.warning('Zoek opdracht mislukt');
     }
   };
   return (
@@ -102,7 +107,7 @@ const Rassen = () => {
       <Table
         rows={rassen}
         columns={headers}
-        colWidths={["40", "35", "25"]}
+        colWidths={['40', '35', '25']}
         onPaginationClick={onPaginationClick}
         pagination={apiData.pagination}
       />
@@ -111,3 +116,21 @@ const Rassen = () => {
 };
 
 export default Rassen;
+
+// const useGetRassenData = () => {
+//   const { getRassen } = useAdminContext();
+//   const [rassen, setRassen] = useState<RasCollection[]>();
+
+//   useEffect(() => {
+//     async () => {
+//       const { data, error } = await getRassenAdmin();
+//       if (data) setRassen(data);
+//       else if (error) {
+//         setRassen([]);
+//         toast.error('Error bij het ophalen van rassen');
+//       }
+//     };
+//   }, []);
+
+//   return { data: rassen };
+// };

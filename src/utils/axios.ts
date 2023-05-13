@@ -8,9 +8,9 @@ export enum REQUEST_METHOD {
   GET = 'GET',
 }
 export type Options = Partial<{ method: REQUEST_METHOD; params: any }>;
-export type ApiResponse<T> = Promise<{
-  data: any | undefined;
-  error: (Partial<T> & { message: string; code: number }) | undefined;
+export type ApiResponse<T, E = Partial<T> & { message: string; code: number }> = Promise<{
+  data: T | undefined;
+  error: E | undefined;
 }>;
 
 const send = async (endpoint: string, payload: any, options?: Options) => {

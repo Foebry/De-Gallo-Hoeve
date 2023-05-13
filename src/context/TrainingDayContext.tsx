@@ -5,11 +5,12 @@ import { toast } from 'react-toastify';
 import getData from 'src/hooks/useApi';
 import useMutation from 'src/hooks/useMutation';
 import { defaultTrainingTimeSlots } from 'src/mappers/trainingDays';
+import { REQUEST_METHOD } from 'src/utils/axios';
 import { ModalContext } from './ModalContext';
 
 type TrainingDayContext = {
   trainingDays: TrainingDayDto[];
-  getTrainingDays: () => Promise<TrainingDayDto[]>;
+  getTrainingDays: () => Promise<TrainingDayDto[] | undefined>;
   updateTrainingDay: (trainingDayDto: TrainingDayDto) => void;
   updateAvailableDays: (trainingDays: string[]) => void;
   saveTrainingDays: () => Promise<void>;
@@ -18,10 +19,7 @@ type TrainingDayContext = {
 
 const trainingDayContextDefaultValues: TrainingDayContext = {
   trainingDays: [],
-  getTrainingDays: async () => {
-    const { data: trainingDays } = await getData('/api/admin/trainingdays');
-    return trainingDays;
-  },
+  getTrainingDays: async () => [],
   updateTrainingDay: () => {},
   updateAvailableDays: () => {},
   saveTrainingDays: async () => {},
@@ -34,15 +32,15 @@ export const TrainingDayContext = createContext<TrainingDayContext>(
 const TrainingDayProvider: React.FC<{ children: any }> = ({ children }) => {
   const [trainingDays, setTrainingDays] = useState<TrainingDayDto[]>([]);
   const [hasLoaded, setHasLoaded] = useState<boolean>(false);
-  const save = useMutation();
+  const save = useMutation<TrainingDayDto[]>('/api/admin/trainingdays');
   const { updateModal } = useContext(ModalContext);
 
   const getTrainingDays = async () => {
     if (hasLoaded) return sortAscending(trainingDays);
-    const { data, error } = await getData('/api/admin/trainingdays');
-    setTrainingDays(data);
+    const { data, error } = await getData<TrainingDayDto[]>('/api/admin/trainingdays');
+    if (data) setTrainingDays(data);
     setHasLoaded(true);
-    if (error) toast.error(error);
+    if (error) toast.error(error.message);
     return data;
   };
 
@@ -70,12 +68,11 @@ const TrainingDayProvider: React.FC<{ children: any }> = ({ children }) => {
 
   const saveTrainingDays = async (confirmed?: boolean) => {
     const { error, data } = await save(
-      '/api/admin/trainingdays',
       {
         selected: trainingDays,
         confirmed,
       },
-      { method: 'PUT' }
+      { method: REQUEST_METHOD.POST }
     );
     if (error) {
       if (error.code === 409) {

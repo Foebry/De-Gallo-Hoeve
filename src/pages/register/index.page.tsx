@@ -4,8 +4,7 @@ import { useRouter } from 'next/router';
 import { INDEX, LOGIN } from 'src/types/linkTypes';
 import { useFieldArray, useForm } from 'react-hook-form';
 import PersoonlijkeGegevens from 'src/components/register/PersoonlijkeGegevens';
-import Step2, { optionInterface } from 'src/components/register/HondGegevens';
-import { OptionsOrGroups } from 'react-select';
+import Step2 from 'src/components/register/HondGegevens';
 import { REGISTERAPI } from 'src/types/apiTypes';
 import useMutation, { structureHondenPayload } from 'src/hooks/useMutation';
 import FormSteps from 'src/components/form/FormSteps';
@@ -14,10 +13,9 @@ import nookies from 'nookies';
 import { toast } from 'react-toastify';
 import Button, { SubmitButton } from 'src/components/buttons/Button';
 import { generateCsrf } from 'src/services/Validator';
-import { useAppContext } from 'src/context/appContext';
 import Skeleton from 'src/components/website/skeleton';
 import Head from 'next/head';
-import { useRasContext } from 'src/context/app/RasProvider';
+import { useRasContext } from 'src/context/app/RasContext';
 
 export interface RegisterHondErrorInterface {
   naam?: string;
@@ -48,7 +46,9 @@ interface RegisterProps {
 
 const Register: React.FC<RegisterProps> = ({ csrf }) => {
   // const { retrieveRassen } = useAppContext();
-  const { rasOptions } = useGetRegisterData();
+  // const { rasOptions } = useGetRegisterData();
+  const { useGetRasOptions } = useRasContext();
+  const rasOptions = useGetRasOptions();
   const [formErrors, setFormErrors] = useState<RegisterErrorInterface>({});
   const router = useRouter();
   const register = useMutation<Partial<RegisterErrorInterface>>(REGISTERAPI);
@@ -184,7 +184,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
                     fields={fields}
                     append={append}
                     remove={remove}
-                    options={rasOptions}
+                    options={rasOptions ?? []}
                     errors={formErrors}
                     setErrors={setFormErrors}
                     values={getValues}
@@ -217,11 +217,18 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
 
 export default Register;
 
-const useGetRegisterData = () => {
-  const { getRassen, getRasOptions } = useRasContext();
+// const useGetRegisterData = () => {
+//   const { getRassen, getRasOptions } = useRasContext();
+//   const [rasOptions, setRasOptions] = useState<OptionsOrGroups<any, optionInterface>>();
+//   useEffect(() => {
+//     (async () => {
+//       const data = await getRasOptions();
+//       setRasOptions(data);
+//     })();
+//   }, [getRasOptions]);
 
-  return { rasOptions: getRasOptions() };
-};
+//   return { rasOptions };
+// };
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const csrf = generateCsrf();

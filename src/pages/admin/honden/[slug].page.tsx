@@ -1,31 +1,31 @@
-import { ADMIN_HOND_DETAIL, RASSEN } from "src/types/apiTypes";
-import Dashboard from "src/components/admin/dashboard";
-import Button from "src/components/buttons/Button";
-import { geslachten } from "src/components/Cards/HondCard";
-import FormInput from "src/components/form/FormInput";
-import FormRow from "src/components/form/FormRow";
-import { MySelect } from "src/components/MySelect";
-import { Option } from "src/utils/MongoDb";
-import getData from "src/hooks/useApi";
-import moment from "moment";
-import { useRouter } from "next/router";
-import { HondDetailResponse } from "src/pages/api/admin/honden/[slug].page";
-import React, { useState } from "react";
-import { useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { ADMIN_HOND_DETAIL, RASSEN } from 'src/types/apiTypes';
+import Dashboard from 'src/components/admin/dashboard';
+import Button from 'src/components/buttons/Button';
+import { geslachten } from 'src/components/Cards/HondCard';
+import FormInput from 'src/components/form/FormInput';
+import FormRow from 'src/components/form/FormRow';
+import { MySelect } from 'src/components/MySelect';
+import { Option } from 'src/utils/MongoDb';
+import getData from 'src/hooks/useApi';
+import moment from 'moment';
+import { useRouter } from 'next/router';
+import { HondDetailResponse } from 'src/pages/api/admin/honden/[slug].page';
+import React, { useState } from 'react';
+import { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 
 const initialState: HondDetailResponse = {
-  _id: "",
-  naam: "",
+  _id: '',
+  naam: '',
   ras: {
-    naam: "",
-    _id: "",
+    naam: '',
+    _id: '',
   },
-  geboortedatum: "",
-  geslacht: "",
+  geboortedatum: '',
+  geslacht: '',
   eigenaar: {
-    fullName: "",
-    _id: "",
+    fullName: '',
+    _id: '',
   },
 };
 
@@ -40,10 +40,10 @@ const HondDetail = () => {
   useEffect(() => {
     (async () => {
       if (slug) {
-        const { data } = await getData(ADMIN_HOND_DETAIL + slug);
-        const { data: rassen } = await getData(RASSEN);
-        setData(data);
-        setRassen(rassen);
+        const { data } = await getData<HondDetailResponse>(ADMIN_HOND_DETAIL + slug);
+        const { data: rassen } = await getData<Option[]>(RASSEN);
+        if (data) setData(data);
+        if (rassen) setRassen(rassen);
       }
     })();
   }, [slug]);
@@ -58,7 +58,7 @@ const HondDetail = () => {
       <Dashboard>
         <FormRow className="flex-row-reverse mb-10">
           {edit ? (
-            <Button label={"save"} onClick={() => setEdit(false)} />
+            <Button label={'save'} onClick={() => setEdit(false)} />
           ) : (
             <Button label="edit" onClick={() => setEdit(true)} />
           )}
@@ -86,8 +86,7 @@ const HondDetail = () => {
                 name="ras"
                 options={rassen}
                 value={
-                  value ??
-                  rassen?.find((rasOption) => rasOption.value === data.ras._id)
+                  value ?? rassen?.find((rasOption) => rasOption.value === data.ras._id)
                 }
                 onChange={onChange}
                 disabled={!edit}
@@ -105,10 +104,7 @@ const HondDetail = () => {
                 label="geslacht"
                 onChange={onChange}
                 value={
-                  value ??
-                  geslachten.find(
-                    (geslacht) => geslacht.label === data.geslacht
-                  )
+                  value ?? geslachten.find((geslacht) => geslacht.label === data.geslacht)
                 }
                 disabled={!edit}
                 options={geslachten}
@@ -124,7 +120,7 @@ const HondDetail = () => {
                 id="geboortedatum"
                 label="geboortedatum"
                 onChange={onChange}
-                value={moment(value ?? data.geboortedatum).format("DD/MM/YYYY")}
+                value={moment(value ?? data.geboortedatum).format('DD/MM/YYYY')}
                 disabled={!edit}
               />
             )}

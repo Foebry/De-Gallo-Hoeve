@@ -1,17 +1,17 @@
-import Link from "next/link";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import Dashboard from "src/components/admin/dashboard";
-import Button from "src/components/buttons/Button";
-import FormInput from "src/components/form/FormInput";
-import FormRow from "src/components/form/FormRow";
-import FormSection from "src/components/form/FormSection";
-import { MySelect } from "src/components/MySelect";
-import { Body } from "src/components/Typography/Typography";
-import getData from "src/hooks/useApi";
-import { ADMIN_KLANT_DETAIL } from "src/types/apiTypes";
-import { ADMINLISTDOGS, ADMINLISTSUBSCRIPTIONS } from "src/types/linkTypes";
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import Dashboard from 'src/components/admin/dashboard';
+import Button from 'src/components/buttons/Button';
+import FormInput from 'src/components/form/FormInput';
+import FormRow from 'src/components/form/FormRow';
+import FormSection from 'src/components/form/FormSection';
+import { MySelect } from 'src/components/MySelect';
+import { Body } from 'src/components/Typography/Typography';
+import getData from 'src/hooks/useApi';
+import { ADMIN_KLANT_DETAIL } from 'src/types/apiTypes';
+import { ADMINLISTDOGS, ADMINLISTSUBSCRIPTIONS } from 'src/types/linkTypes';
 
 interface KlantDetail {
   _id: string;
@@ -47,20 +47,20 @@ interface Inschrijving {
 }
 
 const initialState: KlantDetail = {
-  _id: "",
-  email: "",
-  vnaam: "",
-  lnaam: "",
-  gsm: "",
-  straat: "",
-  nr: "0",
-  gemeente: "",
-  postcode: "0",
+  _id: '',
+  email: '',
+  vnaam: '',
+  lnaam: '',
+  gsm: '',
+  straat: '',
+  nr: '0',
+  gemeente: '',
+  postcode: '0',
   honden: [],
-  roles: "",
+  roles: '',
   verified: false,
-  verified_at: "",
-  created_at: "",
+  verified_at: '',
+  created_at: '',
   inschrijvingen: [],
 };
 
@@ -79,8 +79,8 @@ const KlantDetail = () => {
   useEffect(() => {
     (async () => {
       if (slug) {
-        const { data } = await getData(ADMIN_KLANT_DETAIL + slug);
-        setData(data);
+        const { data } = await getData<KlantDetail>(ADMIN_KLANT_DETAIL + slug);
+        if (data) setData(data);
       }
     })();
   }, [slug]);
@@ -95,7 +95,7 @@ const KlantDetail = () => {
       <Dashboard>
         <FormRow className="flex-row-reverse mb-10">
           {edit ? (
-            <Button label={"save"} onClick={() => setEdit(false)} />
+            <Button label={'save'} onClick={() => setEdit(false)} />
           ) : (
             <Button label="edit" onClick={() => setEdit(true)} />
           )}
@@ -112,12 +112,12 @@ const KlantDetail = () => {
                   disabled={true}
                   label="geverifiëerd"
                   options={[
-                    { label: "Ja", value: true },
-                    { label: "Nee", value: false },
+                    { label: 'Ja', value: true },
+                    { label: 'Nee', value: false },
                   ]}
                   value={
                     value ?? {
-                      label: data.verified ? "Ja" : "Nee",
+                      label: data.verified ? 'Ja' : 'Nee',
                       value: data.verified,
                     }
                   }
@@ -133,7 +133,7 @@ const KlantDetail = () => {
                   label="geregistreerd op"
                   name="created_at"
                   onChange={onChange}
-                  value={value ?? data.created_at ?? "Onbekend"}
+                  value={value ?? data.created_at ?? 'Onbekend'}
                   disabled={true}
                 />
               )}
@@ -147,7 +147,7 @@ const KlantDetail = () => {
                   label="geverifiëerd op"
                   name="verified_at"
                   onChange={onChange}
-                  value={value ?? data.verified_at ?? "Onbekend"}
+                  value={value ?? data.verified_at ?? 'Onbekend'}
                   disabled={true}
                 />
               )}
@@ -272,7 +272,7 @@ const KlantDetail = () => {
                         label="bus"
                         name="bus"
                         onChange={onChange}
-                        value={value ?? data.bus ?? ""}
+                        value={value ?? data.bus ?? ''}
                         disabled={!edit}
                       />
                     )}
@@ -322,7 +322,7 @@ const KlantDetail = () => {
         </FormSection>
         <FormRow>
           <div className="w-5/12">
-            <FormSection label="honden" style={{ padding: "p-5" }}>
+            <FormSection label="honden" style={{ padding: 'p-5' }}>
               {data.honden?.map((hond) => (
                 <div key={hond._id} className="flex justify-between">
                   <Link href={ADMINLISTDOGS + hond._id}>{hond.naam}</Link>
@@ -332,25 +332,23 @@ const KlantDetail = () => {
             </FormSection>
           </div>
           <div className="w-5/12">
-            <FormSection label="inschrijvingen" style={{ padding: "p-5" }}>
-              {data.inschrijvingen
-                .slice(0, limitInschrijvingen)
-                .map((inschrijving) => (
-                  <div key={inschrijving._id} className="flex justify-between">
-                    <Link href={ADMINLISTSUBSCRIPTIONS + inschrijving._id}>
-                      {inschrijving.datum.split(" ")[0]}
-                    </Link>
-                    <Body>{inschrijving.datum.split(" ")[1]}</Body>
-                    <Body>{inschrijving.training}</Body>
-                    <Body>{inschrijving.hond}</Body>
-                  </div>
-                ))}
+            <FormSection label="inschrijvingen" style={{ padding: 'p-5' }}>
+              {data.inschrijvingen.slice(0, limitInschrijvingen).map((inschrijving) => (
+                <div key={inschrijving._id} className="flex justify-between">
+                  <Link href={ADMINLISTSUBSCRIPTIONS + inschrijving._id}>
+                    {inschrijving.datum.split(' ')[0]}
+                  </Link>
+                  <Body>{inschrijving.datum.split(' ')[1]}</Body>
+                  <Body>{inschrijving.training}</Body>
+                  <Body>{inschrijving.hond}</Body>
+                </div>
+              ))}
               <div className="pt-10 flex justify-center">
                 <Button
                   label={
                     limitInschrijvingen >= data.inschrijvingen.length
-                      ? "toon minder"
-                      : "toon meer"
+                      ? 'toon minder'
+                      : 'toon meer'
                   }
                   onClick={
                     limitInschrijvingen >= data.inschrijvingen.length

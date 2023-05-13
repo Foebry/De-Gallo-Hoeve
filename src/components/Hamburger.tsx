@@ -1,10 +1,11 @@
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { GiHamburgerMenu } from "react-icons/gi";
-import { MdClose } from "react-icons/md";
-import useMutation from "../hooks/useMutation";
-import { LOGOUT } from "../types/apiTypes";
-import { INDEX } from "../types/linkTypes";
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { GiHamburgerMenu } from 'react-icons/gi';
+import { MdClose } from 'react-icons/md';
+import { REQUEST_METHOD } from 'src/utils/axios';
+import useMutation from '../hooks/useMutation';
+import { LOGOUT } from '../types/apiTypes';
+import { INDEX } from '../types/linkTypes';
 interface Props {
   children: any;
   roles: number;
@@ -12,21 +13,18 @@ interface Props {
 
 export const Hamburger: React.FC<Props> = ({ children, roles }) => {
   const [open, setOpen] = useState<boolean>(false);
-  const logout = useMutation();
+  const logout = useMutation<{}>(LOGOUT);
   const router = useRouter();
   const handleClick = () => {
     setOpen(() => !open);
   };
   const onLogout = async () => {
-    await logout(LOGOUT, {}, { method: "DELETE" });
+    await logout({}, { method: REQUEST_METHOD.DELETE });
     router.push(INDEX);
   };
   return (
     <div className="relative">
-      <span
-        className="text-2xl text-green-100 cursor-pointer"
-        onClick={handleClick}
-      >
+      <span className="text-2xl text-green-100 cursor-pointer" onClick={handleClick}>
         {open ? <MdClose /> : <GiHamburgerMenu />}
       </span>
       {open && (

@@ -49,7 +49,7 @@ const useGetAvailableTrainingDays = () => {
   useEffect(() => {
     (async () => {
       const trainingDays = await getTrainingDays();
-      setTrainingDays(trainingDays);
+      if (trainingDays) setTrainingDays(trainingDays);
     })();
   }, [getTrainingDays]);
 

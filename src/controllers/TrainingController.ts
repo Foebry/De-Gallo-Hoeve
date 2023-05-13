@@ -27,7 +27,7 @@ export async function getTrainingByName(naam: TrainingType) {
   return training as PriveTrainingCollection;
 }
 
-export const getPriveTraining = async () => {
+export const getPriveTraining = async (): Promise<PriveTrainingCollection | null> => {
   const collection = await getTrainingCollection();
   return collection.findOne({
     naam: 'prive',

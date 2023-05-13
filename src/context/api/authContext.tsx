@@ -2,6 +2,7 @@ import { LOGINAPI } from '@/types/apiTypes';
 import { useRouter } from 'next/router';
 import { createContext, useContext, useState } from 'react';
 import { toast } from 'react-toastify';
+import { IsKlantCollection } from 'src/common/domain/klant';
 import useMutation from 'src/hooks/useMutation';
 import { useUserContext } from '../app/UserContext';
 
@@ -30,7 +31,7 @@ export const AuthContext = createContext<AuthContext>(defaultValues);
 
 export const AuthProvider: React.FC<{ children: any }> = ({ children }) => {
   const { initializeKlant } = useUserContext();
-  const loginMutation = useMutation<LoginBody>(LOGINAPI);
+  const loginMutation = useMutation<IsKlantCollection>(LOGINAPI);
   const router = useRouter();
   const [disabled, setDisabled] = useState<boolean>(false);
   const [callbackUrl, setCallbackUrl] = useState<string | undefined>();

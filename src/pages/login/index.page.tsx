@@ -12,7 +12,7 @@ import validator, { generateCsrf } from 'src/services/Validator';
 import Skeleton from 'src/components/website/skeleton';
 import Link from 'next/link';
 import Head from 'next/head';
-import { useAxiosContext } from 'src/context/axiosContext';
+import { useAxiosContext } from 'src/context/AxiosContext';
 import Spinner from 'src/components/loaders/Spinner';
 import { useApiContext } from 'src/context/api/ApiContext';
 

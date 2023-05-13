@@ -1,7 +1,6 @@
 import { FEEDBACK_API } from '@/types/apiTypes';
 import { useRouter } from 'next/router';
 import { createContext, Dispatch, SetStateAction, useContext, useState } from 'react';
-import { UseFormSetError } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { FeedbackDto } from 'src/common/api/types/feedback';
 import useMutation from 'src/hooks/useMutation';

@@ -12,7 +12,7 @@ import { Options, REQUEST_METHOD } from 'src/utils/axios';
 type contextType = {
   isLoading: boolean;
   setIsLoading: Dispatch<SetStateAction<boolean>>;
-  send: (endpoint: string, payload: any, options?: Options) => AxiosPromise<any>;
+  send: <T>(endpoint: string, payload: any, options?: Options) => AxiosPromise<T>;
   get: (endpoint: string, options?: Options) => AxiosPromise<any>;
   increase: () => void;
   decrease: () => void;
@@ -21,8 +21,8 @@ type contextType = {
 const defaultValues: contextType = {
   isLoading: false,
   setIsLoading: () => {},
-  send: async (endpoint: string, payload: any, options?: Options) => ({} as AxiosPromise),
-  get: async (endpoint: string, options?: Options) => ({} as AxiosPromise),
+  send: async () => ({} as AxiosPromise),
+  get: async () => ({} as AxiosPromise),
   increase: () => {},
   decrease: () => {},
 };
@@ -58,6 +58,8 @@ const AxiosProvider: React.FC<{ children: any }> = ({ children }) => {
 
   const get = async (endpoint: string, options?: Options) =>
     execute(endpoint, { ...options, method: REQUEST_METHOD.GET });
+
+  const useSWR = async () => {};
 
   return (
     <AxiosContext.Provider

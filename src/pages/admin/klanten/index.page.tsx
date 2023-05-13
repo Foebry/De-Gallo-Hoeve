@@ -17,6 +17,7 @@ import Head from 'next/head';
 import Button from 'src/components/buttons/Button';
 import useMutation from 'src/hooks/useMutation';
 import useApi from 'src/hooks/useApi';
+import { REQUEST_METHOD } from 'src/utils/axios';
 
 export type apiOptionsInterface = Partial<{
   page: number;
@@ -43,7 +44,7 @@ const Klanten = () => {
     pagination: { first: 0, last: 0, total: 0, currentPage: 0 },
   });
   const router = useRouter();
-  const sendManualFeedbackMails = useMutation({}, () => {});
+  const sendManualFeedbackMails = useMutation<{}>('/api/cron/sendManualFeedbackMails');
 
   const handleView = (_id: string) => {
     router.push(`/admin/klanten/${_id}`);
@@ -51,10 +52,13 @@ const Klanten = () => {
 
   useEffect(() => {
     (async () => {
-      const { data } = await getData(ADMIN_KLANTEN_OVERVIEW, options);
-      setApiData(data);
+      const { data } = await getData<ApiResult<PaginatedKlant>>(
+        ADMIN_KLANTEN_OVERVIEW,
+        options
+      );
+      setApiData(data!);
     })();
-  }, []);
+  }, [options]);
 
   const klanten = useMemo(() => {
     return apiData.data.map((klant: PaginatedKlant) => {
@@ -96,7 +100,9 @@ const Klanten = () => {
   }, [apiData]);
 
   const onSearch = async (searchValue: string) => {
-    const { data, error } = await getData(`/api/admin/klanten?search=${searchValue}`);
+    const { data, error } = await getData<ApiResult<PaginatedKlant>>(
+      `/api/admin/klanten?search=${searchValue}`
+    );
     if (!error && data) {
       setApiData(data);
     }
@@ -107,7 +113,7 @@ const Klanten = () => {
 
   const onPaginationClick = async (api?: string) => {
     if (!api) return;
-    const { data, error } = await getData(api);
+    const { data, error } = await getData<ApiResult<PaginatedKlant>>(api);
     if (!error && data) {
       setApiData(data);
     }
@@ -119,9 +125,8 @@ const Klanten = () => {
   const onClickSendEmails = async () => {
     try {
       const { data, error } = await sendManualFeedbackMails(
-        '/api/cron/sendManualFeedbackMails',
         {},
-        { method: 'GET' }
+        { method: REQUEST_METHOD.GET }
       );
       if (data) toast.success('emails verzonden');
       if (error) toast.error(error.message);

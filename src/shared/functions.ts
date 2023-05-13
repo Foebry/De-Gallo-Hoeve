@@ -51,6 +51,14 @@ export enum FrontEndErrorCodes {
   ExpiredConfirmCode = 'e7turmpp5tn',
 }
 
+export const sleep = async (s: number) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      return resolve(true);
+    }, s * 1000);
+  });
+};
+
 const helper: HelperInterface = {
   capitalize,
 };

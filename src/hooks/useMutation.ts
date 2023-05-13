@@ -1,13 +1,15 @@
 import moment from 'moment';
-import { useAxiosContext } from 'src/context/axiosContext';
+import { useAxiosContext } from 'src/context/AxiosContext';
 import { ApiResponse, Options } from 'src/utils/axios';
 
-const useMutation = <T>(endpoint: string) => {
+const useMutation = <T, E = Partial<T> & { message: string; code: number }>(
+  endpoint: string
+) => {
   const { increase, decrease, send } = useAxiosContext();
-  const executerFunc = async (payload: any, options?: Options): ApiResponse<T> => {
+  const executerFunc = async (payload: any, options?: Options): ApiResponse<T, E> => {
     try {
       increase();
-      const { data } = await send(endpoint, payload, options);
+      const { data } = await send<T>(endpoint, payload, options);
       return { data, error: undefined };
     } catch (error: any) {
       const data = { ...error.response.data, code: error.response.status };

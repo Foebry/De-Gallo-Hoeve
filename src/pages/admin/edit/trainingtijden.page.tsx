@@ -56,7 +56,7 @@ const useGetTrainingDays = () => {
   useEffect(() => {
     (async () => {
       const data = await getTrainingDays();
-      setTrainingDagen(data);
+      if (data) setTrainingDagen(data);
     })();
   }, [getTrainingDays]);
 

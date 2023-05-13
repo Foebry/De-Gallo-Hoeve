@@ -8,9 +8,9 @@ import { useFeedbackContext } from '../FeedbackContext';
 import { AuthProvider, useAuthContext } from './authContext';
 
 type contextType = {
-  getKlantData: (id: string) => Promise<IsKlantCollection>;
-  getInschrijvingen: (ids: string[]) => Promise<InschrijvingCollection[]>;
-  getFeedback: () => Promise<FeedbackDto[]>;
+  getKlantData: (id: string) => Promise<IsKlantCollection | undefined>;
+  getInschrijvingen: (ids: string[]) => Promise<InschrijvingCollection[] | undefined>;
+  getFeedback: () => Promise<FeedbackDto[] | undefined>;
 };
 
 const defaultValues: contextType = {
@@ -28,31 +28,28 @@ const ApiProvider: React.FC<{ children: any }> = ({ children }) => {
   const getKlantData = async (klantId: string) => {
     if (klant) return klant;
     const url = `/api/admin/klanten/${klantId}`;
-    const { data, error } = await getData(url);
+    const { data, error } = await getData<IsKlantCollection>(url);
     if (data) {
       initializeKlant(data);
       return data;
     }
-    return null;
   };
 
   const getInschrijvingen = async (inschrijvingenIds: string[]) => {
     const url = '/api/inschrijvingen';
     const params = { ids: inschrijvingenIds };
-    const { data, error } = await getData(url, params);
+    const { data, error } = await getData<InschrijvingCollection[]>(url, params);
     if (data) return data;
-    return null;
   };
 
   const getFeedback = async () => {
     if (feedback.length) return feedback;
     const url = '/api/customer-feedback';
-    const { data, error } = await getData(url);
+    const { data, error } = await getData<FeedbackDto[]>(url);
     if (data) {
       setFeedback(data);
       return data;
     }
-    return null;
   };
 
   return (
