@@ -1,15 +1,14 @@
 import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
-import { ADMINEDITTRAININGDAYS } from '@/types/linkTypes';
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useEffect } from 'react';
 import Dashboard from 'src/components/admin/dashboard';
 import Button from 'src/components/buttons/Button';
 import FormRow from 'src/components/form/FormRow';
 import NavLink from 'src/components/NavLink';
-import { Body, EbmeddedLink, Title2 } from 'src/components/Typography/Typography';
-import { TrainingDayContext } from 'src/context/TrainingDayContext';
+import { Body, Title2 } from 'src/components/Typography/Typography';
 import TrainingDay from './components/TrainingDay';
 import { TiDelete, TiRefresh } from 'react-icons/ti';
+import { useTrainingDayContext } from 'src/context/app/TrainingDayContext';
 
 type Props = {};
 
@@ -51,7 +50,7 @@ const Trainingtijden: React.FC<Props> = () => {
 
 const useGetTrainingDays = () => {
   const [trainingDagen, setTrainingDagen] = useState<TrainingDayDto[]>([]);
-  const { getTrainingDays } = useContext(TrainingDayContext);
+  const { getTrainingDays } = useTrainingDayContext();
 
   useEffect(() => {
     (async () => {
@@ -78,7 +77,7 @@ const useGetTrainingDays = () => {
 };
 
 const useSaveTrainingDays = () => {
-  const { saveTrainingDays } = useContext(TrainingDayContext);
+  const { saveTrainingDays } = useTrainingDayContext();
   const save = async () => await saveTrainingDays();
   return [save];
 };

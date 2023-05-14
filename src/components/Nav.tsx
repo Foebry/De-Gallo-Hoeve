@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ADMIN, INDEX, LOGIN, REGISTER } from '../types/linkTypes';
 import { Title3 } from './Typography/Typography';
 import Image from 'next/image';
@@ -8,8 +8,8 @@ import { Hamburger } from './Hamburger';
 import { LOGOUT } from '../types/apiTypes';
 import useMutation from '../hooks/useMutation';
 import { REQUEST_METHOD } from 'src/utils/axios';
-import { useApiContext } from 'src/context/api/ApiContext';
 import { IsKlantCollection } from 'src/common/domain/klant';
+import { useAuthContext } from 'src/context/authContext';
 
 export const Nav = () => {
   const router = useRouter();
@@ -97,18 +97,14 @@ export const Nav = () => {
 };
 
 const useGetKlantData = () => {
-  const { getKlantData } = useApiContext();
   const [klant, setKlant] = useState<IsKlantCollection | null>();
 
   const clearData = () => setKlant(null);
 
   useEffect(() => {
-    const klantId = localStorage.getItem('klantId');
-    (async () => {
-      if (!klantId) return null;
-      const klantData = await getKlantData(klantId);
-      setKlant(klantData);
-    })();
-  }, [getKlantData]);
+    const klant = localStorage.getItem('klant');
+    if (!klant) return;
+    setKlant(JSON.parse(klant));
+  }, []);
   return { klant, clearData };
 };

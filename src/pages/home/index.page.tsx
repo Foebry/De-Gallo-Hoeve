@@ -4,18 +4,22 @@ import Image from 'next/image';
 import Skeleton from 'src/components/website/skeleton';
 import { GiCheckMark } from 'react-icons/gi';
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import getData from 'src/hooks/useApi';
 import FeedbackSection from './components/feedback/section';
 import { IndexData } from './types';
 import { PriveTrainingCollection } from '@/types/EntityTpes/TrainingType';
-import { FeedbackDto } from 'src/common/api/types/feedback';
-import { getPriveTraining } from 'src/controllers/TrainingController';
-import { getAllFeedback } from '../api/feedback/repo';
+import { useFeedbackContext } from 'src/context/app/FeedbackContext';
+import { useTrainingContext } from 'src/context/app/TrainingContext';
 
-interface Props {}
+interface Props {
+  // prijsExcl: number;
+  // kmHeffing: number;
+  // gratisVerplaatsingBinnen: number;
+  // feedback: FeedbackDto[] | undefined;
+}
 
-const Index: React.FC<Props> = () => {
+const Index: React.FC<Props> = ({}) => {
   const { prijsExcl, kmHeffing, gratisVerplaatsingBinnen, feedback } = useGetIndexData();
   return (
     <>
@@ -166,7 +170,7 @@ const Index: React.FC<Props> = () => {
             </div>
           </div>
         </section>
-        {feedback.length > 0 && <FeedbackSection feedback={feedback} />}
+        {feedback && feedback.length > 0 && <FeedbackSection feedback={feedback} />}
       </Skeleton>
     </>
   );
@@ -178,14 +182,15 @@ const useGetIndexData = () => {
     prijsExcl: 20.66,
     kmHeffing: 0.3,
     gratisVerplaatsingBinnen: 10,
-    feedback: [],
   });
+  const feedbackContext = useRef(useFeedbackContext());
+  const trainingContext = useRef(useTrainingContext());
 
   useEffect(() => {
     (async () => {
       const [priveTrainingResult, feedbackResult] = await Promise.all([
-        getData<PriveTrainingCollection>(`/api/trainingen/${priveTrainingId}`),
-        getData<FeedbackDto[]>('/api/feedback'),
+        trainingContext.current.getPriveTraining(),
+        feedbackContext.current.getFeedback(),
       ]);
       const { data: trainingData, error: trainingError } = priveTrainingResult;
       const { data: feedbackData, error: feedbackError } = feedbackResult;
@@ -204,19 +209,7 @@ const useGetIndexData = () => {
 export default Index;
 
 export const getStaticProps = async () => {
-  const priveTraining = await getPriveTraining();
-  const feedback = await getAllFeedback();
-
   return {
-    props: {
-      // prijsExcl: priveTraining?.prijsExcl,
-      // kmHeffing: priveTraining?.kmHeffing,
-      // gratisVerplaatsingBinnen: priveTraining?.gratisVerplaatsingBinnen,
-      // feedback,
-      Excl: 20.66,
-      kmHeffing: 0.3,
-      gratisVerplaatsingBinnen: 10,
-      feedback: [],
-    },
+    props: {},
   };
 };

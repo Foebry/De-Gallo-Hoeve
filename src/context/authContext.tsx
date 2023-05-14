@@ -4,7 +4,7 @@ import { createContext, useContext, useState } from 'react';
 import { toast } from 'react-toastify';
 import { IsKlantCollection } from 'src/common/domain/klant';
 import useMutation from 'src/hooks/useMutation';
-import { useUserContext } from '../app/UserContext';
+import { useUserContext } from './app/UserContext';
 
 type LoginBody = {
   email: string;
@@ -13,7 +13,7 @@ type LoginBody = {
 
 type RegisterBody = {};
 
-type LoginRegisterErrors = Partial<LoginBody & RegisterBody>;
+type LoginRegisterErrors = Partial<LoginBody> | Partial<RegisterBody>;
 
 export type AuthContext = {
   disabled: boolean;

@@ -31,10 +31,7 @@ export const defaultValues: Context = {
   createRas: async () => undefined,
   deleteRas: async () => undefined,
   useGetPaginatedRassen: async () => emptyPaginatedResponse,
-  useGetRasOptions: () => {
-    console.log('hello from defaultValue useGetRasOptions');
-    return [];
-  },
+  useGetRasOptions: () => [],
 };
 
 export const Context = createContext<Context>(defaultValues);

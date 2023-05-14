@@ -1,5 +1,13 @@
 import { PaginatedResponse } from 'src/shared/RequestHelper';
+import AuthContext from '../authContext';
+import FeedbackProvider from './FeedbackContext';
+import HondProvider from './hondContext';
+import InschrijvingProvider from './InschrijvingContext';
+import KlantProvider from './klantContext';
 import { RasProvider } from './RasContext';
+import TrainingProvider from './TrainingContext';
+import TrainingDayProvider from './TrainingDayContext';
+import UserProvider from './UserContext';
 
 export const emptyPaginatedResponse: PaginatedResponse<any> = {
   data: [],
@@ -11,8 +19,28 @@ export const emptyPaginatedResponse: PaginatedResponse<any> = {
   },
 };
 
+export const defaultApiResponse = { data: undefined, error: undefined };
+
 const AppProvider: React.FC<{ children: any }> = ({ children }) => {
-  return <RasProvider>{children}</RasProvider>;
+  return (
+    <RasProvider>
+      <FeedbackProvider>
+        <KlantProvider>
+          <TrainingProvider>
+            <HondProvider>
+              <TrainingDayProvider>
+                <InschrijvingProvider>
+                  <UserProvider>
+                    <AuthContext>{children}</AuthContext>
+                  </UserProvider>
+                </InschrijvingProvider>
+              </TrainingDayProvider>
+            </HondProvider>
+          </TrainingProvider>
+        </KlantProvider>
+      </FeedbackProvider>
+    </RasProvider>
+  );
 };
 
 export default AppProvider;

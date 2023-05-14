@@ -14,7 +14,7 @@ import Link from 'next/link';
 import Head from 'next/head';
 import { useAxiosContext } from 'src/context/AxiosContext';
 import Spinner from 'src/components/loaders/Spinner';
-import { useApiContext } from 'src/context/api/ApiContext';
+import { useAuthContext } from 'src/context/authContext';
 
 export interface LoginErrorInterface {
   email: string;
@@ -28,7 +28,7 @@ interface LoginPropsInterface {
 
 const Login: React.FC<LoginPropsInterface> = ({ csrf }) => {
   // const { login, errors } = useAuthContext();
-  const { login, errors } = useApiContext();
+  const { login, errors } = useAuthContext();
   const { isLoading } = useAxiosContext();
   const { control, handleSubmit } = useForm();
 

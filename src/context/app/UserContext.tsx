@@ -1,7 +1,7 @@
 import { TrainingType } from '@/types/EntityTpes/TrainingType';
 import { createContext, useContext, useState } from 'react';
 import { IsKlantCollection } from 'src/common/domain/klant';
-import { useApiContext } from '../api/ApiContext';
+import { useKlantContext } from './klantContext';
 
 type Inschrijving = {
   datum: Date;
@@ -12,17 +12,13 @@ type contextType = {
   klant: IsKlantCollection | null;
   isLoggedIn: boolean;
   initializeKlant: (klant: IsKlantCollection) => void;
-  getInschrijvingenData: (ids: string[]) => Promise<Inschrijving[] | undefined>;
   clearData: () => void;
 };
 
 const defaultValues: contextType = {
   klant: null,
   isLoggedIn: false,
-  initializeKlant: () => {
-    console.log({ status: 'hello from defaultInitializeKlant' });
-  },
-  getInschrijvingenData: async () => [],
+  initializeKlant: () => {},
   clearData: () => {},
 };
 
@@ -32,27 +28,14 @@ const UserProvider: React.FC<{ children: any }> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [inschrijvingen, setInschrijvingen] = useState<Inschrijving[]>();
   const [klant, setKlant] = useState<IsKlantCollection | null>(null);
-  const { getKlantData, getInschrijvingen } = useApiContext();
+  const { getKlant } = useKlantContext();
 
   const clearData = () => setKlant(null);
 
   const initializeKlant = (klant: IsKlantCollection) => {
     setKlant(klant);
-    localStorage.setItem('klantId', klant._id.toString());
+    localStorage.setItem('klant', JSON.stringify({ ...klant, id: klant._id.toString() }));
     setIsLoggedIn(true);
-  };
-
-  const getKlantById = async (id: string) => {
-    if (klant) return klant;
-    const klantData = await getKlantData(id);
-    if (klantData) return klantData;
-  };
-
-  const getInschrijvingenData = async (inschrijvingIds: string[]) => {
-    if (inschrijvingen) return inschrijvingen;
-    const inschrijvingenData = await getInschrijvingen(inschrijvingIds);
-    setInschrijvingen(inschrijvingenData);
-    return inschrijvingenData;
   };
 
   return (
@@ -61,7 +44,6 @@ const UserProvider: React.FC<{ children: any }> = ({ children }) => {
         klant,
         isLoggedIn,
         initializeKlant,
-        getInschrijvingenData,
         clearData,
       }}
     >

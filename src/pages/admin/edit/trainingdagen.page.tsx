@@ -1,16 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Dashboard from 'src/components/admin/dashboard';
-import { Body, EbmeddedLink, Title2, Title3 } from 'src/components/Typography/Typography';
+import { Body, Title2, Title3 } from 'src/components/Typography/Typography';
 import { DatePicker } from 'react-trip-date';
-import { ADMINEDITTRAININGTIMES } from '@/types/linkTypes';
 import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
-import { TrainingDayContext } from 'src/context/TrainingDayContext';
 import NavLink from 'src/components/NavLink';
+import { useTrainingDayContext } from 'src/context/app/TrainingDayContext';
 
 interface Props {}
 
 const Trainingdagen: React.FC<Props> = ({}) => {
-  const { updateAvailableDays } = useContext(TrainingDayContext);
+  const { updateAvailableDays } = useTrainingDayContext();
 
   const selectedDays = useGetAvailableTrainingDays();
   const onChange = (data: string[]) => {
@@ -45,7 +44,7 @@ const Trainingdagen: React.FC<Props> = ({}) => {
 
 const useGetAvailableTrainingDays = () => {
   const [trainingDays, setTrainingDays] = useState<TrainingDayDto[]>([]);
-  const { getTrainingDays } = useContext(TrainingDayContext);
+  const { getTrainingDays } = useTrainingDayContext();
   useEffect(() => {
     (async () => {
       const trainingDays = await getTrainingDays();
