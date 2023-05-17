@@ -19,7 +19,9 @@ export type Context = {
   updateRas: (updateData: RasDto) => ApiResponse<RasDto> | Promise<undefined>;
   createRas: (rasDto: RasDto) => ApiResponse<RasDto> | Promise<undefined>;
   deleteRas: (rasDto: RasDto) => ApiResponse<{}> | Promise<undefined>;
-  useGetPaginatedRassen: (options?: RevalidateOptions) => Promise<PaginatedData<RasDto>>;
+  useGetPaginatedRassen: (
+    options?: RevalidateOptions
+  ) => Promise<PaginatedData<RasDto> | undefined>;
   useGetRasOptions: (options?: RevalidateOptions) => Option[];
 };
 
@@ -55,34 +57,31 @@ export const RasProvider: React.FC<{ children: any }> = ({ children }) => {
   };
 
   const useGetPaginatedRassen = async (options?: RevalidateOptions) => {
-    const [currentRetries, setCurrentRetries] = useState<number>(0);
-    const [success, setSuccess] = useState<boolean>(false);
-    const canRetry = currentRetries < (options?.maxRetries ?? 5);
-    const [revalidate, setRevalidate] = useState<boolean>(shouldRevalidate);
+    const maxRetries = options?.maxRetries ?? 5;
 
     useEffect(() => {
       (async () => {
         if (!shouldRevalidate && paginatedRassen) return paginatedRassen;
         else {
-          while (!success && canRetry) {
+          while (!success && currentRetries.current <= maxRetries) {
             const { data, error } = await getData<PaginatedData<RasDto>>(
               '/api/admin/rassen'
             );
             if (error) {
-              setCurrentRetries((retry) => retry + 1);
+              currentRetries.current += 1;
               toast.error('Fout bij laden van rassen');
-              sleep(1);
+              sleep(5);
               continue;
             } else if (data) {
               setPaginatedRassen(data);
               setSuccess(true);
-              setCurrentRetries(0);
-              setRevalidate(false);
+              currentRetries.current = 0;
+              setShouldRevalidate(false);
             }
           }
         }
       })();
-    }, [canRetry, success, revalidate]);
+    }, [maxRetries]);
     return paginatedRassen ?? emptyPaginatedResponse;
   };
 
@@ -136,7 +135,6 @@ export const RasProvider: React.FC<{ children: any }> = ({ children }) => {
               await sleep(5);
               continue;
             } else if (data) {
-              console.log({ status: 'inside data check' });
               setSuccess(true);
               currentRetries.current = 0;
               setRassen(data);

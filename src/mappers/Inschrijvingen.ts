@@ -1,8 +1,9 @@
-import moment from "moment";
-import { PaginatedData, PaginatedResponse } from "src/shared/RequestHelper";
-import { HondCollection } from "src/types/EntityTpes/HondTypes";
-import { InschrijvingCollection } from "src/types/EntityTpes/InschrijvingTypes";
-import { IsInschrijvingBodyInschrijving } from "src/types/requestTypes";
+import moment from 'moment';
+import { InschrijvingDto } from 'src/common/api/types/inschrijving';
+import { PaginatedData, PaginatedResponse } from 'src/shared/RequestHelper';
+import { HondCollection } from 'src/types/EntityTpes/HondTypes';
+import { InschrijvingCollection } from 'src/types/EntityTpes/InschrijvingTypes';
+import { IsInschrijvingBodyInschrijving } from 'src/types/requestTypes';
 
 export interface PaginatedInschrijving {
   _id: string;
@@ -35,21 +36,19 @@ export interface DetailInschrijvingResponse {
 
 export const mapToAdminInschrijvingenOverviewResult = (
   data: PaginatedData<InschrijvingCollection>
-): PaginatedResponse<PaginatedInschrijving> => ({
+): PaginatedResponse<InschrijvingDto> => ({
   data: data.data.map((inschrijving) => ({
-    _id: inschrijving._id.toString(),
-    created_at: inschrijving.created_at
-      .toISOString()
-      .replace("T", " ")
-      .split(".")[0],
-    datum: inschrijving.datum.toISOString().replace("T", " ").split(".")[0],
+    id: inschrijving._id.toString(),
+    created_at: inschrijving.created_at.toISOString().replace('T', ' ').split('.')[0],
+    datum: inschrijving.datum.toISOString().replace('T', ' ').split('.')[0],
     training: inschrijving.training,
     klant: {
-      _id: inschrijving.klant.id.toString(),
-      naam: inschrijving.klant.vnaam + " " + inschrijving.klant.lnaam,
+      id: inschrijving.klant.id.toString(),
+      vnaam: inschrijving.klant.vnaam,
+      lnaam: inschrijving.klant.lnaam,
     },
     hond: {
-      _id: inschrijving.hond.id.toString(),
+      id: inschrijving.hond.id.toString(),
       naam: inschrijving.hond.naam,
     },
   })),
@@ -68,12 +67,9 @@ export const mapToInschrijvingDetail = (
   hond: HondCollection
 ) => ({
   _id: inschrijving._id.toString(),
-  datum: inschrijving.datum.toISOString().replace("T", " ").split(".")[0],
+  datum: inschrijving.datum.toISOString().replace('T', ' ').split('.')[0],
   training: inschrijving.training,
-  created_at: inschrijving.created_at
-    .toISOString()
-    .replace("T", " ")
-    .split(".")[0],
+  created_at: inschrijving.created_at.toISOString().replace('T', ' ').split('.')[0],
   klant: {
     _id: inschrijving.klant.id.toString(),
     vnaam: inschrijving.klant.vnaam,
@@ -95,14 +91,11 @@ export const mapInschrijvingen = (
     .map((inschrijving, index) => ({
       [`moment${index}`]: moment(inschrijving.datum)
         .toISOString()
-        .replace("T", " ")
-        .split(":00.")[0],
+        .replace('T', ' ')
+        .split(':00.')[0],
       [`hond${index}`]: inschrijving.hond_naam,
-      [`prijsExcl${index}`]:
-        index === 0 && isFirstInschrijving ? "0.00" : prijs,
+      [`prijsExcl${index}`]: index === 0 && isFirstInschrijving ? '0.00' : prijs,
       [`prijsIncl${index}`]:
-        index === 0 && isFirstInschrijving
-          ? "0.00"
-          : Math.round(prijs * 1.21).toFixed(2),
+        index === 0 && isFirstInschrijving ? '0.00' : Math.round(prijs * 1.21).toFixed(2),
     }))
     .reduce((prev, curr) => ({ ...prev, ...curr }), {});
