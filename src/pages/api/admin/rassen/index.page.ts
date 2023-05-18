@@ -5,10 +5,12 @@ import {
   PaginatedRequestQuery,
   PaginatedResponse,
 } from 'src/shared/RequestHelper';
-import { mapToRassenOverviewResult, PaginatedRas } from 'src/mappers/rassen';
+import { PaginatedRas } from 'src/mappers/rassen';
 import { RasCollection } from 'src/types/EntityTpes/RasTypes';
 import { adminApi } from 'src/services/Authenticator';
 import { NotAllowedError } from 'src/shared/RequestError';
+import { mapToRassenOverviewResult } from './mappers';
+import { RasDto } from 'src/common/api/types/ras';
 
 interface RassenOverviewRequest extends NextApiRequest {
   query: PaginatedRequestQuery;
@@ -29,7 +31,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const getRassenOverview = async (
   req: RassenOverviewRequest,
-  res: NextApiResponse<PaginatedResponse<PaginatedRas>>
+  res: NextApiResponse<PaginatedResponse<RasDto>>
 ) => {
   try {
     const data = await getPaginatedData<RasCollection>(req.query, req.url, RAS);

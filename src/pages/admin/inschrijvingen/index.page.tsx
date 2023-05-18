@@ -30,6 +30,7 @@ const Inschrijvingen = () => {
 
   let { data: apiData, isLoading } = useGetPaginatedInschrijvingen();
   const inschrijvingen = useCreateRowsFromData(apiData, router);
+  console.log({ apiData, isLoading });
 
   const onPaginationClick = async (api?: string) => {
     if (!api) return;

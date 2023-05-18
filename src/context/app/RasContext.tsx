@@ -20,8 +20,12 @@ export type Context = {
   createRas: (rasDto: RasDto) => ApiResponse<RasDto> | Promise<undefined>;
   deleteRas: (rasDto: RasDto) => ApiResponse<{}> | Promise<undefined>;
   useGetPaginatedRassen: (
-    options?: RevalidateOptions
-  ) => Promise<PaginatedData<RasDto> | undefined>;
+    options?: RevalidateOptions,
+    url?: string
+  ) => {
+    data: PaginatedData<RasDto>;
+    isLoading: boolean;
+  };
   useGetRasOptions: (options?: RevalidateOptions) => Option[];
 };
 
@@ -32,7 +36,7 @@ export const defaultValues: Context = {
   updateRas: async () => undefined,
   createRas: async () => undefined,
   deleteRas: async () => undefined,
-  useGetPaginatedRassen: async () => emptyPaginatedResponse,
+  useGetPaginatedRassen: () => ({ data: emptyPaginatedResponse, isLoading: false }),
   useGetRasOptions: () => [],
 };
 
@@ -45,6 +49,7 @@ export const RasProvider: React.FC<{ children: any }> = ({ children }) => {
   const currentRetries = useRef<number>(0);
   const [success, setSuccess] = useState<boolean>(false);
   const [isLoading, setisLoading] = useState<boolean>(false);
+  const [lastPaginatedUrl, setLastPaginatedUrl] = useState<string>();
 
   const create = useMutation<RasDto>('/api/admin/rassen');
   const update = useMutation<RasDto>(`/api/admin/rassen`);
@@ -56,16 +61,22 @@ export const RasProvider: React.FC<{ children: any }> = ({ children }) => {
     return data;
   };
 
-  const useGetPaginatedRassen = async (options?: RevalidateOptions) => {
+  const useGetPaginatedRassen = (options?: RevalidateOptions, url?: string) => {
+    console.log(url);
     const maxRetries = options?.maxRetries ?? 5;
+    const [loading, setLoading] = useState<boolean>(true);
+    const urlMatchesLastUrl = url && url === lastPaginatedUrl;
 
     useEffect(() => {
+      setLoading(true);
       (async () => {
-        if (!shouldRevalidate && paginatedRassen) return paginatedRassen;
-        else {
+        if (!shouldRevalidate && paginatedRassen && urlMatchesLastUrl) {
+          setLoading(false);
+        } else {
+          setLastPaginatedUrl(url);
           while (!success && currentRetries.current <= maxRetries) {
             const { data, error } = await getData<PaginatedData<RasDto>>(
-              '/api/admin/rassen'
+              url ?? '/api/admin/rassen'
             );
             if (error) {
               currentRetries.current += 1;
@@ -76,13 +87,19 @@ export const RasProvider: React.FC<{ children: any }> = ({ children }) => {
               setPaginatedRassen(data);
               setSuccess(true);
               currentRetries.current = 0;
-              setShouldRevalidate(false);
+              setShouldRevalidate(!data.data.length);
+              break;
             }
           }
+          setLoading(false);
+          setSuccess(false);
         }
       })();
-    }, [maxRetries]);
-    return paginatedRassen ?? emptyPaginatedResponse;
+    }, [maxRetries, url]);
+    return {
+      data: paginatedRassen ?? emptyPaginatedResponse,
+      isLoading: loading,
+    };
   };
 
   const createRas = async (rasDto: RasDto) => {

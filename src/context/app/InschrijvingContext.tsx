@@ -92,14 +92,14 @@ const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
 
   const useGetPaginatedInschrijvingen = (options?: RevalidateOptions) => {
     const retries = options?.maxRetries ?? 5;
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
       (async () => {
-        if (!shouldRevalidate && paginatedInschrijvingen)
-          return { data: paginatedInschrijvingen, isLoading: isLoading };
-        else {
-          setIsLoading(true);
+        if (!shouldRevalidate && paginatedInschrijvingen) {
+          setLoading(false);
+        } else {
+          console.log({ status: 'hello' });
           while (!success && currentRetries.current <= retries) {
             const { data, error } = await getData<PaginatedData<InschrijvingDto>>(
               '/api/admin/inschrijvingen'
@@ -117,14 +117,15 @@ const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
               break;
             }
           }
-          setIsLoading(false);
+          setLoading(false);
         }
       })();
-    }, [retries, isLoading]);
+    }, [retries, loading]);
     currentRetries.current = 0;
+
     return {
       data: paginatedInschrijvingen ?? emptyPaginatedResponse,
-      isLoading: isLoading,
+      isLoading: loading,
     };
   };
 
