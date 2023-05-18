@@ -1,10 +1,13 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { HondDto } from 'src/common/api/types/hond';
 import getData from 'src/hooks/useApi';
 import useMutation from 'src/hooks/useMutation';
+import { sleep } from 'src/shared/functions';
+import { PaginatedData } from 'src/shared/RequestHelper';
 import { ApiResponse, REQUEST_METHOD } from 'src/utils/axios';
-import { defaultApiResponse } from './AppContext';
+import { defaultApiResponse, emptyPaginatedResponse } from './AppContext';
+import { RevalidateOptions } from './klantContext';
 
 type HondContext = {
   isLoading: boolean;
@@ -14,7 +17,10 @@ type HondContext = {
   updateHond: (hondDto: HondDto) => ApiResponse<HondDto>;
   postHond: (hondDto: HondDto) => ApiResponse<HondDto>;
   deleteHond: (hondDto: HondDto) => ApiResponse<{}>;
-  useGetHonden: () => Promise<HondDto[] | undefined>;
+  useGetPaginatedHonden: (
+    options?: RevalidateOptions,
+    url?: string
+  ) => { data: PaginatedData<HondDto>; isLoading: boolean };
 };
 
 const defaultValues: HondContext = {
@@ -25,15 +31,19 @@ const defaultValues: HondContext = {
   updateHond: async () => defaultApiResponse,
   postHond: async () => defaultApiResponse,
   deleteHond: async () => defaultApiResponse,
-  useGetHonden: async () => [],
+  useGetPaginatedHonden: () => ({ data: emptyPaginatedResponse, isLoading: false }),
 };
 
 export const HondContext = createContext<HondContext>(defaultValues);
 
 const HondProvider: React.FC<{ children: any }> = ({ children }) => {
-  const [honden, setHonden] = useState<HondDto[]>();
+  const [paginatedHonden, setPaginatedHonden] = useState<PaginatedData<HondDto>>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
+  const [lastPaginatedUrl, setLastPaginatedUrl] = useState<string>();
+  const [revalidateHonden, setRevalidateHonden] = useState<boolean>(false);
+  const [success, setSuccess] = useState<boolean>(false);
+  const currentRetries = useRef<number>(0);
 
   const update = useMutation<HondDto>('/api/honden');
   const create = useMutation<HondDto>('/api/honden');
@@ -94,8 +104,40 @@ const HondProvider: React.FC<{ children: any }> = ({ children }) => {
     return { data, error };
   };
 
-  const useGetHonden = async () => {
-    return [];
+  const useGetPaginatedHonden = (options?: RevalidateOptions, url?: string) => {
+    const maxRetries = options?.maxRetries ?? 5;
+    const [loading, setLoading] = useState<boolean>(true);
+    const urlMatchesLastUrl = url === lastPaginatedUrl;
+
+    useEffect(() => {
+      setLoading(true);
+      (async () => {
+        if (!revalidateHonden && paginatedHonden && urlMatchesLastUrl) {
+          setLoading(false);
+        } else {
+          setLastPaginatedUrl(url);
+          while (!success && currentRetries.current <= maxRetries) {
+            const { data, error } = await getData<PaginatedData<HondDto>>(
+              url ?? '/api/admin/honden'
+            );
+            if (error) {
+              currentRetries.current += 1;
+              toast.error('Fout bij laden van honden');
+              sleep(5);
+              continue;
+            } else if (data) {
+              setPaginatedHonden(data);
+              setSuccess(true);
+              currentRetries.current = 0;
+              break;
+            }
+          }
+          setLoading(false);
+          setSuccess(false);
+        }
+      })();
+    }, [maxRetries, url, urlMatchesLastUrl]);
+    return { data: paginatedHonden ?? emptyPaginatedResponse, isLoading: loading };
   };
 
   return (
@@ -108,7 +150,7 @@ const HondProvider: React.FC<{ children: any }> = ({ children }) => {
         updateHond,
         postHond,
         deleteHond,
-        useGetHonden,
+        useGetPaginatedHonden,
       }}
     >
       {children}

@@ -47,7 +47,6 @@ const Context = createContext<Context>(defaultValues);
 
 const KlantProvider: React.FC<{ children: any }> = ({ children }) => {
   const [revalidateKlanten, setRevalidateKlanten] = useState<boolean>(false);
-  const [paginatedKlanten, setPaginatedKlanten] = useState<PaginatedData<KlantDto>>();
   const [revalidateKlant, setRevalidateKlant] = useState<boolean>(false);
   const [klanten, setKlanten] = useState<PaginatedResponse<KlantDto>>();
   const [klantDetail, setKlantDetail] = useState<KlantDto>();

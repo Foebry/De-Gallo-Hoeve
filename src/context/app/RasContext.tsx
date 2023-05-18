@@ -45,7 +45,7 @@ export const Context = createContext<Context>(defaultValues);
 export const RasProvider: React.FC<{ children: any }> = ({ children }) => {
   const [rassen, setRassen] = useState<RasDto[]>();
   const [paginatedRassen, setPaginatedRassen] = useState<PaginatedData<RasDto>>();
-  const [shouldRevalidate, setShouldRevalidate] = useState<boolean>(true);
+  const [shouldRevalidate, setShouldRevalidate] = useState<boolean>(false);
   const currentRetries = useRef<number>(0);
   const [success, setSuccess] = useState<boolean>(false);
   const [isLoading, setisLoading] = useState<boolean>(false);

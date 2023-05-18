@@ -30,6 +30,7 @@ export interface KlantHond {
   updated_at: Date;
   klant: {
     _id: ObjectId;
-    naam: string;
+    vnaam: string;
+    lnaam: string;
   };
 }
