@@ -94,7 +94,7 @@ export const sendResetConfirmMail = async (
   domain: string | undefined
 ) => {
   const resetConfirmTemplateData: ResetConfirmData = {
-    email: process.env.MAIL_TO ?? klant.email,
+    email: process.env.MAIL_TEST ?? klant.email,
     vnaam: klant.vnaam,
     code,
     domain: domain ?? 'https://degallohoeve.be',
