@@ -59,7 +59,7 @@ describe('/honden', () => {
                 klant.honden.includes(hond)
               );
               return expect.objectContaining({
-                _id: hond._id.toString(),
+                id: hond._id.toString(),
                 naam: hond.naam,
                 ras: hond.ras,
                 geslacht: hond.geslacht,
@@ -71,8 +71,9 @@ describe('/honden', () => {
                 updated_at: hond.updated_at.toISOString().replace('T', ' ').split('.')[0],
                 leeftijd: getAge(hond.geboortedatum),
                 klant: {
-                  _id: klant?._id.toString(),
-                  naam: `${klant?.vnaam} ${klant?.lnaam}`,
+                  id: klant?._id.toString(),
+                  vnaam: klant?.vnaam,
+                  lnaam: klant?.lnaam,
                 },
               });
             })
@@ -102,7 +103,7 @@ describe('/honden', () => {
                 klant.honden.includes(hond)
               );
               return expect.objectContaining({
-                _id: hond._id.toString(),
+                id: hond._id.toString(),
                 naam: hond.naam,
                 ras: hond.ras,
                 geslacht: hond.geslacht,
@@ -114,8 +115,9 @@ describe('/honden', () => {
                 updated_at: hond.updated_at.toISOString().replace('T', ' ').split('.')[0],
                 leeftijd: getAge(hond.geboortedatum),
                 klant: {
-                  _id: klant?._id.toString(),
-                  naam: `${klant?.vnaam} ${klant?.lnaam}`,
+                  id: klant?._id.toString(),
+                  vnaam: klant?.vnaam,
+                  lnaam: klant?.lnaam,
                 },
               });
             })

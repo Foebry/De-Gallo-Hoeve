@@ -64,16 +64,17 @@ describe('/admin/inschrijvingen', () => {
               (hond) => hond._id.toString() === inschrijving.hond.id.toString()
             );
             return expect.objectContaining({
-              _id: inschrijving._id.toString(),
+              id: inschrijving._id.toString(),
               created_at: toReadableDate(inschrijving.created_at),
               datum: toReadableDate(inschrijving.datum),
               training: inschrijving.training,
               klant: expect.objectContaining({
-                _id: klant?._id.toString(),
-                naam: `${klant?.vnaam} ${klant?.lnaam}`,
+                id: klant?._id.toString(),
+                vnaam: klant?.vnaam,
+                lnaam: klant?.lnaam,
               }),
               hond: expect.objectContaining({
-                _id: hond?._id.toString(),
+                id: hond?._id.toString(),
                 naam: hond?.naam,
               }),
             });
