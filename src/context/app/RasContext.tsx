@@ -62,10 +62,9 @@ export const RasProvider: React.FC<{ children: any }> = ({ children }) => {
   };
 
   const useGetPaginatedRassen = (options?: RevalidateOptions, url?: string) => {
-    console.log(url);
     const maxRetries = options?.maxRetries ?? 5;
     const [loading, setLoading] = useState<boolean>(true);
-    const urlMatchesLastUrl = url && url === lastPaginatedUrl;
+    const urlMatchesLastUrl = url === lastPaginatedUrl;
 
     useEffect(() => {
       setLoading(true);
@@ -87,7 +86,6 @@ export const RasProvider: React.FC<{ children: any }> = ({ children }) => {
               setPaginatedRassen(data);
               setSuccess(true);
               currentRetries.current = 0;
-              setShouldRevalidate(!data.data.length);
               break;
             }
           }
@@ -95,7 +93,7 @@ export const RasProvider: React.FC<{ children: any }> = ({ children }) => {
           setSuccess(false);
         }
       })();
-    }, [maxRetries, url]);
+    }, [maxRetries, url, urlMatchesLastUrl]);
     return {
       data: paginatedRassen ?? emptyPaginatedResponse,
       isLoading: loading,

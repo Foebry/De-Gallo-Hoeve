@@ -25,7 +25,6 @@ const Rassen = () => {
   }, [paginatedData]);
 
   const onPaginationClick = async (api?: string) => {
-    console.log({ api });
     if (!api) return;
     setUrl(api);
   };
