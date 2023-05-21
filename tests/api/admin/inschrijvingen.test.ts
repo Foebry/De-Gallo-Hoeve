@@ -65,9 +65,9 @@ describe('/admin/inschrijvingen', () => {
             );
             return expect.objectContaining({
               id: inschrijving._id.toString(),
-              created_at: toReadableDate(inschrijving.created_at),
               datum: toReadableDate(inschrijving.datum),
               training: inschrijving.training,
+              created_at: toReadableDate(inschrijving.created_at),
               klant: expect.objectContaining({
                 id: klant?._id.toString(),
                 vnaam: klant?.vnaam,
@@ -76,6 +76,7 @@ describe('/admin/inschrijvingen', () => {
               hond: expect.objectContaining({
                 id: hond?._id.toString(),
                 naam: hond?.naam,
+                ras: hond?.ras,
               }),
             });
           })
@@ -163,17 +164,17 @@ describe('/admin/inschrijvingen', () => {
       ]);
 
       const expectedResponse = expect.objectContaining({
-        _id: specificInschrijving._id.toString(),
+        id: specificInschrijving._id.toString(),
         datum: toReadableDate(specificInschrijving.datum),
         training: specificInschrijving.training,
         created_at: toReadableDate(specificInschrijving.created_at),
         klant: expect.objectContaining({
-          _id: specificKlant._id.toString(),
+          id: specificKlant._id.toString(),
           vnaam: specificKlant.vnaam,
           lnaam: specificKlant.lnaam,
         }),
         hond: expect.objectContaining({
-          _id: specificHond._id.toString(),
+          id: specificHond._id.toString(),
           naam: specificHond.naam,
           ras: specificHond.ras,
         }),

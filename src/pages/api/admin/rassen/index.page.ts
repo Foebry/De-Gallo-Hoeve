@@ -5,7 +5,6 @@ import {
   PaginatedRequestQuery,
   PaginatedResponse,
 } from 'src/shared/RequestHelper';
-import { PaginatedRas } from 'src/mappers/rassen';
 import { RasCollection } from 'src/types/EntityTpes/RasTypes';
 import { adminApi } from 'src/services/Authenticator';
 import { NotAllowedError } from 'src/shared/RequestError';
