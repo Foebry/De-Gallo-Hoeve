@@ -34,7 +34,7 @@ const getInschrijvingOverview = async (
 ) => {
   try {
     const data = await getPaginatedData<InschrijvingCollection>(
-      { ...req.query, amount: '2' },
+      req.query,
       req.url,
       INSCHRIJVING
     );

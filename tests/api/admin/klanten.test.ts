@@ -138,9 +138,9 @@ describe('/admin/klanten', () => {
         lnaam: specificKlant.lnaam,
         gsm: specificKlant.gsm,
         straat: specificKlant.straat,
-        nr: specificKlant.nr,
+        nr: specificKlant.nr.toString(),
         gemeente: specificKlant.gemeente,
-        postcode: specificKlant.postcode,
+        postcode: specificKlant.postcode.toString(),
         honden: expect.arrayContaining(
           specificKlant.honden.map((hond) =>
             expect.objectContaining({
