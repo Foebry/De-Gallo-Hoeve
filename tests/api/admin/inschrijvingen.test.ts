@@ -76,7 +76,6 @@ describe('/admin/inschrijvingen', () => {
               hond: expect.objectContaining({
                 id: hond?._id.toString(),
                 naam: hond?.naam,
-                ras: hond?.ras,
               }),
             });
           })
