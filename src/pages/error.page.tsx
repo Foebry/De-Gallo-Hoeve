@@ -7,6 +7,7 @@ import { FrontEndErrorCodes } from 'src/shared/functions';
 import useMutation from 'src/hooks/useMutation';
 import logger from 'src/utils/logger';
 import Head from 'next/head';
+import { REQUEST_METHOD } from 'src/utils/axios';
 
 export const FallBack = () => {
   const router = useRouter();
@@ -39,17 +40,13 @@ export const FallBack = () => {
 const useGetErrorInfo = (router: NextRouter) => {
   const errorCode = Object.keys(router.query)[0];
   const confirmCode = Object.values(router.query)[1];
-  const reset = useMutation();
+  const reset = useMutation<{}>(`api/confirm/${confirmCode}`);
   let title: string;
   let link: ReactElement;
 
   const renewVerificationCode = async () => {
     try {
-      const { data, error } = await reset(
-        `api/confirm/${confirmCode}`,
-        {},
-        { method: 'PUT' }
-      );
+      const { data, error } = await reset({}, { method: REQUEST_METHOD.PUT });
       if (data) router.push('/');
       else if (error) router.push(`/error?${error.code}&code=${confirmCode}`);
     } catch (e: any) {

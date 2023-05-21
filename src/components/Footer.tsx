@@ -31,13 +31,13 @@ const Footer: React.FC<Props> = ({}) => {
   const [disabled, setDisabled] = useState<boolean>(false);
   const [formErrors, setFormErrors] = useState<Partial<ContactErrorInterface>>({});
 
-  const contact = useMutation<ContactErrorInterface>();
+  const contact = useMutation<ContactErrorInterface>(CONTACTAPI);
 
   const onSubmit = async (values: any) => {
     const payload = values;
     if (!disabled) {
       setDisabled(() => true);
-      const { data, error } = await contact(CONTACTAPI, {
+      const { data, error } = await contact({
         ...payload,
         email: payload.email?.trim().toLowerCase(),
         csrf: 'MmJiM2pwNHQ1dg==$c0tKJd-G-aePggUzDLC6H28lsl2iNCjnGBQ5i0vpzdw',

@@ -8,7 +8,7 @@ import {
   InvalidPasswordError,
   NotAllowedError,
 } from 'src/shared/RequestError';
-import { createJWT, setClientCookie } from 'src/services/Authenticator';
+import { createJWT } from 'src/services/Authenticator';
 import { logError } from '../logError/repo';
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
@@ -34,9 +34,8 @@ const login = async (req: LoginRequest, res: NextApiResponse) => {
     if (!match) throw new InvalidPasswordError();
 
     createJWT(res, klant);
-    setClientCookie(res, klant);
 
-    return res.send({});
+    return res.send(klant);
   } catch (e: any) {
     req.body.password = req.body.password ? await bcrypt.hash(req.body.password, 10) : '';
     await logError('login', req, e);

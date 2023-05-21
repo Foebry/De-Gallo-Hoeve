@@ -6,12 +6,10 @@ import {
   PaginatedResponse,
 } from 'src/shared/RequestHelper';
 import { InschrijvingCollection } from 'src/types/EntityTpes/InschrijvingTypes';
-import {
-  mapToAdminInschrijvingenOverviewResult,
-  PaginatedInschrijving,
-} from 'src/mappers/Inschrijvingen';
 import { adminApi } from 'src/services/Authenticator';
 import { NotAllowedError } from 'src/shared/RequestError';
+import { InschrijvingDto } from 'src/common/api/types/inschrijving';
+import { mapToAdminInschrijvingenOverviewResult } from './mappers';
 
 interface ListInschrijvingRequest extends NextApiRequest {
   query: PaginatedRequestQuery;
@@ -32,7 +30,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const getInschrijvingOverview = async (
   req: ListInschrijvingRequest,
-  res: NextApiResponse<PaginatedResponse<PaginatedInschrijving>>
+  res: NextApiResponse<PaginatedResponse<InschrijvingDto>>
 ) => {
   try {
     const data = await getPaginatedData<InschrijvingCollection>(

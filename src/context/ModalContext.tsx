@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 
 type ModalContext = {
   message: string | undefined;
@@ -35,5 +35,7 @@ const ModalProvider: React.FC<{ children: any }> = ({ children }) => {
     </ModalContext.Provider>
   );
 };
+
+export const useModalContext = () => useContext(ModalContext);
 
 export default ModalProvider;

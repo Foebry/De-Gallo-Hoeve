@@ -1,11 +1,10 @@
-import React, { Dispatch, useEffect, useState } from 'react';
+import React, { Dispatch, useState } from 'react';
 import Form from 'src/components/form/Form';
 import { useRouter } from 'next/router';
 import { INDEX, LOGIN } from 'src/types/linkTypes';
 import { useFieldArray, useForm } from 'react-hook-form';
 import PersoonlijkeGegevens from 'src/components/register/PersoonlijkeGegevens';
-import Step2, { optionInterface } from 'src/components/register/HondGegevens';
-import { OptionsOrGroups } from 'react-select';
+import Step2 from 'src/components/register/HondGegevens';
 import { REGISTERAPI } from 'src/types/apiTypes';
 import useMutation, { structureHondenPayload } from 'src/hooks/useMutation';
 import FormSteps from 'src/components/form/FormSteps';
@@ -14,9 +13,9 @@ import nookies from 'nookies';
 import { toast } from 'react-toastify';
 import Button, { SubmitButton } from 'src/components/buttons/Button';
 import { generateCsrf } from 'src/services/Validator';
-import { useAppContext } from 'src/context/appContext';
 import Skeleton from 'src/components/website/skeleton';
 import Head from 'next/head';
+import { useRasContext } from 'src/context/app/RasContext';
 
 export interface RegisterHondErrorInterface {
   naam?: string;
@@ -46,10 +45,11 @@ interface RegisterProps {
 }
 
 const Register: React.FC<RegisterProps> = ({ csrf }) => {
-  const { retrieveRassen } = useAppContext();
+  const { useGetRasOptions } = useRasContext();
+  const rasOptions = useGetRasOptions();
   const [formErrors, setFormErrors] = useState<RegisterErrorInterface>({});
   const router = useRouter();
-  const register = useMutation<Partial<RegisterErrorInterface>>();
+  const register = useMutation<Partial<RegisterErrorInterface>>(REGISTERAPI);
   const { control, handleSubmit, getValues } = useForm();
   const { fields, remove, append } = useFieldArray({
     control,
@@ -58,7 +58,6 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
   const [disabled, setDisabled] = useState<boolean>(false);
   const [activeStep, setActiveStep] = useState<number>(0);
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
-  const [rassen, setRassen] = useState<OptionsOrGroups<any, optionInterface>[]>([]);
   const step1 = [
     'vnaam',
     'lnaam',
@@ -132,13 +131,6 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
     }
   };
 
-  useEffect(() => {
-    (async () => {
-      const data = await retrieveRassen!();
-      setRassen(data);
-    })();
-  }, []);
-
   return (
     <>
       <Head>
@@ -182,7 +174,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
                     fields={fields}
                     append={append}
                     remove={remove}
-                    options={rassen}
+                    options={rasOptions ?? []}
                     errors={formErrors}
                     setErrors={setFormErrors}
                     values={getValues}

@@ -1,63 +1,24 @@
-import axios, { AxiosRequestConfig } from 'axios';
-import { toast } from 'react-toastify';
-import { InschrijvingErrorInterface } from 'src/pages/inschrijving/index.page';
-import { LoginErrorInterface } from 'src/pages/login/index.page';
 import moment from 'moment';
-import { useState } from 'react';
+import { useAxiosContext } from 'src/context/AxiosContext';
+import { ApiResponse, Options } from 'src/utils/axios';
 
-interface ApiError {
-  response: {
-    data: {};
-  };
-}
-
-type FormError = InschrijvingErrorInterface | LoginErrorInterface;
-
-type REQUESTMETHOD = 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'GET';
-
-const useMutation = <T>(
-  errors?: any,
-  setErrors?: React.Dispatch<React.SetStateAction<any>>
+const useMutation = <T, E = Partial<T> & { message: string; code: number }>(
+  endpoint: string
 ) => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const executerFunc = async (
-    endpoint: string,
-    payload: any,
-    options?: Partial<{
-      method: REQUESTMETHOD;
-      params: any;
-    }>
-  ): Promise<{
-    data: any | undefined;
-    loading: boolean;
-    error: (Partial<T> & { message: string; code: number }) | undefined;
-  }> => {
+  const { increase, decrease, send } = useAxiosContext();
+  const executerFunc = async (payload: any, options?: Options): ApiResponse<T, E> => {
     try {
-      setIsLoading(true);
-      const { data } = await axios(endpoint, {
-        method: options?.method ?? 'POST',
-        data: payload,
-        withCredentials: true,
-        params: options?.params ?? undefined,
-      });
-      setIsLoading(false);
-      return { data, error: undefined, loading: isLoading };
+      increase();
+      const { data } = await send<T>(endpoint, payload, options);
+      return { data, error: undefined };
     } catch (error: any) {
-      let data = { ...error.response.data, code: error.response.status };
-      if (typeof data.message !== 'string') data = { ...data, ...data.message };
-      setIsLoading(false);
-      return { data: undefined, error: data, loading: isLoading };
+      const data = { ...error.response.data, code: error.response.status };
+      return { data: undefined, error: data };
+    } finally {
+      decrease();
     }
   };
   return executerFunc;
-};
-
-export const handleErrors = (errors: any, setError: any) => {
-  Object.entries(errors).forEach((error) => {
-    const key = error[0];
-    const message = error[1];
-    setError(key, { message });
-  });
 };
 
 export const structureHondenPayload = (payload: any) => {
@@ -98,19 +59,6 @@ export const structureInschrijvingenPayload = (payload: any) => {
     return {};
   });
   return [{ ...payload, inschrijvingen: new_inschrijvingen }, errors];
-};
-
-export const structureDetailsPayload = (payload: any) => {
-  const details = payload?.details ?? [];
-  const start = payload['period'].from;
-  const eind = payload['period'].to;
-  const newDetails = details.map((detail: any) => {
-    const medicatie = detail.medicatie?.value;
-    const ontsnapping = detail.ontsnapping?.value;
-    const sociaal = detail.sociaal?.value;
-    return { ...detail, medicatie, ontsnapping, sociaal };
-  });
-  return { start, eind, details: newDetails };
 };
 
 export default useMutation;

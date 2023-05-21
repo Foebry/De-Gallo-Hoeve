@@ -1,19 +1,24 @@
 import { FEEDBACK_API } from '@/types/apiTypes';
 import { useRouter } from 'next/router';
-import { createContext, useState } from 'react';
-import { UseFormSetError } from 'react-hook-form';
+import { createContext, Dispatch, SetStateAction, useContext, useState } from 'react';
 import { toast } from 'react-toastify';
+import { FeedbackDto } from 'src/common/api/types/feedback';
+import getData from 'src/hooks/useApi';
 import useMutation from 'src/hooks/useMutation';
 import { FeedbackBody } from 'src/pages/api/feedback/schemas';
+import { ApiResponse } from 'src/utils/axios';
 
 type FeedbackContext = {
   disabled: boolean;
+  isLoading: boolean;
+  errors: Partial<FeedbackBody>;
+  feedback: FeedbackDto[];
+  setFeedback: Dispatch<SetStateAction<FeedbackDto[]>>;
   sendFeedback: (
     body: FeedbackBody,
     params: FeedbackQuery
   ) => Promise<Partial<FeedbackBody> | void>;
-  isLoading: boolean;
-  errors: Partial<FeedbackBody>;
+  getFeedback: () => ApiResponse<FeedbackDto[]>;
 };
 
 type FeedbackQuery = {
@@ -22,26 +27,29 @@ type FeedbackQuery = {
 
 const defaultValues: FeedbackContext = {
   disabled: false,
-  sendFeedback: async () => {},
   isLoading: false,
   errors: {},
+  feedback: [],
+  sendFeedback: async () => {},
+  getFeedback: async () => ({ data: undefined, error: undefined }),
+  setFeedback: () => {},
 };
 
 export const FeedbackContext = createContext<FeedbackContext>(defaultValues);
 
 const FeedbackProvider: React.FC<{ children: any }> = ({ children }) => {
-  const mutate = useMutation<FeedbackBody>();
+  const postFeedback = useMutation<FeedbackBody>(FEEDBACK_API);
   const router = useRouter();
-  const api = FEEDBACK_API;
   const [disabled, setDisabled] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<Partial<FeedbackBody>>({});
+  const [feedback, setFeedback] = useState<FeedbackDto[]>([]);
 
   const sendFeedback = async (body: FeedbackBody, query: FeedbackQuery) => {
     if (disabled) return;
     setDisabled(true);
     setIsLoading(true);
-    const { data, error } = await mutate(api, body, { params: query });
+    const { data, error } = await postFeedback(body, { params: query });
     setIsLoading(false);
     if (error) {
       setDisabled(false);
@@ -55,6 +63,11 @@ const FeedbackProvider: React.FC<{ children: any }> = ({ children }) => {
     }
   };
 
+  const getFeedback = async () => {
+    const { data, error } = await getData<FeedbackDto[]>('/api/feedback');
+    return { data, error };
+  };
+
   return (
     <FeedbackContext.Provider
       value={{
@@ -62,6 +75,9 @@ const FeedbackProvider: React.FC<{ children: any }> = ({ children }) => {
         sendFeedback,
         isLoading,
         errors,
+        feedback,
+        setFeedback,
+        getFeedback,
       }}
     >
       {children}
@@ -70,3 +86,5 @@ const FeedbackProvider: React.FC<{ children: any }> = ({ children }) => {
 };
 
 export default FeedbackProvider;
+
+export const useFeedbackContext = () => useContext(FeedbackContext);

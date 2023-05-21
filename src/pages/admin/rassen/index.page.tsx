@@ -1,87 +1,36 @@
-import { nanoid } from "nanoid";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import React, { useEffect, useMemo, useState } from "react";
-import { GrEdit, GrView } from "react-icons/gr";
-import { MdDelete } from "react-icons/md";
-import { toast } from "react-toastify";
-import Dashboard from "src/components/admin/dashboard";
-import Button from "src/components/buttons/Button";
-import FormRow from "src/components/form/FormRow";
-import FormSearch from "src/components/form/FormSearch";
-import Table from "src/components/Table/Table";
-import getData from "src/hooks/useApi";
-import { PaginatedRas } from "src/mappers/rassen";
-import { ADMIN_RASSEN_OVERIEW } from "src/types/apiTypes";
-import { ApiResult } from "../klanten/index.page";
-import { AiOutlinePlus } from "react-icons/ai";
+import { nanoid } from 'nanoid';
+import React, { useMemo, useState } from 'react';
+import { GrEdit } from 'react-icons/gr';
+import { MdDelete } from 'react-icons/md';
+import Dashboard from 'src/components/admin/dashboard';
+import Button from 'src/components/buttons/Button';
+import FormRow from 'src/components/form/FormRow';
+import FormSearch from 'src/components/form/FormSearch';
+import Table from 'src/components/Table/Table';
+import { AiOutlinePlus } from 'react-icons/ai';
+import { useRasContext } from 'src/context/app/RasContext';
+import { PaginatedData } from 'src/shared/RequestHelper';
+import { RasDto } from 'src/common/api/types/ras';
+import Spinner from 'src/components/loaders/Spinner';
 
 const Rassen = () => {
-  const router = useRouter();
-  const [apiData, setApiData] = useState<ApiResult<PaginatedRas>>({
-    data: [],
-    pagination: { first: 0, last: 0, total: 0, currentPage: 0 },
-  });
-  const headers: string[] = ["naam", "soort", "actions"];
+  const { useGetPaginatedRassen } = useRasContext();
+  const [url, setUrl] = useState<string>();
 
-  const handleView = (id: string) => {
-    router.push(`admin/rassen/${id}`);
-  };
+  const { data: paginatedData, isLoading } = useGetPaginatedRassen(undefined, url);
+  const headers: string[] = ['naam', 'soort', 'actions'];
 
-  useEffect(() => {
-    (async () => {
-      const { data, error } = await getData(ADMIN_RASSEN_OVERIEW);
-      if (data) setApiData(data);
-      if (error) toast.error("Error bij ophalen van rassen overzicht");
-    })();
-  }, []);
-
-  const rassen = useMemo(() => {
-    return apiData.data.map((ras) => {
-      const naam = <Link href={`/admin/rassen/${ras._id}`}>{ras.naam}</Link>;
-      const soort = ras.soort;
-      const actions = [
-        <div
-          className="border rounded-l border-grey-200 border-solid p-1 cursor-pointer"
-          key={nanoid(10)}
-        >
-          <GrView onClick={() => handleView(ras._id.toString())} />
-        </div>,
-        <div
-          className="border border-grey-200 border-solid p-1 cursor-pointer"
-          key={nanoid(10)}
-        >
-          <GrEdit />
-        </div>,
-        <div
-          className="border rounded-r border-grey-200 border-solid p-1 cursor-pointer"
-          key={nanoid(10)}
-        >
-          <MdDelete />
-        </div>,
-      ];
-
-      return [naam, soort, actions];
-    });
-  }, [apiData]);
+  const rows = useMemo(() => {
+    return createTableFromData(paginatedData);
+  }, [paginatedData]);
 
   const onPaginationClick = async (api?: string) => {
     if (!api) return;
-    const { data, error } = await getData(api);
-    if (data) setApiData(data);
-    if (error) toast.warning("Fout bij laden van rassen");
+    setUrl(api);
   };
 
   const onSearch = async (searchValue: string) => {
-    const { data, error } = await getData(
-      `/api/admin/rassen?search=${searchValue}`
-    );
-    if (!error && data) {
-      setApiData(data);
-    }
-    if (error) {
-      toast.warning("Zoek opdracht mislukt");
-    }
+    setUrl(`/api/admin/rassen?search=${searchValue}`);
   };
   return (
     <Dashboard>
@@ -99,15 +48,43 @@ const Rassen = () => {
           <FormSearch api="/admin/rassen" onSearch={onSearch} />
         </FormRow>
       </FormRow>
-      <Table
-        rows={rassen}
-        columns={headers}
-        colWidths={["40", "35", "25"]}
-        onPaginationClick={onPaginationClick}
-        pagination={apiData.pagination}
-      />
+      {isLoading && <Spinner />}
+      {!isLoading && (
+        <Table
+          rows={rows}
+          columns={headers}
+          colWidths={['50', '35', '15']}
+          onPaginationClick={onPaginationClick}
+          pagination={paginatedData.pagination}
+        />
+      )}
     </Dashboard>
   );
 };
 
 export default Rassen;
+
+const createTableFromData = (data: PaginatedData<RasDto> | undefined) => {
+  return (
+    data?.data.map((ras) => {
+      const naam = ras.naam;
+      const soort = ras.soort;
+      const actions = [
+        <div
+          className="border rounded-l border-grey-200 border-solid p-1 cursor-pointer"
+          key={nanoid(10)}
+        >
+          <GrEdit />
+        </div>,
+        <div
+          className="border rounded-r border-grey-200 border-solid p-1 cursor-pointer"
+          key={nanoid(10)}
+        >
+          <MdDelete />
+        </div>,
+      ];
+
+      return [naam, soort, actions];
+    }) ?? []
+  );
+};

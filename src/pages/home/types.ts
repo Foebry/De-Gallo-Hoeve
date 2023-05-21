@@ -4,5 +4,5 @@ export type IndexData = {
   prijsExcl: number;
   kmHeffing: number;
   gratisVerplaatsingBinnen: number;
-  feedback: FeedbackDto[];
+  feedback?: FeedbackDto[];
 };

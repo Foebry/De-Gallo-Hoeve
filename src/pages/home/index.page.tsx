@@ -3,16 +3,16 @@ import TrainingCard from 'src/components/Cards/TrainingCard';
 import Image from 'next/image';
 import Skeleton from 'src/components/website/skeleton';
 import { GiCheckMark } from 'react-icons/gi';
-import { getPriveTraining } from 'src/controllers/TrainingController';
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
-import getData from 'src/hooks/useApi';
+import { useEffect, useRef, useState } from 'react';
 import FeedbackSection from './components/feedback/section';
 import { IndexData } from './types';
+import { useFeedbackContext } from 'src/context/app/FeedbackContext';
+import { useTrainingContext } from 'src/context/app/TrainingContext';
 
 interface Props {}
 
-const Index: React.FC<Props> = () => {
+const Index: React.FC<Props> = ({}) => {
   const { prijsExcl, kmHeffing, gratisVerplaatsingBinnen, feedback } = useGetIndexData();
   return (
     <>
@@ -163,26 +163,26 @@ const Index: React.FC<Props> = () => {
             </div>
           </div>
         </section>
-        {feedback.length > 0 && <FeedbackSection feedback={feedback} />}
+        {feedback && feedback.length > 0 && <FeedbackSection feedback={feedback} />}
       </Skeleton>
     </>
   );
 };
 
 const useGetIndexData = () => {
-  const priveTrainingId = '62fa1f25bacc03711136ad5f';
   const [indexData, setIndexData] = useState<IndexData>({
     prijsExcl: 20.66,
     kmHeffing: 0.3,
     gratisVerplaatsingBinnen: 10,
-    feedback: [],
   });
+  const feedbackContext = useRef(useFeedbackContext());
+  const trainingContext = useRef(useTrainingContext());
 
   useEffect(() => {
     (async () => {
       const [priveTrainingResult, feedbackResult] = await Promise.all([
-        getData(`/api/trainingen/${priveTrainingId}`),
-        getData('/api/feedback'),
+        trainingContext.current.getPriveTraining(),
+        feedbackContext.current.getFeedback(),
       ]);
       const { data: trainingData, error: trainingError } = priveTrainingResult;
       const { data: feedbackData, error: feedbackError } = feedbackResult;
@@ -190,7 +190,7 @@ const useGetIndexData = () => {
       if (!trainingError)
         setIndexData((indexData) => ({ ...indexData, ...trainingData }));
 
-      if (!feedbackError)
+      if (!feedbackError && feedbackData)
         setIndexData((indexData) => ({ ...indexData, feedback: feedbackData }));
     })();
   }, []);
@@ -201,14 +201,7 @@ const useGetIndexData = () => {
 export default Index;
 
 export const getStaticProps = async () => {
-  const priveTraining = await getPriveTraining();
-
   return {
-    props: {
-      prijsExcl: priveTraining?.prijsExcl ?? null,
-      kmHeffing: priveTraining?.kmHeffing ?? null,
-      gratisVerplaatsingBinnen: priveTraining?.gratisVerplaatsingBinnen ?? null,
-    },
-    revalidate: 86400,
+    props: {},
   };
 };

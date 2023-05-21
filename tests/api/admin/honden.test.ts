@@ -59,21 +59,26 @@ describe('/honden', () => {
                 klant.honden.includes(hond)
               );
               return expect.objectContaining({
-                _id: hond._id.toString(),
+                id: hond._id.toString(),
                 naam: hond.naam,
-                ras: hond.ras,
                 geslacht: hond.geslacht,
+                created_at: hond.created_at.toISOString().replace('T', ' ').split('.')[0],
+                updated_at: hond.updated_at.toISOString().replace('T', ' ').split('.')[0],
+                ras: {
+                  id: hond.ras,
+                  naam: '',
+                },
+                klant: {
+                  id: klant?._id.toString(),
+                  vnaam: klant?.vnaam,
+                  lnaam: klant?.lnaam,
+                },
                 geboortedatum: hond.geboortedatum
                   .toISOString()
                   .replace('T', ' ')
                   .split('.')[0],
-                created_at: hond.created_at.toISOString().replace('T', ' ').split('.')[0],
-                updated_at: hond.updated_at.toISOString().replace('T', ' ').split('.')[0],
+
                 leeftijd: getAge(hond.geboortedatum),
-                klant: {
-                  _id: klant?._id.toString(),
-                  naam: `${klant?.vnaam} ${klant?.lnaam}`,
-                },
               });
             })
           ),
@@ -102,9 +107,12 @@ describe('/honden', () => {
                 klant.honden.includes(hond)
               );
               return expect.objectContaining({
-                _id: hond._id.toString(),
+                id: hond._id.toString(),
                 naam: hond.naam,
-                ras: hond.ras,
+                ras: {
+                  id: hond.ras,
+                  naam: '',
+                },
                 geslacht: hond.geslacht,
                 geboortedatum: hond.geboortedatum
                   .toISOString()
@@ -114,8 +122,9 @@ describe('/honden', () => {
                 updated_at: hond.updated_at.toISOString().replace('T', ' ').split('.')[0],
                 leeftijd: getAge(hond.geboortedatum),
                 klant: {
-                  _id: klant?._id.toString(),
-                  naam: `${klant?.vnaam} ${klant?.lnaam}`,
+                  id: klant?._id.toString(),
+                  vnaam: klant?.vnaam,
+                  lnaam: klant?.lnaam,
                 },
               });
             })
@@ -162,16 +171,19 @@ describe('/honden', () => {
 
       expect(body).toEqual(
         expect.objectContaining({
-          _id: hond._id.toString(),
+          id: hond._id.toString(),
           naam: hond.naam,
-          geboortedatum: hond.geboortedatum.toISOString(),
           geslacht: hond.geslacht,
-          eigenaar: expect.objectContaining({
-            _id: klant._id.toString(),
-            fullName: `${klant.vnaam} ${klant.lnaam}`,
+          created_at: hond.created_at.toISOString(),
+          updated_at: hond.updated_at.toISOString(),
+          geboortedatum: hond.geboortedatum.toISOString(),
+          klant: expect.objectContaining({
+            id: klant._id.toString(),
+            vnaam: klant.vnaam,
+            lnaam: klant.lnaam,
           }),
           ras: expect.objectContaining({
-            _id: ras._id.toString(),
+            id: ras._id.toString(),
             naam: hond.ras,
           }),
         })

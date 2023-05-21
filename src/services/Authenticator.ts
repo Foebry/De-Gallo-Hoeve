@@ -22,7 +22,6 @@ interface VerifiedToken {
 
 interface AuthenticationHandlerInterface {
   createJWT: (res: NextApiResponse, klantData: any) => void;
-  setClientCookie: (res: NextApiResponse, payload: any) => void;
   secureApi: (obj: { req: NextApiRequest; res: NextApiResponse }) => VerifiedToken;
   adminApi: (ob: { req: NextApiRequest; res: NextApiResponse }) => void;
   verifiedUserApi: (obj: { req: NextApiRequest; res: NextApiResponse }) => void;
@@ -42,18 +41,6 @@ const authenticationHandler: AuthenticationHandlerInterface = {
     const token = jwt.sign({ payload }, `${secret}`);
     setCookie({ res }, 'JWT', token, {
       httpOnly: true,
-      maxAge: 3600,
-      secure: false,
-      sameSite: 'strict',
-      path: '/',
-    });
-  },
-
-  setClientCookie: (res, klantData) => {
-    const { vnaam: name, roles } = klantData;
-    const token = jwt.sign({ name, roles }, `${cookieSecret}`);
-    setCookie({ res }, 'Client', token, {
-      httpOnly: false,
       maxAge: 3600,
       secure: false,
       sameSite: 'strict',
@@ -138,7 +125,6 @@ const authenticationHandler: AuthenticationHandlerInterface = {
 
 export const {
   createJWT,
-  setClientCookie,
   secureApi,
   adminApi,
   verifiedUserApi,

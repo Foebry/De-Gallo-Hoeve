@@ -1,25 +1,26 @@
-import React, { useEffect } from "react";
-import Button from "../buttons/Button";
-import { OptionsOrGroups } from "react-select";
+import React, { useEffect } from 'react';
+import Button from '../buttons/Button';
+import { OptionsOrGroups } from 'react-select';
 import {
   Control,
   FieldValues,
   UseFieldArrayAppend,
   UseFieldArrayRemove,
   UseFormGetValues,
-} from "react-hook-form";
-import { RegisterErrorInterface } from "src/pages/register/index.page";
-import HondCard from "../Cards/HondCard";
+} from 'react-hook-form';
+import { RegisterErrorInterface } from 'src/pages/register/index.page';
+import HondCard from '../Cards/HondCard';
+import { Option } from 'src/utils/MongoDb';
 
 export interface optionInterface {
   options: [{ value: any; label: string }];
 }
 
 interface Props {
-  fields: Record<"id", string>[];
-  append: UseFieldArrayAppend<FieldValues, "honden">;
+  fields: Record<'id', string>[];
+  append: UseFieldArrayAppend<FieldValues, 'honden'>;
   remove: UseFieldArrayRemove;
-  options: OptionsOrGroups<any, optionInterface>[];
+  options: Option[];
   control: Control<FieldValues, any>;
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
   errors: RegisterErrorInterface;
@@ -69,10 +70,7 @@ const HondGegevens: React.FC<Props> = ({
         ))}
       </ul>
       <div className="mb-10 max-w-fit mx-auto">
-        <Button
-          label="Nieuwe hond aanmaken"
-          onClick={() => append(emptyHond)}
-        />
+        <Button label="Nieuwe hond aanmaken" onClick={() => append(emptyHond)} />
       </div>
     </div>
   );

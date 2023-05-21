@@ -27,7 +27,7 @@ const getAllHonden = async (): Promise<KlantHond[]> => {
     .map((klant) =>
       klant.honden.map((hond) => ({
         ...hond,
-        klant: { _id: klant._id, naam: `${klant.vnaam} ${klant.lnaam}` },
+        klant: { _id: klant._id, vnaam: klant.vnaam, lnaam: klant.lnaam },
       }))
     )
     .reduce((honden, hond) => [...honden, ...hond], [])

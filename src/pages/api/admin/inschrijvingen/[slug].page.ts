@@ -3,16 +3,14 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getHondById } from 'src/controllers/HondController';
 import { getInschrijvingById } from 'src/controllers/InschrijvingController';
 import {
-  DetailInschrijvingResponse,
-  mapToInschrijvingDetail,
-} from 'src/mappers/Inschrijvingen';
-import {
   HondNotFoundError,
   InschrijvingNotFoundError,
   NotAllowedError,
 } from 'src/shared/RequestError';
 import { adminApi } from 'src/services/Authenticator';
 import { logError } from '../../logError/repo';
+import { InschrijvingDto } from 'src/common/api/types/inschrijving';
+import { mapToInschrijvingDetail } from './mappers';
 
 export interface DetailRequest extends NextApiRequest {
   query: { slug: string };
@@ -32,7 +30,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const getInschrijvingDetail = async (
   req: DetailRequest,
-  res: NextApiResponse<DetailInschrijvingResponse>
+  res: NextApiResponse<InschrijvingDto>
 ) => {
   const { slug: _id } = req.query;
   try {

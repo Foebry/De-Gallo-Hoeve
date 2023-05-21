@@ -5,10 +5,11 @@ import {
   PaginatedRequestQuery,
   PaginatedResponse,
 } from 'src/shared/RequestHelper';
-import { mapToHondenOverviewResult, PaginatedKlantHond } from 'src/mappers/honden';
 import { KlantHond } from 'src/types/EntityTpes/HondTypes';
 import { adminApi } from 'src/services/Authenticator';
 import { logError } from '../../logError/repo';
+import { mapToHondenOverviewResult } from './mappers';
+import { HondDto } from 'src/common/api/types/hond';
 
 interface ListHondenRequest extends NextApiRequest {
   query: PaginatedRequestQuery;
@@ -30,7 +31,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const getHondenOverview = async (
   req: ListHondenRequest,
-  res: NextApiResponse<PaginatedResponse<PaginatedKlantHond>>
+  res: NextApiResponse<PaginatedResponse<HondDto>>
 ) => {
   try {
     const data = await getPaginatedData<KlantHond>(req.query, req.url, HOND);
