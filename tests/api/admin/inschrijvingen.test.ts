@@ -38,7 +38,9 @@ describe('/admin/inschrijvingen', () => {
         klant.honden = createRandomHonden(faker.datatype.number({ min: 1, max: 5 }));
       });
       const randomInschrijvingen = randomKlanten
-        .map((klant) => createRandomInschrijvingen(klant, faker.datatype.number(10)))
+        .map((klant) =>
+          createRandomInschrijvingen(klant, faker.datatype.number({ min: 0, max: 10 }))
+        )
         .reduce((curr, acc) => [...acc, ...curr], []);
       randomKlanten.forEach((klant) => {
         klant.inschrijvingen = randomInschrijvingen
