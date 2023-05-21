@@ -19,6 +19,6 @@ jobs:
         run: npm run test:int
         env:
           URI: ${{secrets.URI}}
-          MONGODB_DATABASE: ${{secrets.MONGO_DATABASE}}
+          MONGODB_DATABASE: ${{secrets.MONGODB_DATABASE}}
           MAIL_TEST: ${{secrets.MAIL_TEST}}
           CRON_FEEDBACK_EMAIL_KEY: ${{secrets.CRON_FEEDBACK_EMAIL_KEY}}
