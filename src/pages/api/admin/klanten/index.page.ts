@@ -2,13 +2,14 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { KLANT } from 'src/controllers/KlantController';
 import {
   getPaginatedData,
+  PaginatedData,
   PaginatedRequestQuery,
-  PaginatedResponse,
 } from 'src/shared/RequestHelper';
-import { mapToAdminKlantenOverviewResult, PaginatedKlant } from 'src/mappers/klanten';
 import { IsKlantCollection } from 'src/types/EntityTpes/KlantTypes';
 import { adminApi } from 'src/services/Authenticator';
 import { NotAllowedError } from 'src/shared/RequestError';
+import { mapToAdminKlantenOverviewResult } from './mappers';
+import { KlantDto } from 'src/common/api/types/klant';
 
 interface ListKlantenRequest extends NextApiRequest {
   query: PaginatedRequestQuery;
@@ -29,7 +30,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const getKlantenOverview = async (
   req: ListKlantenRequest,
-  res: NextApiResponse<PaginatedResponse<PaginatedKlant>>
+  res: NextApiResponse<PaginatedData<Omit<KlantDto, 'gsm' | 'honden' | 'inschrijvingen'>>>
 ) => {
   try {
     const data = await getPaginatedData<IsKlantCollection>(req.query, req.url, KLANT);

@@ -67,7 +67,6 @@ const Groepslessen: React.FC<LessenProps> = ({
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
   const [disabled, setDisabled] = useState<boolean>(false);
-  // const [isFirstInschrijving, setIsFirstInschrijving] = useState<boolean>(true);
   const latestAvailableDate = available
     .map((dto) => new Date(dto.date))
     .sort((a, b) => b.getTime() - a.getTime())
@@ -81,19 +80,6 @@ const Groepslessen: React.FC<LessenProps> = ({
   const router = useRouter();
   const { handleSubmit, control, getValues, register, setValue } = useForm();
   const inschrijving = useMutation<InschrijvingCollection>('');
-
-  // useEffect(() => {
-  //   (async () => {
-  //     const { data: mijnInschrijvingen } = await getData('/api/inschrijvingen');
-  //     if (!mijnInschrijvingen) {
-  //       setIsFirstInschrijving(true);
-  //       return;
-  //     } else {
-  //       if (mijnInschrijvingen.length > 0) setIsFirstInschrijving(false);
-  //       else setIsFirstInschrijving(true);
-  //     }
-  //   })();
-  // }, []);
 
   const steps = useMemo(() => {
     return klant_id
@@ -136,7 +122,6 @@ const Groepslessen: React.FC<LessenProps> = ({
         klant_id,
         training: type,
         prijs: prijsExcl,
-        // isFirstInschrijving,git
       });
       if (error) {
         if (error.code === 401) router.push(LOGIN);
@@ -200,18 +185,7 @@ const Groepslessen: React.FC<LessenProps> = ({
                               titleOfWeek: {
                                 titles: ['Zo', 'Ma', 'Di', 'Woe', 'Do', 'Vr', 'Za'],
                               },
-                              // header: {
-                              //   monthIcons: {},
-                              // },
                             }}
-                            // disabledA
-                            // disabledAfterDate={
-                            //   available
-                            //     .map((trainingDayDto) => trainingDayDto.date)
-                            //     .sort(
-                            //       (a, b) => new Date(b).getTime() - new Date(a).getTime()
-                            //     )[0]
-                            // }
                           />
                         );
                       }}
@@ -258,7 +232,6 @@ const Groepslessen: React.FC<LessenProps> = ({
 export default Groepslessen;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  // const { type } = ctx.query;
   try {
     const trainingDayController = getController(TRAININGDAY);
     const rasController = getController(RAS);

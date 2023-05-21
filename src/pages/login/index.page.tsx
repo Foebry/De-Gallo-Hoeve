@@ -15,6 +15,7 @@ import Head from 'next/head';
 import { useAxiosContext } from 'src/context/AxiosContext';
 import Spinner from 'src/components/loaders/Spinner';
 import { useAuthContext } from 'src/context/authContext';
+import { useRouter } from 'next/router';
 
 export interface LoginErrorInterface {
   email: string;
@@ -27,12 +28,15 @@ interface LoginPropsInterface {
 }
 
 const Login: React.FC<LoginPropsInterface> = ({ csrf }) => {
-  // const { login, errors } = useAuthContext();
   const { login, errors } = useAuthContext();
   const { isLoading } = useAxiosContext();
   const { control, handleSubmit } = useForm();
+  const router = useRouter();
+  const redirectUrl = router.query['redirectUrl'];
 
-  const onSubmit = async (values: any) => login({ ...values, csrf });
+  const onSubmit = async (values: any) => {
+    login({ ...values, csrf, redirect: redirectUrl });
+  };
 
   return (
     <>

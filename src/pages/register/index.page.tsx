@@ -1,4 +1,4 @@
-import React, { Dispatch, useEffect, useState } from 'react';
+import React, { Dispatch, useState } from 'react';
 import Form from 'src/components/form/Form';
 import { useRouter } from 'next/router';
 import { INDEX, LOGIN } from 'src/types/linkTypes';
@@ -45,8 +45,6 @@ interface RegisterProps {
 }
 
 const Register: React.FC<RegisterProps> = ({ csrf }) => {
-  // const { retrieveRassen } = useAppContext();
-  // const { rasOptions } = useGetRegisterData();
   const { useGetRasOptions } = useRasContext();
   const rasOptions = useGetRasOptions();
   const [formErrors, setFormErrors] = useState<RegisterErrorInterface>({});
@@ -60,7 +58,6 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
   const [disabled, setDisabled] = useState<boolean>(false);
   const [activeStep, setActiveStep] = useState<number>(0);
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
-  // const [rassen, setRassen] = useState<OptionsOrGroups<any, optionInterface>[]>([]);
   const step1 = [
     'vnaam',
     'lnaam',
@@ -133,13 +130,6 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
       setDisabled(() => false);
     }
   };
-
-  // useEffect(() => {
-  //   (async () => {
-  //     const data = await retrieveRassen!();
-  //     setRassen(data);
-  //   })();
-  // }, []);
 
   return (
     <>
@@ -216,19 +206,6 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
 };
 
 export default Register;
-
-// const useGetRegisterData = () => {
-//   const { getRassen, getRasOptions } = useRasContext();
-//   const [rasOptions, setRasOptions] = useState<OptionsOrGroups<any, optionInterface>>();
-//   useEffect(() => {
-//     (async () => {
-//       const data = await getRasOptions();
-//       setRasOptions(data);
-//     })();
-//   }, [getRasOptions]);
-
-//   return { rasOptions };
-// };
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const csrf = generateCsrf();

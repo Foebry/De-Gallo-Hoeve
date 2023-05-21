@@ -21,6 +21,10 @@ type HondContext = {
     options?: RevalidateOptions,
     url?: string
   ) => { data: PaginatedData<HondDto>; isLoading: boolean };
+  useGetHondDetail: (
+    options?: RevalidateOptions,
+    url?: string
+  ) => { data: HondDto | null; isLoading: boolean };
 };
 
 const defaultValues: HondContext = {
@@ -32,16 +36,19 @@ const defaultValues: HondContext = {
   postHond: async () => defaultApiResponse,
   deleteHond: async () => defaultApiResponse,
   useGetPaginatedHonden: () => ({ data: emptyPaginatedResponse, isLoading: false }),
+  useGetHondDetail: () => ({ data: null, isLoading: false }),
 };
 
 export const HondContext = createContext<HondContext>(defaultValues);
 
 const HondProvider: React.FC<{ children: any }> = ({ children }) => {
   const [paginatedHonden, setPaginatedHonden] = useState<PaginatedData<HondDto>>();
+  const [hondDetail, setHondDetail] = useState<HondDto | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [lastPaginatedUrl, setLastPaginatedUrl] = useState<string>();
   const [revalidateHonden, setRevalidateHonden] = useState<boolean>(false);
+  const [revalidateHondDetail, setRevalidateHondDetail] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
   const currentRetries = useRef<number>(0);
 
@@ -123,7 +130,7 @@ const HondProvider: React.FC<{ children: any }> = ({ children }) => {
             if (error) {
               currentRetries.current += 1;
               toast.error('Fout bij laden van honden');
-              sleep(5);
+              await sleep(5);
               continue;
             } else if (data) {
               setPaginatedHonden(data);
@@ -134,10 +141,52 @@ const HondProvider: React.FC<{ children: any }> = ({ children }) => {
           }
           setLoading(false);
           setSuccess(false);
+          currentRetries.current = 0;
+          return;
         }
       })();
     }, [maxRetries, url, urlMatchesLastUrl]);
     return { data: paginatedHonden ?? emptyPaginatedResponse, isLoading: loading };
+  };
+
+  const useGetHondDetail = (options?: RevalidateOptions, url?: string) => {
+    const maxRetries = options?.maxRetries ?? 5;
+    const [loading, setLoading] = useState<boolean>(true);
+    const hondId = url?.split('/').reverse()[0];
+
+    useEffect(() => {
+      setLoading(true);
+      (async () => {
+        if (!revalidateHondDetail && hondDetail) {
+          setLoading(false);
+        } else {
+          while (!success && currentRetries.current <= maxRetries) {
+            if (hondId === 'undefined') {
+              currentRetries.current += 1;
+              await sleep(1);
+              continue;
+            }
+            const { data, error } = await getData<HondDto>(url!);
+            if (error) {
+              currentRetries.current += 1;
+              toast.error('Fout bij laden van detail hond');
+              await sleep(5);
+              continue;
+            } else if (data) {
+              setHondDetail(data ?? null);
+              setSuccess(true);
+              currentRetries.current = 0;
+              break;
+            }
+          }
+          currentRetries.current = 0;
+          setLoading(false);
+          setSuccess(false);
+          return;
+        }
+      })();
+    }, [maxRetries, url, hondId]);
+    return { data: hondDetail, isLoading: loading };
   };
 
   return (
@@ -151,6 +200,7 @@ const HondProvider: React.FC<{ children: any }> = ({ children }) => {
         postHond,
         deleteHond,
         useGetPaginatedHonden,
+        useGetHondDetail,
       }}
     >
       {children}

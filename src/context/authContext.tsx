@@ -9,6 +9,7 @@ import { useUserContext } from './app/UserContext';
 type LoginBody = {
   email: string;
   password: string;
+  redirect?: string;
 };
 
 type RegisterBody = {};
@@ -48,7 +49,7 @@ export const AuthProvider: React.FC<{ children: any }> = ({ children }) => {
     }
     if (data) {
       initializeKlant(data);
-      router.push(callbackUrl ?? '/');
+      router.push(body.redirect ?? '/');
       setCallbackUrl(() => undefined);
       setErrors({});
     }

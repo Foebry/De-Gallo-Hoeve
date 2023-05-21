@@ -13,8 +13,18 @@ type Context = {
   isLoading: boolean;
   disabled: boolean;
   createInschrijving: (dto: InschrijvingDto) => ApiResponse<InschrijvingDto>;
-  useGetPaginatedInschrijvingen: (options?: RevalidateOptions) => {
+  useGetPaginatedInschrijvingen: (
+    options?: RevalidateOptions,
+    url?: string
+  ) => {
     data: PaginatedData<InschrijvingDto>;
+    isLoading: boolean;
+  };
+  useGetInschrijvingDetail: (
+    options?: RevalidateOptions,
+    url?: string
+  ) => {
+    data: InschrijvingDto | null;
     isLoading: boolean;
   };
   editInschrijving: (dto: InschrijvingDto) => ApiResponse<InschrijvingDto>;
@@ -29,6 +39,10 @@ const defaultValues: Context = {
     data: emptyPaginatedResponse,
     isLoading: false,
   }),
+  useGetInschrijvingDetail: () => ({
+    data: null,
+    isLoading: false,
+  }),
   editInschrijving: async () => defaultApiResponse,
   softDeleteInschrijving: async () => defaultApiResponse,
 };
@@ -38,9 +52,14 @@ const Context = createContext<Context>(defaultValues);
 const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
+  const [lastPaginatedUrl, setLastPaginatedUrl] = useState<string>();
   const [paginatedInschrijvingen, setPaginatedInschrijvingen] =
     useState<PaginatedData<InschrijvingDto>>();
+  const [inschrijvingDetail, setInschrijvingDetail] = useState<InschrijvingDto | null>(
+    null
+  );
   const [shouldRevalidate, setShouldRevalidate] = useState<boolean>(true);
+  const [revalidateInschrijving, setRevalidateInschrijving] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
   const currentRetries = useRef<number>(0);
 
@@ -90,19 +109,20 @@ const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
     return { data, error };
   };
 
-  const useGetPaginatedInschrijvingen = (options?: RevalidateOptions) => {
+  const useGetPaginatedInschrijvingen = (options?: RevalidateOptions, url?: string) => {
     const retries = options?.maxRetries ?? 5;
     const [loading, setLoading] = useState<boolean>(true);
+    const urlMatchesLastUrl = url === lastPaginatedUrl;
 
     useEffect(() => {
       (async () => {
-        if (!shouldRevalidate && paginatedInschrijvingen) {
+        if (!shouldRevalidate && paginatedInschrijvingen && urlMatchesLastUrl) {
           setLoading(false);
         } else {
-          console.log({ status: 'hello' });
+          setLastPaginatedUrl(url);
           while (!success && currentRetries.current <= retries) {
             const { data, error } = await getData<PaginatedData<InschrijvingDto>>(
-              '/api/admin/inschrijvingen'
+              url ?? '/api/admin/inschrijvingen'
             );
             if (error) {
               currentRetries.current += 1;
@@ -118,15 +138,56 @@ const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
             }
           }
           setLoading(false);
+          setSuccess(false);
         }
       })();
-    }, [retries, loading]);
+    }, [retries, loading, url, urlMatchesLastUrl]);
     currentRetries.current = 0;
 
     return {
       data: paginatedInschrijvingen ?? emptyPaginatedResponse,
       isLoading: loading,
     };
+  };
+
+  const useGetInschrijvingDetail = (options?: RevalidateOptions, url?: string) => {
+    const maxRetries = options?.maxRetries ?? 5;
+    const [loading, setLoading] = useState<boolean>(true);
+    const inschrijvingId = url?.split('/').reverse()[0];
+    const hasDataStored = !revalidateInschrijving && inschrijvingDetail;
+
+    useEffect(() => {
+      setLoading(true);
+      (async () => {
+        if (hasDataStored) {
+          setLoading(false);
+        } else {
+          while (!success && currentRetries.current <= maxRetries) {
+            if (inschrijvingId === 'undefined') {
+              currentRetries.current += 1;
+              await sleep(1);
+              continue;
+            }
+            const { data, error } = await getData<InschrijvingDto>(url!);
+            if (error) {
+              currentRetries.current += 1;
+              toast.error('Fout bij laden van detail hond');
+              await sleep(5);
+              continue;
+            } else if (data) {
+              setInschrijvingDetail(data ?? null);
+              setSuccess(true);
+              currentRetries.current = 0;
+              break;
+            }
+          }
+          currentRetries.current = 0;
+          setLoading(false);
+          setSuccess(false);
+        }
+      })();
+    }, [hasDataStored, inschrijvingId, maxRetries, url]);
+    return { data: inschrijvingDetail, isLoading: loading };
   };
 
   return (
@@ -137,6 +198,7 @@ const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
         createInschrijving,
         editInschrijving,
         useGetPaginatedInschrijvingen,
+        useGetInschrijvingDetail,
         softDeleteInschrijving,
       }}
     >

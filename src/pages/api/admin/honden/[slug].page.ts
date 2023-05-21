@@ -1,7 +1,6 @@
 import { getHondById } from 'src/controllers/HondController';
 import { getHondOwner } from 'src/controllers/KlantController';
 import { getRasByName } from 'src/controllers/rasController';
-import { mapToHondDetailResponse } from 'src/mappers/honden';
 import {
   HondNotFoundError,
   KlantNotFoundError,
@@ -11,6 +10,8 @@ import {
 import { ObjectId } from 'mongodb';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { logError } from '../../logError/repo';
+import { HondDto } from 'src/common/api/types/hond';
+import { mapToHondDetailResponse } from './mappers';
 
 export interface HondDetailResponse {
   _id: string;
@@ -42,10 +43,7 @@ const handler = async (req: HondDetailRequest, res: NextApiResponse) => {
   }
 };
 
-const getHondDetail = async (
-  req: HondDetailRequest,
-  res: NextApiResponse<HondDetailResponse | { message: string }>
-) => {
+const getHondDetail = async (req: HondDetailRequest, res: NextApiResponse<HondDto>) => {
   try {
     const { slug: _id } = req.query;
     const hond = await getHondById(new ObjectId(_id));

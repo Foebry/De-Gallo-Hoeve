@@ -1,147 +1,140 @@
-import { ADMIN_HOND_DETAIL, RASSEN } from 'src/types/apiTypes';
 import Dashboard from 'src/components/admin/dashboard';
 import Button from 'src/components/buttons/Button';
 import { geslachten } from 'src/components/Cards/HondCard';
 import FormInput from 'src/components/form/FormInput';
 import FormRow from 'src/components/form/FormRow';
 import { MySelect } from 'src/components/MySelect';
-import { Option } from 'src/utils/MongoDb';
-import getData from 'src/hooks/useApi';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { HondDetailResponse } from 'src/pages/api/admin/honden/[slug].page';
-import React, { useState } from 'react';
-import { useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-
-const initialState: HondDetailResponse = {
-  _id: '',
-  naam: '',
-  ras: {
-    naam: '',
-    _id: '',
-  },
-  geboortedatum: '',
-  geslacht: '',
-  eigenaar: {
-    fullName: '',
-    _id: '',
-  },
-};
+import { useHondContext } from 'src/context/app/hondContext';
+import { useRasContext } from 'src/context/app/RasContext';
+import Head from 'next/head';
+import Spinner from 'src/components/loaders/Spinner';
 
 const HondDetail = () => {
   const router = useRouter();
-  const { slug, editMode } = router.query;
+  const { slug: hondId, editMode } = router.query;
+  const url = useMemo(() => `/api/admin/honden/${hondId}`, [hondId]);
+  const { useGetHondDetail } = useHondContext();
+  const { useGetRasOptions } = useRasContext();
 
   const [edit, setEdit] = useState<boolean>(editMode ? true : false);
-  const [data, setData] = useState<HondDetailResponse>(initialState);
-  const [rassen, setRassen] = useState<Option[]>([]);
-
-  useEffect(() => {
-    (async () => {
-      if (slug) {
-        const { data } = await getData<HondDetailResponse>(ADMIN_HOND_DETAIL + slug);
-        const { data: rassen } = await getData<Option[]>(RASSEN);
-        if (data) setData(data);
-        if (rassen) setRassen(rassen);
-      }
-    })();
-  }, [slug]);
+  const rassen = useGetRasOptions();
+  const { data: hondDetail, isLoading } = useGetHondDetail(undefined, url);
 
   const { control, handleSubmit } = useForm<HondDetailResponse>();
 
   return (
     <>
-      <head>
+      <Head>
         <title>De Gallo-hoeve - Honddetail</title>
-      </head>
+      </Head>
       <Dashboard>
-        <FormRow className="flex-row-reverse mb-10">
-          {edit ? (
-            <Button label={'save'} onClick={() => setEdit(false)} />
-          ) : (
-            <Button label="edit" onClick={() => setEdit(true)} />
-          )}
-        </FormRow>
-        <FormRow>
-          <Controller
-            name="naam"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <FormInput
+        {isLoading && <Spinner />}
+        {!isLoading && (
+          <>
+            <FormRow className="flex-row-reverse mb-10">
+              {edit ? (
+                <Button label={'save'} onClick={() => setEdit(false)} />
+              ) : (
+                <Button label="edit" onClick={() => setEdit(true)} />
+              )}
+            </FormRow>
+            <FormRow>
+              <Controller
                 name="naam"
-                id="naam"
-                label="naam"
-                onChange={onChange}
-                value={value ?? data.naam}
-                disabled={!edit}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <FormInput
+                    name="naam"
+                    id="naam"
+                    label="naam"
+                    onChange={onChange}
+                    value={value ?? hondDetail?.naam ?? ''}
+                    disabled={!edit}
+                  />
+                )}
               />
-            )}
-          />
-          <Controller
-            name="ras.naam"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <MySelect
-                name="ras"
-                options={rassen}
-                value={
-                  value ?? rassen?.find((rasOption) => rasOption.value === data.ras._id)
-                }
-                onChange={onChange}
-                disabled={!edit}
+              <Controller
+                name="ras.naam"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <MySelect
+                    name="ras"
+                    options={rassen}
+                    value={
+                      value ??
+                      rassen?.find((rasOption) => rasOption.value === hondDetail?.ras.id)
+                    }
+                    onChange={onChange}
+                    disabled={!edit}
+                  />
+                )}
               />
-            )}
-          />
-        </FormRow>
-        <FormRow className="mt-48">
-          <Controller
-            name="geslacht"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <MySelect
+            </FormRow>
+            <FormRow className="mt-48">
+              <Controller
                 name="geslacht"
-                label="geslacht"
-                onChange={onChange}
-                value={
-                  value ?? geslachten.find((geslacht) => geslacht.label === data.geslacht)
-                }
-                disabled={!edit}
-                options={geslachten}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <MySelect
+                    name="geslacht"
+                    label="geslacht"
+                    onChange={onChange}
+                    value={
+                      value ??
+                      geslachten.find(
+                        (geslacht) => geslacht.label === hondDetail?.geslacht
+                      )
+                    }
+                    disabled={!edit}
+                    options={geslachten}
+                  />
+                )}
               />
-            )}
-          />
-          <Controller
-            name="geboortedatum"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <FormInput
+              <Controller
                 name="geboortedatum"
-                id="geboortedatum"
-                label="geboortedatum"
-                onChange={onChange}
-                value={moment(value ?? data.geboortedatum).format('DD/MM/YYYY')}
-                disabled={!edit}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <FormInput
+                    name="geboortedatum"
+                    id="geboortedatum"
+                    label="geboortedatum"
+                    onChange={onChange}
+                    value={
+                      moment(value ?? hondDetail?.geboortedatum).format('DD/MM/YYYY') ??
+                      ''
+                    }
+                    disabled={!edit}
+                  />
+                )}
               />
-            )}
-          />
-        </FormRow>
-        <FormRow className="mt-48">
-          <Controller
-            name="eigenaar.fullName"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <FormInput
-                name="eigenaar"
-                id="eigenaar"
-                label="eigenaar"
-                onChange={onChange}
-                value={value ?? data.eigenaar.fullName}
-                disabled={true}
+            </FormRow>
+            <FormRow className="mt-48">
+              <Controller
+                name="eigenaar.fullName"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <FormInput
+                    name="eigenaar"
+                    id="eigenaar"
+                    label="eigenaar"
+                    onChange={onChange}
+                    value={
+                      value ??
+                      `${hondDetail?.klant.vnaam} ${hondDetail?.klant.lnaam}` ??
+                      ''
+                    }
+                    disabled={true}
+                  />
+                )}
               />
-            )}
-          />
-        </FormRow>
+            </FormRow>
+          </>
+        )}
       </Dashboard>
     </>
   );

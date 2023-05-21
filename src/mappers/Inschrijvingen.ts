@@ -32,26 +32,6 @@ export interface DetailInschrijvingResponse {
   };
 }
 
-export const mapToInschrijvingDetail = (
-  inschrijving: InschrijvingCollection,
-  hond: HondCollection
-) => ({
-  _id: inschrijving._id.toString(),
-  datum: inschrijving.datum.toISOString().replace('T', ' ').split('.')[0],
-  training: inschrijving.training,
-  created_at: inschrijving.created_at.toISOString().replace('T', ' ').split('.')[0],
-  klant: {
-    _id: inschrijving.klant.id.toString(),
-    vnaam: inschrijving.klant.vnaam,
-    lnaam: inschrijving.klant.lnaam,
-  },
-  hond: {
-    _id: inschrijving.hond.id.toString(),
-    naam: inschrijving.hond.naam,
-    ras: hond.ras,
-  },
-});
-
 export const mapInschrijvingen = (
   inschrijvingen: IsInschrijvingBodyInschrijving[],
   isFirstInschrijving: boolean,

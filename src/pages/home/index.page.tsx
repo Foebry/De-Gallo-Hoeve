@@ -5,19 +5,12 @@ import Skeleton from 'src/components/website/skeleton';
 import { GiCheckMark } from 'react-icons/gi';
 import Head from 'next/head';
 import { useEffect, useRef, useState } from 'react';
-import getData from 'src/hooks/useApi';
 import FeedbackSection from './components/feedback/section';
 import { IndexData } from './types';
-import { PriveTrainingCollection } from '@/types/EntityTpes/TrainingType';
 import { useFeedbackContext } from 'src/context/app/FeedbackContext';
 import { useTrainingContext } from 'src/context/app/TrainingContext';
 
-interface Props {
-  // prijsExcl: number;
-  // kmHeffing: number;
-  // gratisVerplaatsingBinnen: number;
-  // feedback: FeedbackDto[] | undefined;
-}
+interface Props {}
 
 const Index: React.FC<Props> = ({}) => {
   const { prijsExcl, kmHeffing, gratisVerplaatsingBinnen, feedback } = useGetIndexData();
@@ -177,7 +170,6 @@ const Index: React.FC<Props> = ({}) => {
 };
 
 const useGetIndexData = () => {
-  const priveTrainingId = '62fa1f25bacc03711136ad5f';
   const [indexData, setIndexData] = useState<IndexData>({
     prijsExcl: 20.66,
     kmHeffing: 0.3,

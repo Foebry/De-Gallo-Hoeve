@@ -7,6 +7,8 @@ import Button from 'src/components/buttons/Button';
 import FormInput from 'src/components/form/FormInput';
 import FormRow from 'src/components/form/FormRow';
 import FormSection from 'src/components/form/FormSection';
+import Spinner from 'src/components/loaders/Spinner';
+import { useInschrijvingContext } from 'src/context/app/InschrijvingContext';
 import getData from 'src/hooks/useApi';
 import { ADMIN_INSCHRIJVING_DETAIL } from 'src/types/apiTypes';
 
@@ -53,144 +55,155 @@ const InschrijvingDetail = () => {
   const router = useRouter();
   const { slug, editMode } = router.query;
 
-  const [edit, setEdit] = useState<boolean>(editMode ? true : false);
-  const [data, setData] = useState<InschrijvingDetail>(initialState);
+  const { useGetInschrijvingDetail } = useInschrijvingContext();
+  const { data, isLoading } = useGetInschrijvingDetail(
+    undefined,
+    `/api/admin/inschrijvingen/${router.query.slug}`
+  );
 
-  useEffect(() => {
-    (async () => {
-      if (slug) {
-        const { data, error } = await getData<InschrijvingDetail>(
-          ADMIN_INSCHRIJVING_DETAIL + slug
-        );
-        if (data) setData(data);
-        else if (error) {
-          toast.error(error.message);
-        }
-      }
-    })();
-  }, [slug]);
+  const [edit, setEdit] = useState<boolean>(editMode ? true : false);
+  // const [data, setData] = useState<InschrijvingDetail>(initialState);
+
+  // useEffect(() => {
+  //   (async () => {
+  //     if (slug) {
+  //       const { data, error } = await getData<InschrijvingDetail>(
+  //         ADMIN_INSCHRIJVING_DETAIL + slug
+  //       );
+  //       if (data) setData(data);
+  //       else if (error) {
+  //         toast.error(error.message);
+  //       }
+  //     }
+  //   })();
+  // }, [slug]);
 
   const { control, handleSubmit } = useForm<InschrijvingDetail>();
 
   return (
     <Dashboard>
-      <FormRow className="flex-row-reverse mb-10">
-        {edit ? (
-          <Button label={'save'} onClick={() => setEdit(false)} />
-        ) : (
-          <Button label={'edit'} onClick={() => setEdit(true)} />
-        )}
-      </FormRow>
-      <FormSection label="inschrijving gegevens">
-        <FormRow className="items-center">
-          <Controller
-            name="datum"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <FormInput
-                id="datum"
+      {isLoading && <Spinner />}
+      {!isLoading && data && (
+        <>
+          <FormRow className="flex-row-reverse mb-10">
+            {edit ? (
+              <Button label={'save'} onClick={() => setEdit(false)} />
+            ) : (
+              <Button label={'edit'} onClick={() => setEdit(true)} />
+            )}
+          </FormRow>
+          <FormSection label="inschrijving gegevens">
+            <FormRow className="items-center">
+              <Controller
                 name="datum"
-                label="datum"
-                onChange={onChange}
-                value={value ?? data.datum ?? 'onbekend'}
-                disabled={true}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <FormInput
+                    id="datum"
+                    name="datum"
+                    label="datum"
+                    onChange={onChange}
+                    value={value ?? data.datum ?? 'onbekend'}
+                    disabled={true}
+                  />
+                )}
               />
-            )}
-          />
-          <Controller
-            name="training"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <FormInput
-                id="training"
+              <Controller
                 name="training"
-                label="training"
-                onChange={onChange}
-                value={value ?? data.training ?? 'onbekend'}
-                disabled={true}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <FormInput
+                    id="training"
+                    name="training"
+                    label="training"
+                    onChange={onChange}
+                    value={value ?? data.training ?? 'onbekend'}
+                    disabled={true}
+                  />
+                )}
               />
-            )}
-          />
-          <Controller
-            name="created_at"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <FormInput
-                id="created_at"
+              <Controller
                 name="created_at"
-                label="aangemaakt op"
-                onChange={onChange}
-                value={value ?? data.created_at ?? 'onbekend'}
-                disabled={true}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <FormInput
+                    id="created_at"
+                    name="created_at"
+                    label="aangemaakt op"
+                    onChange={onChange}
+                    value={value ?? data.created_at ?? 'onbekend'}
+                    disabled={true}
+                  />
+                )}
               />
-            )}
-          />
-        </FormRow>
-      </FormSection>
-      <FormSection label="klant gegevens">
-        <FormRow className="items-center">
-          <Controller
-            name="klant.vnaam"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <FormInput
-                id="vnaam"
-                label="voornaam"
+            </FormRow>
+          </FormSection>
+          <FormSection label="klant gegevens">
+            <FormRow className="items-center">
+              <Controller
                 name="klant.vnaam"
-                onChange={onChange}
-                value={value ?? data.klant?.vnaam ?? 'onbekend'}
-                disabled={true}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <FormInput
+                    id="vnaam"
+                    label="voornaam"
+                    name="klant.vnaam"
+                    onChange={onChange}
+                    value={value ?? data.klant?.vnaam ?? 'onbekend'}
+                    disabled={true}
+                  />
+                )}
               />
-            )}
-          />
-          <Controller
-            name="klant.lnaam"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <FormInput
-                id="lnaam"
-                label="achternaam"
+              <Controller
                 name="klant.lnaam"
-                onChange={onChange}
-                value={value ?? data.klant?.lnaam ?? 'onbekend'}
-                disabled={true}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <FormInput
+                    id="lnaam"
+                    label="achternaam"
+                    name="klant.lnaam"
+                    onChange={onChange}
+                    value={value ?? data.klant?.lnaam ?? 'onbekend'}
+                    disabled={true}
+                  />
+                )}
               />
-            )}
-          />
-        </FormRow>
-      </FormSection>
-      <FormSection label="hond gegevens">
-        <FormRow>
-          <Controller
-            name="hond.naam"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <FormInput
-                id="naam"
-                label="naam"
+            </FormRow>
+          </FormSection>
+          <FormSection label="hond gegevens">
+            <FormRow>
+              <Controller
                 name="hond.naam"
-                onChange={onChange}
-                value={value ?? data.hond?.naam ?? 'onbekend'}
-                disabled={true}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <FormInput
+                    id="naam"
+                    label="naam"
+                    name="hond.naam"
+                    onChange={onChange}
+                    value={value ?? data.hond?.naam ?? 'onbekend'}
+                    disabled={true}
+                  />
+                )}
               />
-            )}
-          />
-          <Controller
-            name="hond.ras"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <FormInput
-                id="ras"
-                label="ras"
+              <Controller
                 name="hond.ras"
-                onChange={onChange}
-                value={value ?? data.hond?.ras ?? 'onbekend'}
-                disabled={true}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <FormInput
+                    id="ras"
+                    label="ras"
+                    name="hond.ras"
+                    onChange={onChange}
+                    value={value ?? data.hond?.ras ?? 'onbekend'}
+                    disabled={true}
+                  />
+                )}
               />
-            )}
-          />
-        </FormRow>
-      </FormSection>
+            </FormRow>
+          </FormSection>
+        </>
+      )}
     </Dashboard>
   );
 };

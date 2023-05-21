@@ -1,28 +1,33 @@
 import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
 import { nanoid } from 'nanoid';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import getData from 'src/hooks/useApi';
 import useMutation from 'src/hooks/useMutation';
 import { defaultTrainingTimeSlots } from 'src/mappers/trainingDays';
+import { sleep } from 'src/shared/functions';
 import { REQUEST_METHOD } from 'src/utils/axios';
 import { useModalContext } from '../ModalContext';
+import { RevalidateOptions } from './klantContext';
 
 type TrainingDayContext = {
-  trainingDays: TrainingDayDto[];
-  getTrainingDays: () => Promise<TrainingDayDto[] | undefined>;
+  trainingDays?: TrainingDayDto[];
   updateTrainingDay: (trainingDayDto: TrainingDayDto) => void;
   updateAvailableDays: (trainingDays: string[]) => void;
   saveTrainingDays: () => Promise<void>;
+  useGetAvailableTrainingDays: (
+    options?: RevalidateOptions,
+    url?: string
+  ) => { data: TrainingDayDto[]; isLoading: boolean };
   error?: string;
 };
 
 const trainingDayContextDefaultValues: TrainingDayContext = {
   trainingDays: [],
-  getTrainingDays: async () => [],
   updateTrainingDay: () => {},
   updateAvailableDays: () => {},
   saveTrainingDays: async () => {},
+  useGetAvailableTrainingDays: () => ({ data: [], isLoading: false }),
 };
 
 export const TrainingDayContext = createContext<TrainingDayContext>(
@@ -30,28 +35,25 @@ export const TrainingDayContext = createContext<TrainingDayContext>(
 );
 
 const TrainingDayProvider: React.FC<{ children: any }> = ({ children }) => {
-  const [trainingDays, setTrainingDays] = useState<TrainingDayDto[]>([]);
+  const [trainingDays, setTrainingDays] = useState<TrainingDayDto[]>();
   const [hasLoaded, setHasLoaded] = useState<boolean>(false);
+  const [lastUrl, setLastUrl] = useState<string>();
+  const [success, setSuccess] = useState<boolean>(false);
+  const [revalidateTrainingDays, setRevalidateTrainingDays] = useState<boolean>(false);
   const save = useMutation<TrainingDayDto[]>('/api/admin/trainingdays');
+  const currentRetries = useRef<number>(0);
   const { updateModal } = useModalContext();
 
-  const getTrainingDays = async () => {
-    if (hasLoaded) return sortAscending(trainingDays);
-    const { data, error } = await getData<TrainingDayDto[]>('/api/admin/trainingdays');
-    if (data) setTrainingDays(data);
-    setHasLoaded(true);
-    if (error) toast.error(error.message);
-    return data;
-  };
-
   const updateTrainingDay = (trainingDayDto: TrainingDayDto) => {
+    if (!trainingDays) return;
     setTrainingDays(() =>
       trainingDays.map((day) => (day._id === trainingDayDto._id ? trainingDayDto : day))
     );
   };
 
   const updateAvailableDays = (days: string[]) => {
-    const remainingTrainingDays = trainingDays.filter((day) =>
+    if (!trainingDays) return;
+    const remainingTrainingDays = trainingDays?.filter((day) =>
       days.includes(day.date.split('T')[0])
     );
     const newDates = days.filter(
@@ -72,7 +74,7 @@ const TrainingDayProvider: React.FC<{ children: any }> = ({ children }) => {
         selected: trainingDays,
         confirmed,
       },
-      { method: REQUEST_METHOD.POST }
+      { method: REQUEST_METHOD.PUT }
     );
     if (error) {
       if (error.code === 409) {
@@ -83,18 +85,55 @@ const TrainingDayProvider: React.FC<{ children: any }> = ({ children }) => {
     }
     if (data) {
       toast.success('save succesvol');
-      setTrainingDays(data);
+      setRevalidateTrainingDays(true);
     }
+  };
+
+  const useGetAvailableTrainingDays = (options?: RevalidateOptions, url?: string) => {
+    const maxRetries = options?.maxRetries ?? 5;
+    const [loading, setLoading] = useState<boolean>(true);
+    const urlMatchesLastUrl = url === lastUrl;
+
+    useEffect(() => {
+      setLoading(true);
+      (async () => {
+        if (!revalidateTrainingDays && trainingDays && urlMatchesLastUrl) {
+          setLoading(false);
+        } else {
+          setLastUrl(url);
+          while (!success && currentRetries.current <= maxRetries) {
+            const { data, error } = await getData<TrainingDayDto[]>(
+              url ?? '/api/admin/trainingdays'
+            );
+            if (error) {
+              currentRetries.current += 1;
+              toast.error('Fout bij laden van beschikbare training dagen');
+              await sleep(5);
+              continue;
+            } else if (data) {
+              setTrainingDays(data);
+              setSuccess(true);
+              setRevalidateTrainingDays(false);
+              currentRetries.current = 0;
+              break;
+            }
+          }
+          setLoading(false);
+          setSuccess(false);
+        }
+      })();
+    }, [maxRetries, url, urlMatchesLastUrl]);
+    return { data: trainingDays ?? [], isLoading: loading };
   };
 
   return (
     <TrainingDayContext.Provider
       value={{
         trainingDays,
-        getTrainingDays,
         updateTrainingDay,
         saveTrainingDays,
         updateAvailableDays,
+        useGetAvailableTrainingDays,
       }}
     >
       {children}

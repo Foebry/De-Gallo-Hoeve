@@ -15,6 +15,7 @@ const getData = async <T>(
     return { data, error: undefined };
   } catch (error: any) {
     process.env.NODE_ENV === 'development' && logger.info(error);
+    error.code = error.response.status;
     // toast.error(error.response.data.message);
     return { data, error };
   }

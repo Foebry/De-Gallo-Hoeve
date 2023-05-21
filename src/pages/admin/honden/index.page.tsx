@@ -57,7 +57,7 @@ const createTableFromData = ({ data }: PaginatedData<HondDto>, router: NextRoute
 
   return data.map((klantHond) => {
     const naam = <Link href={`/admin/honden/${klantHond.id}`}>{klantHond.naam}</Link>;
-    const ras = klantHond.ras;
+    const ras = klantHond.ras.naam;
     const klant = (
       <Link
         href={`/admin/klanten/${klantHond.klant.id}`}

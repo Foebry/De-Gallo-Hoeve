@@ -69,7 +69,7 @@ export const RasProvider: React.FC<{ children: any }> = ({ children }) => {
     useEffect(() => {
       setLoading(true);
       (async () => {
-        if (!shouldRevalidate && paginatedRassen && urlMatchesLastUrl) {
+        if (!shouldRevalidate && !!paginatedRassen && urlMatchesLastUrl) {
           setLoading(false);
         } else {
           setLastPaginatedUrl(url);
@@ -157,6 +157,7 @@ export const RasProvider: React.FC<{ children: any }> = ({ children }) => {
               break;
             }
           }
+          setSuccess(false);
         }
       })();
     }, [retries]);

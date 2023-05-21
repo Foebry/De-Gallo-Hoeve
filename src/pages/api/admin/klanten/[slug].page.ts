@@ -1,11 +1,12 @@
 import { ObjectId } from 'mongodb';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { KlantDto } from 'src/common/api/types/klant';
 import { getInschrijvingenByIds } from 'src/controllers/InschrijvingController';
 import { getKlantById } from 'src/controllers/KlantController';
-import { mapToKlantDetail } from 'src/mappers/klanten';
 import { adminApi } from 'src/services/Authenticator';
 import { KlantNotFoundError, NotAllowedError } from 'src/shared/RequestError';
 import { DetailRequest } from '../inschrijvingen/[slug].page';
+import { mapToKlantDetail } from './mappers';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -18,12 +19,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(e.code).json(e.response);
   }
 };
-type KlantDetailResponse = {};
 
-const getKlantDetail = async (
-  req: DetailRequest,
-  res: NextApiResponse<KlantDetailResponse>
-) => {
+const getKlantDetail = async (req: DetailRequest, res: NextApiResponse<KlantDto>) => {
   try {
     const { slug: _id } = req.query;
 

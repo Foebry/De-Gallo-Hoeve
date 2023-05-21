@@ -4,9 +4,13 @@ export type HondDto = {
   id: string;
   naam: string;
   geslacht: Geslacht;
-  created_at: string;
-  updated_at: string;
-  ras: string;
+  created_at?: string;
+  updated_at?: string;
+  geboortedatum: string;
+  ras: {
+    id: string;
+    naam: string;
+  };
   klant: {
     id: string;
     vnaam: string;

@@ -1,3 +1,4 @@
+import { NextRouter, useRouter } from 'next/router';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { KlantDto } from 'src/common/api/types/klant';
@@ -7,6 +8,22 @@ import { sleep } from 'src/shared/functions';
 import { PaginatedData, PaginatedResponse } from 'src/shared/RequestHelper';
 import { REQUEST_METHOD } from 'src/utils/axios';
 import { emptyPaginatedResponse } from './AppContext';
+
+const DEFAULT_KLANT_DETAIL: KlantDto = {
+  created_at: '',
+  email: '',
+  gemeente: '',
+  gsm: '',
+  honden: [],
+  id: '',
+  inschrijvingen: [],
+  lnaam: '',
+  nr: '',
+  postcode: '',
+  straat: '',
+  verified: false,
+  vnaam: '',
+};
 
 type Context = {
   isLoading: boolean;
@@ -18,11 +35,14 @@ type Context = {
     updateData: KlantDto
   ) => Promise<ApiResponse<KlantDto> | void>;
   deleteKlant: (id: string) => Promise<ApiResponse<{}> | void>;
-  useGetKlant: (id: string) => Promise<KlantDto | void>;
   useGetPaginatedKlanten: (
     options?: RevalidateOptions,
     url?: string
   ) => { data: PaginatedData<KlantDto>; isLoading: boolean };
+  useGetKlantDetail: (
+    options?: RevalidateOptions,
+    url?: string
+  ) => { data: KlantDto | null; isLoading: boolean };
 };
 
 type ApiError<T> = Partial<T> & { message: string; code: number };
@@ -39,8 +59,8 @@ const defaultValues: Context = {
   getKlant: async () => undefined,
   updateKlant: async () => {},
   deleteKlant: async () => {},
-  useGetKlant: async () => {},
   useGetPaginatedKlanten: () => ({ data: emptyPaginatedResponse, isLoading: false }),
+  useGetKlantDetail: () => ({ data: null, isLoading: false }),
 };
 
 const Context = createContext<Context>(defaultValues);
@@ -49,7 +69,7 @@ const KlantProvider: React.FC<{ children: any }> = ({ children }) => {
   const [revalidateKlanten, setRevalidateKlanten] = useState<boolean>(false);
   const [revalidateKlant, setRevalidateKlant] = useState<boolean>(false);
   const [klanten, setKlanten] = useState<PaginatedResponse<KlantDto>>();
-  const [klantDetail, setKlantDetail] = useState<KlantDto>();
+  const [klantDetail, setKlantDetail] = useState<KlantDto | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
@@ -114,11 +134,6 @@ const KlantProvider: React.FC<{ children: any }> = ({ children }) => {
     return { data, error };
   };
 
-  const useGetKlant = async (id: string, options?: RevalidateOptions) => {
-    const [tries, setTries] = useState<number>(0);
-    return;
-  };
-
   const useGetPaginatedKlanten = (options?: RevalidateOptions, url?: string) => {
     const maxRetries = options?.maxRetries ?? 5;
     const [loading, setLoading] = useState<boolean>(true);
@@ -138,7 +153,7 @@ const KlantProvider: React.FC<{ children: any }> = ({ children }) => {
             if (error) {
               currentRetries.current += 1;
               toast.error('Fout bij laden van klanten');
-              sleep(5);
+              await sleep(5);
               continue;
             } else if (data) {
               setKlanten(data);
@@ -149,10 +164,59 @@ const KlantProvider: React.FC<{ children: any }> = ({ children }) => {
           }
           setLoading(false);
           setSuccess(false);
+          currentRetries.current = 0;
+          return;
         }
       })();
     }, [maxRetries, url, urlMatchesLastUrl]);
     return { data: klanten ?? emptyPaginatedResponse, isLoading: loading };
+  };
+
+  const useGetKlantDetail = (options?: RevalidateOptions, url?: string) => {
+    const maxRetries = options?.maxRetries ?? 5;
+    const [loading, setLoading] = useState<boolean>(true);
+    const router = useRef<NextRouter>(useRouter());
+    const klantId = url?.split('/').reverse()[0];
+    const hasDataStored = !revalidateKlant && klantDetail;
+
+    useEffect(() => {
+      setLoading(true);
+      (async () => {
+        if (hasDataStored) {
+          setLoading(false);
+        } else {
+          while (!success && currentRetries.current <= maxRetries) {
+            if (klantId === 'undefined') {
+              currentRetries.current += 1;
+              await sleep(1);
+              continue;
+            }
+            const { data, error } = await getData<KlantDto>(url!);
+            if (error) {
+              if (error.code === 403) {
+                router.current.push(`/login?redirectUrl=admin/klanten/${klantId}`);
+                currentRetries.current = 0;
+                break;
+              }
+              currentRetries.current += 1;
+              toast.error('Fout bij laden van detail klant');
+              await sleep(5);
+              continue;
+            } else if (data) {
+              setKlantDetail(data ?? null);
+              setSuccess(true);
+              currentRetries.current = 0;
+              break;
+            }
+          }
+          currentRetries.current = 0;
+          setLoading(false);
+          setSuccess(false);
+          return;
+        }
+      })();
+    }, [maxRetries, url, hasDataStored, klantId]);
+    return { data: klantDetail ?? DEFAULT_KLANT_DETAIL, isLoading: loading };
   };
 
   return (
@@ -164,8 +228,8 @@ const KlantProvider: React.FC<{ children: any }> = ({ children }) => {
         getKlanten,
         updateKlant,
         deleteKlant,
-        useGetKlant,
         useGetPaginatedKlanten,
+        useGetKlantDetail,
       }}
     >
       {children}

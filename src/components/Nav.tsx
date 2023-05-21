@@ -13,7 +13,7 @@ import { useAuthContext } from 'src/context/authContext';
 
 export const Nav = () => {
   const router = useRouter();
-  const { klant, clearData } = useGetKlantData();
+  const { klant, clearData } = useGetActiveKlant();
   const logout = useMutation<{}>(LOGOUT);
 
   const onLogout = async () => {
@@ -96,7 +96,7 @@ export const Nav = () => {
   );
 };
 
-const useGetKlantData = () => {
+const useGetActiveKlant = () => {
   const [klant, setKlant] = useState<IsKlantCollection | null>();
 
   const clearData = () => setKlant(null);

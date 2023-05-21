@@ -11,5 +11,6 @@ export type InschrijvingDto = {
   hond: {
     id: string;
     naam: string;
+    ras: string;
   };
 };

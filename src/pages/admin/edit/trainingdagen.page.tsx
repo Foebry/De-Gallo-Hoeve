@@ -5,13 +5,16 @@ import { DatePicker } from 'react-trip-date';
 import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
 import NavLink from 'src/components/NavLink';
 import { useTrainingDayContext } from 'src/context/app/TrainingDayContext';
+import Spinner from 'src/components/loaders/Spinner';
 
 interface Props {}
 
 const Trainingdagen: React.FC<Props> = ({}) => {
-  const { updateAvailableDays } = useTrainingDayContext();
+  const { updateAvailableDays, useGetAvailableTrainingDays } = useTrainingDayContext();
+  const { data: trainingDays, isLoading } = useGetAvailableTrainingDays(undefined);
+  const selectedDays = trainingDays.map((dto) => dto.date.split('T')[0]);
 
-  const selectedDays = useGetAvailableTrainingDays();
+  // const selectedDays = useGetAvailableTrainingDays();
   const onChange = (data: string[]) => {
     updateAvailableDays(data);
   };
@@ -30,29 +33,32 @@ const Trainingdagen: React.FC<Props> = ({}) => {
         </Body>
         <Body>Alle niet geslecteerde dagen zullen niet beschikbaar zijn</Body>
       </div>
-      <div className="max-w-3xl mx-auto mt-10">
-        <DatePicker
-          onChange={onChange}
-          selectedDays={selectedDays}
-          disabledBeforeToday={true}
-          startOfWeek={1}
-        />
-      </div>
+      {isLoading && <Spinner />}
+      {!isLoading && (
+        <div className="max-w-3xl mx-auto mt-10">
+          <DatePicker
+            onChange={onChange}
+            selectedDays={selectedDays}
+            disabledBeforeToday={true}
+            startOfWeek={1}
+          />
+        </div>
+      )}
     </Dashboard>
   );
 };
 
-const useGetAvailableTrainingDays = () => {
-  const [trainingDays, setTrainingDays] = useState<TrainingDayDto[]>([]);
-  const { getTrainingDays } = useTrainingDayContext();
-  useEffect(() => {
-    (async () => {
-      const trainingDays = await getTrainingDays();
-      if (trainingDays) setTrainingDays(trainingDays);
-    })();
-  }, [getTrainingDays]);
+// const useGetAvailableTrainingDays = () => {
+//   const [trainingDays, setTrainingDays] = useState<TrainingDayDto[]>([]);
+//   const { getTrainingDays } = useTrainingDayContext();
+//   useEffect(() => {
+//     (async () => {
+//       const trainingDays = await getTrainingDays();
+//       if (trainingDays) setTrainingDays(trainingDays);
+//     })();
+//   }, [getTrainingDays]);
 
-  return trainingDays.map((day) => day.date.split('T')[0]);
-};
+//   return trainingDays.map((day) => day.date.split('T')[0]);
+// };
 
 export default Trainingdagen;
