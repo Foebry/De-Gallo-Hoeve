@@ -9,6 +9,7 @@ export const mapToAdminInschrijvingenOverviewResult = (
   data: data.data.map((inschrijving) => ({
     id: inschrijving._id.toString(),
     created_at: inschrijving.created_at.toISOString().replace('T', ' ').split('.')[0],
+    updated_at: inschrijving.updated_at.toISOString().replace('T', '').split('.')[0],
     datum: inschrijving.datum.toISOString().replace('T', ' ').split('.')[0],
     training: inschrijving.training,
     klant: {
@@ -40,6 +41,7 @@ export const mapToInschrijvingDetail = (
   datum: inschrijving.datum.toISOString().replace('T', ' ').split('.')[0],
   training: inschrijving.training,
   created_at: inschrijving.created_at.toISOString().replace('T', ' ').split('.')[0],
+  updated_at: inschrijving.updated_at.toISOString().replace('T', ' ').split('.')[0],
   klant: {
     id: inschrijving.klant.id.toString(),
     vnaam: inschrijving.klant.vnaam,
