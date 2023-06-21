@@ -28,8 +28,8 @@ const Inschrijvingen = () => {
   const router = useRouter();
 
   const { data: inschrijvingData, isLoading } = useGetPaginatedInschrijvingen(
-    undefined,
-    url
+    url,
+    undefined
   );
   const rows = useMemo(
     () => createTableFromData(inschrijvingData, router),
@@ -43,9 +43,6 @@ const Inschrijvingen = () => {
 
   return (
     <Dashboard>
-      <FormRow className="">
-        <div></div>
-      </FormRow>
       {isLoading && <Spinner />}
       {!isLoading && (
         <Table
@@ -63,14 +60,14 @@ const Inschrijvingen = () => {
 export default Inschrijvingen;
 
 const createTableFromData = (
-  data: PaginatedData<InschrijvingDto>,
+  { data }: PaginatedData<InschrijvingDto>,
   router: NextRouter
 ) => {
   const handleView = (_id: string) => {
     router.push(`/admin/inschrijvingen/${_id}`);
   };
 
-  return data.data.map((inschrijving) => {
+  return data.map((inschrijving) => {
     const datum = (
       <Link href={`/admin/inschrijvingen/${inschrijving.id}`}>{inschrijving.datum}</Link>
     );

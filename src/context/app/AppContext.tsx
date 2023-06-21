@@ -9,7 +9,7 @@ import TrainingProvider from './TrainingContext';
 import TrainingDayProvider from './TrainingDayContext';
 import UserProvider from './UserContext';
 
-export const emptyPaginatedResponse: PaginatedResponse<any> = {
+export const emptyPaginatedResponse = <T extends unknown>(): PaginatedResponse<T> => ({
   data: [],
   pagination: {
     currentPage: 1,
@@ -17,7 +17,7 @@ export const emptyPaginatedResponse: PaginatedResponse<any> = {
     last: 1,
     total: 0,
   },
-};
+});
 
 export const defaultApiResponse = { data: undefined, error: undefined };
 

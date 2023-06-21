@@ -7,7 +7,7 @@ import {
 } from 'src/shared/RequestHelper';
 import { IsKlantCollection } from 'src/types/EntityTpes/KlantTypes';
 import { adminApi } from 'src/services/Authenticator';
-import { NotAllowedError } from 'src/shared/RequestError';
+import { KlantNotFoundError, NotAllowedError } from 'src/shared/RequestError';
 import { mapToAdminKlantenOverviewResult } from './mappers';
 import { KlantDto } from 'src/common/api/types/klant';
 

@@ -7,7 +7,7 @@ import { MySelect } from 'src/components/MySelect';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { HondDetailResponse } from 'src/pages/api/admin/honden/[slug].page';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useHondContext } from 'src/context/app/hondContext';
 import { useRasContext } from 'src/context/app/RasContext';
@@ -16,14 +16,13 @@ import Spinner from 'src/components/loaders/Spinner';
 
 const HondDetail = () => {
   const router = useRouter();
-  const { slug: hondId, editMode } = router.query;
-  const url = useMemo(() => `/api/admin/honden/${hondId}`, [hondId]);
+  const { editMode } = router.query;
   const { useGetHondDetail } = useHondContext();
   const { useGetRasOptions } = useRasContext();
 
   const [edit, setEdit] = useState<boolean>(editMode ? true : false);
   const rassen = useGetRasOptions();
-  const { data: hondDetail, isLoading } = useGetHondDetail(undefined, url);
+  const { data: hondDetail, isLoading } = useGetHondDetail(router);
 
   const { control, handleSubmit } = useForm<HondDetailResponse>();
 

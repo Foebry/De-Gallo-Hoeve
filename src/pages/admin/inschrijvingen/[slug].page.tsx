@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { InschrijvingDto } from 'src/common/api/types/inschrijving';
 import Dashboard from 'src/components/admin/dashboard';
 import Button from 'src/components/buttons/Button';
 import FormInput from 'src/components/form/FormInput';
@@ -9,76 +9,17 @@ import FormRow from 'src/components/form/FormRow';
 import FormSection from 'src/components/form/FormSection';
 import Spinner from 'src/components/loaders/Spinner';
 import { useInschrijvingContext } from 'src/context/app/InschrijvingContext';
-import getData from 'src/hooks/useApi';
-import { ADMIN_INSCHRIJVING_DETAIL } from 'src/types/apiTypes';
-
-interface InschrijvingDetail {
-  _id: string;
-  datum: string;
-  training: string;
-  klant: Klant;
-  hond: Hond;
-  created_at: string;
-  updated_at: string;
-}
-
-interface Klant {
-  _id: string;
-  vnaam: string;
-  lnaam: string;
-}
-interface Hond {
-  _id: string;
-  naam: string;
-  ras: string;
-}
-
-const initialState: InschrijvingDetail = {
-  _id: '',
-  datum: '',
-  training: '',
-  klant: {
-    _id: '',
-    vnaam: '',
-    lnaam: '',
-  },
-  hond: {
-    _id: '',
-    naam: '',
-    ras: '',
-  },
-  created_at: '',
-  updated_at: '',
-};
 
 const InschrijvingDetail = () => {
   const router = useRouter();
-  const { slug, editMode } = router.query;
+  const { editMode } = router.query;
 
   const { useGetInschrijvingDetail } = useInschrijvingContext();
-  const { data, isLoading } = useGetInschrijvingDetail(
-    undefined,
-    `/api/admin/inschrijvingen/${router.query.slug}`
-  );
+  const { data, isLoading } = useGetInschrijvingDetail(router);
 
   const [edit, setEdit] = useState<boolean>(editMode ? true : false);
-  // const [data, setData] = useState<InschrijvingDetail>(initialState);
 
-  // useEffect(() => {
-  //   (async () => {
-  //     if (slug) {
-  //       const { data, error } = await getData<InschrijvingDetail>(
-  //         ADMIN_INSCHRIJVING_DETAIL + slug
-  //       );
-  //       if (data) setData(data);
-  //       else if (error) {
-  //         toast.error(error.message);
-  //       }
-  //     }
-  //   })();
-  // }, [slug]);
-
-  const { control, handleSubmit } = useForm<InschrijvingDetail>();
+  const { control, handleSubmit } = useForm<InschrijvingDto>();
 
   return (
     <Dashboard>

@@ -21,7 +21,7 @@ const Index = () => {
   const router = useRouter();
   const [url, setUrl] = useState<string>();
   const { useGetPaginatedHonden } = useHondContext();
-  const { data: paginatedHonden, isLoading } = useGetPaginatedHonden(undefined, url);
+  const { data: paginatedHonden, isLoading } = useGetPaginatedHonden(url);
 
   const rows = useMemo(() => {
     return createTableFromData(paginatedHonden, router);

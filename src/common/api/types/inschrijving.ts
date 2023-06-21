@@ -3,6 +3,7 @@ export type InschrijvingDto = {
   datum: string;
   training: string;
   created_at: string;
+  updated_at: string;
   klant: {
     id: string;
     vnaam: string;

@@ -20,10 +20,7 @@ const KlantDetail = () => {
   const router = useRouter();
 
   const { useGetKlantDetail } = useKlantContext();
-  const { data, isLoading } = useGetKlantDetail(
-    undefined,
-    `/api/admin/klanten/${router.query.slug}`
-  );
+  const { data, isLoading } = useGetKlantDetail(router);
 
   const [limitInschrijvingen, setLimitInschrijvingen] = useState<number>(5);
   const [edit, setEdit] = useState<boolean>(router.query.editMode ? true : false);
@@ -41,7 +38,7 @@ const KlantDetail = () => {
       </Head>
       <Dashboard>
         {isLoading && <Spinner />}
-        {!isLoading && data && data !== null && (
+        {!isLoading && data && (
           <>
             {' '}
             <FormRow className="flex-row-reverse mb-10">
