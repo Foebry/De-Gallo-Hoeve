@@ -1,6 +1,7 @@
 import React, { Ref, RefObject, useEffect, useRef, useState } from 'react';
 import { FeedbackDto } from 'src/common/api/types/feedback';
 import { Title2 } from 'src/components/Typography/Typography';
+import { useFeedbackContext } from 'src/context/app/FeedbackContext';
 import FeedbackCard from './card';
 
 type Props = {
@@ -37,21 +38,26 @@ const useDetermineVisibleFeedback = (
   const gap = 40;
   const sectionWidth = sectionRef.current?.offsetWidth ?? 0;
   const maxVisible = Math.floor(sectionWidth / (minCardWidth + gap));
+  const { firstRender, setFirstRender } = useFeedbackContext();
 
-  const newVisibleFeedback = (currentFeedback: FeedbackDto[]): FeedbackDto[] => {
-    const currentVisible = currentFeedback.slice(0, maxVisible);
-    const newFeedback = [...currentFeedback.slice(maxVisible), ...currentVisible];
-    return newFeedback;
-  };
+  const newVisibleFeedback = useRef<(currentFeedback: FeedbackDto[]) => FeedbackDto[]>(
+    (currentFeedback: FeedbackDto[]): FeedbackDto[] => {
+      const currentVisible = currentFeedback.slice(0, maxVisible);
+      const newFeedback = [...currentFeedback.slice(maxVisible), ...currentVisible];
+      return newFeedback;
+    }
+  );
 
   useEffect(() => {
+    const delay = firstRender ? 0 : 8_000;
     setTimeout(() => {
-      const newFeedbackArray = newVisibleFeedback(visibleFeedBack);
+      const newFeedbackArray = newVisibleFeedback.current(visibleFeedBack);
       setVisibleFeedBack(() => newFeedbackArray);
-    }, 8_000);
+    }, delay);
     return;
-  }, [visibleFeedBack, sectionWidth, maxVisible]);
+  }, [visibleFeedBack, sectionWidth, maxVisible, firstRender]);
 
+  setFirstRender(false);
   return [visibleFeedBack, maxVisible];
 };
 
