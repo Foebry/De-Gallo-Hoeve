@@ -9,11 +9,20 @@ import FeedbackSection from './components/feedback/section';
 import { IndexData } from './types';
 import { useFeedbackContext } from 'src/context/app/FeedbackContext';
 import { useTrainingContext } from 'src/context/app/TrainingContext';
+import { useRouter } from 'next/router';
+import { onPageChange } from 'src/hooks/onPageChange';
 
 interface Props {}
 
 const Index: React.FC<Props> = ({}) => {
   const { prijsExcl, kmHeffing, gratisVerplaatsingBinnen, feedback } = useGetIndexData();
+  const { setFirstRender } = useFeedbackContext();
+  const router = useRouter();
+
+  onPageChange(router.pathname, () => {
+    setFirstRender(true);
+  });
+
   return (
     <>
       <Head>

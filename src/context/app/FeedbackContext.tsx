@@ -11,6 +11,8 @@ import { ApiResponse } from 'src/utils/axios';
 type FeedbackContext = {
   disabled: boolean;
   isLoading: boolean;
+  firstRender: boolean;
+  setFirstRender: Dispatch<SetStateAction<boolean>>;
   errors: Partial<FeedbackBody>;
   feedback: FeedbackDto[];
   setFeedback: Dispatch<SetStateAction<FeedbackDto[]>>;
@@ -28,11 +30,13 @@ type FeedbackQuery = {
 const defaultValues: FeedbackContext = {
   disabled: false,
   isLoading: false,
+  firstRender: true,
   errors: {},
   feedback: [],
   sendFeedback: async () => {},
   getFeedback: async () => ({ data: undefined, error: undefined }),
   setFeedback: () => {},
+  setFirstRender: () => {},
 };
 
 export const FeedbackContext = createContext<FeedbackContext>(defaultValues);
@@ -41,6 +45,7 @@ const FeedbackProvider: React.FC<{ children: any }> = ({ children }) => {
   const postFeedback = useMutation<FeedbackBody>(FEEDBACK_API);
   const router = useRouter();
   const [disabled, setDisabled] = useState<boolean>(false);
+  const [firstRender, setFirstRender] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<Partial<FeedbackBody>>({});
   const [feedback, setFeedback] = useState<FeedbackDto[]>([]);
@@ -74,9 +79,11 @@ const FeedbackProvider: React.FC<{ children: any }> = ({ children }) => {
         disabled,
         sendFeedback,
         isLoading,
+        firstRender,
         errors,
         feedback,
         setFeedback,
+        setFirstRender,
         getFeedback,
       }}
     >
