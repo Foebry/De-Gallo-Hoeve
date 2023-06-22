@@ -17,7 +17,7 @@ const Rassen = () => {
   const { useGetPaginatedRassen } = useRasContext();
   const [url, setUrl] = useState<string>();
 
-  const { data: paginatedData, isLoading } = useGetPaginatedRassen(undefined, url);
+  const { data: paginatedData, isLoading } = useGetPaginatedRassen(url);
   const headers: string[] = ['naam', 'soort', 'actions'];
 
   const rows = useMemo(() => {

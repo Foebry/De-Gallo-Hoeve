@@ -28,7 +28,7 @@ const UserProvider: React.FC<{ children: any }> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [inschrijvingen, setInschrijvingen] = useState<Inschrijving[]>();
   const [klant, setKlant] = useState<IsKlantCollection | null>(null);
-  const { getKlant } = useKlantContext();
+  // const { getKlant } = useKlantContext();
 
   const clearData = () => setKlant(null);
 

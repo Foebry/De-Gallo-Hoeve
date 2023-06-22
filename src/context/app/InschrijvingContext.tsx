@@ -1,28 +1,46 @@
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { NextRouter } from 'next/router';
+import { createContext, useContext, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { InschrijvingDto } from 'src/common/api/types/inschrijving';
-import getData from 'src/hooks/useApi';
 import useMutation from 'src/hooks/useMutation';
-import { sleep } from 'src/shared/functions';
 import { PaginatedData } from 'src/shared/RequestHelper';
 import { ApiResponse, REQUEST_METHOD } from 'src/utils/axios';
+import { useAxiosContext } from '../AxiosContext';
 import { defaultApiResponse, emptyPaginatedResponse } from './AppContext';
 import { RevalidateOptions } from './klantContext';
+
+const EMPTY_INSCHRIJVING_DETAIL: InschrijvingDto = {
+  id: '',
+  training: '',
+  created_at: '',
+  updated_at: '',
+  datum: '',
+  klant: {
+    id: '',
+    lnaam: '',
+    vnaam: '',
+  },
+  hond: {
+    id: '',
+    naam: '',
+    ras: '',
+  },
+};
 
 type Context = {
   isLoading: boolean;
   disabled: boolean;
   createInschrijving: (dto: InschrijvingDto) => ApiResponse<InschrijvingDto>;
   useGetPaginatedInschrijvingen: (
-    options?: RevalidateOptions,
-    url?: string
+    url?: string,
+    options?: RevalidateOptions
   ) => {
     data: PaginatedData<InschrijvingDto>;
     isLoading: boolean;
   };
   useGetInschrijvingDetail: (
-    options?: RevalidateOptions,
-    url?: string
+    router: NextRouter,
+    options?: RevalidateOptions
   ) => {
     data: InschrijvingDto | null;
     isLoading: boolean;
@@ -36,7 +54,7 @@ const defaultValues: Context = {
   disabled: false,
   createInschrijving: async () => defaultApiResponse,
   useGetPaginatedInschrijvingen: () => ({
-    data: emptyPaginatedResponse,
+    data: emptyPaginatedResponse(),
     isLoading: false,
   }),
   useGetInschrijvingDetail: () => ({
@@ -52,20 +70,19 @@ const Context = createContext<Context>(defaultValues);
 const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
-  const [lastPaginatedUrl, setLastPaginatedUrl] = useState<string>();
-  const [paginatedInschrijvingen, setPaginatedInschrijvingen] =
-    useState<PaginatedData<InschrijvingDto>>();
-  const [inschrijvingDetail, setInschrijvingDetail] = useState<InschrijvingDto | null>(
-    null
+  const lastPaginatedUrl = useRef<string>();
+  const inschrijvingDetail = useRef<InschrijvingDto | null>(null);
+  const paginatedInschrijvingen = useRef<PaginatedData<InschrijvingDto>>(
+    emptyPaginatedResponse()
   );
-  const [shouldRevalidate, setShouldRevalidate] = useState<boolean>(true);
-  const [revalidateInschrijving, setRevalidateInschrijving] = useState<boolean>(false);
-  const [success, setSuccess] = useState<boolean>(false);
-  const currentRetries = useRef<number>(0);
+  const [revalidateList, setRevalidateList] = useState<boolean>(false);
+  const [revalidateDetail, setRevalidateDetail] = useState<boolean>(false);
 
   const create = useMutation<InschrijvingDto>('api/inschrijvingen/');
   const edit = useMutation<InschrijvingDto>('/api/inschrijvingen/');
   const softDelete = useMutation<InschrijvingDto>('/api/inschrijvingen/');
+  const lastLoadedId = useRef<string>('');
+  const { useSWR } = useAxiosContext();
 
   const createInschrijving = async (dto: InschrijvingDto) => {
     if (disabled) return defaultApiResponse;
@@ -73,7 +90,7 @@ const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
     setIsLoading(true);
     const { data, error } = await create(dto);
     if (error) toast.error('Fout bij aanmaken inschrijving');
-    setShouldRevalidate(true);
+    setRevalidateList(true);
     setDisabled(false);
     setIsLoading(false);
     return { data, error };
@@ -88,7 +105,10 @@ const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
       params: { id: dto.id },
     });
     if (error) toast.error('Fout bij bewerken inschrijving');
-    if (data) setShouldRevalidate(true);
+    if (data) {
+      setRevalidateDetail(true);
+      setRevalidateList(true);
+    }
     setDisabled(false);
     setIsLoading(false);
     return { data, error };
@@ -103,91 +123,60 @@ const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
       params: { id: dto.id },
     });
     if (error) toast.error('Fout bij verwijderen inschrijving');
-    if (data) setShouldRevalidate(true);
+    if (data) setRevalidateList(true);
     setDisabled(false);
     setIsLoading(false);
     return { data, error };
   };
 
-  const useGetPaginatedInschrijvingen = (options?: RevalidateOptions, url?: string) => {
-    const retries = options?.maxRetries ?? 5;
-    const [loading, setLoading] = useState<boolean>(true);
-    const urlMatchesLastUrl = url === lastPaginatedUrl;
+  const useGetPaginatedInschrijvingen = (
+    url: string = '/api/admin/inschrijvingen',
+    options?: RevalidateOptions
+  ) => {
+    const urlMatchesLastUrl = url && url === lastPaginatedUrl.current;
+    const shouldRevalidate =
+      revalidateList || !urlMatchesLastUrl || !paginatedInschrijvingen.current;
 
-    useEffect(() => {
-      (async () => {
-        if (!shouldRevalidate && paginatedInschrijvingen && urlMatchesLastUrl) {
-          setLoading(false);
-        } else {
-          setLastPaginatedUrl(url);
-          while (!success && currentRetries.current <= retries) {
-            const { data, error } = await getData<PaginatedData<InschrijvingDto>>(
-              url ?? '/api/admin/inschrijvingen'
-            );
-            if (error) {
-              currentRetries.current += 1;
-              toast.error('Fout bij laden van rassen');
-              await sleep(5);
-              continue;
-            } else if (data) {
-              setSuccess(true);
-              currentRetries.current = 0;
-              setPaginatedInschrijvingen(data);
-              setShouldRevalidate(false);
-              break;
-            }
-          }
-          setLoading(false);
-          setSuccess(false);
-        }
-      })();
-    }, [retries, loading, url, urlMatchesLastUrl]);
-    currentRetries.current = 0;
-
-    return {
-      data: paginatedInschrijvingen ?? emptyPaginatedResponse,
-      isLoading: loading,
-    };
+    const { data, error, loading } = useSWR<PaginatedData<InschrijvingDto>>(
+      url,
+      shouldRevalidate,
+      options,
+      'Fout bij laden van inschrijvingen',
+      emptyPaginatedResponse()
+    );
+    if (data && shouldRevalidate) {
+      paginatedInschrijvingen.current = data;
+      lastPaginatedUrl.current = url;
+      setRevalidateList(false);
+    } else if (error) {
+      lastPaginatedUrl.current = url;
+    }
+    return { data: paginatedInschrijvingen.current, isLoading: loading };
   };
 
-  const useGetInschrijvingDetail = (options?: RevalidateOptions, url?: string) => {
-    const maxRetries = options?.maxRetries ?? 5;
-    const [loading, setLoading] = useState<boolean>(true);
-    const inschrijvingId = url?.split('/').reverse()[0];
-    const hasDataStored = !revalidateInschrijving && inschrijvingDetail;
+  const useGetInschrijvingDetail = (router: NextRouter, options?: RevalidateOptions) => {
+    const { isReady } = router;
+    const { slug: id } = router.query as { slug: string };
+    const newIdOrMissingData = id !== lastLoadedId.current || !inschrijvingDetail;
+    const shouldRevalidate = isReady && (revalidateDetail || newIdOrMissingData);
 
-    useEffect(() => {
-      setLoading(true);
-      (async () => {
-        if (hasDataStored) {
-          setLoading(false);
-        } else {
-          while (!success && currentRetries.current <= maxRetries) {
-            if (inschrijvingId === 'undefined') {
-              currentRetries.current += 1;
-              await sleep(1);
-              continue;
-            }
-            const { data, error } = await getData<InschrijvingDto>(url!);
-            if (error) {
-              currentRetries.current += 1;
-              toast.error('Fout bij laden van detail hond');
-              await sleep(5);
-              continue;
-            } else if (data) {
-              setInschrijvingDetail(data ?? null);
-              setSuccess(true);
-              currentRetries.current = 0;
-              break;
-            }
-          }
-          currentRetries.current = 0;
-          setLoading(false);
-          setSuccess(false);
-        }
-      })();
-    }, [hasDataStored, inschrijvingId, maxRetries, url]);
-    return { data: inschrijvingDetail, isLoading: loading };
+    const { data, error, loading } = useSWR<InschrijvingDto>(
+      `/api/admin/inschrijvingen/${id}`,
+      shouldRevalidate,
+      options,
+      'Fout bij laden van inschrijving detail',
+      EMPTY_INSCHRIJVING_DETAIL
+    );
+    if (data && shouldRevalidate) {
+      inschrijvingDetail.current = data;
+      if (id !== 'undefined') lastLoadedId.current = id;
+      setRevalidateDetail(false);
+    } else if (error) {
+      inschrijvingDetail.current = null;
+      if (id !== 'undefined') lastLoadedId.current = id;
+    }
+
+    return { data: inschrijvingDetail.current, isLoading: loading };
   };
 
   return (
