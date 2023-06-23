@@ -14,15 +14,14 @@ interface Props {}
 
 const Index: React.FC<Props> = ({}) => {
   const { prijsExcl, kmHeffing, gratisVerplaatsingBinnen, feedback } = useGetIndexData();
-  const { setFirstRender } = useFeedbackContext();
-  const resetFirstRender = useRef<() => void>(() => setFirstRender(true));
+  const { firstRender } = useFeedbackContext();
 
   useEffect(() => {
     const onComponentUnMount = () => {
-      resetFirstRender.current();
+      firstRender.current = true;
     };
     return onComponentUnMount();
-  }, []);
+  }, [firstRender]);
 
   return (
     <>

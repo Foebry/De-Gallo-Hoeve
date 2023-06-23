@@ -1,4 +1,4 @@
-import React, { Ref, RefObject, useEffect, useRef, useState } from 'react';
+import React, { RefObject, useEffect, useRef, useState } from 'react';
 import { FeedbackDto } from 'src/common/api/types/feedback';
 import { Title2 } from 'src/components/Typography/Typography';
 import { useFeedbackContext } from 'src/context/app/FeedbackContext';
@@ -38,7 +38,7 @@ const useDetermineVisibleFeedback = (
   const gap = 40;
   const sectionWidth = sectionRef.current?.offsetWidth ?? 0;
   const maxVisible = Math.floor(sectionWidth / (minCardWidth + gap));
-  const { firstRender, setFirstRender } = useFeedbackContext();
+  const { firstRender } = useFeedbackContext();
 
   const newVisibleFeedback = useRef<(currentFeedback: FeedbackDto[]) => FeedbackDto[]>(
     (currentFeedback: FeedbackDto[]): FeedbackDto[] => {
@@ -57,7 +57,7 @@ const useDetermineVisibleFeedback = (
     return;
   }, [visibleFeedBack, sectionWidth, maxVisible, firstRender]);
 
-  setFirstRender(false);
+  firstRender.current = false;
   return [visibleFeedBack, maxVisible];
 };
 
