@@ -1,6 +1,14 @@
 import { FEEDBACK_API } from '@/types/apiTypes';
 import { useRouter } from 'next/router';
-import { createContext, Dispatch, SetStateAction, useContext, useState } from 'react';
+import {
+  createContext,
+  Dispatch,
+  MutableRefObject,
+  SetStateAction,
+  useContext,
+  useRef,
+  useState,
+} from 'react';
 import { toast } from 'react-toastify';
 import { FeedbackDto } from 'src/common/api/types/feedback';
 import getData from 'src/hooks/useApi';
@@ -11,8 +19,7 @@ import { ApiResponse } from 'src/utils/axios';
 type FeedbackContext = {
   disabled: boolean;
   isLoading: boolean;
-  firstRender: boolean;
-  setFirstRender: Dispatch<SetStateAction<boolean>>;
+  firstRender: MutableRefObject<boolean>;
   errors: Partial<FeedbackBody>;
   feedback: FeedbackDto[];
   setFeedback: Dispatch<SetStateAction<FeedbackDto[]>>;
@@ -30,13 +37,12 @@ type FeedbackQuery = {
 const defaultValues: FeedbackContext = {
   disabled: false,
   isLoading: false,
-  firstRender: true,
+  firstRender: { current: true },
   errors: {},
   feedback: [],
   sendFeedback: async () => {},
   getFeedback: async () => ({ data: undefined, error: undefined }),
   setFeedback: () => {},
-  setFirstRender: () => {},
 };
 
 export const FeedbackContext = createContext<FeedbackContext>(defaultValues);
@@ -45,7 +51,7 @@ const FeedbackProvider: React.FC<{ children: any }> = ({ children }) => {
   const postFeedback = useMutation<FeedbackBody>(FEEDBACK_API);
   const router = useRouter();
   const [disabled, setDisabled] = useState<boolean>(false);
-  const [firstRender, setFirstRender] = useState<boolean>(true);
+  const firstRender = useRef<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<Partial<FeedbackBody>>({});
   const [feedback, setFeedback] = useState<FeedbackDto[]>([]);
@@ -83,7 +89,6 @@ const FeedbackProvider: React.FC<{ children: any }> = ({ children }) => {
         errors,
         feedback,
         setFeedback,
-        setFirstRender,
         getFeedback,
       }}
     >
