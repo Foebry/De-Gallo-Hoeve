@@ -58,17 +58,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
   const [disabled, setDisabled] = useState<boolean>(false);
   const [activeStep, setActiveStep] = useState<number>(0);
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
-  const step1 = [
-    'vnaam',
-    'lnaam',
-    'email',
-    'straat',
-    'nr',
-    'bus',
-    'gemeente',
-    'postcode',
-    'telefoon',
-  ];
+  const step1 = ['vnaam', 'lnaam', 'email', 'straat', 'nr', 'bus', 'gemeente', 'postcode', 'telefoon'];
   const step2 = ['naam', 'ras_id', 'gelacht', 'chip_nr', 'geboortedatum', 'honden'];
 
   const setErrors = (step: number) => {
@@ -99,10 +89,8 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
         ...formErrors,
         password: 'Minstens 1 speciaal teken',
       });
-    else if (!password.match(/[0-9]+/))
-      setFormErrors({ ...formErrors, password: 'Minstens 1 cijfer' });
-    else if (password.length < 8)
-      setFormErrors({ ...formErrors, password: 'Minstens 8 characters' });
+    else if (!password.match(/[0-9]+/)) setFormErrors({ ...formErrors, password: 'Minstens 1 cijfer' });
+    else if (password.length < 8) setFormErrors({ ...formErrors, password: 'Minstens 8 characters' });
   };
 
   const onSubmit = async (values: any) => {
@@ -117,7 +105,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
 
     if (!disabled) {
       setDisabled(() => true);
-      const { data, error } = await register(REGISTERAPI, { ...payload, csrf });
+      const { data, error } = await register({ ...payload, csrf });
       if (data) {
         toast.success('Registratie succesvol!');
         router.push(LOGIN);
@@ -210,7 +198,5 @@ export default Register;
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const csrf = generateCsrf();
 
-  return nookies.get(ctx).JWT
-    ? { redirect: { permanent: false, destination: INDEX } }
-    : { props: { csrf } };
+  return nookies.get(ctx).JWT ? { redirect: { permanent: false, destination: INDEX } } : { props: { csrf } };
 };

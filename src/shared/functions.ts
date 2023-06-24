@@ -8,9 +8,7 @@ interface HelperInterface {
 export const capitalize = (string: string) => {
   return string
     .split(' ')
-    .map(
-      (word) => word.substring(0, 1).toUpperCase() + word.substring(1).toLocaleLowerCase()
-    )
+    .map((word) => word.substring(0, 1).toUpperCase() + word.substring(1).toLocaleLowerCase())
     .join(' ');
 };
 
@@ -24,14 +22,9 @@ export const toLocalTime = (date: string): Date => {
 };
 
 export const getAge = (date: Date) =>
-  moment(date)
-    .fromNow()
-    .replace('years ago', 'jaar')
-    .replace('a month ago', '1 maand')
-    .replace('days ago', 'dagen');
+  moment(date).fromNow().replace('years ago', 'jaar').replace('a month ago', '1 maand').replace('days ago', 'dagen');
 
-export const toReadableDate = (date: Date): string =>
-  date.toISOString().replace('T', ' ').split('.')[0];
+export const toReadableDate = (date: Date): string => date.toISOString().replace('T', ' ').split('.')[0];
 
 export const pick = <T>(arr: T[]): T => {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -42,7 +35,7 @@ export const unique = <T>(arr: T[]): T[] => {
 };
 
 export const getDomain = (req: NextApiRequest): string | undefined => {
-  return req.headers.host;
+  return req.headers.host?.includes('localhost') ? 'de-gallo-hoeve-git-develop-foebry.vercel.app' : req.headers.host;
 };
 
 export enum FrontEndErrorCodes {

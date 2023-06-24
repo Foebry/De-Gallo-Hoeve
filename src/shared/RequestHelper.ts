@@ -30,6 +30,8 @@ export type PaginatedData<T> = {
   pagination: Pagination;
 };
 
+// this needs to be refactored to correctly use mongodb functions
+// this might have seemed like a good idea at first, but is actually very terrible
 export async function getPaginatedData<T>(
   query: PaginatedRequestQuery,
   url: string,
@@ -51,11 +53,7 @@ export async function getPaginatedData<T>(
   controller: 'RasController'
 ): Promise<PaginatedData<T>>;
 
-export async function getPaginatedData<T>(
-  query: PaginatedRequestQuery,
-  url: string,
-  controller: string
-) {
+export async function getPaginatedData<T>(query: PaginatedRequestQuery, url: string, controller: string) {
   // await client.connect();
 
   const data = await getData(controller);
@@ -68,11 +66,7 @@ export async function getPaginatedData<T>(
   return { data: filteredData.slice(first, last), pagination };
 }
 
-const getPagination = <T>(
-  query: PaginatedRequestQuery,
-  url: string,
-  data: T[]
-): Pagination => {
+const getPagination = <T>(query: PaginatedRequestQuery, url: string, data: T[]): Pagination => {
   const { page, amount, search } = query;
 
   const pageSize = parseInt(amount ?? '10');
@@ -92,12 +86,8 @@ const getPagination = <T>(
     currentPage,
     first,
     last,
-    next: nextPage
-      ? `${baseUrl}?${[searchValue, nextPage, sizeValue].filter(notEmpty).join('&')}`
-      : undefined,
-    previous: prevPage
-      ? `${baseUrl}?${[searchValue, prevPage, sizeValue].filter(notEmpty).join('&')}`
-      : undefined,
+    next: nextPage ? `${baseUrl}?${[searchValue, nextPage, sizeValue].filter(notEmpty).join('&')}` : undefined,
+    previous: prevPage ? `${baseUrl}?${[searchValue, prevPage, sizeValue].filter(notEmpty).join('&')}` : undefined,
     total: data.length,
   };
 };
@@ -107,11 +97,7 @@ function filterData<T>(data: InschrijvingCollection[], query: PaginatedRequestQu
 function filterData<T>(data: HondCollection[], query: PaginatedRequestQuery): T[];
 function filterData<T>(data: RasCollection[], query: PaginatedRequestQuery): T[];
 function filterData<T>(
-  data:
-    | IsKlantCollection[]
-    | InschrijvingCollection[]
-    | HondCollection[]
-    | RasCollection[],
+  data: IsKlantCollection[] | InschrijvingCollection[] | HondCollection[] | RasCollection[],
   query: PaginatedRequestQuery
 ) {
   const { search, id } = query;
@@ -132,9 +118,7 @@ function filterData<T>(
     }
     return data;
   } else if (instanceOfRasCollectionArray(data)) {
-    return search
-      ? data.filter((ras) => ras.naam.toLowerCase().includes(search.toLowerCase()))
-      : data;
+    return search ? data.filter((ras) => ras.naam.toLowerCase().includes(search.toLowerCase())) : data;
   }
   return data;
 }
@@ -162,9 +146,7 @@ function instanceOfKlantCollectionArray(array: any[]): array is IsKlantCollectio
   );
 }
 
-function instanceOfInschrijvingCollectionArray(
-  array: any[]
-): array is InschrijvingCollection[] {
+function instanceOfInschrijvingCollectionArray(array: any[]): array is InschrijvingCollection[] {
   return (
     '_id' in array[0] &&
     'created_at' in array[0] &&
@@ -180,9 +162,7 @@ function instanceOfInschrijvingCollectionArray(
   );
 }
 function instanceOfRasCollectionArray(array: any[]): array is RasCollection[] {
-  return (
-    '_id' in array[0] && 'naam' in array[0] && 'soort' in array[0] && 'avatar' in array[0]
-  );
+  return '_id' in array[0] && 'naam' in array[0] && 'soort' in array[0] && 'avatar' in array[0];
 }
 
 export const notEmpty = <T>(obj: T | null | undefined): obj is T => {
