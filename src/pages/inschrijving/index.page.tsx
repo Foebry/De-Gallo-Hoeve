@@ -107,6 +107,7 @@ const Groepslessen: React.FC<LessenProps> = ({
     }
   };
 
+  // should be refactored to use the function from InschrijvingContext
   const onSubmit = async (values: FieldValues) => {
     const [structuredData, newErrors] = structureInschrijvingenPayload(values);
     if (!disabled) {
