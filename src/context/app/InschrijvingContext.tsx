@@ -72,9 +72,7 @@ const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
   const [disabled, setDisabled] = useState<boolean>(false);
   const lastPaginatedUrl = useRef<string>();
   const inschrijvingDetail = useRef<InschrijvingDto | null>(null);
-  const paginatedInschrijvingen = useRef<PaginatedData<InschrijvingDto>>(
-    emptyPaginatedResponse()
-  );
+  const paginatedInschrijvingen = useRef<PaginatedData<InschrijvingDto>>(emptyPaginatedResponse());
   const [revalidateList, setRevalidateList] = useState<boolean>(false);
   const [revalidateDetail, setRevalidateDetail] = useState<boolean>(false);
 
@@ -129,13 +127,9 @@ const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
     return { data, error };
   };
 
-  const useGetPaginatedInschrijvingen = (
-    url: string = '/api/admin/inschrijvingen',
-    options?: RevalidateOptions
-  ) => {
+  const useGetPaginatedInschrijvingen = (url: string = '/api/admin/inschrijvingen', options?: RevalidateOptions) => {
     const urlMatchesLastUrl = url && url === lastPaginatedUrl.current;
-    const shouldRevalidate =
-      revalidateList || !urlMatchesLastUrl || !paginatedInschrijvingen.current;
+    const shouldRevalidate = revalidateList || !urlMatchesLastUrl || !paginatedInschrijvingen.current;
 
     const { data, error, loading } = useSWR<PaginatedData<InschrijvingDto>>(
       url,

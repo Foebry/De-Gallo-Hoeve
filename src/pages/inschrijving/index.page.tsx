@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/router';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
 import useMutation, { structureInschrijvingenPayload } from 'src/hooks/useMutation';
 import { POST_INSCHRIJVING } from 'src/types/apiTypes';
@@ -18,7 +18,6 @@ import { generateCsrf } from 'src/services/Validator';
 import { securepage } from 'src/services/Authenticator';
 import Skeleton from 'src/components/website/skeleton';
 import { TRAINING } from 'src/controllers/TrainingController';
-import getData from 'src/hooks/useApi';
 import Head from 'next/head';
 import { TRAININGDAY } from 'src/controllers/TrainingDayController';
 import { getController } from 'src/services/Factory';
@@ -79,7 +78,7 @@ const Groepslessen: React.FC<LessenProps> = ({
 
   const router = useRouter();
   const { handleSubmit, control, getValues, register, setValue } = useForm();
-  const inschrijving = useMutation<InschrijvingCollection>('');
+  const inschrijving = useMutation<InschrijvingCollection>(POST_INSCHRIJVING);
 
   const steps = useMemo(() => {
     return klant_id
@@ -109,20 +108,15 @@ const Groepslessen: React.FC<LessenProps> = ({
   };
 
   const onSubmit = async (values: FieldValues) => {
-    const [payload, newErrors] = structureInschrijvingenPayload(values);
+    const [structuredData, newErrors] = structureInschrijvingenPayload(values);
     if (!disabled) {
       setDisabled(() => true);
       if (Object.keys(newErrors).length > 0) {
         setDisabled(false);
         return setErrors(newErrors);
       }
-      const { data, error } = await inschrijving(POST_INSCHRIJVING, {
-        ...payload,
-        csrf,
-        klant_id,
-        training: type,
-        prijs: prijsExcl,
-      });
+      const payload = { ...structuredData, csrf, klant_id, training: type, prijs: prijsExcl };
+      const { data, error } = await inschrijving(payload);
       if (error) {
         if (error.code === 401) router.push(LOGIN);
         else toast.error(error.message);
@@ -141,19 +135,16 @@ const Groepslessen: React.FC<LessenProps> = ({
         <title>De Gallo-hoeve - inschrijving privétraining</title>
         <meta
           name="description"
-          content="Maak nu een nieuwe afspraak. Selecteer de datum en het tijdstap waarop u een trainng wil boeken. Selecteer vervolgens voor welke hond u deze training wil boeken. U ontvangt een email ter bevestiging van uw inschrijving."
+          content={`Maak nu een nieuwe afspraak. Selecteer de datum en het tijdstap waarop u een trainng wil boeken.
+            Selecteer vervolgens voor welke hond u deze training wil boeken. U ontvangt een email ter bevestiging van
+            uw inschrijving.`}
           key="description inschrijving"
         ></meta>
       </Head>
       <Skeleton>
         <section className="mb-48 md:px-5 mt-20">
           <div className="max-w-7xl mx-auto">
-            <FormSteps
-              steps={steps}
-              activeStep={activeStep}
-              errorSteps={errorSteps}
-              setActiveStep={setActiveStep}
-            />
+            <FormSteps steps={steps} activeStep={activeStep} errorSteps={errorSteps} setActiveStep={setActiveStep} />
             <Form onSubmit={handleSubmit(onSubmit)}>
               <div className="max-w-3xl mx-0 md:mx-auto mt-20 mb-30">
                 {activeStep === 0 ? (
@@ -168,8 +159,7 @@ const Groepslessen: React.FC<LessenProps> = ({
                               onChange(e);
                               setSelectedDates(
                                 getValues().dates.sort(
-                                  (a: string, b: string) =>
-                                    new Date(a).getTime() - new Date(b).getTime()
+                                  (a: string, b: string) => new Date(a).getTime() - new Date(b).getTime()
                                 )
                               );
                               setValue('inschrijvingen', []);
@@ -248,8 +238,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
         redirect: { permanent: false, destination: LOGIN },
       };
     }
-    const { disabled, available } =
-      await trainingDayController.getAvailableForInschrijving();
+    const { disabled, available } = await trainingDayController.getAvailableForInschrijving();
     const training = await trainingController.getPriveTraining();
     const rassen = await rasController.getRasOptions();
     const honden = await hondController.getHondOptions(klant_id);
