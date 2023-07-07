@@ -9,6 +9,9 @@ import { useEffect, useState } from 'react';
 import getData from 'src/hooks/useApi';
 import FeedbackSection from './components/feedback/section';
 import { IndexData } from './types';
+import ServiceCard from './components/diensten/ServiceCard';
+import { Toast } from 'react-toastify/dist/components';
+import { toast } from 'react-toastify';
 
 interface Props {}
 
@@ -28,6 +31,16 @@ const Index: React.FC<Props> = () => {
         {/**
          * Heading section WHO ARE WE
          */}
+        <section className="mb-20 block mt-10 items center max-w-7xl mx-auto md:px-5">
+          <div className="border-2 border-green-200 text-center bg-green-100 rounded-lg py-2 mx-5">
+            <p className="text-xl text-gray-100">
+              Best klant, wij gaan er even tussen uit van 16 juli tot en met 23 juli.
+            </p>
+            <p className="text-xl text-gray-100">
+              Vanaf maandag 24 juli staan wij weer volledig paraat voor u en uw trouwe vriend.
+            </p>
+          </div>
+        </section>
         <section className="mb-40 block flex-wrap mt-10 items-center max-w-7xl justify-between mx-auto md:flex md:px-5">
           <div className="mx-auto w-1/2 flex flex-wrap rotate-135 gap-5 self-center md:w-4/12 md:mx-0 md:self-end relative mt-28">
             <div className="w-5/12 max-w-sm aspect-square border-4 border-green-200 overflow-hidden relative images">
@@ -153,12 +166,17 @@ const Index: React.FC<Props> = () => {
             </div>
           </div>
           <div className="px-5 max-w-7xl pb-24 relative md:mx-auto md:px-0">
-            <div className="flex gap-10 justify-center flex-wrap sm:flex-nowrap max-w-7xl md:mx-auto py-24 relative ">
+            <div className="flex gap-28 sm:gap-10 justify-center flex-wrap sm:flex-nowrap max-w-7xl md:mx-auto py-24">
               <TrainingCard
                 type="prive"
                 price={prijsExcl}
                 kmHeffing={kmHeffing}
                 gratisVerplaatsingBinnen={gratisVerplaatsingBinnen}
+              />
+              <ServiceCard
+                active={false}
+                title="Uitlaatdienst"
+                imageSrc="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1688751489/De-Gallo-Hoeve/content/pexels-blue-bird-7210754_rwez0z.jpg"
               />
             </div>
           </div>
@@ -193,6 +211,8 @@ const useGetIndexData = () => {
       if (!feedbackError)
         setIndexData((indexData) => ({ ...indexData, feedback: feedbackData }));
     })();
+
+    toast.info('Beste klant, wij gaan er even tussen uit vanaf 16 juli.', { autoClose: false });
   }, []);
 
   return indexData;
