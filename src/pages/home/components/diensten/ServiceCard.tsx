@@ -14,7 +14,10 @@ type Props = {
 
 const ServiceCard: React.FC<Props> = ({ active = false, title, imageSrc }) => {
   return (
-    <div className="border cursor-pointer border-gray-100 rounded-lg pb-2 hover:shadow-xl max-w-md flex-shrink relative">
+    <div
+      className="border cursor-pointer border-gray-100 rounded-lg pb-2 hover:shadow-xl max-w-md relative flex-shrink"
+      onClick={() => {}}
+    >
       <div
         className={`${
           active ? 'bg-green-200' : style['coming-soon']
@@ -29,7 +32,6 @@ const ServiceCard: React.FC<Props> = ({ active = false, title, imageSrc }) => {
             width="448"
             height="262"
             alt="degallohoeve hondentrainer hond uitlaat-dienst wandelen"
-            style={{ color: 'green' }}
           />
         </div>
         <div className="px-2 flex flex-col gap-2">
@@ -38,7 +40,7 @@ const ServiceCard: React.FC<Props> = ({ active = false, title, imageSrc }) => {
           <Body>Bent u slecht te been, of heeft u graag hulp bij het uitlaten van uw hond?</Body>
           <Body>Dan staan wij iedere dag voor u klaar om u bij te staan.</Body>
         </div>
-        <ul className="pl-5 md:pl-20 mt-10">
+        <ul className="pl-5 md:pl-20 mt-10 mb-10">
           <li className="flex gap-2">
             <GiCheckMark /> <Body>Meerdere honden mogelijk</Body>
           </li>
