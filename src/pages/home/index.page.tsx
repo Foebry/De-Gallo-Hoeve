@@ -10,6 +10,8 @@ import { IndexData } from './types';
 import { useFeedbackContext } from 'src/context/app/FeedbackContext';
 import { useTrainingContext } from 'src/context/app/TrainingContext';
 import ServiceCard from './components/diensten/ServiceCard';
+import { Toast } from 'react-toastify/dist/components';
+import { toast } from 'react-toastify';
 
 interface Props {}
 
@@ -204,6 +206,8 @@ const useGetIndexData = () => {
 
       if (!feedbackError && feedbackData) setIndexData((indexData) => ({ ...indexData, feedback: feedbackData }));
     })();
+
+    toast.info('Beste klant, wij gaan er even tussen uit vanaf 16 juli.', { autoClose: false });
   }, []);
 
   return indexData;
