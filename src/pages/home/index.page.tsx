@@ -32,7 +32,7 @@ const Index: React.FC<Props> = () => {
          * Heading section WHO ARE WE
          */}
         <section className="mb-20 block mt-10 items center max-w-7xl mx-auto md:px-5">
-          <div className="border-2 border-green-200 text-center bg-green-100 rounded-lg py-2">
+          <div className="border-2 border-green-200 text-center bg-green-100 rounded-lg py-2 mx-5">
             <p className="text-xl text-gray-100">
               Best klant, wij gaan er even tussen uit van 16 juli tot en met 23 juli.
             </p>
@@ -173,12 +173,6 @@ const Index: React.FC<Props> = () => {
                 kmHeffing={kmHeffing}
                 gratisVerplaatsingBinnen={gratisVerplaatsingBinnen}
               />
-              {/* <TrainingCard
-                type="prive"
-                price={prijsExcl}
-                kmHeffing={kmHeffing}
-                gratisVerplaatsingBinnen={gratisVerplaatsingBinnen}
-              /> */}
               <ServiceCard
                 active={false}
                 title="Uitlaatdienst"
