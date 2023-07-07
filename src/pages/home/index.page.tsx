@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import getData from 'src/hooks/useApi';
 import FeedbackSection from './components/feedback/section';
 import { IndexData } from './types';
+import ServiceCard from './components/diensten/ServiceCard';
 
 interface Props {}
 
@@ -159,6 +160,11 @@ const Index: React.FC<Props> = () => {
                 price={prijsExcl}
                 kmHeffing={kmHeffing}
                 gratisVerplaatsingBinnen={gratisVerplaatsingBinnen}
+              />
+              <ServiceCard
+                active={false}
+                title="Uitlaatdienst"
+                imageSrc="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1688751489/De-Gallo-Hoeve/content/pexels-blue-bird-7210754_rwez0z.jpg"
               />
             </div>
           </div>
