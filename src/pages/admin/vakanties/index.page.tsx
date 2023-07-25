@@ -1,13 +1,16 @@
+import { VACATIONS_OVERVIEW } from '@/types/apiTypes';
 import { VacationDto } from '@/types/DtoTypes/VacationDto';
 import { nanoid } from 'nanoid';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { GrEdit, GrView } from 'react-icons/gr';
 import { MdDelete } from 'react-icons/md';
+import { toast } from 'react-toastify';
 import Dashboard from 'src/components/admin/dashboard';
 import Table from 'src/components/Table/Table';
-import { string } from 'yup';
+import getData from 'src/hooks/useApi';
+import { apiOptionsInterface, ApiResult } from '../klanten/index.page';
 
 interface Props {}
 
@@ -22,19 +25,18 @@ const Vakanties: React.FC<Props> = ({}) => {
     'actions',
   ];
 
-  const apiData = {
-    data: [
-      {
-        id: 'abc',
-        startDate: '16-07-2023',
-        endDate: '23-07-2023',
-        notificationStartDate: '09-07-2023',
-        longDescription: '',
-        notificationDescription: '',
-      },
-    ],
-    pagination: { first: 1, last: 1, total: 1, currentPage: 1 },
-  };
+  const [options, setOptions] = useState<apiOptionsInterface>({});
+  const [apiData, setApiData] = useState<ApiResult<VacationDto>>({
+    data: [],
+    pagination: { first: 0, last: 0, total: 0, currentPage: 0 },
+  });
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await getData(VACATIONS_OVERVIEW, options);
+      setApiData(data);
+    })();
+  }, []);
 
   const handleView = (id: string) => {
     router.push(`/admin/vakanties/${id}`);
@@ -72,7 +74,18 @@ const Vakanties: React.FC<Props> = ({}) => {
       return [startDate, endDate, notificationStartDate, createdAt, editedAt, actions];
     });
   }, [apiData]);
-  const onPageChange = async () => {};
+
+  const onPageChange = async (api?: string) => {
+    if (!api) return;
+    const { data, error } = await getData(api);
+    if (!error && data) {
+      setApiData(data);
+    }
+    if (error) {
+      toast.warning('Fout bij laden van vakantie-instellingen');
+    }
+  };
+
   return (
     <Dashboard>
       <Table
