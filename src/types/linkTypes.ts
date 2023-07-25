@@ -20,6 +20,7 @@ const linkTypes = {
   ADMINLISTTRAININGS: '/admin/trainingen',
   ADMINEDITTRAININGTIMES: '/admin/edit/trainingtijden',
   CHANGELOG: '/what-is-new',
+  VAKANTIECONTROL: '/admin/vakanties',
 };
 
 export const {
@@ -44,4 +45,5 @@ export const {
   ADMINLISTUSERS,
   ADMINEDITTRAININGTIMES,
   CHANGELOG,
+  VAKANTIECONTROL,
 } = linkTypes;
