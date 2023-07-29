@@ -68,7 +68,7 @@ export async function getPaginatedData<T>(
   return { data: filteredData.slice(first, last), pagination };
 }
 
-const getPagination = <T>(
+export const getPagination = <T>(
   query: PaginatedRequestQuery,
   url: string,
   data: T[]
@@ -187,4 +187,8 @@ function instanceOfRasCollectionArray(array: any[]): array is RasCollection[] {
 
 export const notEmpty = <T>(obj: T | null | undefined): obj is T => {
   return obj !== null && obj !== undefined;
+};
+
+export const calculateDbSkip = (page: string, amount: string): number => {
+  return (parseInt(page) - 1) * parseInt(amount);
 };
