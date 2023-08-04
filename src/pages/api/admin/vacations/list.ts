@@ -5,6 +5,7 @@ import {
   getPagination,
   PaginatedRequestQuery,
 } from 'src/shared/RequestHelper';
+import { mapVacationToDto } from './mappers';
 import { getVacationsList } from './repo';
 
 export interface ListVacationRequest extends NextApiRequest {
@@ -24,9 +25,13 @@ export const getVacationsOverview = async (
       parseInt(amount),
       search
     );
+    console.log({ data });
 
-    const pagination = getPagination<VacationType>(query, url, data);
-    const result = { pagination, data };
+    const pagination = getPagination<VacationType>({ page, amount }, url, data);
+    const result = {
+      pagination,
+      data: data.map((vacation) => mapVacationToDto(vacation)),
+    };
 
     return res.status(200).send(result);
   } catch (e: any) {

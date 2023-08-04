@@ -13,7 +13,7 @@ import {
   VAKANTIECONTROL,
 } from 'src/types/linkTypes';
 import { BiUser } from 'react-icons/bi';
-import { BsCalendarDay, BsListUl } from 'react-icons/bs';
+import { BsCalendarDay, BsListUl, BsCalendar2RangeFill } from 'react-icons/bs';
 import { GiSittingDog, GiJumpingDog } from 'react-icons/gi';
 import { FaDatabase, FaDog, FaEdit } from 'react-icons/fa';
 import { CgWebsite } from 'react-icons/cg';
@@ -29,7 +29,11 @@ const Dashboard: React.FC<Props> = ({ children }) => {
       <aside className="bg-green-300 px-2 pt-5 min-h-full" style={{ width: '12.5%' }}>
         <MenuSection title="dashboard" icon={<AiOutlineHome />} link={ADMIN} />
         <MenuSection title="gegevens aanpassen" icon={<FaEdit />}>
-          <MenuItem title="vakanties" icon="" link={VAKANTIECONTROL} />
+          <MenuItem
+            title="vakanties"
+            icon={<BsCalendar2RangeFill />}
+            link={VAKANTIECONTROL}
+          />
           <MenuItem title="Website" icon={<CgWebsite />} link={ADMINEDITINDEX} />
           <MenuItem
             title="Trainingdagen"

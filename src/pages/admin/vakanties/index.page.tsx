@@ -3,13 +3,17 @@ import { VacationDto } from '@/types/DtoTypes/VacationDto';
 import { nanoid } from 'nanoid';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { GrEdit, GrView } from 'react-icons/gr';
 import { MdDelete } from 'react-icons/md';
 import { toast } from 'react-toastify';
 import Dashboard from 'src/components/admin/dashboard';
+import Button from 'src/components/buttons/Button';
+import FormRow from 'src/components/form/FormRow';
 import Table from 'src/components/Table/Table';
+import { ModalContext } from 'src/context/ModalContext';
 import getData from 'src/hooks/useApi';
+import { toReadableDate } from 'src/shared/functions';
 import { apiOptionsInterface, ApiResult } from '../klanten/index.page';
 
 interface Props {}
@@ -25,6 +29,7 @@ const Vakanties: React.FC<Props> = ({}) => {
     'actions',
   ];
 
+  const { updateModal } = useContext(ModalContext);
   const [options, setOptions] = useState<apiOptionsInterface>({});
   const [apiData, setApiData] = useState<ApiResult<VacationDto>>({
     data: [],
@@ -45,12 +50,12 @@ const Vakanties: React.FC<Props> = ({}) => {
   const rows = useMemo(() => {
     return apiData.data.map((row: VacationDto) => {
       const startDate = (
-        <Link href={`/admin/vakanties/${row.id}`}>{row.startDate.toString()}</Link>
+        <Link href={`/admin/vakanties/${row.id}`}>{row.duration.startDate}</Link>
       );
-      const endDate = row.endDate;
+      const endDate = row.duration.endDate;
       const notificationStartDate = row.notificationStartDate;
-      const createdAt = row.createdAt;
-      const editedAt = row.updatedAt;
+      const createdAt = row.created_at;
+      const editedAt = row.updated_at;
       const actions = [
         <div
           className="border rounded-l border-grey-200 border-solid p-1 cursor-pointer"
@@ -86,8 +91,15 @@ const Vakanties: React.FC<Props> = ({}) => {
     }
   };
 
+  const onClick = () => {
+    router.push('/admin/vakanties/create');
+  };
+
   return (
     <Dashboard>
+      <FormRow className="flex-row-reverse mb-10">
+        <Button label="Nieuwe vakantie aanmaken" onClick={onClick} />
+      </FormRow>
       <Table
         colWidths={['15', '17.5', '25', '17.5', '15', '10']}
         columns={headers}

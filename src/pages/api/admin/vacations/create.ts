@@ -1,6 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Factory from 'src/services/Factory';
 import { validate } from 'src/services/Validator';
+import { VacationOverLappingError } from 'src/shared/RequestError';
+import { getVacationsBetweenStartAndEndDate, saveVacation } from './repo';
 import { VacationSchema } from './schemas';
 import { validateVacationNotOverlapping } from './validators';
 
@@ -25,7 +27,9 @@ export const createVacation = async (req: Request, res: NextApiResponse) => {
       notificationDescription,
     } = req.body;
 
-    validateVacationNotOverlapping(startDate, endDate);
+    const vacations = await getVacationsBetweenStartAndEndDate(startDate, endDate);
+    if (vacations.length) throw new VacationOverLappingError();
+    // validateVacationNotOverlapping(startDate, endDate);
 
     const vacation = Factory.createVacation(
       startDate,
@@ -34,6 +38,8 @@ export const createVacation = async (req: Request, res: NextApiResponse) => {
       longDescription,
       notificationDescription
     );
+
+    await saveVacation(vacation);
 
     return res.status(201).send(vacation);
   } catch (e: any) {
