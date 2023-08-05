@@ -12,10 +12,15 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { FallBack } from 'src/pages/error.page';
 import useMutation from 'src/hooks/useMutation';
 import { useRouter } from 'next/router';
+import VacationProvider from 'src/context/VacationContext';
+import BannerProvider from 'src/context/BannerContext';
+import { useState } from 'react';
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const [shouldShowBanner, setShouldShowBanner] = useState<boolean>(false);
   const logError = useMutation();
   const router = useRouter();
+
   const errorHandler = (error: any, errorInfo: any) => {
     const page = router.route;
     handleError(page, error, errorInfo);
@@ -35,19 +40,23 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Head>
         <link rel="icon" type="image/x-icon" href="/favicon.ico"></link>
       </Head>
-      <FeedbackProvider>
-        <ModalProvider>
-          <ErrorBoundary FallbackComponent={FallBack} onError={errorHandler}>
-            <TrainingDayProvider>
-              <AppProvider>
-                <Modal />
-                <ToastContainer position="top-right" />
-                <Component {...pageProps} />
-              </AppProvider>
-            </TrainingDayProvider>
-          </ErrorBoundary>
-        </ModalProvider>
-      </FeedbackProvider>
+      <BannerProvider>
+        <FeedbackProvider>
+          <ModalProvider>
+            <ErrorBoundary FallbackComponent={FallBack} onError={errorHandler}>
+              <TrainingDayProvider>
+                <VacationProvider>
+                  <AppProvider>
+                    <Modal />
+                    <ToastContainer position="top-right" />
+                    <Component {...pageProps} />
+                  </AppProvider>
+                </VacationProvider>
+              </TrainingDayProvider>
+            </ErrorBoundary>
+          </ModalProvider>
+        </FeedbackProvider>
+      </BannerProvider>
     </>
   );
 }

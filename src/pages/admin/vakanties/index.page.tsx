@@ -1,9 +1,11 @@
 import { VACATIONS_OVERVIEW } from '@/types/apiTypes';
 import { VacationDto } from '@/types/DtoTypes/VacationDto';
 import { nanoid } from 'nanoid';
+import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useMemo, useState } from 'react';
+import { AiOutlinePlus } from 'react-icons/ai';
 import { GrEdit, GrView } from 'react-icons/gr';
 import { MdDelete } from 'react-icons/md';
 import { toast } from 'react-toastify';
@@ -96,18 +98,31 @@ const Vakanties: React.FC<Props> = ({}) => {
   };
 
   return (
-    <Dashboard>
-      <FormRow className="flex-row-reverse mb-10">
-        <Button label="Nieuwe vakantie aanmaken" onClick={onClick} />
-      </FormRow>
-      <Table
-        colWidths={['15', '17.5', '25', '17.5', '15', '10']}
-        columns={headers}
-        rows={rows}
-        pagination={apiData?.pagination}
-        onPaginationClick={onPageChange}
-      />
-    </Dashboard>
+    <>
+      <Head>
+        <title>De gallo-hoeve - Vakanties</title>
+      </Head>
+      <Dashboard>
+        <FormRow className="flex-row-reverse mb-10">
+          <Button
+            label={
+              <span className="flex items-center">
+                <AiOutlinePlus />
+                <span className="ml-1">toevoegen</span>
+              </span>
+            }
+            onClick={onClick}
+          />
+        </FormRow>
+        <Table
+          colWidths={['15', '17.5', '25', '17.5', '15', '10']}
+          columns={headers}
+          rows={rows}
+          pagination={apiData?.pagination}
+          onPaginationClick={onPageChange}
+        />
+      </Dashboard>
+    </>
   );
 };
 
