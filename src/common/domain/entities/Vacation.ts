@@ -1,3 +1,5 @@
+import moment from 'moment';
+import { toLocalTime } from 'src/shared/functions';
 import Entitybase from './Entitybase';
 
 type VacationDuration = {
@@ -10,11 +12,19 @@ export default class Vacation extends Entitybase {
   endDate!: Date;
   notificationStartDate!: Date;
 
-  static Create = (duration: VacationDuration, notificationStartDate: Date) => {
+  setDefaultNotificationStartDate = () => {
+    return toLocalTime(
+      moment(this.startDate).subtract(14, 'days').format('YYYY-MM-DD HH:mm:ss')
+    );
+  };
+
+  static Create = (duration: VacationDuration, notificationStartDate?: string) => {
     const vacation = new Vacation();
     vacation.startDate = duration.startDate;
     vacation.endDate = duration.endDate;
-    vacation.notificationStartDate = notificationStartDate;
+    vacation.notificationStartDate = notificationStartDate
+      ? toLocalTime(moment(notificationStartDate).format('YYYY-MM-DD HH:mm:ss'))
+      : vacation.setDefaultNotificationStartDate();
 
     return vacation;
   };

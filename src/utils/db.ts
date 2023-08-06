@@ -19,7 +19,7 @@ import {
   PriveTrainingCollection,
   TrainingDaysCollection,
 } from 'src/types/EntityTpes/TrainingType';
-import { VacationType } from '@/types/EntityTpes/VacationType';
+import Vacation from 'src/common/domain/entities/Vacation';
 
 export type CollectionOptions = {
   includeDeleted?: boolean;
@@ -121,9 +121,9 @@ export const getFeedbackCollection = async (): Promise<
   return client.db(DATABASE).collection<FeedBackCollection>('feedback');
 };
 
-export const getVacationCollection = async (): Promise<Collection<VacationType>> => {
+export const getVacationCollection = async (): Promise<Collection<Vacation>> => {
   const client = await connectClient();
-  return client.db(DATABASE).collection<VacationType>('vacation');
+  return client.db(DATABASE).collection<Vacation>('vacation');
 };
 
 export const startTransaction = (): TransactionOptions => {

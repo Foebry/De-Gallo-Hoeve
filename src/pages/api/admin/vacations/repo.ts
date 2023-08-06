@@ -1,5 +1,5 @@
-import { VacationType } from '@/types/EntityTpes/VacationType';
 import { ObjectId } from 'mongodb';
+import Vacation from 'src/common/domain/entities/Vacation';
 import { getVacationCollection } from 'src/utils/db';
 
 export const getVacationsList = async (skip: number, take: number, query?: string) => {
@@ -32,7 +32,7 @@ export const getVacationsBetweenStartAndEndDate = async (
     .toArray();
 };
 
-export const getCurrentActiveVacation = async (): Promise<VacationType | null> => {
+export const getCurrentActiveVacation = async (): Promise<Vacation | null> => {
   const collection = await getVacationCollection();
   const today = new Date();
   return collection.findOne({
@@ -42,7 +42,7 @@ export const getCurrentActiveVacation = async (): Promise<VacationType | null> =
   });
 };
 
-export const saveVacation = async (vacation: VacationType) => {
+export const saveVacation = async (vacation: Vacation) => {
   const collection = await getVacationCollection();
   collection.insertOne(vacation);
 };

@@ -35,7 +35,7 @@ const TrainingDayProvider: React.FC<{ children: any }> = ({ children }) => {
   const [trainingDays, setTrainingDays] = useState<TrainingDayDto[]>([]);
   const [hasLoaded, setHasLoaded] = useState<boolean>(false);
   const save = useMutation();
-  const { updateModal } = useContext(ModalContext);
+  const { updateModal, openModal } = useContext(ModalContext);
 
   const getTrainingDays = async () => {
     if (hasLoaded) return sortAscending(trainingDays);
@@ -79,7 +79,11 @@ const TrainingDayProvider: React.FC<{ children: any }> = ({ children }) => {
     );
     if (error) {
       if (error.code === 409) {
-        updateModal(error.message, () => saveTrainingDays);
+        updateModal(
+          { type: 'error', content: error.message, caption: 'hello?' },
+          () => saveTrainingDays
+        );
+        openModal();
       } else {
         toast.error(error.message);
       }

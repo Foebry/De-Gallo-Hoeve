@@ -48,6 +48,7 @@ const Details: React.FC<Props> = ({ control, getValues }) => {
               label={'notifcatie start-datum'}
               name={'notificationStartDate'}
               id={'notificationStartDate'}
+              disabledAfterDate={getValues().duration?.from}
             />
           )}
         />

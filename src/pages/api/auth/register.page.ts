@@ -2,11 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { validateCsrfToken, validate } from 'src/services/Validator';
 import mailer from 'src/utils/Mailer';
 import bcrypt from 'bcrypt';
-import {
-  EmailOccupiedError,
-  NotAllowedError,
-  TransactionError,
-} from 'src/shared/RequestError';
+import { EmailOccupiedError, NotAllowedError } from 'src/shared/RequestError';
 import { registerSchema } from 'src/types/schemas';
 import Factory, { getController } from 'src/services/Factory';
 import { getKlantByEmail, KLANT } from 'src/controllers/KlantController';
@@ -57,6 +53,9 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(201).send(klant);
   } catch (e: any) {
     req.body.password = req.body.password ? await bcrypt.hash(req.body.password, 10) : '';
+    req.body.passwordConfirmation = req.body.passwordConfirmation
+      ? await bcrypt.hash(req.body.passwordConfirmation, 10)
+      : '';
     await logError('register', req, e);
     return res.status(e.code).json(e.response);
   }

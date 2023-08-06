@@ -17,7 +17,7 @@ const Modal = () => {
     <div
       className={`${
         !message && 'hidden'
-      } modal z-50 w-1/3 h-1/3 bg-gray-100 px-5 opacity-90 rounded-xl flex items-center justify-center text-center flex-col border-red-900 border-2`}
+      } modal z-50 w-1/3 h-1/3 px-5 bg-white-900 opacity-80 rounded-xl flex items-center justify-center text-center flex-col border-red-900 border-2`}
     >
       <div>
         <Caption className="text-red-900">Opgelet !</Caption>

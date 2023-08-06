@@ -1,11 +1,11 @@
-import { VacationType } from '@/types/EntityTpes/VacationType';
 import { NextApiRequest, NextApiResponse } from 'next';
+import Vacation from 'src/common/domain/entities/Vacation';
 import { getCurrentActiveVacation } from './repo';
 
 export const activeVacation = async (
   req: NextApiRequest,
   res: NextApiResponse
-): Promise<VacationType | null> => {
+): Promise<Vacation | null> => {
   const vacation = await getCurrentActiveVacation();
   return vacation;
 };

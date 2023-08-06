@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import AppProvider from '../context/appContext';
 import Head from 'next/head';
 import TrainingDayProvider from 'src/context/TrainingDayContext';
-import Modal from 'src/components/Modal';
+import Modal from 'src/components/Modal/Modal/BaseModal';
 import ModalProvider from 'src/context/ModalContext';
 import FeedbackProvider from 'src/context/FeedbackContext';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -47,7 +47,7 @@ function MyApp({ Component, pageProps }: AppProps) {
               <TrainingDayProvider>
                 <VacationProvider>
                   <AppProvider>
-                    <Modal />
+                    {/* <Modal /> */}
                     <ToastContainer position="top-right" />
                     <Component {...pageProps} />
                   </AppProvider>

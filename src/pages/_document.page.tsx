@@ -1,17 +1,15 @@
-import Document, { Head, Html, Main, NextScript } from 'next/document';
+import { Head, Html, Main, NextScript } from 'next/document';
 
-class MyDocument extends Document {
-  render(): JSX.Element {
-    return (
-      <Html lang="nl">
-        <Head />
-        <body>
-          <Main />
-          <NextScript />
-        </body>
-      </Html>
-    );
-  }
-}
+const MyDocument: React.FC<{}> = ({}) => {
+  return (
+    <Html lang="nl">
+      <Head />
+      <body>
+        <Main />
+        <NextScript />
+      </body>
+    </Html>
+  );
+};
 
 export default MyDocument;

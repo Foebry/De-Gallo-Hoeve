@@ -1,5 +1,5 @@
-import { VacationType } from '@/types/EntityTpes/VacationType';
 import { NextApiRequest, NextApiResponse } from 'next';
+import Vacation from 'src/common/domain/entities/Vacation';
 import {
   calculateDbSkip,
   getPagination,
@@ -27,7 +27,7 @@ export const getVacationsOverview = async (
     );
     console.log({ data });
 
-    const pagination = getPagination<VacationType>({ page, amount }, url, data);
+    const pagination = getPagination<Vacation>({ page, amount }, url, data);
     const result = {
       pagination,
       data: data.map((vacation) => mapVacationToDto(vacation)),

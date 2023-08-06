@@ -1,5 +1,8 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useMemo } from 'react';
+import { useContext, useEffect } from 'react';
 import { RangePicker } from 'react-trip-date';
+import { ModalType } from 'src/components/Modal/Modal/BaseModal';
+import { ModalContext } from 'src/context/ModalContext';
 import FormInput from '../../FormInput';
 import FormRow from '../../FormRow';
 
@@ -11,30 +14,29 @@ export type SelectedRange = {
 type Props = {
   onChange: (...event: any[]) => void;
   value: SelectedRange;
-  // retrieveStartDate?: Dispatch<SetStateAction<string | undefined>>;
   retrieveStartDate?: (value: string) => void;
 };
 
 const DateRangeSelector: React.FC<Props> = ({ onChange, value, retrieveStartDate }) => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [inputValue, setInputValue] = useState<string>(
-    value ? Object.entries(value).join(' - ') : ''
-  );
+  const { updateModal, openModal, isModalActive } = useContext(ModalContext);
 
-  const openRangePickerModal = () => setIsModalOpen(true);
-
-  useEffect(() => {
-    const entries = value ? Object.entries(value) : [];
-    const from = entries.find(([key]) => key === 'from')?.[1];
-    const to = entries.find(([key]) => key === 'to')?.[1];
-    setInputValue(from && to ? `Vanaf: ${from}     tot: ${to}` : '');
-    if (from && to) setIsModalOpen(false);
-  }, [value]);
+  const openRangePickerModal = () => {
+    updateModal({ type: ModalType.DEFAULT, content: rangeSelector });
+    openModal();
+  };
 
   useEffect(() => {
-    if (isModalOpen) return;
+    if (isModalActive) return;
     retrieveStartDate?.(value?.from);
-  }, [isModalOpen, retrieveStartDate]);
+  }, [isModalActive, retrieveStartDate, value?.from]);
+
+  const rangeSelector = useMemo(() => {
+    return (
+      <div className="min-w-s">
+        <RangePicker onChange={onChange} selectedDays={value} numberOfMonths={2} />
+      </div>
+    );
+  }, [value, onChange]);
 
   return (
     <>
@@ -56,9 +58,6 @@ const DateRangeSelector: React.FC<Props> = ({ onChange, value, retrieveStartDate
           onChange={() => {}}
         />
       </FormRow>
-      {isModalOpen && (
-        <RangePicker onChange={onChange} selectedDays={value} numberOfMonths={2} />
-      )}
     </>
   );
 };

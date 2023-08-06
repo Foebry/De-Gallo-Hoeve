@@ -1,16 +1,14 @@
-import { VacationDto } from '@/types/DtoTypes/VacationDto';
-import { VacationType } from '@/types/EntityTpes/VacationType';
+import { VacationDto } from 'src/common/api/dtos/VacationDto';
+import Vacation from 'src/common/domain/entities/Vacation';
 import { toReadableDate } from 'src/shared/functions';
 
-export const mapVacationToDto = (vacation: VacationType): VacationDto => ({
+export const mapVacationToDto = (vacation: Vacation): VacationDto => ({
   id: vacation._id.toString(),
   duration: {
-    startDate: toReadableDate(vacation.duration.startDate),
-    endDate: toReadableDate(vacation.duration.endDate),
+    from: toReadableDate(vacation.startDate),
+    to: toReadableDate(vacation.endDate),
   },
   notificationStartDate: toReadableDate(vacation.notificationStartDate),
-  longDescription: vacation.longDescription.join('<br/>'),
-  notificationDescription: vacation.notificationDescription,
-  created_at: toReadableDate(vacation.created_at),
-  updated_at: toReadableDate(vacation.updated_at),
+  createdAt: toReadableDate(vacation.created_at),
+  updatedAt: toReadableDate(vacation.updated_at),
 });

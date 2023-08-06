@@ -3,9 +3,11 @@ import { NotAllowedError } from 'src/shared/RequestError';
 import { createVacation } from './create';
 import { getVacationsOverview, ListVacationRequest } from './list';
 import { Request as CreateVacationRequest } from './create';
+import { adminApi } from 'src/services/Authenticator';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
+    adminApi({ req, res });
     if (req.method === 'GET')
       return getVacationsOverview(req as ListVacationRequest, res);
     if (req.method === 'POST') return createVacation(req as CreateVacationRequest, res);

@@ -8,17 +8,12 @@ import Head from 'next/head';
 import { useVacationContext } from 'src/context/VacationContext';
 import FormRow from 'src/components/form/FormRow';
 import Button, { SubmitButton } from 'src/components/buttons/Button';
-import { toast } from 'react-toastify';
-import { nanoid } from 'nanoid';
-import { useMemo, useState } from 'react';
-import { useBannerContext } from 'src/context/BannerContext';
-import Banner from 'src/components/Banner/index.page';
 
 type Props = {};
 export type FormType = VacationDto & { duration: { from: string; to: string } };
 
 const Create: React.FC<Props> = ({}) => {
-  const { activateVacationNotification } = useVacationContext();
+  const { activateVacationNotification, saveVacation } = useVacationContext();
 
   const { handleSubmit, control, getValues } = useForm<FormType>();
 
@@ -28,6 +23,7 @@ const Create: React.FC<Props> = ({}) => {
 
   const onSubmit = async (values: FieldValues) => {
     const { duration, notificationStartDate } = values;
+    await saveVacation({ duration, notificationStartDate });
   };
 
   return (
@@ -47,6 +43,9 @@ const Create: React.FC<Props> = ({}) => {
           <Body>
             De notificatie start-datum kan gewijzigd worden wanneer een andere datum
             gewenst is.
+          </Body>
+          <Body>
+            Klik tot slot op de Voorbeeld knop om te tonen hoe dit zal getoond worden
           </Body>
         </div>
         <div className="border-2 rounded mt-20 max-w-2xl mx-auto px-10">

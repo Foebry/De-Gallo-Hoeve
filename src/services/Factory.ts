@@ -43,11 +43,6 @@ import {
   IsNewKlant,
 } from 'src/common/domain/klant';
 import { FEEDBACK } from 'src/utils/db';
-import {
-  defaultNotificationDescription,
-  defaultVacationLongDescription,
-  VacationType,
-} from '@/types/EntityTpes/VacationType';
 
 export type CONFIRM = 'ConfirmController';
 export type CONTENT = 'ContentController';
@@ -138,22 +133,6 @@ export const createTrainingDay = (
   updated_at: getCurrentTime(),
 });
 
-export const createVacation = (
-  startDate: Date,
-  endDate: Date,
-  notificationStartDate: Date,
-  longDescription?: string[],
-  notificationDescription?: string
-): VacationType => ({
-  _id: new ObjectId(),
-  created_at: getCurrentTime(),
-  updated_at: getCurrentTime(),
-  duration: { startDate, endDate },
-  notificationStartDate,
-  longDescription: longDescription ?? defaultVacationLongDescription,
-  notificationDescription: notificationDescription ?? defaultNotificationDescription,
-});
-
 const Factory = {
   createRas,
   createKlant,
@@ -161,7 +140,6 @@ const Factory = {
   createConfirm,
   createInschrijving,
   createTrainingDay,
-  createVacation,
   getController,
 };
 

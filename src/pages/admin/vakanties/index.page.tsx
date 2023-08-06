@@ -1,5 +1,4 @@
 import { VACATIONS_OVERVIEW } from '@/types/apiTypes';
-import { VacationDto } from '@/types/DtoTypes/VacationDto';
 import { nanoid } from 'nanoid';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -9,6 +8,7 @@ import { AiOutlinePlus } from 'react-icons/ai';
 import { GrEdit, GrView } from 'react-icons/gr';
 import { MdDelete } from 'react-icons/md';
 import { toast } from 'react-toastify';
+import { VacationDto } from 'src/common/api/dtos/VacationDto';
 import Dashboard from 'src/components/admin/dashboard';
 import Button from 'src/components/buttons/Button';
 import FormRow from 'src/components/form/FormRow';
@@ -52,12 +52,12 @@ const Vakanties: React.FC<Props> = ({}) => {
   const rows = useMemo(() => {
     return apiData.data.map((row: VacationDto) => {
       const startDate = (
-        <Link href={`/admin/vakanties/${row.id}`}>{row.duration.startDate}</Link>
+        <Link href={`/admin/vakanties/${row.id}`}>{row.duration.from}</Link>
       );
-      const endDate = row.duration.endDate;
+      const endDate = row.duration.to;
       const notificationStartDate = row.notificationStartDate;
-      const createdAt = row.created_at;
-      const editedAt = row.updated_at;
+      const createdAt = row.createdAt;
+      const editedAt = row.updatedAt;
       const actions = [
         <div
           className="border rounded-l border-grey-200 border-solid p-1 cursor-pointer"
