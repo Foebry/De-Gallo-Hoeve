@@ -17,7 +17,6 @@ export const getVacationDetails = async (req: ByIdRequest, res: NextApiResponse)
     const result = mapVacationToDto(vacation);
     return res.status(200).send(result);
   } catch (e: any) {
-    console.log(e);
     return res.status(e.code).json(e.response);
   }
 };

@@ -39,26 +39,24 @@ const DateRangeSelector: React.FC<Props> = ({ onChange, value, retrieveStartDate
   }, [value, onChange]);
 
   return (
-    <>
-      <FormRow>
-        <FormInput
-          label="startDatum"
-          name="periode"
-          id="duration"
-          onFocus={openRangePickerModal}
-          value={value?.from}
-          onChange={() => {}}
-        />
-        <FormInput
-          label="eindDatum"
-          name="periode"
-          id="duration"
-          onFocus={openRangePickerModal}
-          value={value?.to}
-          onChange={() => {}}
-        />
-      </FormRow>
-    </>
+    <FormRow>
+      <FormInput
+        label="startDatum"
+        name="periode"
+        id="duration"
+        onFocus={openRangePickerModal}
+        value={value?.from}
+        onChange={() => {}}
+      />
+      <FormInput
+        label="eindDatum"
+        name="periode"
+        id="duration"
+        onFocus={openRangePickerModal}
+        value={value?.to}
+        onChange={() => {}}
+      />
+    </FormRow>
   );
 };
 

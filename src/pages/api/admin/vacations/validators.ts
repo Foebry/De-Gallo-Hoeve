@@ -6,6 +6,5 @@ export const validateVacationNotOverlapping = async (
   endDate: Date
 ): Promise<void> => {
   const vacations = await getVacationsBetweenStartAndEndDate(startDate, endDate);
-  console.log({ vacations });
   if (vacations.length) throw new VacationOverLappingError();
 };

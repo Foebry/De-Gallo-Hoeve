@@ -5,7 +5,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import AppProvider from '../context/appContext';
 import Head from 'next/head';
 import TrainingDayProvider from 'src/context/TrainingDayContext';
-import Modal from 'src/components/Modal/Modal/BaseModal';
 import ModalProvider from 'src/context/ModalContext';
 import FeedbackProvider from 'src/context/FeedbackContext';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -14,10 +13,8 @@ import useMutation from 'src/hooks/useMutation';
 import { useRouter } from 'next/router';
 import VacationProvider from 'src/context/VacationContext';
 import BannerProvider from 'src/context/BannerContext';
-import { useState } from 'react';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const [shouldShowBanner, setShouldShowBanner] = useState<boolean>(false);
   const logError = useMutation();
   const router = useRouter();
 
@@ -47,7 +44,6 @@ function MyApp({ Component, pageProps }: AppProps) {
               <TrainingDayProvider>
                 <VacationProvider>
                   <AppProvider>
-                    {/* <Modal /> */}
                     <ToastContainer position="top-right" />
                     <Component {...pageProps} />
                   </AppProvider>

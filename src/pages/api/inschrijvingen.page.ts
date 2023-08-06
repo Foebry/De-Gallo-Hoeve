@@ -132,8 +132,7 @@ const postInschrijving = async (req: PostInschrijvingRequest, res: NextApiRespon
     });
     return res.status(201).json({ message: 'Inschrijving ontvangen!' });
   } catch (e: any) {
-    // await logError('inschrijving', req, e);
-    console.log({ error: e });
+    await logError('inschrijving', req, e);
     return res.status(e.code).send(e.response);
   }
 };

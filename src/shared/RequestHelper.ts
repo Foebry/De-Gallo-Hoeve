@@ -56,9 +56,6 @@ export async function getPaginatedData<T>(
   url: string,
   controller: string
 ) {
-  // await client.connect();
-  console.log({ queryKlanten: query, url });
-
   const data = await getData(controller);
 
   const filteredData = filterData<T>(data, query);
@@ -75,16 +72,11 @@ export const getPagination = <T>(
   data: T[]
 ): Pagination => {
   const { page, amount, search } = query;
-  console.log({ query });
 
   const pageSize = parseInt(amount ?? '10');
-  console.log({ page });
   const cPage = parseInt(page ?? '1');
   const currentPage = Math.min(Math.max(cPage, 1), Math.ceil(data.length / pageSize));
-  console.log({ currentPage, length: data.length });
   const first = data.length === 0 ? 0 : Math.max((currentPage - 1) * pageSize, -1);
-  console.log({ dataLength: data.length, first });
-  // const first = Math.max(currentPage * pageSize, -1);
   const last = Math.min(first + pageSize, data.length);
 
   const searchValue = search ? `search=${search}` : undefined;

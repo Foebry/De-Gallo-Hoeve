@@ -25,7 +25,6 @@ export const getVacationsOverview = async (
       parseInt(amount),
       search
     );
-    console.log({ data });
 
     const pagination = getPagination<Vacation>({ page, amount }, url, data);
     const result = {

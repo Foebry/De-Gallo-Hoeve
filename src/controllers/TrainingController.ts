@@ -142,7 +142,7 @@ export const klantReedsIngeschreven = async (
     'klant.id': klant._id,
     deleted_at: undefined,
   });
-  console.log({ inschrijvingFound });
+
   return inschrijvingFound ? true : false;
 };
 

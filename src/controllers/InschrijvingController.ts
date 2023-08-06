@@ -59,15 +59,11 @@ export const save = async (
   session?: ClientSession
 ): Promise<InschrijvingCollection> => {
   const collection = await getInschrijvingCollection();
-  console.log({ status: 'like 62' });
 
   const klant_id = inschrijving.klant.id;
   const training = inschrijving.training;
 
-  console.log({ klant_id, training });
-  console.log(inschrijving);
   const { insertedId } = await collection.insertOne(inschrijving, { session });
-  console.log({ insertedId });
   if (!insertedId) throw new InternalServerError();
 
   await addKlantInschrijving(klant_id, inschrijving, session);
