@@ -11,9 +11,9 @@ interface Props {
 
 const Skeleton: React.FC<Props> = ({ children }) => {
   const { bannerContent } = useBannerContext();
-  const { message } = useContext(ModalContext);
+  const { isModalActive } = useContext(ModalContext);
   return (
-    <div className={message ? 'blur-sm' : undefined}>
+    <div className={isModalActive ? 'blur-sm' : undefined}>
       {bannerContent.length > 0 && <Banner content={bannerContent} />}
       <Nav />
       {children}

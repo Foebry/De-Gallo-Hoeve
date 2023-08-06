@@ -2,6 +2,7 @@ import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
 import { nanoid } from 'nanoid';
 import { createContext, useContext, useState } from 'react';
 import { toast } from 'react-toastify';
+import { ModalType } from 'src/components/Modal/Modal/BaseModal';
 import getData from 'src/hooks/useApi';
 import useMutation from 'src/hooks/useMutation';
 import { defaultTrainingTimeSlots } from 'src/mappers/trainingDays';
@@ -80,7 +81,7 @@ const TrainingDayProvider: React.FC<{ children: any }> = ({ children }) => {
     if (error) {
       if (error.code === 409) {
         updateModal(
-          { type: 'error', content: error.message, caption: 'hello?' },
+          { type: 'error' as ModalType, content: error.message, caption: 'hello?' },
           () => saveTrainingDays
         );
         openModal();
