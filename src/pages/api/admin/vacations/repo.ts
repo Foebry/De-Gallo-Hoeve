@@ -36,3 +36,8 @@ export const saveVacation = async (vacation: Vacation) => {
   const collection = await getVacationCollection();
   collection.insertOne(vacation);
 };
+
+export const hardDeleteVacation = async (vacation: Vacation) => {
+  const collection = await getVacationCollection();
+  collection.deleteOne({ _id: vacation._id });
+};

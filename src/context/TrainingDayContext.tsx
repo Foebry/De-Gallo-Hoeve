@@ -81,7 +81,12 @@ const TrainingDayProvider: React.FC<{ children: any }> = ({ children }) => {
     if (error) {
       if (error.code === 409) {
         updateModal(
-          { type: 'error' as ModalType, content: error.message, caption: 'hello?' }, // getting typeError cannot read ERROR of undefined when using ModalType.ERROR
+          {
+            type: 'error' as ModalType,
+            content: error.message,
+            caption: 'hello?',
+            callbackData: true,
+          }, // getting typeError cannot read ERROR of undefined when using ModalType.ERROR
           () => saveTrainingDays
         );
         openModal();

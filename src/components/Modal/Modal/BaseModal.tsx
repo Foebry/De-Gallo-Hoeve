@@ -15,7 +15,7 @@ const BaseModal: React.FC<Props> = () => {
   const { caption, type, content } = modalData;
 
   const confirm = async () => {
-    await callback?.(true);
+    await callback?.(modalData.callbackData);
     closeModal();
   };
 
@@ -41,7 +41,7 @@ const BaseModal: React.FC<Props> = () => {
         )}
       </div>
       {type === ModalType.ERROR && (
-        <div className="flex py-10 justify-between w-1/3">
+        <div className="flex py-10 justify-between w-2/3">
           <div>
             <Button label="doorgaan" onClick={confirm} />
           </div>

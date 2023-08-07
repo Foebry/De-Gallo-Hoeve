@@ -5,11 +5,12 @@ export type ModalData = {
   caption?: string;
   type: ModalType;
   content?: ReactNode;
+  callbackData?: any;
 };
 
 type ModalContext = {
   callback: ((confirmed: boolean) => any) | undefined;
-  updateModal: (data: ModalData, callBack?: () => any) => void;
+  updateModal: (data: ModalData, callBack?: (param: any) => any) => void;
   modalData: ModalData;
   openModal: () => void;
   closeModal: () => void;
@@ -34,7 +35,7 @@ const ModalProvider: React.FC<{ children: any }> = ({ children }) => {
 
   const updateModal = (data: ModalData, cb?: (confirmed: boolean) => any) => {
     setModalData(data);
-    setCallback(cb);
+    if (cb) setCallback(cb);
   };
 
   const closeModal = () => {

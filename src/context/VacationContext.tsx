@@ -13,6 +13,7 @@ type VacationContext = {
   updateVacation: (dto: VacationDto) => void;
   saveVacation: (dto: CreateVacationDto) => Promise<void>;
   disableVacationNotification: () => void;
+  deleteVacation: (id: string) => Promise<void>;
 };
 
 const VacationContextDefaultValues: VacationContext = {
@@ -27,6 +28,7 @@ const VacationContextDefaultValues: VacationContext = {
   updateVacation: () => {},
   saveVacation: async () => {},
   disableVacationNotification: () => {},
+  deleteVacation: async () => {},
 };
 
 export const VacationContext = createContext<VacationContext>(
@@ -66,6 +68,17 @@ const VacationProvider: React.FC<{ children: any }> = ({ children }) => {
       disableBanner();
       router.push('/admin/vakanties');
     }
+  };
+
+  const deleteVacation = async (id: string) => {
+    const { data, error } = await mutate(
+      `/api/admin/vacations/${id}`,
+      {},
+      { method: 'DELETE' }
+    );
+    if (data) toast.success('Vakantie-periode verwijderd');
+    else if (error) toast.error(error.message);
+    return;
   };
 
   const getResumeDate = (dateString: string) => {
@@ -128,6 +141,7 @@ const VacationProvider: React.FC<{ children: any }> = ({ children }) => {
         updateVacation,
         saveVacation,
         disableVacationNotification,
+        deleteVacation,
       }}
     >
       {children}

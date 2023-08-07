@@ -12,10 +12,12 @@ import { VacationDto } from 'src/common/api/dtos/VacationDto';
 import Dashboard from 'src/components/admin/dashboard';
 import Button from 'src/components/buttons/Button';
 import FormRow from 'src/components/form/FormRow';
+import { ModalType } from 'src/components/Modal/Modal/BaseModal';
 import Table from 'src/components/Table/Table';
-import { ModalContext } from 'src/context/ModalContext';
+import { Body } from 'src/components/Typography/Typography';
+import { ModalContext, ModalData } from 'src/context/ModalContext';
+import { useVacationContext } from 'src/context/VacationContext';
 import getData from 'src/hooks/useApi';
-import { toReadableDate } from 'src/shared/functions';
 import { apiOptionsInterface, ApiResult } from '../klanten/index.page';
 
 interface Props {}
@@ -31,7 +33,8 @@ const Vakanties: React.FC<Props> = ({}) => {
     'actions',
   ];
 
-  const { updateModal } = useContext(ModalContext);
+  const { updateModal, openModal } = useContext(ModalContext);
+  const { deleteVacation } = useVacationContext();
   const [options, setOptions] = useState<apiOptionsInterface>({});
   const [apiData, setApiData] = useState<ApiResult<VacationDto>>({
     data: [],
@@ -43,10 +46,31 @@ const Vakanties: React.FC<Props> = ({}) => {
       const { data } = await getData(VACATIONS_OVERVIEW, options);
       setApiData(data);
     })();
-  }, []);
+  }, [deleteVacation]);
 
   const handleView = (id: string) => {
     router.push(`/admin/vakanties/${id}`);
+  };
+
+  const modalContent = useMemo(() => {
+    return (
+      <div>
+        <Body>Je staat op het punt om een vakantie-periode te verwijderen.</Body>
+        <Body>Als je zeker bent, klik op doorgaan.</Body>
+      </div>
+    );
+  }, []);
+
+  const onDelete = (id: string) => {
+    const modalData: ModalData = {
+      type: ModalType.ERROR,
+      caption: 'Ben je zeker?',
+      content: modalContent,
+      callbackData: id,
+    };
+
+    updateModal(modalData, () => deleteVacation);
+    openModal();
   };
 
   const rows = useMemo(() => {
@@ -75,7 +99,7 @@ const Vakanties: React.FC<Props> = ({}) => {
           className="border rounded-r border-grey-200 border-solid p-1 cursor-pointer"
           key={nanoid(10)}
         >
-          <MdDelete />
+          <MdDelete onClick={() => onDelete(row.id)} />
         </div>,
       ];
       return [startDate, endDate, notificationStartDate, createdAt, editedAt, actions];
