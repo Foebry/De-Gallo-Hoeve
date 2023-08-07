@@ -32,16 +32,6 @@ export const getVacationsBetweenStartAndEndDate = async (
     .toArray();
 };
 
-export const getCurrentActiveVacation = async (): Promise<Vacation | null> => {
-  const collection = await getVacationCollection();
-  const today = new Date();
-  return collection.findOne({
-    deleted_at: undefined,
-    startDate: { $gte: today },
-    endDate: { $lte: today },
-  });
-};
-
 export const saveVacation = async (vacation: Vacation) => {
   const collection = await getVacationCollection();
   collection.insertOne(vacation);

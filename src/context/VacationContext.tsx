@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { CreateVacationDto, VacationDto } from 'src/common/api/dtos/VacationDto';
 import { SelectedRange } from 'src/components/form/inputs/date/DateRangeSelector';
@@ -39,8 +39,8 @@ const VacationProvider: React.FC<{ children: any }> = ({ children }) => {
   const mutate = useMutation();
 
   const getActiveVacation = async () => {
-    const { data, error } = await getData('/api/vacations/active');
-    if (error) toast.error(error);
+    const { data, error } = await getData('/api/announcements');
+    if (error) return toast.error(error);
 
     return data;
   };
@@ -112,6 +112,13 @@ const VacationProvider: React.FC<{ children: any }> = ({ children }) => {
     const endDate = getShortHandDate(duration.from);
     return `Beste klant, wij gaan er even tussen uit vanaf ${endDate}.`;
   };
+
+  useEffect(() => {
+    (async () => {
+      const vacation = await getActiveVacation();
+      if (vacation) activateVacationNotification(vacation.duration);
+    })();
+  }, []);
 
   return (
     <VacationContext.Provider

@@ -104,12 +104,12 @@ const postInschrijving = async (req: PostInschrijvingRequest, res: NextApiRespon
             klant,
             hond
           );
+
           if (await klantReedsIngeschreven(klant, training, newInschrijving))
             throw new ReedsIngeschrevenError(index);
           if (await trainingVolzet(selectedTraining, newInschrijving.datum))
             throw new TrainingVolzetError();
 
-          console.log({ status: 'line 113' });
           await save(newInschrijving, session);
           ids.push(newInschrijving._id.toString());
         }
@@ -119,7 +119,6 @@ const postInschrijving = async (req: PostInschrijvingRequest, res: NextApiRespon
     }
 
     const data = mapInschrijvingen(inschrijvingen, isFirstInschrijving, prijs);
-
     await mailer.sendMail('inschrijving', {
       naam,
       email: process.env.MAIL_TEST ?? email,
