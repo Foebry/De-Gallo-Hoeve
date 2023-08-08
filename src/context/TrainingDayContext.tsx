@@ -84,7 +84,7 @@ const TrainingDayProvider: React.FC<{ children: any }> = ({ children }) => {
           {
             type: 'error' as ModalType,
             content: error.message,
-            caption: 'hello?',
+            caption: 'Ben je zeker?',
             callbackData: true,
           }, // getting typeError cannot read ERROR of undefined when using ModalType.ERROR
           () => saveTrainingDays
