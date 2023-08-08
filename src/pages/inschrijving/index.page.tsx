@@ -146,7 +146,7 @@ const Groepslessen: React.FC<LessenProps> = ({
       </Head>
       <Skeleton>
         <section className="mb-48 md:px-5 mt-20">
-          <FormRow className="-mt-10 mb-10 px-10 max-w-7xl">
+          <FormRow className="-mt-10 mb-10 px-10">
             {activeStep > 0 ? (
               <Button label="vorige" onClick={() => setActiveStep(activeStep - 1)} />
             ) : (
