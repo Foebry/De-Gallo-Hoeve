@@ -11,7 +11,7 @@ import { Title2 } from 'src/components/Typography/Typography';
 import { useVacationContext } from 'src/context/VacationContext';
 import Details from '../components/-details';
 import { FormType } from '../create/index.page';
-import { MdDelete, MdEdit } from 'react-icons/md';
+import { MdEdit } from 'react-icons/md';
 
 interface Props {}
 
@@ -55,7 +55,7 @@ const DetailsPage: React.FC<Props> = ({}) => {
   }, [vacationData]);
 
   const onSubmit = async (values: FieldValues) => {
-    if (!editMode) return;
+    if (!editMode || !vacationData) return;
     const dto = {
       ...vacationData,
       duration: values.duration,
