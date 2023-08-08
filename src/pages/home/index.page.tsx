@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import getData from 'src/hooks/useApi';
 import FeedbackSection from './components/feedback/section';
 import { IndexData } from './types';
+import ServiceCard from './components/diensten/ServiceCard';
 
 interface Props {}
 
@@ -153,12 +154,17 @@ const Index: React.FC<Props> = () => {
             </div>
           </div>
           <div className="px-5 max-w-7xl pb-24 relative md:mx-auto md:px-0">
-            <div className="flex gap-10 justify-center flex-wrap sm:flex-nowrap max-w-7xl md:mx-auto py-24 relative ">
+            <div className="flex gap-28 sm:gap-10 justify-center flex-wrap sm:flex-nowrap max-w-7xl md:mx-auto py-24">
               <TrainingCard
                 type="prive"
                 price={prijsExcl}
                 kmHeffing={kmHeffing}
                 gratisVerplaatsingBinnen={gratisVerplaatsingBinnen}
+              />
+              <ServiceCard
+                active={false}
+                title="Uitlaatdienst"
+                imageSrc="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1688751489/De-Gallo-Hoeve/content/pexels-blue-bird-7210754_rwez0z.jpg"
               />
             </div>
           </div>

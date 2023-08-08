@@ -18,6 +18,7 @@ export interface FormInputProps {
   setErrors?: any;
   onClick?: (e: React.FormEvent<HTMLInputElement>) => void;
   disabled?: boolean;
+  onFocus?: (e: React.FormEvent<HTMLInputElement>) => void;
 }
 
 const FormInput: React.FC<FormInputProps> = ({
@@ -33,6 +34,7 @@ const FormInput: React.FC<FormInputProps> = ({
   dataid = '',
   setErrors,
   disabled = false,
+  onFocus,
 }) => {
   const labelRef = useRef<HTMLLabelElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -73,6 +75,7 @@ const FormInput: React.FC<FormInputProps> = ({
         value={value}
         autoComplete="off"
         data-id={`${dataid}`}
+        onFocus={onFocus}
       />
       <FormError>{errors?.[fieldName]}</FormError>
     </div>

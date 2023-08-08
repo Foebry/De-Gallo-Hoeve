@@ -119,14 +119,13 @@ const postInschrijving = async (req: PostInschrijvingRequest, res: NextApiRespon
     }
 
     const data = mapInschrijvingen(inschrijvingen, isFirstInschrijving, prijs);
-
     await mailer.sendMail('inschrijving', {
       naam,
       email: process.env.MAIL_TEST ?? email,
       ...data,
     });
     await mailer.sendMail('inschrijving-headsup', {
-      email: process.env.MAIL_TEST ?? process.env.MAIL_TO,
+      email: process.env.MAIL_TEST ?? process.env.MAIL_FROM,
       _ids: ids.join(','),
       domain: getDomain(req),
     });

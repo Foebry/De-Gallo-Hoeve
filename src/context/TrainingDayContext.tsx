@@ -2,6 +2,7 @@ import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
 import { nanoid } from 'nanoid';
 import { createContext, useContext, useState } from 'react';
 import { toast } from 'react-toastify';
+import { ModalType } from 'src/components/Modal/Modal/BaseModal';
 import getData from 'src/hooks/useApi';
 import useMutation from 'src/hooks/useMutation';
 import { defaultTrainingTimeSlots } from 'src/mappers/trainingDays';
@@ -35,7 +36,7 @@ const TrainingDayProvider: React.FC<{ children: any }> = ({ children }) => {
   const [trainingDays, setTrainingDays] = useState<TrainingDayDto[]>([]);
   const [hasLoaded, setHasLoaded] = useState<boolean>(false);
   const save = useMutation();
-  const { updateModal } = useContext(ModalContext);
+  const { updateModal, openModal } = useContext(ModalContext);
 
   const getTrainingDays = async () => {
     if (hasLoaded) return sortAscending(trainingDays);
@@ -79,7 +80,16 @@ const TrainingDayProvider: React.FC<{ children: any }> = ({ children }) => {
     );
     if (error) {
       if (error.code === 409) {
-        updateModal(error.message, () => saveTrainingDays);
+        updateModal(
+          {
+            type: 'error' as ModalType,
+            content: error.message,
+            caption: 'Ben je zeker?',
+            callbackData: true,
+          }, // getting typeError cannot read ERROR of undefined when using ModalType.ERROR
+          () => saveTrainingDays
+        );
+        openModal();
       } else {
         toast.error(error.message);
       }

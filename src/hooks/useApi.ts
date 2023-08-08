@@ -11,7 +11,7 @@ const getData = async (endpoint: string, options: any = {}) => {
   } catch (error: any) {
     process.env.NODE_ENV === 'development' && logger.info(error);
     // toast.error(error.response.data.message);
-    return { data: [], error };
+    return { data: [], error: error.response.data };
   }
 };
 
