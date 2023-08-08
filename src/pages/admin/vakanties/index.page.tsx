@@ -34,7 +34,7 @@ const Vakanties: React.FC<Props> = ({}) => {
   ];
 
   const { updateModal, openModal } = useContext(ModalContext);
-  const { deleteVacation } = useVacationContext();
+  const { deleteVacation, getVacationList } = useVacationContext();
   const [options, setOptions] = useState<apiOptionsInterface>({});
   const [apiData, setApiData] = useState<ApiResult<VacationDto>>({
     data: [],
@@ -43,8 +43,8 @@ const Vakanties: React.FC<Props> = ({}) => {
 
   useEffect(() => {
     (async () => {
-      const { data } = await getData(VACATIONS_OVERVIEW, options);
-      setApiData(data);
+      const data = await getVacationList();
+      if (data) setApiData(data);
     })();
   }, [deleteVacation]);
 
@@ -74,7 +74,7 @@ const Vakanties: React.FC<Props> = ({}) => {
   };
 
   const rows = useMemo(() => {
-    return apiData.data.map((row: VacationDto) => {
+    return apiData?.data.map((row: VacationDto) => {
       const startDate = (
         <Link href={`/admin/vakanties/${row.id}`}>{row.duration.from}</Link>
       );

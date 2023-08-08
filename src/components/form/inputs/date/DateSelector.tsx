@@ -13,6 +13,7 @@ type Props = {
   id: string;
   defaultValue?: string;
   disabledAfterDate?: string;
+  disabled: boolean;
 };
 
 const DateSelector: React.FC<Props> = ({
@@ -23,9 +24,11 @@ const DateSelector: React.FC<Props> = ({
   id,
   defaultValue,
   disabledAfterDate,
+  disabled,
 }) => {
   const { updateModal, openModal } = useContext(ModalContext);
   const openDatePickerModal = () => {
+    if (disabled) return;
     updateModal({ type: ModalType.DEFAULT, content: dateSelector });
     openModal();
   };

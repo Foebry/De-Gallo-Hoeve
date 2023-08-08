@@ -1,5 +1,5 @@
 import { Control, Controller, UseFormGetValues } from 'react-hook-form';
-import { FormType } from '../index.page';
+import { FormType } from '../create/index.page';
 import DateRangeSelector from 'src/components/form/inputs/date/DateRangeSelector';
 import DateSelector from 'src/components/form/inputs/date/DateSelector';
 import { useState } from 'react';
@@ -7,9 +7,10 @@ import { useState } from 'react';
 type Props = {
   control: Control<FormType, any>;
   getValues: UseFormGetValues<FormType>;
+  disabled?: boolean;
 };
 
-const Details: React.FC<Props> = ({ control, getValues }) => {
+const Details: React.FC<Props> = ({ control, getValues, disabled = false }) => {
   const [defaultNotificationStartDate, setDefaultNotificationStartDate] =
     useState<string>();
 
@@ -32,6 +33,7 @@ const Details: React.FC<Props> = ({ control, getValues }) => {
               onChange={onChange}
               value={value}
               retrieveStartDate={retrieveStartDate}
+              disabled={disabled}
             />
           )}
         />
@@ -49,6 +51,7 @@ const Details: React.FC<Props> = ({ control, getValues }) => {
               name={'notificationStartDate'}
               id={'notificationStartDate'}
               disabledAfterDate={getValues().duration?.from}
+              disabled={disabled}
             />
           )}
         />

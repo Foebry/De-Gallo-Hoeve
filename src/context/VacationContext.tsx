@@ -5,15 +5,19 @@ import { CreateVacationDto, VacationDto } from 'src/common/api/dtos/VacationDto'
 import { SelectedRange } from 'src/components/form/inputs/date/DateRangeSelector';
 import getData from 'src/hooks/useApi';
 import useMutation from 'src/hooks/useMutation';
+import { PaginatedResponse } from 'src/shared/RequestHelper';
+import { string } from 'yup';
 import { useBannerContext } from './BannerContext';
 
 type VacationContext = {
   activateVacationNotification: (duration: SelectedRange) => void;
   getActiveVacation: () => Promise<VacationDto>;
-  updateVacation: (dto: VacationDto) => void;
+  updateVacation: (dto: VacationDto) => Promise<void>;
   saveVacation: (dto: CreateVacationDto) => Promise<void>;
   disableVacationNotification: () => void;
   deleteVacation: (id: string) => Promise<void>;
+  getVacationById: (id: string) => Promise<VacationDto>;
+  getVacationList: () => Promise<PaginatedResponse<VacationDto>>;
 };
 
 const VacationContextDefaultValues: VacationContext = {
@@ -25,10 +29,21 @@ const VacationContextDefaultValues: VacationContext = {
     duration: { from: '', to: '' },
     notificationStartDate: '',
   }),
-  updateVacation: () => {},
+  updateVacation: async () => {},
   saveVacation: async () => {},
   disableVacationNotification: () => {},
   deleteVacation: async () => {},
+  getVacationById: async () => ({
+    id: '',
+    createdAt: '',
+    updatedAt: '',
+    duration: { from: '', to: '' },
+    notificationStartDate: '',
+  }),
+  getVacationList: async () => ({
+    pagination: { currentPage: 1, first: 1, last: 1, total: 1 },
+    data: [],
+  }),
 };
 
 export const VacationContext = createContext<VacationContext>(
@@ -42,7 +57,7 @@ const VacationProvider: React.FC<{ children: any }> = ({ children }) => {
 
   const getActiveVacation = async () => {
     const { data, error } = await getData('/api/announcements');
-    if (error) return toast.error(error);
+    if (error) return toast.error(error.message);
 
     return data;
   };
@@ -53,7 +68,10 @@ const VacationProvider: React.FC<{ children: any }> = ({ children }) => {
     });
 
     if (error) toast.error(error.message);
-    if (data) toast.success('Vakantie-periode aangepast');
+    if (data) {
+      toast.success('Vakantie-periode aangepast');
+      router.push('/admin/vakanties');
+    }
   };
 
   const saveVacation = async (dto: CreateVacationDto) => {
@@ -79,6 +97,20 @@ const VacationProvider: React.FC<{ children: any }> = ({ children }) => {
     if (data) toast.success('Vakantie-periode verwijderd');
     else if (error) toast.error(error.message);
     return;
+  };
+
+  const getVacationById = async (id: string) => {
+    const { data, error } = await getData(`/api/admin/vacations/${id}`);
+    if (error) toast.error('Error bij ophalen vakantie data');
+    if (data) return data;
+  };
+
+  const getVacationList = async () => {
+    const { data, error } = await getData(`/api/admin/vacations`);
+    if (error) {
+      if (error.errorCode === 'NotLoggedInError') router.push('/login');
+      else toast.error(error.message);
+    } else if (data) return data;
   };
 
   const getResumeDate = (dateString: string) => {
@@ -142,6 +174,8 @@ const VacationProvider: React.FC<{ children: any }> = ({ children }) => {
         saveVacation,
         disableVacationNotification,
         deleteVacation,
+        getVacationById,
+        getVacationList,
       }}
     >
       {children}

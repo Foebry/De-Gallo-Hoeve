@@ -15,12 +15,19 @@ type Props = {
   onChange: (...event: any[]) => void;
   value: SelectedRange;
   retrieveStartDate?: (value: string) => void;
+  disabled?: boolean;
 };
 
-const DateRangeSelector: React.FC<Props> = ({ onChange, value, retrieveStartDate }) => {
+const DateRangeSelector: React.FC<Props> = ({
+  onChange,
+  value,
+  retrieveStartDate,
+  disabled = false,
+}) => {
   const { updateModal, openModal, isModalActive } = useContext(ModalContext);
 
   const openRangePickerModal = () => {
+    if (disabled) return;
     updateModal({ type: ModalType.DEFAULT, content: rangeSelector });
     openModal();
   };

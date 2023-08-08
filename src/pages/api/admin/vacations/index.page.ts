@@ -4,7 +4,6 @@ import { createVacation } from './create';
 import { getVacationsOverview, ListVacationRequest } from './list';
 import { Request as CreateVacationRequest } from './create';
 import { adminApi } from 'src/services/Authenticator';
-import { deleteVacation, ResourceIdRequest } from './delete';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {

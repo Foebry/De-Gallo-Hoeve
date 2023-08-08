@@ -1,5 +1,5 @@
 import Dashboard from 'src/components/admin/dashboard';
-import Details from './components/-details';
+import Details from '../components/-details';
 import Form from 'src/components/form/Form';
 import { FieldValues, useForm } from 'react-hook-form';
 import { VacationDto } from '@/types/DtoTypes/VacationDto';
