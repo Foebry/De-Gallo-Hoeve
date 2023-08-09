@@ -22,6 +22,7 @@ const ApiTypes = {
   ADMIN_RAS_DETAIL: '/api/admin/ras/',
   ADMIN_TRAINING_DAGEN: '/api/admin/trainingdays',
   FEEDBACK_API: '/api/feedback',
+  VACATIONS_OVERVIEW: '/api/admin/vacations',
 };
 
 export const {
@@ -48,4 +49,5 @@ export const {
   ADMIN_RAS_DETAIL,
   ADMIN_TRAINING_DAGEN,
   FEEDBACK_API,
+  VACATIONS_OVERVIEW,
 } = ApiTypes;

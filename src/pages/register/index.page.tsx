@@ -17,6 +17,7 @@ import { generateCsrf } from 'src/services/Validator';
 import { useAppContext } from 'src/context/appContext';
 import Skeleton from 'src/components/website/skeleton';
 import Head from 'next/head';
+import FormRow from 'src/components/form/FormRow';
 
 export interface RegisterHondErrorInterface {
   naam?: string;
@@ -113,7 +114,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
         ...formErrors,
         password_verification: 'Komt niet overeen.',
       });
-      return;
+      return toast.warning('Wachtwoorden komen niet overeen');
     }
 
     if (!disabled) {
@@ -151,6 +152,19 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
       </Head>
       <Skeleton>
         <section className="mb-48 md:px-5 mt-20">
+          {activeStep === 1 && (
+            <FormRow className="-mt-10 mb-10 px-10">
+              <>
+                <div>
+                  <Button label="vorige" onClick={() => setActiveStep(activeStep - 1)} />
+                </div>
+                <div>
+                  <SubmitButton label="verzend" onClick={() => onSubmit(getValues())} />
+                </div>
+              </>
+            </FormRow>
+          )}
+
           <div className="max-w-7xl mx-auto">
             <FormSteps
               activeStep={activeStep}
@@ -190,23 +204,13 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
                 ) : null}
               </div>
             </Form>
-          </div>
-          {activeStep === 1 ? (
-            <>
-              <div className="absolute left-10 top-20">
-                <Button label="vorige" onClick={() => setActiveStep(activeStep - 1)} />
-              </div>
-              <div className="absolute right-10 top-20">
-                <SubmitButton label="verzend" onClick={() => onSubmit(getValues())} />
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="absolute right-10">
+            {activeStep === 0 && (
+              <FormRow className="px-10">
+                <div></div>
                 <Button label="volgende" onClick={() => setActiveStep(activeStep + 1)} />
-              </div>
-            </>
-          )}
+              </FormRow>
+            )}
+          </div>
         </section>
       </Skeleton>
     </>

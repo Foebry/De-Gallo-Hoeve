@@ -108,6 +108,12 @@ export class RasNotFoundError extends EntityNotFoundError {
   }
 }
 
+export class VacationNotFoundError extends EntityNotFoundError {
+  constructor() {
+    super('VacationNotFoundError', 'vakantie niet gevonden');
+  }
+}
+
 export class ExpiredConfirmCodeError extends EntityNotFoundError {
   constructor() {
     super('ExpiredConfirmCodeError', 'Confirm code expired');
@@ -218,6 +224,15 @@ export class KlantAlreadyVerifiedError extends ConflictError {
 export class LinkAlreadyUsedError extends ConflictError {
   constructor() {
     super('LinkAlreadyUsedError', 'Deze link is niet meer geldig');
+  }
+}
+
+export class VacationOverLappingError extends ConflictError {
+  constructor() {
+    super(
+      'VacationOverlappingError',
+      'Er bestaat reeds een vakantie-periode tussen deze start-en eind datum'
+    );
   }
 }
 

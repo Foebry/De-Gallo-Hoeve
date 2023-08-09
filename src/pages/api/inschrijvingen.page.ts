@@ -119,7 +119,6 @@ const postInschrijving = async (req: PostInschrijvingRequest, res: NextApiRespon
     }
 
     const data = mapInschrijvingen(inschrijvingen, isFirstInschrijving, prijs);
-
     await mailer.sendMail('inschrijving', {
       naam,
       email: process.env.MAIL_TEST ?? email,
