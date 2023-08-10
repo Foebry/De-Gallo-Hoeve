@@ -1,0 +1,18 @@
+.coming-soon {
+  position: relative;
+  background-color: rgb(200, 200, 200);
+}
+.coming-soon:after {
+  position: absolute;
+  top: -40px;
+  right: 35px;
+  background-color: rgb(205, 195, 50);
+  padding: 8px 5px;
+  font-size: 1.3rem;
+  content: 'Binnenkort';
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+.coming-soon + div img {
+  filter: saturate(0.1);
+}

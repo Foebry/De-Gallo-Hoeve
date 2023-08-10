@@ -1,5 +1,7 @@
 import { PaginatedResponse } from 'src/shared/RequestHelper';
 import AuthContext from '../authContext';
+import BannerProvider from '../BannerContext';
+import VacationProvider from '../VacationContext';
 import FeedbackProvider from './FeedbackContext';
 import HondProvider from './hondContext';
 import InschrijvingProvider from './InschrijvingContext';
@@ -23,23 +25,27 @@ export const defaultApiResponse = { data: undefined, error: undefined };
 
 const AppProvider: React.FC<{ children: any }> = ({ children }) => {
   return (
-    <RasProvider>
-      <FeedbackProvider>
-        <KlantProvider>
-          <TrainingProvider>
-            <HondProvider>
-              <TrainingDayProvider>
-                <InschrijvingProvider>
-                  <UserProvider>
-                    <AuthContext>{children}</AuthContext>
-                  </UserProvider>
-                </InschrijvingProvider>
-              </TrainingDayProvider>
-            </HondProvider>
-          </TrainingProvider>
-        </KlantProvider>
-      </FeedbackProvider>
-    </RasProvider>
+    <BannerProvider>
+      <RasProvider>
+        <FeedbackProvider>
+          <KlantProvider>
+            <TrainingProvider>
+              <HondProvider>
+                <TrainingDayProvider>
+                  <InschrijvingProvider>
+                    <VacationProvider>
+                      <UserProvider>
+                        <AuthContext>{children}</AuthContext>
+                      </UserProvider>
+                    </VacationProvider>
+                  </InschrijvingProvider>
+                </TrainingDayProvider>
+              </HondProvider>
+            </TrainingProvider>
+          </KlantProvider>
+        </FeedbackProvider>
+      </RasProvider>
+    </BannerProvider>
   );
 };
 

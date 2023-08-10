@@ -54,8 +54,6 @@ export async function getPaginatedData<T>(
 ): Promise<PaginatedData<T>>;
 
 export async function getPaginatedData<T>(query: PaginatedRequestQuery, url: string, controller: string) {
-  // await client.connect();
-
   const data = await getData(controller);
 
   const filteredData = filterData<T>(data, query);
@@ -66,14 +64,13 @@ export async function getPaginatedData<T>(query: PaginatedRequestQuery, url: str
   return { data: filteredData.slice(first, last), pagination };
 }
 
-const getPagination = <T>(query: PaginatedRequestQuery, url: string, data: T[]): Pagination => {
+export const getPagination = <T>(query: PaginatedRequestQuery, url: string, data: T[]): Pagination => {
   const { page, amount, search } = query;
 
   const pageSize = parseInt(amount ?? '10');
   const cPage = parseInt(page ?? '1');
   const currentPage = Math.min(Math.max(cPage, 1), Math.ceil(data.length / pageSize));
   const first = data.length === 0 ? 0 : Math.max((currentPage - 1) * pageSize, -1);
-  // const first = Math.max(currentPage * pageSize, -1);
   const last = Math.min(first + pageSize, data.length);
 
   const searchValue = search ? `search=${search}` : undefined;
@@ -167,4 +164,8 @@ function instanceOfRasCollectionArray(array: any[]): array is RasCollection[] {
 
 export const notEmpty = <T>(obj: T | null | undefined): obj is T => {
   return obj !== null && obj !== undefined;
+};
+
+export const calculateDbSkip = (page: string, amount: string): number => {
+  return (parseInt(page) - 1) * parseInt(amount);
 };

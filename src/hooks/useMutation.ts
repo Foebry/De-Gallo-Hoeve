@@ -2,9 +2,7 @@ import moment from 'moment';
 import { useAxiosContext } from 'src/context/AxiosContext';
 import { ApiResponse, Options } from 'src/utils/axios';
 
-const useMutation = <T, E = Partial<T> & { message: string; code: number }>(
-  endpoint: string
-) => {
+const useMutation = <T, E = Partial<T> & { message: string; code: number }>(endpoint: string) => {
   const { increase, decrease, send } = useAxiosContext();
   const executerFunc = async (payload: any, options?: Options): ApiResponse<T, E> => {
     try {
@@ -51,9 +49,7 @@ export const structureInschrijvingenPayload = (payload: any) => {
         ...inschrijving,
         hond_id: inschrijving.hond_id.value,
         hond_naam: inschrijving.hond_id.label,
-        datum: moment
-          .utc([inschrijving.datum, inschrijving.tijdslot.value].join(' '))
-          .local(),
+        datum: moment.utc([inschrijving.datum, inschrijving.tijdslot.value].join(' ')).local(),
       };
     }
     return {};

@@ -25,6 +25,7 @@ import { RAS } from 'src/controllers/rasController';
 import { HOND } from 'src/controllers/HondController';
 import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
 import { InschrijvingCollection } from '@/types/EntityTpes/InschrijvingTypes';
+import FormRow from 'src/components/form/FormRow';
 
 type TrainingType = 'prive' | 'groep';
 
@@ -144,6 +145,14 @@ const Groepslessen: React.FC<LessenProps> = ({
       </Head>
       <Skeleton>
         <section className="mb-48 md:px-5 mt-20">
+          <FormRow className="-mt-10 mb-10 px-10">
+            {activeStep > 0 ? <Button label="vorige" onClick={() => setActiveStep(activeStep - 1)} /> : <div></div>}
+            {activeStep === 1 ? (
+              <SubmitButton label="verzend" onClick={() => onSubmit(getValues())} />
+            ) : (
+              <Button label="volgende" onClick={handleNextPageClick} />
+            )}
+          </FormRow>
           <div className="max-w-7xl mx-auto">
             <FormSteps steps={steps} activeStep={activeStep} errorSteps={errorSteps} setActiveStep={setActiveStep} />
             <Form onSubmit={handleSubmit(onSubmit)}>
@@ -201,18 +210,6 @@ const Groepslessen: React.FC<LessenProps> = ({
                 ) : null}
               </div>
             </Form>
-            {activeStep > 0 && (
-              <div className="absolute left-10 top-20">
-                <Button label="vorige" onClick={() => setActiveStep(activeStep - 1)} />
-              </div>
-            )}
-            <div className="absolute right-10 top-20">
-              {activeStep === 1 ? (
-                <SubmitButton label="verzend" onClick={() => onSubmit(getValues())} />
-              ) : (
-                <Button label="volgende" onClick={handleNextPageClick} />
-              )}
-            </div>
           </div>
         </section>
       </Skeleton>

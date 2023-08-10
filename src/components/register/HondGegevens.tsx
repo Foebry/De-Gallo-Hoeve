@@ -1,13 +1,7 @@
 import React, { useEffect } from 'react';
 import Button from '../buttons/Button';
 import { OptionsOrGroups } from 'react-select';
-import {
-  Control,
-  FieldValues,
-  UseFieldArrayAppend,
-  UseFieldArrayRemove,
-  UseFormGetValues,
-} from 'react-hook-form';
+import { Control, FieldValues, UseFieldArrayAppend, UseFieldArrayRemove, UseFormGetValues } from 'react-hook-form';
 import { RegisterErrorInterface } from 'src/pages/register/index.page';
 import HondCard from '../Cards/HondCard';
 import { Option } from 'src/utils/MongoDb';
@@ -70,7 +64,7 @@ const HondGegevens: React.FC<Props> = ({
         ))}
       </ul>
       <div className="mb-10 max-w-fit mx-auto">
-        <Button label="Nieuwe hond aanmaken" onClick={() => append(emptyHond)} />
+        <Button label="Ik heb nog een hond" onClick={() => append(emptyHond)} />
       </div>
     </div>
   );

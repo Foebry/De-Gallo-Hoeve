@@ -17,7 +17,7 @@ const send = async (msg: any) => {
   await sgMail
     .send(msg)
     .then(() => {
-      logger.info('Email sent');
+      logger.info(`Email sent to ${msg.to}`);
     })
     .catch((error: any) => {
       logError('email', undefined, error);
@@ -108,8 +108,8 @@ export const sendFeedBackMailsForKlanten = async (
 ) => {
   const mailsToSend = klanten.map((klant) => ({
     email:
-      process.env.MAIL_TO && process.env.NODE_ENV !== 'test'
-        ? process.env.MAIL_TO
+      process.env.MAIL_TEST && process.env.NODE_ENV !== 'test'
+        ? process.env.MAIL_TEST
         : klant.email,
     vnaam: klant.vnaam,
     amount: getNextTresholdAmount(klant),

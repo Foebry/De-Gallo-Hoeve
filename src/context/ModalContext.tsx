@@ -1,34 +1,58 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
+import { ModalType } from 'src/components/Modal/Modal/BaseModal';
+
+export type ModalData = {
+  caption?: string;
+  type: ModalType;
+  content?: ReactNode;
+  callbackData?: any;
+};
 
 type ModalContext = {
-  message: string | undefined;
   callback: ((confirmed: boolean) => any) | undefined;
-  updateModal: (msg?: string, callBack?: () => any) => void;
+  updateModal: (data: ModalData, callBack?: (param: any) => any) => void;
+  modalData: ModalData;
+  openModal: () => void;
+  closeModal: () => void;
+  isModalActive: boolean;
 };
 
 const trainingDayContextDefaultValues: ModalContext = {
-  message: '',
   callback: () => {},
   updateModal: () => {},
+  modalData: { type: ModalType.DEFAULT, content: <></> },
+  openModal: () => {},
+  closeModal: () => {},
+  isModalActive: false,
 };
 
 export const ModalContext = createContext<ModalContext>(trainingDayContextDefaultValues);
 
 const ModalProvider: React.FC<{ children: any }> = ({ children }) => {
-  const [message, setMessage] = useState<string>();
+  const [isModalActive, setModalActive] = useState<boolean>(false);
   const [callback, setCallback] = useState<(confirmed: boolean) => any>();
+  const [modalData, setModalData] = useState<ModalData>({ type: ModalType.DEFAULT });
 
-  const updateModal = (msg?: string, cb?: (confirmed: boolean) => any) => {
-    setMessage(msg);
-    setCallback(cb);
+  const updateModal = (data: ModalData, cb?: (confirmed: boolean) => any) => {
+    setModalData(data);
+    if (cb) setCallback(cb);
   };
+
+  const closeModal = () => {
+    setModalActive(false);
+  };
+
+  const openModal = () => setModalActive(true);
 
   return (
     <ModalContext.Provider
       value={{
-        message,
         callback,
         updateModal,
+        modalData,
+        openModal,
+        closeModal,
+        isModalActive,
       }}
     >
       {children}

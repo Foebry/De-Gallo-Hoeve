@@ -2,6 +2,7 @@ import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
 import { nanoid } from 'nanoid';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import { ModalType } from 'src/components/Modal/Modal/BaseModal';
 import getData from 'src/hooks/useApi';
 import useMutation from 'src/hooks/useMutation';
 import { defaultTrainingTimeSlots } from 'src/mappers/trainingDays';
@@ -30,35 +31,36 @@ const trainingDayContextDefaultValues: TrainingDayContext = {
   useGetAvailableTrainingDays: () => ({ data: [], isLoading: false }),
 };
 
-export const TrainingDayContext = createContext<TrainingDayContext>(
-  trainingDayContextDefaultValues
-);
+export const TrainingDayContext = createContext<TrainingDayContext>(trainingDayContextDefaultValues);
 
 const TrainingDayProvider: React.FC<{ children: any }> = ({ children }) => {
-  const [trainingDays, setTrainingDays] = useState<TrainingDayDto[]>();
+  const [trainingDays, setTrainingDays] = useState<TrainingDayDto[]>([]);
   const [hasLoaded, setHasLoaded] = useState<boolean>(false);
   const [lastUrl, setLastUrl] = useState<string>();
   const [success, setSuccess] = useState<boolean>(false);
   const [revalidateTrainingDays, setRevalidateTrainingDays] = useState<boolean>(false);
-  const save = useMutation<TrainingDayDto[]>('/api/admin/trainingdays');
   const currentRetries = useRef<number>(0);
-  const { updateModal } = useModalContext();
+  const save = useMutation<TrainingDayDto[]>('/api/admin/trainingdays');
+  const { updateModal, openModal } = useModalContext();
+
+  const getTrainingDays = async () => {
+    if (hasLoaded) return sortAscending(trainingDays);
+    const { data, error } = await getData<TrainingDayDto[]>('/api/admin/trainingdays');
+    if (data) setTrainingDays(data);
+    setHasLoaded(true);
+    if (error) toast.error(error.message);
+    return data;
+  };
 
   const updateTrainingDay = (trainingDayDto: TrainingDayDto) => {
     if (!trainingDays) return;
-    setTrainingDays(() =>
-      trainingDays.map((day) => (day._id === trainingDayDto._id ? trainingDayDto : day))
-    );
+    setTrainingDays(() => trainingDays.map((day) => (day._id === trainingDayDto._id ? trainingDayDto : day)));
   };
 
   const updateAvailableDays = (days: string[]) => {
     if (!trainingDays) return;
-    const remainingTrainingDays = trainingDays?.filter((day) =>
-      days.includes(day.date.split('T')[0])
-    );
-    const newDates = days.filter(
-      (day) => !trainingDays.map((td) => td.date.split('T')[0]).includes(day)
-    );
+    const remainingTrainingDays = trainingDays?.filter((day) => days.includes(day.date.split('T')[0]));
+    const newDates = days.filter((day) => !trainingDays.map((td) => td.date.split('T')[0]).includes(day));
     const newTrainingDays: TrainingDayDto[] = newDates.map((date) => ({
       date: date,
       _id: nanoid(4),
@@ -78,7 +80,16 @@ const TrainingDayProvider: React.FC<{ children: any }> = ({ children }) => {
     );
     if (error) {
       if (error.code === 409) {
-        updateModal(error.message, () => saveTrainingDays);
+        updateModal(
+          {
+            type: 'error' as ModalType,
+            content: error.message,
+            caption: 'Ben je zeker?',
+            callbackData: true,
+          }, // getting typeError cannot read ERROR of undefined when using ModalType.ERROR
+          () => saveTrainingDays
+        );
+        openModal();
       } else {
         toast.error(error.message);
       }
@@ -102,9 +113,7 @@ const TrainingDayProvider: React.FC<{ children: any }> = ({ children }) => {
         } else {
           setLastUrl(url);
           while (!success && currentRetries.current <= maxRetries) {
-            const { data, error } = await getData<TrainingDayDto[]>(
-              url ?? '/api/admin/trainingdays'
-            );
+            const { data, error } = await getData<TrainingDayDto[]>(url ?? '/api/admin/trainingdays');
             if (error) {
               currentRetries.current += 1;
               toast.error('Fout bij laden van beschikbare training dagen');
@@ -146,7 +155,5 @@ export const useTrainingDayContext = () => useContext(TrainingDayContext);
 export default TrainingDayProvider;
 
 const sortAscending = (trainingDays: TrainingDayDto[]): TrainingDayDto[] => {
-  return trainingDays.sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
+  return trainingDays.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 };

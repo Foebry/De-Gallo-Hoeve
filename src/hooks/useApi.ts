@@ -3,10 +3,7 @@ import { toast } from 'react-toastify';
 import { ApiResponse } from 'src/utils/axios';
 import logger from 'src/utils/logger';
 
-const getData = async <T>(
-  endpoint: string,
-  options: any = {}
-): Promise<ApiResponse<T>> => {
+const getData = async <T>(endpoint: string, options: any = {}): Promise<ApiResponse<T>> => {
   let data: T | undefined;
   try {
     const { data } = await axios(endpoint, {
