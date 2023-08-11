@@ -7,8 +7,10 @@ export enum REQUEST_METHOD {
   DELETE = 'DELETE',
   GET = 'GET',
 }
+export type ErrorInfoType = { message: string; code: number; errorCode: string };
+
 export type Options = Partial<{ method: REQUEST_METHOD; params: any }>;
-export type ApiResponse<T, E = Partial<T> & { message: string; code: number }> = Promise<{
+export type ApiResponse<T, E = Partial<T> & ErrorInfoType> = Promise<{
   data: T | undefined;
   error: E | undefined;
 }>;

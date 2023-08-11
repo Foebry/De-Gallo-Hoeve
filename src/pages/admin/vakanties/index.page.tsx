@@ -18,20 +18,14 @@ import { Body } from 'src/components/Typography/Typography';
 import { ModalContext, ModalData } from 'src/context/ModalContext';
 import { useVacationContext } from 'src/context/VacationContext';
 import getData from 'src/hooks/useApi';
+import { PaginatedResponse } from 'src/shared/RequestHelper';
 import { apiOptionsInterface, ApiResult } from '../klanten/index.page';
 
 interface Props {}
 
 const Vakanties: React.FC<Props> = ({}) => {
   const router = useRouter();
-  const headers = [
-    'startDatum',
-    'eindDatum',
-    'notificaties-startDatum',
-    'aangemaakt op',
-    'aangepast op',
-    'actions',
-  ];
+  const headers = ['startDatum', 'eindDatum', 'notificaties-startDatum', 'aangemaakt op', 'aangepast op', 'actions'];
 
   const { updateModal, openModal } = useContext(ModalContext);
   const { deleteVacation, getVacationList } = useVacationContext();
@@ -75,30 +69,19 @@ const Vakanties: React.FC<Props> = ({}) => {
 
   const rows = useMemo(() => {
     return apiData?.data.map((row: VacationDto) => {
-      const startDate = (
-        <Link href={`/admin/vakanties/${row.id}`}>{row.duration.from}</Link>
-      );
+      const startDate = <Link href={`/admin/vakanties/${row.id}`}>{row.duration.from}</Link>;
       const endDate = row.duration.to;
       const notificationStartDate = row.notificationStartDate;
       const createdAt = row.createdAt;
       const editedAt = row.updatedAt;
       const actions = [
-        <div
-          className="border rounded-l border-grey-200 border-solid p-1 cursor-pointer"
-          key={nanoid(10)}
-        >
+        <div className="border rounded-l border-grey-200 border-solid p-1 cursor-pointer" key={nanoid(10)}>
           <GrView onClick={() => handleView(row.id)} />
         </div>,
-        <div
-          className="border border-grey-200 border-solid p-1 cursor-pointer"
-          key={nanoid(10)}
-        >
+        <div className="border border-grey-200 border-solid p-1 cursor-pointer" key={nanoid(10)}>
           <GrEdit />
         </div>,
-        <div
-          className="border rounded-r border-grey-200 border-solid p-1 cursor-pointer"
-          key={nanoid(10)}
-        >
+        <div className="border rounded-r border-grey-200 border-solid p-1 cursor-pointer" key={nanoid(10)}>
           <MdDelete onClick={() => onDelete(row.id)} />
         </div>,
       ];
@@ -108,7 +91,7 @@ const Vakanties: React.FC<Props> = ({}) => {
 
   const onPageChange = async (api?: string) => {
     if (!api) return;
-    const { data, error } = await getData(api);
+    const { data, error } = await getData<PaginatedResponse<VacationDto>>(api);
     if (!error && data) {
       setApiData(data);
     }

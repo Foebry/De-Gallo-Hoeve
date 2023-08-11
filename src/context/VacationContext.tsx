@@ -6,18 +6,19 @@ import { SelectedRange } from 'src/components/form/inputs/date/DateRangeSelector
 import getData from 'src/hooks/useApi';
 import useMutation from 'src/hooks/useMutation';
 import { PaginatedResponse } from 'src/shared/RequestHelper';
+import { REQUEST_METHOD } from 'src/utils/axios';
 import { string } from 'yup';
 import { useBannerContext } from './BannerContext';
 
 type VacationContext = {
   activateVacationNotification: (duration: SelectedRange) => void;
-  getActiveVacation: () => Promise<VacationDto>;
+  getActiveVacation: () => Promise<VacationDto | undefined>;
   updateVacation: (dto: VacationDto) => Promise<void>;
   saveVacation: (dto: CreateVacationDto) => Promise<void>;
   disableVacationNotification: () => void;
   deleteVacation: (id: string) => Promise<void>;
-  getVacationById: (id: string) => Promise<VacationDto>;
-  getVacationList: () => Promise<PaginatedResponse<VacationDto>>;
+  getVacationById: (id: string) => Promise<VacationDto | undefined>;
+  getVacationList: () => Promise<PaginatedResponse<VacationDto> | undefined>;
 };
 
 const VacationContextDefaultValues: VacationContext = {
@@ -46,25 +47,24 @@ const VacationContextDefaultValues: VacationContext = {
   }),
 };
 
-export const VacationContext = createContext<VacationContext>(
-  VacationContextDefaultValues
-);
+export const VacationContext = createContext<VacationContext>(VacationContextDefaultValues);
 
 const VacationProvider: React.FC<{ children: any }> = ({ children }) => {
   const router = useRouter();
   const { setBannerContent, activateBanner, disableBanner } = useBannerContext();
-  const mutate = useMutation();
+  const mutate = useMutation<VacationDto>('/api/admin/vacations/');
 
   const getActiveVacation = async () => {
-    const { data, error } = await getData('/api/announcements');
-    if (error) return toast.error(error.message);
+    const { data, error } = await getData<VacationDto>('/api/announcements');
+    if (error) toast.error(error.message);
 
     return data;
   };
 
   const updateVacation = async (dto: VacationDto) => {
-    const { data, error } = await mutate(`/api/admin/vacations/${dto.id}`, dto, {
-      method: 'PUT',
+    const { data, error } = await mutate(dto, {
+      method: REQUEST_METHOD.PUT,
+      params: { id: dto.id },
     });
 
     if (error) toast.error(error.message);
@@ -75,10 +75,9 @@ const VacationProvider: React.FC<{ children: any }> = ({ children }) => {
   };
 
   const saveVacation = async (dto: CreateVacationDto) => {
-    const { data, error } = await mutate('/api/admin/vacations', dto);
+    const { data, error } = await mutate(dto);
     if (error) {
-      if (error.code === 403 && error.errorCode === 'NotLoggedInError')
-        router.push('/login');
+      if (error.code === 403 && error.errorCode === 'NotLoggedInError') router.push('/login');
       else toast.error(error.message);
     }
     if (data) {
@@ -89,28 +88,25 @@ const VacationProvider: React.FC<{ children: any }> = ({ children }) => {
   };
 
   const deleteVacation = async (id: string) => {
-    const { data, error } = await mutate(
-      `/api/admin/vacations/${id}`,
-      {},
-      { method: 'DELETE' }
-    );
+    const { data, error } = await mutate({}, { method: REQUEST_METHOD.DELETE, params: { id } });
     if (data) toast.success('Vakantie-periode verwijderd');
     else if (error) toast.error(error.message);
     return;
   };
 
   const getVacationById = async (id: string) => {
-    const { data, error } = await getData(`/api/admin/vacations/${id}`);
+    const { data, error } = await getData<VacationDto>(`/api/admin/vacations/${id}`);
     if (error) toast.error('Error bij ophalen vakantie data');
     if (data) return data;
   };
 
   const getVacationList = async () => {
-    const { data, error } = await getData(`/api/admin/vacations`);
+    const { data, error } = await getData<PaginatedResponse<VacationDto>>(`/api/admin/vacations`);
     if (error) {
       if (error.errorCode === 'NotLoggedInError') router.push('/login');
       else toast.error(error.message);
-    } else if (data) return data;
+    }
+    return data;
   };
 
   const getResumeDate = (dateString: string) => {
