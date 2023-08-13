@@ -52,7 +52,7 @@ export const VacationContext = createContext<VacationContext>(VacationContextDef
 const VacationProvider: React.FC<{ children: any }> = ({ children }) => {
   const router = useRouter();
   const { setBannerContent, activateBanner, disableBanner } = useBannerContext();
-  const mutate = useMutation<VacationDto>('/api/admin/vacations/');
+  const mutate = useMutation<VacationDto>('/api/admin/vacations');
 
   const getActiveVacation = async () => {
     const { data, error } = await getData<VacationDto>('/api/announcements');
@@ -62,9 +62,8 @@ const VacationProvider: React.FC<{ children: any }> = ({ children }) => {
   };
 
   const updateVacation = async (dto: VacationDto) => {
-    const { data, error } = await mutate(dto, {
+    const { data, error } = await mutate(`${dto.id}`, dto, {
       method: REQUEST_METHOD.PUT,
-      params: { id: dto.id },
     });
 
     if (error) toast.error(error.message);
@@ -75,7 +74,7 @@ const VacationProvider: React.FC<{ children: any }> = ({ children }) => {
   };
 
   const saveVacation = async (dto: CreateVacationDto) => {
-    const { data, error } = await mutate(dto);
+    const { data, error } = await mutate('/', dto);
     if (error) {
       if (error.code === 403 && error.errorCode === 'NotLoggedInError') router.push('/login');
       else toast.error(error.message);
@@ -88,7 +87,7 @@ const VacationProvider: React.FC<{ children: any }> = ({ children }) => {
   };
 
   const deleteVacation = async (id: string) => {
-    const { data, error } = await mutate({}, { method: REQUEST_METHOD.DELETE, params: { id } });
+    const { data, error } = await mutate(`/${id}`, {}, { method: REQUEST_METHOD.DELETE });
     if (data) toast.success('Vakantie-periode verwijderd');
     else if (error) toast.error(error.message);
     return;

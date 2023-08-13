@@ -1,4 +1,4 @@
-import { PaginatedResponse } from 'src/shared/RequestHelper';
+import { PaginatedData } from 'src/common/api/shared/types';
 import AuthContext from '../authContext';
 import BannerProvider from '../BannerContext';
 import VacationProvider from '../VacationContext';
@@ -11,10 +11,10 @@ import TrainingProvider from './TrainingContext';
 import TrainingDayProvider from './TrainingDayContext';
 import UserProvider from './UserContext';
 
-export const emptyPaginatedResponse = <T extends unknown>(): PaginatedResponse<T> => ({
+export const emptyPaginatedResponse = <T extends unknown>(): PaginatedData<T> => ({
   data: [],
   pagination: {
-    currentPage: 1,
+    page: 1,
     first: 1,
     last: 1,
     total: 0,

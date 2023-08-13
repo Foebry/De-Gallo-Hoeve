@@ -1,44 +1,23 @@
 import { InschrijvingCollection } from '@/types/EntityTpes/InschrijvingTypes';
 import { IsKlantCollection } from '@/types/EntityTpes/KlantTypes';
 import { KlantDto } from 'src/common/api/types/klant';
-import { toReadableDate } from 'src/shared/functions';
-import { PaginatedData } from 'src/shared/RequestHelper';
 
-export const mapToAdminKlantenOverviewResult = (
-  data: PaginatedData<IsKlantCollection>
-): PaginatedData<Omit<KlantDto, 'gsm' | 'honden' | 'inschrijvingen'>> => {
-  return {
-    data: data.data.map((klant) => ({
-      id: klant._id.toString(),
-      verified: klant.verified,
-      email: klant.email,
-      vnaam: klant.vnaam,
-      lnaam: klant.lnaam,
-      straat: klant.straat,
-      nr: klant.nr.toString(),
-      bus: klant.bus ?? undefined,
-      postcode: klant.postcode.toString(),
-      gemeente: klant.gemeente,
-      created_at: klant.created_at.toISOString().replace('T', ' ').split('.')[0],
-      updated_at: toReadableDate(klant.updated_at),
-      verified_at:
-        klant.verified_at?.toISOString().replace('T', ' ').split('.')[0] ?? undefined,
-    })),
-    pagination: {
-      currentPage: data.pagination.currentPage,
-      first: data.pagination.first + 1,
-      last: data.pagination.last,
-      total: data.pagination.total,
-      next: data.pagination.next,
-      previous: data.pagination.previous,
-    },
-  };
-};
+export const mapToKlantDto = (klant: IsKlantCollection) => ({
+  id: klant._id.toString(),
+  verified: klant.verified,
+  email: klant.email,
+  vnaam: klant.vnaam,
+  lnaam: klant.lnaam,
+  straat: klant.straat,
+  nr: klant.nr.toString(),
+  bus: klant.bus ?? undefined,
+  postcode: klant.postcode.toString(),
+  gemeente: klant.gemeente,
+  created_at: klant.created_at.toISOString(),
+  verified_at: klant.verified_at ? klant.verified_at.toISOString() : undefined,
+});
 
-export const mapToKlantDetail = (
-  klant: IsKlantCollection,
-  inschrijvingen: InschrijvingCollection[]
-): KlantDto => ({
+export const mapToKlantDetail = (klant: IsKlantCollection, inschrijvingen: InschrijvingCollection[]): KlantDto => ({
   id: klant._id.toString(),
   email: klant.email,
   vnaam: klant.vnaam,
