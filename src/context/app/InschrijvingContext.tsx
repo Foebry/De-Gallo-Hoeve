@@ -1,13 +1,19 @@
 import { NextRouter } from 'next/router';
-import { createContext, useContext, useRef, useState } from 'react';
+import { createContext, useContext, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import { PaginatedData } from 'src/common/api/shared/types';
 import { InschrijvingDto } from 'src/common/api/types/inschrijving';
 import useMutation from 'src/hooks/useMutation';
-import { PaginatedData } from 'src/shared/RequestHelper';
 import { ApiResponse, REQUEST_METHOD } from 'src/utils/axios';
-import { useAxiosContext } from '../AxiosContext';
+import { SWROptions, useAxiosContext } from '../AxiosContext';
 import { defaultApiResponse, emptyPaginatedResponse } from './AppContext';
 import { RevalidateOptions } from './klantContext';
+
+export type InschrijvingQuery = Partial<{
+  page: string;
+  pageSize: string;
+  ids: string;
+}>;
 
 const EMPTY_INSCHRIJVING_DETAIL: InschrijvingDto = {
   id: '',
@@ -32,15 +38,15 @@ type Context = {
   disabled: boolean;
   createInschrijving: (dto: InschrijvingDto) => ApiResponse<InschrijvingDto>;
   useGetPaginatedInschrijvingen: (
-    url?: string,
-    options?: RevalidateOptions
+    query: InschrijvingQuery,
+    options?: SWROptions<PaginatedData<InschrijvingDto>>
   ) => {
     data: PaginatedData<InschrijvingDto>;
     isLoading: boolean;
   };
   useGetInschrijvingDetail: (
-    router: NextRouter,
-    options?: RevalidateOptions
+    id: string,
+    options?: SWROptions<InschrijvingDto>
   ) => {
     data: InschrijvingDto | null;
     isLoading: boolean;
@@ -70,25 +76,24 @@ const Context = createContext<Context>(defaultValues);
 const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
-  const lastPaginatedUrl = useRef<string>();
-  const inschrijvingDetail = useRef<InschrijvingDto | null>(null);
-  const paginatedInschrijvingen = useRef<PaginatedData<InschrijvingDto>>(emptyPaginatedResponse());
   const [revalidateList, setRevalidateList] = useState<boolean>(false);
   const [revalidateDetail, setRevalidateDetail] = useState<boolean>(false);
 
   const create = useMutation<InschrijvingDto>('api/inschrijvingen/');
   const edit = useMutation<InschrijvingDto>('/api/inschrijvingen/');
   const softDelete = useMutation<InschrijvingDto>('/api/inschrijvingen/');
-  const lastLoadedId = useRef<string>('');
+  const swrKey = useMemo(() => 'inschrijvign', []);
   const { useSWR } = useAxiosContext();
+
+  const { revalidate } = useSWR(swrKey);
 
   const createInschrijving = async (dto: InschrijvingDto) => {
     if (disabled) return defaultApiResponse;
     setDisabled(true);
     setIsLoading(true);
-    const { data, error } = await create(dto);
+    const { data, error } = await create('/', dto);
     if (error) toast.error('Fout bij aanmaken inschrijving');
-    setRevalidateList(true);
+    if (data) revalidate();
     setDisabled(false);
     setIsLoading(false);
     return { data, error };
@@ -98,14 +103,12 @@ const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
     if (disabled) return defaultApiResponse;
     setDisabled(true);
     setIsLoading(true);
-    const { data, error } = await edit(dto, {
+    const { data, error } = await edit(`/${dto.id}`, dto, {
       method: REQUEST_METHOD.PUT,
-      params: { id: dto.id },
     });
     if (error) toast.error('Fout bij bewerken inschrijving');
     if (data) {
-      setRevalidateDetail(true);
-      setRevalidateList(true);
+      revalidate();
     }
     setDisabled(false);
     setIsLoading(false);
@@ -116,61 +119,38 @@ const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
     if (disabled) defaultApiResponse;
     setDisabled(true);
     setIsLoading(true);
-    const { data, error } = await softDelete(null, {
+    const { data, error } = await softDelete(`/${dto.id}`, null, {
       method: REQUEST_METHOD.DELETE,
-      params: { id: dto.id },
     });
     if (error) toast.error('Fout bij verwijderen inschrijving');
-    if (data) setRevalidateList(true);
+    if (data) revalidate();
     setDisabled(false);
     setIsLoading(false);
     return { data, error };
   };
 
-  const useGetPaginatedInschrijvingen = (url: string = '/api/admin/inschrijvingen', options?: RevalidateOptions) => {
-    const urlMatchesLastUrl = url && url === lastPaginatedUrl.current;
-    const shouldRevalidate = revalidateList || !urlMatchesLastUrl || !paginatedInschrijvingen.current;
+  const useGetPaginatedInschrijvingen = (query: InschrijvingQuery, options?: RevalidateOptions) => {
+    const queryString = new URLSearchParams();
+    if (query.page) queryString.set('page', query.page.toString());
 
-    const { data, error, loading } = useSWR<PaginatedData<InschrijvingDto>>(
-      url,
-      shouldRevalidate,
-      options,
-      'Fout bij laden van inschrijvingen',
-      emptyPaginatedResponse()
-    );
-    if (data && shouldRevalidate) {
-      paginatedInschrijvingen.current = data;
-      lastPaginatedUrl.current = url;
-      setRevalidateList(false);
-    } else if (error) {
-      lastPaginatedUrl.current = url;
-    }
-    return { data: paginatedInschrijvingen.current, isLoading: loading };
+    const url = queryString ? `/api/admin/inschrijvingen?${queryString}` : '/api/admin/inschrijvingen';
+
+    const { data, isLoading } = useSWR<PaginatedData<InschrijvingDto>>(swrKey, url, {
+      ...options,
+      errorMessage: 'Fout bij laden van inschrijvingen',
+      fallbackData: emptyPaginatedResponse(),
+    });
+    return { data: data ?? emptyPaginatedResponse(), isLoading };
   };
 
-  const useGetInschrijvingDetail = (router: NextRouter, options?: RevalidateOptions) => {
-    const { isReady } = router;
-    const { slug: id } = router.query as { slug: string };
-    const newIdOrMissingData = id !== lastLoadedId.current || !inschrijvingDetail;
-    const shouldRevalidate = isReady && (revalidateDetail || newIdOrMissingData);
+  const useGetInschrijvingDetail = (id: string, options?: RevalidateOptions) => {
+    const { data, isLoading } = useSWR<InschrijvingDto>(swrKey, `/api/admin/inschrijvingen/${id}`, {
+      ...options,
+      errorMessage: 'Fout bij laden van inschrijving detail',
+      fallbackData: EMPTY_INSCHRIJVING_DETAIL,
+    });
 
-    const { data, error, loading } = useSWR<InschrijvingDto>(
-      `/api/admin/inschrijvingen/${id}`,
-      shouldRevalidate,
-      options,
-      'Fout bij laden van inschrijving detail',
-      EMPTY_INSCHRIJVING_DETAIL
-    );
-    if (data && shouldRevalidate) {
-      inschrijvingDetail.current = data;
-      if (id !== 'undefined') lastLoadedId.current = id;
-      setRevalidateDetail(false);
-    } else if (error) {
-      inschrijvingDetail.current = null;
-      if (id !== 'undefined') lastLoadedId.current = id;
-    }
-
-    return { data: inschrijvingDetail.current, isLoading: loading };
+    return { data: data ?? EMPTY_INSCHRIJVING_DETAIL, isLoading };
   };
 
   return (
