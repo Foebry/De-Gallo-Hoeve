@@ -10,5 +10,14 @@ export const getRassen = async (
 ): Promise<[number, WithId<RasCollection>[]]> => {
   const collection = await getRasCollection();
 
-  return [1, []];
+  const refinementQuery: Record<string, Record<string, any>> = { deleted_at: { deleted_at: undefined } };
+  if (query?.ids) refinementQuery.ids = { _id: { $in: query.ids } };
+  if (query?.search) refinementQuery.search = { name: { $regex: `${query.search}`, options: 'i' } };
+
+  const refinements = Object.values(refinementQuery);
+
+  const count = await collection.countDocuments({ deleted_at: undefined });
+  const rassen = await collection.find({ $all: refinements }).skip(skip).limit(take).sort({ name: 1 }).toArray();
+
+  return [count, rassen];
 };

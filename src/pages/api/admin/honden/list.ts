@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { calculateDbSkip, calculatePagination } from 'src/common/api/shared/functions';
 import { mapToHondDto } from './mappers';
@@ -23,8 +24,11 @@ const handler = async (req: ListRequest, res: NextApiResponse) => {
     const result = { data: data.map(mapToHondDto), pagination };
 
     return res.status(200).send(result);
-  } catch (e: any) {
-    return res.status(e.code).json(e.response);
+  } catch (e: unknown) {
+    const isAxiosError = e instanceof AxiosError;
+    if (!isAxiosError) return res.status(500).send({ message: 'Er is iets foutgelopen' });
+
+    return res.status(parseInt(e.code!)).json(e.response);
   }
 };
 
