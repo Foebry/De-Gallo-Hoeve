@@ -118,7 +118,7 @@ const Groepslessen: React.FC<LessenProps> = ({
         return setErrors(newErrors);
       }
       const payload = { ...structuredData, csrf, klant_id, training: type, prijs: prijsExcl };
-      const { data, error } = await inschrijving(payload);
+      const { data, error } = await inschrijving('/', payload);
       if (error) {
         if (error.code === 401) router.push(LOGIN);
         else toast.error(error.message);

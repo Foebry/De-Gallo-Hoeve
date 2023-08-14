@@ -47,7 +47,7 @@ interface RegisterProps {
 
 const Register: React.FC<RegisterProps> = ({ csrf }) => {
   const { useGetRasOptions } = useRasContext();
-  const rasOptions = useGetRasOptions();
+  const { data: rasOptions, isLoading } = useGetRasOptions();
   const [formErrors, setFormErrors] = useState<RegisterErrorInterface>({});
   const router = useRouter();
   const register = useMutation<Partial<RegisterErrorInterface>>(REGISTERAPI);
@@ -106,7 +106,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
 
     if (!disabled) {
       setDisabled(() => true);
-      const { data, error } = await register({ ...payload, csrf });
+      const { data, error } = await register('/', { ...payload, csrf });
       if (data) {
         toast.success('Registratie succesvol!');
         router.push(LOGIN);

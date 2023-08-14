@@ -1,11 +1,24 @@
-import { ObjectId } from 'mongodb';
+import { ObjectId, WithId } from 'mongodb';
 import Vacation from 'src/common/domain/entities/Vacation';
 import { getCurrentTime } from 'src/shared/functions';
 import { getVacationCollection } from 'src/utils/db';
 
-export const getVacationsList = async (skip: number, take: number, query?: string) => {
+export const getVacationsList = async (
+  skip: number,
+  take: number,
+  query?: string
+): Promise<[number, WithId<Vacation>[]]> => {
   const collection = await getVacationCollection();
-  return collection.find({}, { skip, batchSize: take }).toArray();
+
+  const refinementQuery = [{ deleted_at: { deleted_at: undefined } }];
+  const vacations = await collection
+    .find({ $all: [...refinementQuery] })
+    .skip(skip)
+    .limit(take)
+    .toArray();
+  const total = await collection.countDocuments({ deleted_at: undefined });
+
+  return [total, vacations];
 };
 
 export const getVacationById = async (_id: ObjectId) => {
@@ -13,10 +26,7 @@ export const getVacationById = async (_id: ObjectId) => {
   return collection.findOne({ _id });
 };
 
-export const getVacationsBetweenStartAndEndDate = async (
-  startDate: Date,
-  endDate: Date
-) => {
+export const getVacationsBetweenStartAndEndDate = async (startDate: Date, endDate: Date) => {
   const collection = await getVacationCollection();
   return collection
     .find({

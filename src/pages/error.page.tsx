@@ -46,7 +46,7 @@ const useGetErrorInfo = (router: NextRouter) => {
 
   const renewVerificationCode = async () => {
     try {
-      const { data, error } = await reset({}, { method: REQUEST_METHOD.PUT });
+      const { data, error } = await reset('/', {}, { method: REQUEST_METHOD.PUT });
       if (data) router.push('/');
       else if (error) router.push(`/error?${error.code}&code=${confirmCode}`);
     } catch (e: any) {
@@ -59,8 +59,7 @@ const useGetErrorInfo = (router: NextRouter) => {
       title = 'Oeps, er is iets mis gegaan bij de registratie';
       link = (
         <>
-          klik <EbmeddedLink to="/register">hier</EbmeddedLink> om terug te keren naar de
-          registratie pagina
+          klik <EbmeddedLink to="/register">hier</EbmeddedLink> om terug te keren naar de registratie pagina
         </>
       );
       break;
@@ -68,8 +67,7 @@ const useGetErrorInfo = (router: NextRouter) => {
       title = 'U heeft uw account reeds geverifiëerd';
       link = (
         <>
-          Klik <EbmeddedLink to="/login">hier</EbmeddedLink> om terug te keren naar de
-          login pagina
+          Klik <EbmeddedLink to="/login">hier</EbmeddedLink> om terug te keren naar de login pagina
         </>
       );
       break;

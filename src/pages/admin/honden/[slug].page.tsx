@@ -7,7 +7,7 @@ import { MySelect } from 'src/components/MySelect';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { HondDetailResponse } from 'src/pages/api/admin/honden/[slug].page';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useHondContext } from 'src/context/app/hondContext';
 import { useRasContext } from 'src/context/app/RasContext';
@@ -16,13 +16,18 @@ import Spinner from 'src/components/loaders/Spinner';
 
 const HondDetail = () => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const { editMode, slug: id } = router.query as { editMode: string; slug: string };
   const { useGetHondDetail } = useHondContext();
   const { useGetRasOptions } = useRasContext();
 
   const [edit, setEdit] = useState<boolean>(editMode ? true : false);
-  const rassen = useGetRasOptions();
-  const { data: hondDetail, isLoading } = useGetHondDetail(id);
+  const { data: rassen, isLoading: isRassenLoading } = useGetRasOptions();
+  const { data: hondDetail, isLoading: isHondDetailLoading } = useGetHondDetail(id);
+
+  useEffect(() => {
+    setIsLoading(isRassenLoading && isHondDetailLoading);
+  }, [isRassenLoading, isHondDetailLoading]);
 
   const { control, handleSubmit } = useForm<HondDetailResponse>();
 
