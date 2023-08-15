@@ -8,14 +8,15 @@ export interface ListRequest extends NextApiRequest {
     page?: string;
     pageSize: string;
     ids?: string;
+    search?: string;
   };
 }
 
 const handler = async (req: ListRequest, res: NextApiResponse) => {
-  const { page = '1', pageSize = '20', ids } = req.query;
-  const query = { ids };
+  const { page = '1', pageSize = '20', ids, search } = req.query;
+  const query = { ids, search };
 
-  const [total, data] = await getRassen(calculateDbSkip(page, pageSize), parseInt(pageSize));
+  const [total, data] = await getRassen(calculateDbSkip(page, pageSize), parseInt(pageSize), query);
   const { first, last, next, prev } = calculatePagination(page, pageSize, total);
 
   const pagination = { total, page, first, last, next, prev };

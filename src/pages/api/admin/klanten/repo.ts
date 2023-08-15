@@ -52,12 +52,8 @@ export const getKlanten = async (
   }
   const refinements = Object.values(refinementQuery);
 
-  const count = await collection.countDocuments({ deleted_at: undefined });
-  const klanten = await collection
-    .find(refinements.length ? { $and: [...refinements] } : {})
-    .skip(skip)
-    .limit(take)
-    .toArray();
+  const count = await collection.countDocuments({ $and: refinements });
+  const klanten = await collection.find({ $and: refinements }).skip(skip).limit(take).toArray();
 
   return [count, klanten];
 };

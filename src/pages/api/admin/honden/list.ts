@@ -1,6 +1,7 @@
 import { AxiosError } from 'axios';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { calculateDbSkip, calculatePagination } from 'src/common/api/shared/functions';
+import { logError } from '../../logError/repo';
 import { mapToHondDto } from './mappers';
 import { getHonden } from './repo';
 
@@ -25,6 +26,7 @@ const handler = async (req: ListRequest, res: NextApiResponse) => {
 
     return res.status(200).send(result);
   } catch (e: unknown) {
+    await logError('/admin/honden/list', req, e);
     const isAxiosError = e instanceof AxiosError;
     if (!isAxiosError) return res.status(500).send({ message: 'Er is iets foutgelopen' });
 

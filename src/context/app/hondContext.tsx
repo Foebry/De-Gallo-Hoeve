@@ -134,8 +134,9 @@ const HondProvider: React.FC<{ children: any }> = ({ children }) => {
   const useGetPaginatedHonden = (query: HondQuery, options?: RevalidateOptions) => {
     const queryString = new URLSearchParams();
     if (query.ids) queryString.set('ids', query.ids.toString());
+    const hasQuery = queryString && queryString.toString() !== '?';
 
-    const url = queryString ? `/api/admin/honden?${queryString.toString()}` : '/api/admin/honden';
+    const url = hasQuery ? `/api/admin/honden?${queryString.toString()}` : '/api/admin/honden';
 
     const { data, isLoading } = useSWR<PaginatedData<HondDto>>(swrKey, url, {
       ...options,

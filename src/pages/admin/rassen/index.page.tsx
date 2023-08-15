@@ -31,6 +31,7 @@ const Rassen = () => {
   };
 
   const onSearch = async (searchValue: string) => {
+    setPage(1);
     setSearch(searchValue !== '' ? searchValue : undefined);
   };
   return (

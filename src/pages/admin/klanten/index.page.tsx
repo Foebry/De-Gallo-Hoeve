@@ -44,6 +44,7 @@ const Klanten = () => {
   const sendManualFeedbackMails = useMutation<{}>('/api/cron/sendManualFeedbackMails');
 
   const onSearch = async (searchValue: string) => {
+    setPage(1);
     setSearch(searchValue !== '' ? searchValue : undefined);
   };
 
