@@ -1,6 +1,6 @@
 import path from 'path';
 import logger from 'src/utils/logger';
-const job = (obj: Record<string, any>) => {
+const job = async (obj: Record<string, any>) => {
   if (!Object.keys(obj).includes('script')) return;
 
   logger.info(`running script ${obj['script']}`);
@@ -9,7 +9,10 @@ const job = (obj: Record<string, any>) => {
   try {
     if (Object.keys(obj).includes('description')) {
       require(script).description();
-    } else require(script).handler(obj['target-env']);
+    } else {
+      const handler = require(script).handler;
+      await handler(obj['target-env']);
+    }
   } catch (error: any) {
     if (error.code === 'MODULE_NOT_FOUND') {
       logger.error(`Could not locate script ${obj.script}`);
