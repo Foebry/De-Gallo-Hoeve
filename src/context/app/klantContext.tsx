@@ -1,11 +1,10 @@
-import { NextRouter } from 'next/router';
-import { createContext, useContext, useRef, useState } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
+import { PaginatedData } from 'src/common/api/shared/types';
 import { KlantDto } from 'src/common/api/types/klant';
 import useMutation from 'src/hooks/useMutation';
-import { PaginatedData } from 'src/shared/RequestHelper';
 import { REQUEST_METHOD } from 'src/utils/axios';
-import { useAxiosContext } from '../AxiosContext';
+import { SWROptions, useAxiosContext } from '../AxiosContext';
 import { emptyPaginatedResponse } from './AppContext';
 
 const EMPTY_KLANT_DETAIL: KlantDto = {
@@ -24,22 +23,21 @@ const EMPTY_KLANT_DETAIL: KlantDto = {
   vnaam: '',
 };
 
+export type KlantenQuery = Partial<{
+  search: string;
+  page: number;
+}>;
+
 type Context = {
   isLoading: boolean;
   disabled: boolean;
-  updateKlant: (
-    id: string,
-    updateData: KlantDto
-  ) => Promise<ApiResponse<KlantDto> | void>;
+  updateKlant: (id: string, updateData: KlantDto) => Promise<ApiResponse<KlantDto> | void>;
   deleteKlant: (id: string) => Promise<ApiResponse<{}> | void>;
   useGetPaginatedKlanten: (
-    options?: RevalidateOptions,
-    url?: string
+    query: KlantenQuery,
+    options?: SWROptions<PaginatedData<KlantDto>>
   ) => { data: PaginatedData<KlantDto>; isLoading: boolean };
-  useGetKlantDetail: (
-    router: NextRouter,
-    options?: RevalidateOptions
-  ) => { data: KlantDto | null; isLoading: boolean };
+  useGetKlantDetail: (id: string, options?: SWROptions<KlantDto>) => { data: KlantDto; isLoading: boolean };
 };
 
 type ApiError<T> = Partial<T> & { message: string; code: number };
@@ -55,36 +53,32 @@ const defaultValues: Context = {
   updateKlant: async () => {},
   deleteKlant: async () => {},
   useGetPaginatedKlanten: () => ({ data: emptyPaginatedResponse(), isLoading: false }),
-  useGetKlantDetail: () => ({ data: null, isLoading: false }),
+  useGetKlantDetail: () => ({ data: EMPTY_KLANT_DETAIL, isLoading: false }),
 };
 
 const Context = createContext<Context>(defaultValues);
 
 const KlantProvider: React.FC<{ children: any }> = ({ children }) => {
-  const [revalidateList, setRevalidateList] = useState<boolean>(false);
-  const paginatedKlanten = useRef<PaginatedData<KlantDto>>(emptyPaginatedResponse());
-  const lastPaginatedUrl = useRef<string>();
-  const klantDetail = useRef<KlantDto | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
-  const lastLoadedKlantId = useRef<string>('');
+  const swrKey = useMemo(() => 'klanten', []);
 
   const update = useMutation<KlantDto>('/api/admin/klanten');
   const remove = useMutation<{}>('/api/admin/klanten');
   const { useSWR } = useAxiosContext();
 
+  const { revalidate } = useSWR(swrKey);
+
   const updateKlant = async (id: string, updateData: KlantDto) => {
     if (disabled) return;
     setIsLoading(true);
     setDisabled(true);
-    const { data, error } = await update(updateData, {
+    const { data, error } = await update(`/${id}`, updateData, {
       method: REQUEST_METHOD.PUT,
-      params: { id },
     });
     if (data) {
       toast.success('klant succesvol gewijzigd!');
-      klantDetail.current = data;
-      setRevalidateList(true);
+      revalidate();
     } else if (error) toast.error('Fout bij wijzigen klant');
     setIsLoading(false);
     setDisabled(false);
@@ -95,65 +89,41 @@ const KlantProvider: React.FC<{ children: any }> = ({ children }) => {
     if (disabled) return;
     setIsLoading(true);
     setDisabled(true);
-    const { data, error } = await remove(null, {
+    const { data, error } = await remove(`/${id}`, null, {
       method: REQUEST_METHOD.DELETE,
-      params: { id },
     });
     if (data) {
       toast.success('Klant succesvol verwijderd!');
-      setRevalidateList(true);
+      revalidate();
     } else if (error) toast.error('Fout bij verwijderen van klant');
     setIsLoading(false);
     setDisabled(false);
     return { data, error };
   };
 
-  const useGetPaginatedKlanten = (
-    options?: RevalidateOptions,
-    url: string = '/api/admin/klanten'
-  ) => {
-    const urlMatchesLastUrl = url && url === lastPaginatedUrl.current;
-    const shouldRevalidate =
-      revalidateList || !urlMatchesLastUrl || !paginatedKlanten.current;
+  const useGetPaginatedKlanten = (query: KlantenQuery, options?: SWROptions<PaginatedData<KlantDto>>) => {
+    const queryString = new URLSearchParams();
+    if (query.page) queryString.set('page', query.page.toString());
+    if (query.search) queryString.set('search', query.search.toString());
 
-    const { data, error, loading } = useSWR<PaginatedData<KlantDto>>(
-      url,
-      shouldRevalidate,
-      options,
-      'Fout bij laden van klanten',
-      emptyPaginatedResponse()
-    );
-    if (data && shouldRevalidate) {
-      paginatedKlanten.current = data;
-      lastPaginatedUrl.current = url;
-      setRevalidateList(false);
-    } else if (error) {
-      lastPaginatedUrl.current = url;
-    }
-    return { data: paginatedKlanten.current!, isLoading: loading };
+    const url = queryString ? `/api/admin/klanten?${queryString}` : '/api/admin/klanten';
+
+    const { data, isLoading } = useSWR<PaginatedData<KlantDto>>(swrKey, url, {
+      ...options,
+      errorMessage: 'Fout bij laden van klanten',
+      fallbackData: emptyPaginatedResponse(),
+    });
+    return { data: data ?? emptyPaginatedResponse(), isLoading };
   };
 
-  const useGetKlantDetail = (router: NextRouter, options?: RevalidateOptions) => {
-    const { isReady } = router;
-    const { slug: id } = router.query as { slug: string };
-    const newIdOrMissingData = id !== lastLoadedKlantId.current || !klantDetail;
-    const shouldRevalidate = isReady && newIdOrMissingData;
+  const useGetKlantDetail = (id: string, options?: SWROptions<KlantDto>) => {
+    const { data, isLoading } = useSWR<KlantDto>(swrKey, `/api/admin/klanten/${id}`, {
+      ...options,
+      errorMessage: 'Fout bij laden van klant detail',
+      fallbackData: EMPTY_KLANT_DETAIL,
+    });
 
-    const { data, error, loading } = useSWR<KlantDto>(
-      `/api/admin/klanten/${id}`,
-      shouldRevalidate,
-      options,
-      'Fout bij laden van klant detail',
-      EMPTY_KLANT_DETAIL
-    );
-    if (data && shouldRevalidate) {
-      klantDetail.current = data;
-      if (id !== 'undefined') lastLoadedKlantId.current = id;
-    } else if (error) {
-      klantDetail.current = null;
-      if (id !== 'undefined') lastLoadedKlantId.current = id;
-    }
-    return { data: klantDetail.current, isLoading: loading };
+    return { data: data ?? EMPTY_KLANT_DETAIL, isLoading };
   };
 
   return (

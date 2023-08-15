@@ -1,151 +1,112 @@
-import { createContext, useContext, useRef, useState } from 'react';
-import { OptionsOrGroups } from 'react-select';
+import { createContext, useContext, useState } from 'react';
 import { toast } from 'react-toastify';
+import { PaginatedData } from 'src/common/api/shared/types';
 import { RasDto } from 'src/common/api/types/ras';
-import { optionInterface } from 'src/components/register/HondGegevens';
-import getData from 'src/hooks/useApi';
 import useMutation from 'src/hooks/useMutation';
-import { PaginatedData } from 'src/shared/RequestHelper';
 import { ApiResponse, REQUEST_METHOD } from 'src/utils/axios';
 import { Option } from 'src/utils/MongoDb';
-import { useAxiosContext } from '../AxiosContext';
+import { SWROptions, useAxiosContext } from '../AxiosContext';
 import { emptyPaginatedResponse } from './AppContext';
-import { RevalidateOptions } from './klantContext';
+
+export type RasQuery = Partial<{
+  page: string;
+  pageSize: string;
+  ids: string;
+  search: string;
+}>;
 
 export type Context = {
   isLoading: boolean;
-  getRassen: () => Promise<RasDto[] | undefined>;
-  getRasOptions: () => Promise<OptionsOrGroups<any, optionInterface>>;
   updateRas: (updateData: RasDto) => ApiResponse<RasDto> | Promise<undefined>;
   createRas: (rasDto: RasDto) => ApiResponse<RasDto> | Promise<undefined>;
   deleteRas: (rasDto: RasDto) => ApiResponse<{}> | Promise<undefined>;
   useGetPaginatedRassen: (
-    url?: string,
-    options?: RevalidateOptions
+    query: RasQuery,
+    options?: SWROptions<PaginatedData<RasDto>>
   ) => {
     data: PaginatedData<RasDto>;
     isLoading: boolean;
   };
-  useGetRasOptions: (options?: RevalidateOptions) => Option[];
+  useGetRasOptions: (options?: SWROptions<RasDto[]>) => { data: Option[]; isLoading: boolean };
 };
 
 export const defaultValues: Context = {
   isLoading: false,
-  getRassen: async () => [],
-  getRasOptions: async () => [],
   updateRas: async () => undefined,
   createRas: async () => undefined,
   deleteRas: async () => undefined,
   useGetPaginatedRassen: () => ({ data: emptyPaginatedResponse(), isLoading: false }),
-  useGetRasOptions: () => [],
+  useGetRasOptions: () => ({ data: [], isLoading: false }),
 };
 
 export const Context = createContext<Context>(defaultValues);
 
 export const RasProvider: React.FC<{ children: any }> = ({ children }) => {
-  const [revalidateList, setRevalidateList] = useState<boolean>(false);
-  const [revalidateOptions, setRevalidateOptions] = useState<boolean>(false);
   const [isLoading, setisLoading] = useState<boolean>(false);
-  const rassen = useRef<RasDto[]>();
-  const paginatedRassen = useRef<PaginatedData<RasDto>>(emptyPaginatedResponse());
-  const lastPaginatedUrl = useRef<string>();
+  const swrKey = 'rassen';
 
-  const create = useMutation<RasDto>('/api/admin/rassen');
-  const update = useMutation<RasDto>(`/api/admin/rassen`);
-  const softDelete = useMutation<RasDto>(`api/admin/rassen`);
+  const mutate = useMutation<RasDto>('/api/admin/rassen');
   const { useSWR } = useAxiosContext();
 
-  const getRassen = async () => {
-    const { data, error } = await getData<RasDto[]>('/api/rassen');
-    if (error) toast.error('Fout bij laden van rassen');
-    return data;
-  };
+  const { revalidate } = useSWR(swrKey);
 
-  const useGetPaginatedRassen = (
-    url = '/api/admin/rassen',
-    options?: RevalidateOptions
-  ) => {
-    const urlMatchesLastUrl = url === lastPaginatedUrl.current;
-    const shouldRevalidate =
-      revalidateList || !urlMatchesLastUrl || !paginatedRassen.current;
+  const useGetPaginatedRassen = (query: RasQuery, options?: SWROptions<PaginatedData<RasDto>>) => {
+    const queryString = new URLSearchParams();
 
-    const { data, error, loading } = useSWR<PaginatedData<RasDto>>(
-      url,
-      shouldRevalidate,
-      options,
-      'Fout bij laden van rassen',
-      emptyPaginatedResponse()
-    );
+    if (query?.page) queryString.set('page', query.page.toString());
+    if (query.pageSize) queryString.set('pageSize', query.pageSize.toString());
+    if (query.search) queryString.set('search', query.search.toString());
+    if (query.ids) queryString.set('ids', query.ids.toString());
 
-    if (data && shouldRevalidate) {
-      lastPaginatedUrl.current = url;
-      paginatedRassen.current = data;
-      setRevalidateList(false);
-    } else if (error) lastPaginatedUrl.current = url;
+    const url = queryString ? `/api/admin/rassen?${queryString.toString()}` : '/api/admin/rassen';
 
-    return { data: paginatedRassen.current, isLoading: loading };
+    const { data, isLoading } = useSWR<PaginatedData<RasDto>>(swrKey, url, {
+      ...options,
+      errorMessage: 'Fout bij laden van rassen',
+      fallbackData: emptyPaginatedResponse(),
+    });
+
+    return { data: data ?? emptyPaginatedResponse(), isLoading };
   };
 
   const createRas = async (rasDto: RasDto) => {
-    const { data, error } = await create(rasDto);
+    const { data, error } = await mutate('/', rasDto);
     if (error) toast.error(`error bij aanmaken van ras`);
-    if (data) setRevalidateList(true);
+    if (data) revalidate();
     return { data, error };
   };
 
   const updateRas = async (rasDto: RasDto) => {
-    const { data, error } = await update(rasDto, {
+    const { data, error } = await mutate(`/${rasDto.id}`, rasDto, {
       method: REQUEST_METHOD.PUT,
-      params: { id: rasDto.id },
     });
     if (error) toast.error(`Fout bij updaten van ras`);
-    if (data) setRevalidateList(true);
+    if (data) revalidate();
     return { data, error };
   };
 
   const deleteRas = async (rasDto: RasDto) => {
-    const { data, error } = await softDelete(
-      {},
-      { method: REQUEST_METHOD.DELETE, params: { id: rasDto.id } }
-    );
+    const { data, error } = await mutate(`/${rasDto.id}`, {}, { method: REQUEST_METHOD.DELETE });
     if (error) toast.error(`Fout bij verwijderen van ras`);
-    if (data) setRevalidateList(true);
+    if (data) revalidate();
     return { data, error };
   };
 
-  const getRasOptions = async () => {
-    const rasData = await getRassen();
-    return rasData
-      ? rasData.map((rasDto) => ({ value: rasDto.id, label: rasDto.naam }))
-      : [];
-  };
+  const useGetRasOptions = (options?: SWROptions<RasDto[]>) => {
+    const { data, isLoading } = useSWR<RasDto[]>(swrKey, '/api/rassen', {
+      ...options,
+      errorMessage: 'Fout bij laden van ras opties',
+      fallbackData: [],
+    });
+    const rasOptions = data?.map((rasDto) => ({ value: rasDto.id, label: rasDto.naam })) ?? [];
 
-  const useGetRasOptions = (options?: RevalidateOptions) => {
-    const shouldRevalidate = !rassen.current || revalidateOptions;
-
-    const { data, error, loading } = useSWR<RasDto[]>(
-      '/api/rassen',
-      shouldRevalidate,
-      options,
-      'Fout bij laden van ras opties',
-      []
-    );
-    if (data && shouldRevalidate) {
-      rassen.current = data;
-      setRevalidateOptions(false);
-    }
-
-    return (
-      rassen.current?.map((rasDto) => ({ value: rasDto.id, label: rasDto.naam })) ?? []
-    );
+    return { data: rasOptions, isLoading };
   };
 
   return (
     <Context.Provider
       value={{
         isLoading,
-        getRassen,
-        getRasOptions,
         createRas,
         deleteRas,
         updateRas,

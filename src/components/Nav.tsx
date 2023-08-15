@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ADMIN, INDEX, LOGIN, REGISTER } from '../types/linkTypes';
 import { Title3 } from './Typography/Typography';
 import Image from 'next/image';
@@ -9,7 +9,6 @@ import { LOGOUT } from '../types/apiTypes';
 import useMutation from '../hooks/useMutation';
 import { REQUEST_METHOD } from 'src/utils/axios';
 import { IsKlantCollection } from 'src/common/domain/klant';
-import { useAuthContext } from 'src/context/authContext';
 
 export const Nav = () => {
   const router = useRouter();
@@ -17,7 +16,7 @@ export const Nav = () => {
   const logout = useMutation<{}>(LOGOUT);
 
   const onLogout = async () => {
-    await logout({}, { method: REQUEST_METHOD.DELETE });
+    await logout('/', {}, { method: REQUEST_METHOD.DELETE });
     localStorage.clear();
     clearData();
     router.push(INDEX);
@@ -26,10 +25,7 @@ export const Nav = () => {
   return (
     <div className="relative mb-30 w-full shadow h-16 z-20 md:mb-0 md:block">
       <div className="max-w-7xl flex justify-between items-center mx-auto px-5">
-        <div
-          className="flex gap-2 items-center cursor-pointer 3xs:gap-10"
-          onClick={() => router.push(INDEX)}
-        >
+        <div className="flex gap-2 items-center cursor-pointer 3xs:gap-10" onClick={() => router.push(INDEX)}>
           <div className="w-16">
             <Image
               src="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1659613403/De-Gallo-Hoeve/content/logo-r_vwnpdy.png"

@@ -18,9 +18,10 @@ import { ADMINLISTDOGS, ADMINLISTSUBSCRIPTIONS } from 'src/types/linkTypes';
 
 const KlantDetail = () => {
   const router = useRouter();
+  const id = router.query.slug as string;
 
   const { useGetKlantDetail } = useKlantContext();
-  const { data, isLoading } = useGetKlantDetail(router);
+  const { data, isLoading } = useGetKlantDetail(id);
 
   const [limitInschrijvingen, setLimitInschrijvingen] = useState<number>(5);
   const [edit, setEdit] = useState<boolean>(router.query.editMode ? true : false);
@@ -281,27 +282,19 @@ const KlantDetail = () => {
               </div>
               <div className="w-5/12">
                 <FormSection label="inschrijvingen" style={{ padding: 'p-5' }}>
-                  {data.inschrijvingen
-                    .slice(0, limitInschrijvingen)
-                    .map((inschrijving) => (
-                      <div key={inschrijving.id} className="flex justify-between">
-                        <Link href={ADMINLISTSUBSCRIPTIONS + inschrijving.id}>
-                          {inschrijving.datum.split(' ')[0]}
-                        </Link>
-                        <Body>{inschrijving.datum.split(' ')[1]}</Body>
-                        <Body>{inschrijving.training}</Body>
-                        <Body>{inschrijving.hond}</Body>
-                      </div>
-                    ))}
+                  {data.inschrijvingen?.slice(0, limitInschrijvingen).map((inschrijving) => (
+                    <div key={inschrijving.id} className="flex justify-between">
+                      <Link href={ADMINLISTSUBSCRIPTIONS + inschrijving.id}>{inschrijving.datum.split(' ')[0]}</Link>
+                      <Body>{inschrijving.datum.split(' ')[1]}</Body>
+                      <Body>{inschrijving.training}</Body>
+                      <Body>{inschrijving.hond}</Body>
+                    </div>
+                  ))}
                   <div className="pt-10 flex justify-center">
                     <Button
-                      label={
-                        limitInschrijvingen >= data.inschrijvingen.length
-                          ? 'toon minder'
-                          : 'toon meer'
-                      }
+                      label={limitInschrijvingen >= data.inschrijvingen?.length ? 'toon minder' : 'toon meer'}
                       onClick={
-                        limitInschrijvingen >= data.inschrijvingen.length
+                        limitInschrijvingen >= data.inschrijvingen?.length
                           ? () => setLimitInschrijvingen(5)
                           : onShowMore
                       }

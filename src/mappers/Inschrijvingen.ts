@@ -1,6 +1,4 @@
 import moment from 'moment';
-import { HondCollection } from 'src/types/EntityTpes/HondTypes';
-import { InschrijvingCollection } from 'src/types/EntityTpes/InschrijvingTypes';
 import { IsInschrijvingBodyInschrijving } from 'src/types/requestTypes';
 
 export interface PaginatedInschrijving {
@@ -39,13 +37,9 @@ export const mapInschrijvingen = (
 ) =>
   inschrijvingen
     .map((inschrijving, index) => ({
-      [`moment${index}`]: moment(inschrijving.datum)
-        .toISOString()
-        .replace('T', ' ')
-        .split(':00.')[0],
+      [`moment${index}`]: moment(inschrijving.datum).toISOString().replace('T', ' ').split(':00.')[0],
       [`hond${index}`]: inschrijving.hond_naam,
       [`prijsExcl${index}`]: index === 0 && isFirstInschrijving ? '0.00' : prijs,
-      [`prijsIncl${index}`]:
-        index === 0 && isFirstInschrijving ? '0.00' : Math.round(prijs * 1.21).toFixed(2),
+      [`prijsIncl${index}`]: index === 0 && isFirstInschrijving ? '0.00' : Math.round(prijs * 1.21).toFixed(2),
     }))
     .reduce((prev, curr) => ({ ...prev, ...curr }), {});

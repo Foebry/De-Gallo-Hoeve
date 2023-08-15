@@ -13,14 +13,8 @@ interface Props {
 
 export const Hamburger: React.FC<Props> = ({ children, roles }) => {
   const [open, setOpen] = useState<boolean>(false);
-  const logout = useMutation<{}>(LOGOUT);
-  const router = useRouter();
   const handleClick = () => {
     setOpen(() => !open);
-  };
-  const onLogout = async () => {
-    await logout({}, { method: REQUEST_METHOD.DELETE });
-    router.push(INDEX);
   };
   return (
     <div className="relative">

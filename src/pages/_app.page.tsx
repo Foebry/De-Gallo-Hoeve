@@ -21,7 +21,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   };
   const handleError = async (page: string, error: any, errorInfo: any) => {
     try {
-      if (process.env.NODE_ENV === 'production') await logError({ page, error, errorInfo });
+      if (process.env.NODE_ENV === 'production') await logError('/', { page, error, errorInfo });
       else console.log(error, errorInfo);
     } catch (e: any) {
       if (process.env.NODE_ENV !== 'production') console.log(e);

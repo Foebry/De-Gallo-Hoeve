@@ -3,15 +3,10 @@ import { ClientSession, ObjectId } from 'mongodb';
 import { InternalServerError, TransactionError } from '../shared/RequestError';
 import { InschrijvingCollection } from '../types/EntityTpes/InschrijvingTypes';
 import { IsKlantCollection } from '../types/EntityTpes/KlantTypes';
-import {
-  GroepTrainingCollection,
-  PriveTrainingCollection,
-  TrainingType,
-} from '../types/EntityTpes/TrainingType';
+import { GroepTrainingCollection, PriveTrainingCollection, TrainingType } from '../types/EntityTpes/TrainingType';
 import inschrijvingController, { getInschrijvingById } from './InschrijvingController';
-import { notEmpty } from 'src/shared/RequestHelper';
 import { getInschrijvingCollection, getTrainingCollection } from 'src/utils/db';
-import { getCurrentTime } from 'src/shared/functions';
+import { getCurrentTime, notEmpty } from 'src/shared/functions';
 
 export async function getTrainingByName(
   naam: TrainingType
@@ -34,12 +29,8 @@ export const getPriveTraining = async (): Promise<PriveTrainingCollection | null
   });
 };
 
-export async function getTrainingById(
-  _id: ObjectId
-): Promise<PriveTrainingCollection | GroepTrainingCollection | null>;
-export async function getTrainingById(
-  _id: ObjectId
-): Promise<PriveTrainingCollection | GroepTrainingCollection | null>;
+export async function getTrainingById(_id: ObjectId): Promise<PriveTrainingCollection | GroepTrainingCollection | null>;
+export async function getTrainingById(_id: ObjectId): Promise<PriveTrainingCollection | GroepTrainingCollection | null>;
 export async function getTrainingById(
   _id: ObjectId
 ): Promise<GroepTrainingCollection | PriveTrainingCollection | null> {
@@ -99,13 +90,9 @@ export const hardDelete = async (training: PriveTrainingCollection): Promise<voi
   const { deletedCount } = await collection.deleteOne({ training });
   if (deletedCount !== 1) throw new InternalServerError();
 
-  const inschrijvingen = await Promise.all(
-    inschrijvingIds.map((_id) => getInschrijvingById(_id))
-  );
+  const inschrijvingen = await Promise.all(inschrijvingIds.map((_id) => getInschrijvingById(_id)));
   await Promise.all(
-    inschrijvingen
-      .filter(notEmpty)
-      .map((inschrijving) => inschrijvingController.softDelete(inschrijving))
+    inschrijvingen.filter(notEmpty).map((inschrijving) => inschrijvingController.softDelete(inschrijving))
   );
 };
 
@@ -114,19 +101,12 @@ export const softDelete = async (training: PriveTrainingCollection): Promise<voi
   const inschrijvingIds = training.inschrijvingen;
 
   const deletedTraining = { ...training, deleted_at: getCurrentTime() };
-  const { modifiedCount } = await collection.updateOne(
-    { _id: training._id },
-    deletedTraining
-  );
+  const { modifiedCount } = await collection.updateOne({ _id: training._id }, deletedTraining);
   if (modifiedCount !== 1) throw new InternalServerError();
 
-  const inschrijvingen = await Promise.all(
-    inschrijvingIds.map((_id) => getInschrijvingById(_id))
-  );
+  const inschrijvingen = await Promise.all(inschrijvingIds.map((_id) => getInschrijvingById(_id)));
   await Promise.all(
-    inschrijvingen
-      .filter(notEmpty)
-      .map((inschrijving) => inschrijvingController.softDelete(inschrijving))
+    inschrijvingen.filter(notEmpty).map((inschrijving) => inschrijvingController.softDelete(inschrijving))
   );
 };
 
@@ -156,9 +136,7 @@ export const trainingVolzet = async (
     .toArray();
 
   if (training.naam === 'groep')
-    return (
-      inschrijvingen.length >= (training as GroepTrainingCollection)!.max_inschrijvingen
-    );
+    return inschrijvingen.length >= (training as GroepTrainingCollection)!.max_inschrijvingen;
   return inschrijvingen.length > 0;
 };
 
@@ -166,14 +144,8 @@ export async function update(
   _id: ObjectId,
   updateData: GroepTrainingCollection
 ): Promise<GroepTrainingCollection | PriveTrainingCollection>;
-export async function update(
-  _id: ObjectId,
-  updateData: PriveTrainingCollection
-): Promise<PriveTrainingCollection>;
-export async function update(
-  _id: ObjectId,
-  updateData: GroepTrainingCollection | PriveTrainingCollection
-) {
+export async function update(_id: ObjectId, updateData: PriveTrainingCollection): Promise<PriveTrainingCollection>;
+export async function update(_id: ObjectId, updateData: GroepTrainingCollection | PriveTrainingCollection) {
   const collection = await getTrainingCollection();
   const training = await getTrainingById(_id);
   const updateTraining = { ...training, ...updateData };
@@ -214,12 +186,8 @@ const trainingController: IsTrainingController = {
 };
 
 export type IsTrainingController = {
-  getTrainingById: (
-    _id: ObjectId
-  ) => Promise<GroepTrainingCollection | PriveTrainingCollection | null>;
-  getTrainingByName: (
-    name: TrainingType
-  ) => Promise<PriveTrainingCollection | GroepTrainingCollection | null>;
+  getTrainingById: (_id: ObjectId) => Promise<GroepTrainingCollection | PriveTrainingCollection | null>;
+  getTrainingByName: (name: TrainingType) => Promise<PriveTrainingCollection | GroepTrainingCollection | null>;
   getPriveTraining: () => Promise<PriveTrainingCollection | null>;
   addInschrijving: (
     trainingName: TrainingType,
@@ -238,10 +206,7 @@ export type IsTrainingController = {
     training: TrainingType,
     inschrijving: InschrijvingCollection
   ) => Promise<boolean>;
-  trainingVolzet: (
-    trainingName: GroepTrainingCollection | PriveTrainingCollection,
-    datum: Date
-  ) => Promise<boolean>;
+  trainingVolzet: (trainingName: GroepTrainingCollection | PriveTrainingCollection, datum: Date) => Promise<boolean>;
   save: (
     training: GroepTrainingCollection | PriveTrainingCollection
   ) => Promise<GroepTrainingCollection | PriveTrainingCollection>;

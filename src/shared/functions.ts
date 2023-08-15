@@ -25,6 +25,8 @@ export const getAge = (date: Date) =>
   moment(date).fromNow().replace('years ago', 'jaar').replace('a month ago', '1 maand').replace('days ago', 'dagen');
 
 export const toReadableDate = (date: Date): string => date.toISOString().replace('T', ' ').split('.')[0];
+export const toHumanReadableDate = (date: Date): string =>
+  date.toLocaleDateString('nl-BE', { year: 'numeric', month: 'long', day: 'numeric' });
 
 export const pick = <T>(arr: T[]): T => {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -50,6 +52,10 @@ export const sleep = async (s: number) => {
       return resolve(true);
     }, s * 1000);
   });
+};
+
+export const notEmpty = <T>(obj: T | null | undefined): obj is T => {
+  return obj !== null && obj !== undefined;
 };
 
 const helper: HelperInterface = {

@@ -71,13 +71,8 @@ const TrainingDayProvider: React.FC<{ children: any }> = ({ children }) => {
   };
 
   const saveTrainingDays = async (confirmed?: boolean) => {
-    const { error, data } = await save(
-      {
-        selected: trainingDays,
-        confirmed,
-      },
-      { method: REQUEST_METHOD.PUT }
-    );
+    const dto = { selected: trainingDays, confirmed };
+    const { error, data } = await save('/', dto, { method: REQUEST_METHOD.PUT });
     if (error) {
       if (error.code === 409) {
         updateModal(

@@ -12,10 +12,11 @@ import { useInschrijvingContext } from 'src/context/app/InschrijvingContext';
 
 const InschrijvingDetail = () => {
   const router = useRouter();
+  const id = router.query.slug as string;
   const { editMode } = router.query;
 
   const { useGetInschrijvingDetail } = useInschrijvingContext();
-  const { data, isLoading } = useGetInschrijvingDetail(router);
+  const { data, isLoading } = useGetInschrijvingDetail(id);
 
   const [edit, setEdit] = useState<boolean>(editMode ? true : false);
 

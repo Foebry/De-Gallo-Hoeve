@@ -1,10 +1,5 @@
 import { Body, Title2 } from './Typography/Typography';
-import {
-  IoLogoFacebook,
-  IoLogoInstagram,
-  IoMdMail,
-  IoMdPhonePortrait,
-} from 'react-icons/io';
+import { IoLogoFacebook, IoLogoInstagram, IoMdMail, IoMdPhonePortrait } from 'react-icons/io';
 import Form from './form/Form';
 import FormInput from './form/FormInput';
 import { Controller, useForm } from 'react-hook-form';
@@ -37,7 +32,7 @@ const Footer: React.FC<Props> = ({}) => {
     const payload = values;
     if (!disabled) {
       setDisabled(() => true);
-      const { data, error } = await contact({
+      const { data, error } = await contact('/', {
         ...payload,
         email: payload.email?.trim().toLowerCase(),
         csrf: 'MmJiM2pwNHQ1dg==$c0tKJd-G-aePggUzDLC6H28lsl2iNCjnGBQ5i0vpzdw',
@@ -70,11 +65,7 @@ const Footer: React.FC<Props> = ({}) => {
             </Body>
             <Body className="flex gap-2 items-center">
               <IoLogoInstagram className="text-green-200 text-2xl" />
-              <a
-                href="https://www.instagram.com/degallohoeve"
-                target="_blank"
-                rel="noreferrer"
-              >
+              <a href="https://www.instagram.com/degallohoeve" target="_blank" rel="noreferrer">
                 degallohoeve
               </a>
             </Body>

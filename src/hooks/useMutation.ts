@@ -4,10 +4,11 @@ import { ApiResponse, ErrorInfoType, Options } from 'src/utils/axios';
 
 const useMutation = <T, E = Partial<T> & ErrorInfoType>(endpoint: string) => {
   const { increase, decrease, send } = useAxiosContext();
-  const executerFunc = async (payload: any, options?: Options): ApiResponse<T, E> => {
+  const executerFunc = async (params: string, payload: any, options?: Options): ApiResponse<T, E> => {
+    const api = `${endpoint}${params}`;
     try {
       increase();
-      const { data } = await send<T>(endpoint, payload, options);
+      const { data } = await send<T>(api, payload, options);
       return { data, error: undefined };
     } catch (error: any) {
       const data = { ...error.response.data, code: error.response.status };

@@ -7,7 +7,7 @@ import { MySelect } from 'src/components/MySelect';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { HondDetailResponse } from 'src/pages/api/admin/honden/[slug].page';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useHondContext } from 'src/context/app/hondContext';
 import { useRasContext } from 'src/context/app/RasContext';
@@ -16,13 +16,18 @@ import Spinner from 'src/components/loaders/Spinner';
 
 const HondDetail = () => {
   const router = useRouter();
-  const { editMode } = router.query;
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { editMode, slug: id } = router.query as { editMode: string; slug: string };
   const { useGetHondDetail } = useHondContext();
   const { useGetRasOptions } = useRasContext();
 
   const [edit, setEdit] = useState<boolean>(editMode ? true : false);
-  const rassen = useGetRasOptions();
-  const { data: hondDetail, isLoading } = useGetHondDetail(router);
+  const { data: rassen, isLoading: isRassenLoading } = useGetRasOptions();
+  const { data: hondDetail, isLoading: isHondDetailLoading } = useGetHondDetail(id);
+
+  useEffect(() => {
+    setIsLoading(isRassenLoading && isHondDetailLoading);
+  }, [isRassenLoading, isHondDetailLoading]);
 
   const { control, handleSubmit } = useForm<HondDetailResponse>();
 
@@ -64,10 +69,7 @@ const HondDetail = () => {
                   <MySelect
                     name="ras"
                     options={rassen}
-                    value={
-                      value ??
-                      rassen?.find((rasOption) => rasOption.value === hondDetail?.ras.id)
-                    }
+                    value={value ?? rassen?.find((rasOption) => rasOption.value === hondDetail?.ras.id)}
                     onChange={onChange}
                     disabled={!edit}
                   />
@@ -83,12 +85,7 @@ const HondDetail = () => {
                     name="geslacht"
                     label="geslacht"
                     onChange={onChange}
-                    value={
-                      value ??
-                      geslachten.find(
-                        (geslacht) => geslacht.label === hondDetail?.geslacht
-                      )
-                    }
+                    value={value ?? geslachten.find((geslacht) => geslacht.label === hondDetail?.geslacht)}
                     disabled={!edit}
                     options={geslachten}
                   />
@@ -103,10 +100,7 @@ const HondDetail = () => {
                     id="geboortedatum"
                     label="geboortedatum"
                     onChange={onChange}
-                    value={
-                      moment(value ?? hondDetail?.geboortedatum).format('DD/MM/YYYY') ??
-                      ''
-                    }
+                    value={moment(value ?? hondDetail?.geboortedatum).format('DD/MM/YYYY') ?? ''}
                     disabled={!edit}
                   />
                 )}
@@ -122,11 +116,7 @@ const HondDetail = () => {
                     id="eigenaar"
                     label="eigenaar"
                     onChange={onChange}
-                    value={
-                      value ??
-                      `${hondDetail?.klant.vnaam} ${hondDetail?.klant.lnaam}` ??
-                      ''
-                    }
+                    value={value ?? `${hondDetail?.klant.vnaam} ${hondDetail?.klant.lnaam}` ?? ''}
                     disabled={true}
                   />
                 )}

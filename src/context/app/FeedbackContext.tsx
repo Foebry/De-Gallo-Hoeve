@@ -1,14 +1,6 @@
 import { FEEDBACK_API } from '@/types/apiTypes';
 import { useRouter } from 'next/router';
-import {
-  createContext,
-  Dispatch,
-  MutableRefObject,
-  SetStateAction,
-  useContext,
-  useRef,
-  useState,
-} from 'react';
+import { createContext, Dispatch, MutableRefObject, SetStateAction, useContext, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { FeedbackDto } from 'src/common/api/types/feedback';
 import getData from 'src/hooks/useApi';
@@ -23,10 +15,7 @@ type FeedbackContext = {
   errors: Partial<FeedbackBody>;
   feedback: FeedbackDto[];
   setFeedback: Dispatch<SetStateAction<FeedbackDto[]>>;
-  sendFeedback: (
-    body: FeedbackBody,
-    params: FeedbackQuery
-  ) => Promise<Partial<FeedbackBody> | void>;
+  sendFeedback: (body: FeedbackBody, params: FeedbackQuery) => Promise<Partial<FeedbackBody> | void>;
   getFeedback: () => ApiResponse<FeedbackDto[]>;
 };
 
@@ -60,7 +49,7 @@ const FeedbackProvider: React.FC<{ children: any }> = ({ children }) => {
     if (disabled) return;
     setDisabled(true);
     setIsLoading(true);
-    const { data, error } = await postFeedback(body, { params: query });
+    const { data, error } = await postFeedback('/', body, { params: query });
     setIsLoading(false);
     if (error) {
       setDisabled(false);

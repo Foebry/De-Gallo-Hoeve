@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<{ children: any }> = ({ children }) => {
   const login = async (body: LoginBody) => {
     if (disabled) return;
     setDisabled(true);
-    const { data, error } = await loginMutation(body);
+    const { data, error } = await loginMutation('', body);
     setDisabled(false);
     if (error) {
       setErrors(error);

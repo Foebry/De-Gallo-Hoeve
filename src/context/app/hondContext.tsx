@@ -1,15 +1,20 @@
 import { Geslacht } from '@/types/EntityTpes/HondTypes';
-import { NextRouter } from 'next/router';
-import { createContext, useContext, useRef, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { toast } from 'react-toastify';
+import { PaginatedData } from 'src/common/api/shared/types';
 import { HondDto } from 'src/common/api/types/hond';
 import getData from 'src/hooks/useApi';
 import useMutation from 'src/hooks/useMutation';
-import { PaginatedData } from 'src/shared/RequestHelper';
 import { ApiResponse, REQUEST_METHOD } from 'src/utils/axios';
 import { useAxiosContext } from '../AxiosContext';
 import { defaultApiResponse, emptyPaginatedResponse } from './AppContext';
 import { RevalidateOptions } from './klantContext';
+
+type HondQuery = Partial<{
+  page: string;
+  pageSize: string;
+  ids: string;
+}>;
 
 const EMPTY_HOND_DETAIL: HondDto = {
   id: '',
@@ -38,13 +43,10 @@ type HondContext = {
   postHond: (hondDto: HondDto) => ApiResponse<HondDto>;
   deleteHond: (hondDto: HondDto) => ApiResponse<{}>;
   useGetPaginatedHonden: (
-    url?: string,
+    query: HondQuery,
     options?: RevalidateOptions
   ) => { data: PaginatedData<HondDto>; isLoading: boolean };
-  useGetHondDetail: (
-    router: NextRouter,
-    options?: RevalidateOptions
-  ) => { data: HondDto | null; isLoading: boolean };
+  useGetHondDetail: (id: string, options?: RevalidateOptions) => { data: HondDto | null; isLoading: boolean };
 };
 
 const defaultValues: HondContext = {
@@ -62,18 +64,14 @@ const defaultValues: HondContext = {
 export const HondContext = createContext<HondContext>(defaultValues);
 
 const HondProvider: React.FC<{ children: any }> = ({ children }) => {
-  const [revalidateList, setRevalidateList] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
-  const hondDetail = useRef<HondDto | null>(null);
-  const lastPaginatedUrl = useRef<string>();
-  const paginatedHonden = useRef<PaginatedData<HondDto>>(emptyPaginatedResponse());
-  const lastLoadedId = useRef<string>('');
+  const swrKey = 'honden';
 
-  const update = useMutation<HondDto>('/api/honden');
-  const create = useMutation<HondDto>('/api/honden');
-  const softDelete = useMutation<{}>('/api/honden');
+  const mutate = useMutation<HondDto>('/api/honden');
   const { useSWR } = useAxiosContext();
+
+  const { revalidate } = useSWR(swrKey);
 
   const getHonden = async () => {
     setIsLoading(true);
@@ -95,16 +93,14 @@ const HondProvider: React.FC<{ children: any }> = ({ children }) => {
     if (disabled) return defaultApiResponse;
     setDisabled(true);
     setIsLoading(true);
-    const { data, error } = await update(hondDto, {
+    const { data, error } = await mutate(`/${hondDto.id}`, hondDto, {
       method: REQUEST_METHOD.PUT,
-      params: { id: hondDto.id },
     });
     setDisabled(false);
     setIsLoading(false);
     if (error) toast.error('Fout bij updaten van hond');
     if (data) {
-      hondDetail.current = data;
-      setRevalidateList(true);
+      revalidate();
     }
     return { data, error };
   };
@@ -113,9 +109,9 @@ const HondProvider: React.FC<{ children: any }> = ({ children }) => {
     if (disabled) return defaultApiResponse;
     setDisabled(true);
     setIsLoading(true);
-    const { data, error } = await create(hondDto);
+    const { data, error } = await mutate('/', hondDto);
     if (error) toast.error(`Fout bij aanmaken van hond`);
-    else if (data) setRevalidateList(true);
+    else if (data) revalidate();
     setDisabled(false);
     setIsLoading(false);
     return { data, error };
@@ -125,64 +121,40 @@ const HondProvider: React.FC<{ children: any }> = ({ children }) => {
     if (disabled) return defaultApiResponse;
     setDisabled(true);
     setIsLoading(true);
-    const { data, error } = await softDelete(null, {
+    const { data, error } = await mutate(`/${hondDto.id}`, null, {
       method: REQUEST_METHOD.DELETE,
-      params: { id: hondDto.id },
     });
     if (error) toast.error('Fout bij verwijderen van hond');
-    else if (data) setRevalidateList(true);
+    else if (data) revalidate();
     setDisabled(false);
     setIsLoading(false);
     return { data, error };
   };
 
-  const useGetPaginatedHonden = (
-    url = '/api/admin/honden',
-    options?: RevalidateOptions
-  ) => {
-    const urlMatchesLastUrl = url && url === lastPaginatedUrl.current;
-    const shouldRevalidate =
-      revalidateList || !urlMatchesLastUrl || !paginatedHonden.current;
+  const useGetPaginatedHonden = (query: HondQuery, options?: RevalidateOptions) => {
+    const queryString = new URLSearchParams();
+    if (query.ids) queryString.set('ids', query.ids.toString());
 
-    const { data, error, loading } = useSWR<PaginatedData<HondDto>>(
-      url,
-      shouldRevalidate,
-      options,
-      'Fout bij laden van honden',
-      emptyPaginatedResponse()
-    );
-    if (data && shouldRevalidate) {
-      lastPaginatedUrl.current = url;
-      paginatedHonden.current = data;
-      setRevalidateList(false);
-    } else if (error) {
-      lastPaginatedUrl.current = url;
-    }
-    return { data: paginatedHonden.current, isLoading: loading };
+    const url = queryString ? `/api/admin/honden?${queryString.toString()}` : '/api/admin/honden';
+
+    const { data, isLoading } = useSWR<PaginatedData<HondDto>>(swrKey, url, {
+      ...options,
+      errorMessage: 'Fout bij laden van honden',
+      fallbackData: emptyPaginatedResponse(),
+    });
+    return { data: data ?? emptyPaginatedResponse(), isLoading };
   };
 
-  const useGetHondDetail = (router: NextRouter, options?: RevalidateOptions) => {
-    const { isReady } = router;
-    const { slug: id } = router.query as { slug: string };
-    const newIdOrMissingData = id !== lastLoadedId.current || !hondDetail;
-    const shouldRevalidate = isReady && newIdOrMissingData;
+  const useGetHondDetail = (id: string, options?: RevalidateOptions) => {
+    const url = `/api/admin/honden/${id}`;
 
-    const { data, error, loading } = useSWR<HondDto>(
-      `/api/admin/honden/${id}`,
-      shouldRevalidate,
-      options,
-      'Fout bij laden van hond detail',
-      EMPTY_HOND_DETAIL
-    );
-    if (data && shouldRevalidate) {
-      hondDetail.current = data;
-      if (id !== 'undefined') lastLoadedId.current = id;
-    } else if (error) {
-      hondDetail.current = null;
-      if (id !== 'undefined') lastLoadedId.current = id;
-    }
+    const { data, isLoading } = useSWR<HondDto>(swrKey, url, {
+      ...options,
+      fallbackData: EMPTY_HOND_DETAIL,
+      errorMessage: 'Fout bij laden van hond detail',
+    });
 
-    return { data: hondDetail.current, isLoading: loading };
+    return { data: data ?? EMPTY_HOND_DETAIL, isLoading };
   };
 
   return (
