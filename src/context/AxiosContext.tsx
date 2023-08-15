@@ -4,7 +4,6 @@ import { toast } from 'react-toastify';
 import getData from 'src/hooks/useApi';
 import { sleep } from 'src/shared/functions';
 import { Options, REQUEST_METHOD } from 'src/utils/axios';
-import { RevalidateOptions } from './app/klantContext';
 
 export type SWROptions<T> = {
   maxRetries?: number;

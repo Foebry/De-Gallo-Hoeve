@@ -59,7 +59,7 @@ const DetailsPage: React.FC<Props> = ({}) => {
     const dto = {
       ...vacationData,
       duration: values.duration,
-      notificationStartData:
+      notificationStartDate:
         typeof values.notificationStartData === 'string'
           ? values.notificationStartDate
           : values.notificationStartDate[0],
@@ -87,10 +87,7 @@ const DetailsPage: React.FC<Props> = ({}) => {
           )}
           <Title2>Vacation-details</Title2>
           <div className="border-2 rounded mt-20 max-w-2xl mx-auto px-10">
-            <Form
-              onSubmit={handleSubmit(onSubmit)}
-              action={editMode ? 'verstuur' : undefined}
-            >
+            <Form onSubmit={handleSubmit(onSubmit)} action={editMode ? 'verstuur' : undefined}>
               <Details control={control} getValues={getValues} disabled={!editMode} />
             </Form>
           </div>

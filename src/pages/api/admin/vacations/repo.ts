@@ -10,12 +10,9 @@ export const getVacationsList = async (
 ): Promise<[number, WithId<Vacation>[]]> => {
   const collection = await getVacationCollection();
 
-  const refinementQuery = [{ deleted_at: { deleted_at: undefined } }];
-  const vacations = await collection
-    .find({ $all: [...refinementQuery] })
-    .skip(skip)
-    .limit(take)
-    .toArray();
+  const refinementQuery = { deleted_at: { deleted_at: undefined } };
+  const refinements = Object.values(refinementQuery);
+  const vacations = await collection.find({ $and: refinements }).skip(skip).limit(take).toArray();
   const total = await collection.countDocuments({ deleted_at: undefined });
 
   return [total, vacations];

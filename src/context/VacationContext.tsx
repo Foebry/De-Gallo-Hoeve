@@ -76,7 +76,7 @@ const VacationProvider: React.FC<{ children: any }> = ({ children }) => {
   };
 
   const updateVacation = async (dto: VacationDto) => {
-    const { data, error } = await mutate(`${dto.id}`, dto, {
+    const { data, error } = await mutate(`/${dto.id}`, dto, {
       method: REQUEST_METHOD.PUT,
     });
 
@@ -104,7 +104,8 @@ const VacationProvider: React.FC<{ children: any }> = ({ children }) => {
 
   const deleteVacation = async (id: string) => {
     const { data, error } = await mutate(`/${id}`, {}, { method: REQUEST_METHOD.DELETE });
-    if (data) {
+    if (!error) {
+      // we should refactor the usMutatehook so that the mutate function returns a loading and isSuccess state
       revalidate();
       toast.success('Vakantie-periode verwijderd');
     } else if (error) toast.error(error.message);
