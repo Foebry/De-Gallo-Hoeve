@@ -110,8 +110,10 @@ const Index: React.FC<Props> = ({}) => {
                 Heb je zelf geen tijd om elke zondag ochtend naar de hondenschool te gaan? <br />
                 En heb je liever dat je het weekend thuis kunt spenderen en ook alles met je hond kunt leren?
               </Body>
-              <Body>Reserveer hieronder dan een testsessie, de eerste consultatie is gratis.</Body>
-              <Body>Hierna kom ik tot bij u thuis en gaan wij samenzitten om alles rond uw hond te bespreken:</Body>
+              <Body>
+                Reserveer hieronder dan eenvouding een training moment. <br /> Volgende topics zullen we dan tijdens de
+                training bespreken:
+              </Body>
               <ul className="mx-auto text-left pl-20 pt-2 pb-3 flex flex-col gap-1 md:w-4/5 md:pl-80">
                 <li className="flex gap-1 items-center">
                   <GiCheckMark />

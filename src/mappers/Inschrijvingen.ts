@@ -30,16 +30,12 @@ export interface DetailInschrijvingResponse {
   };
 }
 
-export const mapInschrijvingen = (
-  inschrijvingen: IsInschrijvingBodyInschrijving[],
-  isFirstInschrijving: boolean,
-  prijs: number
-) =>
+export const mapInschrijvingen = (inschrijvingen: IsInschrijvingBodyInschrijving[], prijs: number) =>
   inschrijvingen
     .map((inschrijving, index) => ({
       [`moment${index}`]: moment(inschrijving.datum).toISOString().replace('T', ' ').split(':00.')[0],
       [`hond${index}`]: inschrijving.hond_naam,
-      [`prijsExcl${index}`]: index === 0 && isFirstInschrijving ? '0.00' : prijs,
-      [`prijsIncl${index}`]: index === 0 && isFirstInschrijving ? '0.00' : Math.round(prijs * 1.21).toFixed(2),
+      [`prijsExcl${index}`]: prijs,
+      [`prijsIncl${index}`]: Math.round(prijs * 1.21).toFixed(2),
     }))
     .reduce((prev, curr) => ({ ...prev, ...curr }), {});
