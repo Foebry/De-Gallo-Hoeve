@@ -20,6 +20,7 @@ import {
   TrainingDaysCollection,
 } from 'src/types/EntityTpes/TrainingType';
 import Vacation from 'src/common/domain/entities/Vacation';
+import { ObjectLiteral } from 'src/common/domain/entities/Entitybase';
 
 export type CollectionOptions = {
   includeDeleted?: boolean;
@@ -74,16 +75,12 @@ export const getContentCollection = async (): Promise<Collection<ContentCollecti
   return client.db(DATABASE).collection<ContentCollection>('content');
 };
 
-export const getErrorLogCollection = async (): Promise<
-  Collection<ErrorLogCollection>
-> => {
+export const getErrorLogCollection = async (): Promise<Collection<ErrorLogCollection>> => {
   const client = await connectClient();
   return client.db(DATABASE).collection<ErrorLogCollection>('ErrorLog');
 };
 
-export const getInschrijvingCollection = async (): Promise<
-  Collection<InschrijvingCollection>
-> => {
+export const getInschrijvingCollection = async (): Promise<Collection<InschrijvingCollection>> => {
   const client = await connectClient();
   return client.db(DATABASE).collection<InschrijvingCollection>('inschrijving');
 };
@@ -102,21 +99,15 @@ export const getTrainingCollection = async (): Promise<
   Collection<PriveTrainingCollection | GroepTrainingCollection>
 > => {
   const client = await connectClient();
-  return client
-    .db(DATABASE)
-    .collection<PriveTrainingCollection | GroepTrainingCollection>('training');
+  return client.db(DATABASE).collection<PriveTrainingCollection | GroepTrainingCollection>('training');
 };
 
-export const getTrainingDaysCollection = async (): Promise<
-  Collection<TrainingDaysCollection>
-> => {
+export const getTrainingDaysCollection = async (): Promise<Collection<TrainingDaysCollection>> => {
   const client = await connectClient();
   return client.db(DATABASE).collection<TrainingDaysCollection>('trainingDays');
 };
 
-export const getFeedbackCollection = async (): Promise<
-  Collection<FeedBackCollection>
-> => {
+export const getFeedbackCollection = async (): Promise<Collection<FeedBackCollection>> => {
   const client = await connectClient();
   return client.db(DATABASE).collection<FeedBackCollection>('feedback');
 };
@@ -139,4 +130,9 @@ export const startTransaction = (): TransactionOptions => {
 export const startSession = async (): Promise<ClientSession> => {
   const client = await connectClient();
   return client.startSession();
+};
+
+export const getCollection = async <T>(entity: T extends ObjectLiteral ? T : any) => {
+  const client = await connectClient();
+  return client.db(DATABASE).collection<T>(entity.name);
 };
