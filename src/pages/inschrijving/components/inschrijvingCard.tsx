@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { Control, Controller, useForm } from 'react-hook-form';
 import { RiDeleteBin6Line } from 'react-icons/ri';
-import { FormType } from './uitlaat-dienst/index.page';
+import { FormType } from '../uitlaat-dienst/index.page';
 
 type Props = {
   date: string;

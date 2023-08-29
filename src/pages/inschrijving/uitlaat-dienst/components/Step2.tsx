@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid';
 import React from 'react';
 import { Control, UseFormGetValues, Controller } from 'react-hook-form';
-import InschrijvingCard from '../../inschrijvingCard';
+import InschrijvingCard from '../../components/inschrijvingCard';
 import { FormType } from '../index.page';
 // import { Controller } from 'react-hook-form';
 import Select from 'react-select';
