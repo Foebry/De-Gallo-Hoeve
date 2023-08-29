@@ -46,7 +46,7 @@ const useGetErrorInfo = (router: NextRouter) => {
 
   const renewVerificationCode = async () => {
     try {
-      const { data, error } = await reset('/', {}, { method: REQUEST_METHOD.PUT });
+      const { data, error } = await reset(`/?code=${confirmCode}`, {}, { method: REQUEST_METHOD.PUT });
       if (data) router.push('/');
       else if (error) router.push(`/error?${error.code}&code=${confirmCode}`);
     } catch (e: any) {
@@ -71,7 +71,7 @@ const useGetErrorInfo = (router: NextRouter) => {
         </>
       );
       break;
-    case 'e7turmpp5tn':
+    case FrontEndErrorCodes.ExpiredConfirmCode:
       title = 'Deze verificatie-code is vervallen';
       link = (
         <>
