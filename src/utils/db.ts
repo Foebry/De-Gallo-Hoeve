@@ -6,6 +6,7 @@ import {
   ReadConcernLevel,
   ClientSession,
   MongoClientOptions,
+  WithId,
 } from 'mongodb';
 import { IsKlantCollection } from 'src/common/domain/klant';
 import { ConfirmCollection } from 'src/types/EntityTpes/ConfirmTypes';
@@ -132,7 +133,7 @@ export const startSession = async (): Promise<ClientSession> => {
   return client.startSession();
 };
 
-export const getCollection = async <T>(entity: T extends ObjectLiteral ? T : any) => {
+export const getCollection = async <T extends ObjectLiteral>(entity: T): Promise<Collection<T>> => {
   const client = await connectClient();
   return client.db(DATABASE).collection<T>(entity.name);
 };

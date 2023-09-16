@@ -1,9 +1,10 @@
 import { NextRouter } from 'next/router';
-import { createContext, useContext, useMemo, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { PaginatedData } from 'src/common/api/shared/types';
 import { InschrijvingDto } from 'src/common/api/types/inschrijving';
 import useMutation from 'src/hooks/useMutation';
+import { CheckAvailabilityType } from 'src/pages/api/subscriptions/check-availability/schemas';
 import { ApiResponse, REQUEST_METHOD } from 'src/utils/axios';
 import { SWROptions, useAxiosContext } from '../AxiosContext';
 import { defaultApiResponse, emptyPaginatedResponse } from './AppContext';
@@ -53,6 +54,11 @@ type Context = {
   };
   editInschrijving: (dto: InschrijvingDto) => ApiResponse<InschrijvingDto>;
   softDeleteInschrijving: (dto: InschrijvingDto) => ApiResponse<{}>;
+  useCheckAvailabilityRecurringWalkingServiceSubscriptions: (payload: CheckAvailabilityType) => {
+    data: any;
+    isLoading: boolean;
+    error?: any;
+  };
 };
 
 const defaultValues: Context = {
@@ -69,6 +75,7 @@ const defaultValues: Context = {
   }),
   editInschrijving: async () => defaultApiResponse,
   softDeleteInschrijving: async () => defaultApiResponse,
+  useCheckAvailabilityRecurringWalkingServiceSubscriptions: () => ({ data: null, isLoading: false }),
 };
 
 const Context = createContext<Context>(defaultValues);
@@ -76,8 +83,6 @@ const Context = createContext<Context>(defaultValues);
 const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
-  const [revalidateList, setRevalidateList] = useState<boolean>(false);
-  const [revalidateDetail, setRevalidateDetail] = useState<boolean>(false);
 
   const create = useMutation<InschrijvingDto>('api/inschrijvingen/');
   const edit = useMutation<InschrijvingDto>('/api/inschrijvingen/');
@@ -153,6 +158,32 @@ const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
     return { data: data ?? EMPTY_INSCHRIJVING_DETAIL, isLoading };
   };
 
+  const useCheckAvailabilityRecurringWalkingServiceSubscriptions = (payload: CheckAvailabilityType) => {
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [data, setData] = useState<any>();
+    const [error, setError] = useState<any>();
+    const mutate = useMutation<CheckAvailabilityType>('/api/subscriptions/check-availability');
+
+    useEffect(() => {
+      (async () => {
+        const { data: mutationData, error: mutationError } = await mutate('', payload);
+        setIsLoading(false);
+        setData(mutationData);
+        setError(mutationError);
+      })();
+    }, []);
+    // useEffect(() => {
+    //   (async () => {
+    //     const p = new Promise((resolve, reject) => {
+    //       setTimeout(() => setIsLoading(false), 2000);
+    //       resolve('ok');
+    //     });
+    //   })();
+    // }, []);
+
+    return { isLoading, data, error };
+  };
+
   return (
     <Context.Provider
       value={{
@@ -163,6 +194,7 @@ const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
         useGetPaginatedInschrijvingen,
         useGetInschrijvingDetail,
         softDeleteInschrijving,
+        useCheckAvailabilityRecurringWalkingServiceSubscriptions,
       }}
     >
       {children}

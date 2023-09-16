@@ -65,6 +65,17 @@ export const classNames = (classes: Record<string, boolean>) => {
     .join(' ');
 };
 
+export const getDatesBetween = (startDate: Date, endDate: Date) => {
+  const dates: Date[] = [];
+  let currentDate = new Date(startDate);
+  while (currentDate <= endDate) {
+    const newDate = new Date(currentDate);
+    dates.push(newDate);
+    currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+  }
+  return dates;
+};
+
 const helper: HelperInterface = {
   capitalize,
 };
