@@ -4,7 +4,7 @@ import { NotAllowedError } from 'src/shared/RequestError';
 import checkAvailability, { Request } from './checkAvailability';
 import { verifiedUserApi } from 'src/services/Authenticator';
 import { validate } from 'src/services/Validator';
-import { CheckAvailabilitySchema } from './schemas';
+import { CheckAvailabilitySchema } from '../schemas';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {

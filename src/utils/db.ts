@@ -133,7 +133,7 @@ export const startSession = async (): Promise<ClientSession> => {
   return client.startSession();
 };
 
-export const getCollection = async <T extends ObjectLiteral>(entity: T): Promise<Collection<T>> => {
+export const getCollection = async <T extends ObjectLiteral>(name: string): Promise<Collection<T>> => {
   const client = await connectClient();
-  return client.db(DATABASE).collection<T>(entity.name);
+  return client.db(DATABASE).collection<T>(name);
 };

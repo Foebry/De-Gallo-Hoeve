@@ -5,7 +5,7 @@ import Spinner from 'src/components/loaders/Spinner';
 import { useInschrijvingContext } from 'src/context/app/InschrijvingContext';
 import { useKlantContext } from 'src/context/app/klantContext';
 import { useUserContext } from 'src/context/app/UserContext';
-import { CheckAvailabilityType } from 'src/pages/api/subscriptions/check-availability/schemas';
+import { CheckAvailabilityType } from 'src/pages/api/subscriptions/schemas';
 import { FormType } from '../index.page';
 
 type Props = {

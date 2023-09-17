@@ -10,7 +10,7 @@ export enum TimeFrame {
   EVENING = 'evening',
 }
 
-type SubscriptionDetails = {
+export type SubscriptionDetails = {
   date: Date;
   dogs: HondCollection[];
   timeSlots: (string | TimeFrame)[];

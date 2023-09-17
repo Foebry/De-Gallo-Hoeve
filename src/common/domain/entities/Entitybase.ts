@@ -1,7 +1,8 @@
 import { ObjectId } from 'mongodb';
 import { getCurrentTime } from 'src/shared/functions';
+import {Document} from 'mongodb'
 
-export interface ObjectLiteral {
+export interface ObjectLiteral extends Document {
   [k: string]: any;
 }
 

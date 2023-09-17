@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { PaginatedData } from 'src/common/api/shared/types';
 import { InschrijvingDto } from 'src/common/api/types/inschrijving';
 import useMutation from 'src/hooks/useMutation';
-import { CheckAvailabilityType } from 'src/pages/api/subscriptions/check-availability/schemas';
+import { CheckAvailabilityType } from 'src/pages/api/subscriptions/schemas';
 import { ApiResponse, REQUEST_METHOD } from 'src/utils/axios';
 import { SWROptions, useAxiosContext } from '../AxiosContext';
 import { defaultApiResponse, emptyPaginatedResponse } from './AppContext';
