@@ -78,8 +78,6 @@ const postInschrijving = async (req: PostInschrijvingRequest, res: NextApiRespon
     const klant = await getKlantById(new ObjectId(klant_id));
     if (!klant) throw new KlantNotFoundError();
 
-    const isFirstInschrijving = !klant.inschrijvingen.length;
-
     const selectedTraining = await getTrainingByName(training);
     if (!selectedTraining) throw new TrainingNotFoundError();
 
@@ -118,7 +116,7 @@ const postInschrijving = async (req: PostInschrijvingRequest, res: NextApiRespon
       throw new TransactionError(e.name, e.code, e.response);
     }
 
-    const data = mapInschrijvingen(inschrijvingen, isFirstInschrijving, prijs);
+    const data = mapInschrijvingen(inschrijvingen, prijs);
     await mailer.sendMail('inschrijving', {
       naam,
       email: process.env.MAIL_TEST ?? email,

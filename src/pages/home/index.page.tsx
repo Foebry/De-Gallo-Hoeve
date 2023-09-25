@@ -111,11 +111,8 @@ const Index: React.FC<Props> = () => {
                 je hond kunt leren?
               </Body>
               <Body>
-                Reserveer hieronder dan een testsessie, de eerste consultatie is gratis.
-              </Body>
-              <Body>
-                Hierna kom ik tot bij u thuis en gaan wij samenzitten om alles rond uw
-                hond te bespreken:
+                Reserveer hieronder dan eenvouding een training moment. <br /> Volgende
+                topics zullen we dan tijdens de training bespreken:
               </Body>
               <ul className="mx-auto text-left pl-20 pt-2 pb-3 flex flex-col gap-1 md:w-4/5 md:pl-80">
                 <li className="flex gap-1 items-center">
