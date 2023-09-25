@@ -5,17 +5,16 @@ export const SelectedRangeSchema = object({
   to: string().required({ ['period.to']: 'Period heeft een verplichte eind datum' }),
 });
 
-export const SelectedSubscriptionDaySchema = object({
-  weekday: string().required(),
-  dogs: array(string()).required(),
-  moments: array(string()).required(),
+export const SelectedSubscriptionItemSchema = object({
+  datum: string().required(),
+  hondIds: array(string()).required().min(1),
+  timeSlots: array(string()).required().min(1),
 });
 
 export const CheckAvailabilitySchema = object({
   serviceId: string().required({ serviceId: 'serviceId is verplicht' }),
   klantId: string().required({ klantId: 'klantId is verplicht' }),
-  period: SelectedRangeSchema.required({ period: 'period is verplicht' }),
-  selectedDays: array(SelectedSubscriptionDaySchema).required({
+  items: array(SelectedSubscriptionItemSchema).required({
     selectedDays: 'selectedDays is verplicht',
   }),
 });

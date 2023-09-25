@@ -1,12 +1,10 @@
 import { HondCollection } from '@/types/EntityTpes/HondTypes';
 import { ObjectId } from 'mongodb';
+import { SubscriptionDetailsDto } from 'src/common/api/dtos/Subscription';
 import Service from 'src/common/domain/entities/Service';
 import Subscription, { SubscriptionDetails } from 'src/common/domain/entities/Subscription';
 import { IsKlantCollection } from 'src/common/domain/klant';
-import { SelectedRange } from 'src/components/form/inputs/date/DateRangeSelector';
-import { getDatesBetween, notEmpty } from 'src/shared/functions';
-import { getServiceById } from '../services/repo';
-import { SelectedSubscriptionDay } from './check-availability/checkAvailability';
+import { notEmpty, unique } from 'src/shared/functions';
 import { getSubscriptionsByServiceIdAndSelectedDates, GroupedSubscription, itemDetail } from './repo';
 
 export type AvailableAndBlockedSubscriptions = Partial<{
@@ -18,19 +16,20 @@ export const getAvailableAndBlockedSubscriptions = async (
   service: Service,
   customer: IsKlantCollection,
   dogs: HondCollection[],
-  period: SelectedRange,
-  selectedDays: SelectedSubscriptionDay[]
+  items: SubscriptionDetailsDto[]
 ): Promise<AvailableAndBlockedSubscriptions> => {
-  const datesInPeriod = getDatesBetween(new Date(period.from), new Date(period.to));
-  const selectedWeekDays = selectedDays.map((day) => parseInt(day.weekday));
-  const selectedDates = datesInPeriod.filter((date) => selectedWeekDays.includes(date.getDay()));
-
+  const dates = unique(items.map((item) => new Date(item.datum))).sort((a, b) => a.getTime() - b.getTime());
   const availableItems: SubscriptionDetails[] = [];
   const blockedItems: SubscriptionDetails[] = [];
 
   // get all existing subscriptions
-  const existingSubscriptions = await getSubscriptionsByServiceIdAndSelectedDates(service._id, selectedDates);
-  const allItems = createAllSubscriptionItems(selectedDays, selectedDates, dogs);
+  const existingSubscriptions = await getSubscriptionsByServiceIdAndSelectedDates(service._id, dates);
+
+  const allItems = items.map((item) => ({
+    date: new Date(item.datum),
+    dogs: item.hondIds.map((id) => dogs.find((dog) => dog._id.toString() === id)).filter(notEmpty),
+    timeSlots: item.timeSlots,
+  }));
 
   allItems.forEach((subscriptionItem) => {
     const { available: availableItem, blocked: blockedItem } = checkAvailability(
@@ -56,26 +55,6 @@ export const getAvailableAndBlockedSubscriptions = async (
     available: subscriptionWithAvailableItems,
     blocked: subscriptionWithBlockedItems,
   };
-};
-
-const createAllSubscriptionItems = (
-  weekdays: SelectedSubscriptionDay[],
-  selectedDates: Date[],
-  klantHonden: HondCollection[]
-): SubscriptionDetails[] => {
-  return selectedDates
-    .map((date) => {
-      const weekday = weekdays.find((wd) => wd.weekday === date.getDay().toString());
-      if (!weekday) return null;
-      const dogs = weekday.dogs.map((id) => klantHonden.find((kh) => kh._id.toString() === id)).filter(notEmpty);
-      const timeSlots = weekday.moments;
-      return {
-        date,
-        dogs,
-        timeSlots,
-      };
-    })
-    .filter(notEmpty);
 };
 
 const checkAvailability = (

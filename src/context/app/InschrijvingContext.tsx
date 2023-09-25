@@ -1,6 +1,7 @@
 import { NextRouter } from 'next/router';
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import { AvailabilityDto, SubscriptionDto } from 'src/common/api/dtos/Subscription';
 import { PaginatedData } from 'src/common/api/shared/types';
 import { InschrijvingDto } from 'src/common/api/types/inschrijving';
 import useMutation from 'src/hooks/useMutation';
@@ -54,8 +55,8 @@ type Context = {
   };
   editInschrijving: (dto: InschrijvingDto) => ApiResponse<InschrijvingDto>;
   softDeleteInschrijving: (dto: InschrijvingDto) => ApiResponse<{}>;
-  useCheckAvailabilityRecurringWalkingServiceSubscriptions: (payload: CheckAvailabilityType) => {
-    data: any;
+  useCheckAvailabilityRecurringWalkingServiceSubscriptions: (payload: SubscriptionDto) => {
+    data: AvailabilityDto | null;
     isLoading: boolean;
     error?: any;
   };
@@ -158,28 +159,20 @@ const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
     return { data: data ?? EMPTY_INSCHRIJVING_DETAIL, isLoading };
   };
 
-  const useCheckAvailabilityRecurringWalkingServiceSubscriptions = (payload: CheckAvailabilityType) => {
+  const useCheckAvailabilityRecurringWalkingServiceSubscriptions = (payload: SubscriptionDto) => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [data, setData] = useState<any>();
+    const [data, setData] = useState<AvailabilityDto | null>(null);
     const [error, setError] = useState<any>();
-    const mutate = useMutation<CheckAvailabilityType>('/api/subscriptions/check-availability');
+    const mutate = useMutation<AvailabilityDto, CheckAvailabilityType>('/api/subscriptions/check-availability');
 
     useEffect(() => {
       (async () => {
         const { data: mutationData, error: mutationError } = await mutate('', payload);
         setIsLoading(false);
-        setData(mutationData);
+        if (mutationData) setData(mutationData);
         setError(mutationError);
       })();
     }, []);
-    // useEffect(() => {
-    //   (async () => {
-    //     const p = new Promise((resolve, reject) => {
-    //       setTimeout(() => setIsLoading(false), 2000);
-    //       resolve('ok');
-    //     });
-    //   })();
-    // }, []);
 
     return { isLoading, data, error };
   };

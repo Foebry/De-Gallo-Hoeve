@@ -118,7 +118,7 @@ const Inschrijving = () => {
             </FormRow>
             <FormSteps steps={steps} activeStep={activeStep} setActiveStep={setActiveStep} errorSteps={[]} />
 
-            <div className="py-20 text-center px-10 lg:px-40 mx-auto">
+            <div className="py-20 text-center px-10 mx-auto">
               {activeStep === 0 ? (
                 <ChooseOption control={control} getValues={getValues} setValue={setValue} />
               ) : activeStep === 1 ? (
