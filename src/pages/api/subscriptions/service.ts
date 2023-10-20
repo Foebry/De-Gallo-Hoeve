@@ -29,6 +29,7 @@ export const getAvailableAndBlockedSubscriptions = async (
     date: new Date(item.datum),
     dogs: item.hondIds.map((id) => dogs.find((dog) => dog._id.toString() === id)).filter(notEmpty),
     timeSlots: item.timeSlots,
+    id: new ObjectId(),
   }));
 
   allItems.forEach((subscriptionItem) => {
@@ -107,4 +108,9 @@ const checkAvailability = (
     available,
     blocked,
   };
+};
+
+export const getTravelCostForCustomer = async (customer: IsKlantCollection): Promise<number> => {
+  const address = `${customer.straat} ${customer.nr}${customer.bus} ${customer.gemeente} ${customer.postcode}`;
+  return 14.99;
 };

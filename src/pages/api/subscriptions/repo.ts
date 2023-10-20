@@ -16,6 +16,11 @@ export type GroupedSubscription = {
   date: Date;
 };
 
+export const saveSubcription = async (subscription: Subscription) => {
+  const collection = await getCollection<Subscription>(Subscription.name);
+  return collection.insertOne(subscription);
+};
+
 export const getSubscriptionsByServiceIdAndSelectedDates = async (
   serviceId: ObjectId,
   selectedDates: Date[]
@@ -35,43 +40,44 @@ export const getSubscriptionsByServiceIdAndSelectedDates = async (
     },
   };
 
-  // group documents by date
-  const group_ByDate = {
-    $group: {
-      _id: { $arrayElemAt: ['$items.date', 0] },
-      items: {
-        $push: {
-          subscriptionId: '$_id',
-          moment: { $arrayElemAt: ['$items.timeSlots', 0] },
-          customerId: '$customerId',
-          hondIds: '$items.dogs',
-        },
-      },
-    },
-  };
-
   // flatten documents by items
-  const unwind_Items = {
+  const unwind_items = {
     $unwind: {
       path: '$items',
     },
   };
 
-  // flatten documents by moment
-  const unwind_items_moment = {
+  // flatten documents by timeSlots
+  const unwind_timeSlots = {
     $unwind: {
-      path: '$items.moment',
+      path: '$items.timeSlots',
     },
   };
 
-  // group documents by date conditionally
-  const group_ByMoment = {
+  // group documents by timeSlot
+  const group_byTimeSlot = {
     $group: {
-      _id: '$_id',
+      _id: '$items.timeSlots',
+      items: {
+        $push: {
+          subscriptionId: '$_id',
+          moment: '$items.timeSlots',
+          customerId: '$customerId',
+          hondIds: '$items.dogs',
+          date: '$items.date',
+        },
+      },
+    },
+  };
+
+  //
+  const group_andMapToTimeSlots = {
+    $group: {
+      _id: '$items.date',
       ochtend: {
         $push: {
           $cond: [
-            { $eq: ['$items.moment', 'ochtend'] },
+            { $eq: ['ochtend', '$items.moment'] },
             {
               subscriptionId: '$items.subscriptionId',
               klantId: '$items.customerId',
@@ -84,7 +90,7 @@ export const getSubscriptionsByServiceIdAndSelectedDates = async (
       middag: {
         $push: {
           $cond: [
-            { $eq: ['$items.moment', 'middag'] },
+            { $eq: ['middag', '$items.moment'] },
             {
               subscriptionId: '$items.subscriptionId',
               klantId: '$items.customerId',
@@ -97,7 +103,7 @@ export const getSubscriptionsByServiceIdAndSelectedDates = async (
       avond: {
         $push: {
           $cond: [
-            { $eq: ['$items.moment', 'avond'] },
+            { $eq: ['avond', '$items.moment'] },
             {
               subscriptionId: '$items.subscriptionId',
               klantId: '$items.customerId',
@@ -141,10 +147,11 @@ export const getSubscriptionsByServiceIdAndSelectedDates = async (
   const result = await collection
     .aggregate([
       match_ServiceAndDates,
-      group_ByDate,
-      unwind_Items,
-      unwind_items_moment,
-      group_ByMoment,
+      unwind_items,
+      unwind_timeSlots,
+      group_byTimeSlot,
+      unwind_items,
+      group_andMapToTimeSlots,
       addFields_filterNulls,
     ])
     .toArray();

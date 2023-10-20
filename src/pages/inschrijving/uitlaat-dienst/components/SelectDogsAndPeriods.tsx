@@ -6,6 +6,8 @@ import { FormType } from '../index.page';
 import Select, { MultiValue, OptionsOrGroups } from 'react-select';
 import { useUserContext } from 'src/context/app/UserContext';
 import { optionInterface } from 'src/components/register/HondGegevens';
+import { Body } from 'src/components/Typography/Typography';
+import { classNames } from 'src/shared/functions';
 
 type Props = {
   control: Control<FormType, any>;
@@ -14,6 +16,7 @@ type Props = {
   getValues: UseFormGetValues<FormType>;
   handleHondSelect: (e: MultiValue<any>, weekday: string) => MultiValue<any>;
   handleMomentSelect: (e: MultiValue<any>, weekday: string) => MultiValue<any>;
+  ['r-if']: boolean;
 };
 
 const SelectDogsAndPeriods: React.FC<Props> = ({
@@ -23,6 +26,7 @@ const SelectDogsAndPeriods: React.FC<Props> = ({
   handleDeleteWeekDays,
   handleHondSelect,
   handleMomentSelect,
+  ['r-if']: rIf,
 }) => {
   const { recurring, dates, period, weekDays } = getValues();
   const recurringWeekdays = recurring && weekDays;
@@ -58,11 +62,27 @@ const SelectDogsAndPeriods: React.FC<Props> = ({
     label: hond.naam,
   }));
 
-  return (
-    <div>
+  return rIf ? (
+    <>
+      <div className="mb-16">
+        <Body>
+          Hou er rekening mee dat we voor deze dienst geen specifieke uren kunnen meegeven. <br />
+          Indien u <span className="italic underline">Ochtend</span> aanduidde, kan u ons verwachten tussen{' '}
+          <strong>06:00 - 11:00</strong>. <br />
+          Duidde u <span className="italic underline">Middag</span> aan, dan kan u ons verwachten tussen{' '}
+          <strong>11:00 - 16:00</strong>. <br />
+          Wanneer u <span className="italic underline">Avond</span> aanduidde, kan u ons verwachten tussen{' '}
+          <strong>16:00 - 21:00</strong>.
+        </Body>
+        <Body className="text-left">
+          <strong>Let op</strong>: We rekenen voor ieder moment verplaatsingskosten aan. <br />
+          Wilt u bijvoorbeeld dezelfde dag zowel &apos;s ochtends als &apos;s avonds van onze dienst gebruik maken, zijn
+          we genoodzaakt hier 2x verplaatsingskosten aanrekenen.
+        </Body>
+      </div>
       {recurringWeekdays &&
         selectedWeekDays
-          .sort((a, b) => (a > b ? 1 : -1))
+          .sort((a, b) => ((a === '0' ? '7' : a) > (b === '0' ? '7' : b) ? 1 : -1))
           .map((weekday, index) => (
             <InschrijvingCard
               key={nanoid()}
@@ -101,7 +121,9 @@ const SelectDogsAndPeriods: React.FC<Props> = ({
               </div>
             </InschrijvingCard>
           ))}
-    </div>
+    </>
+  ) : (
+    <></>
   );
 };
 

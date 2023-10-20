@@ -58,6 +58,7 @@ type Context = {
   useCheckAvailabilityRecurringWalkingServiceSubscriptions: (payload: SubscriptionDto) => {
     data: AvailabilityDto | null;
     isLoading: boolean;
+    refetch: (payload: SubscriptionDto) => Promise<void>;
     error?: any;
   };
 };
@@ -76,7 +77,11 @@ const defaultValues: Context = {
   }),
   editInschrijving: async () => defaultApiResponse,
   softDeleteInschrijving: async () => defaultApiResponse,
-  useCheckAvailabilityRecurringWalkingServiceSubscriptions: () => ({ data: null, isLoading: false }),
+  useCheckAvailabilityRecurringWalkingServiceSubscriptions: () => ({
+    data: null,
+    isLoading: false,
+    refetch: async () => {},
+  }),
 };
 
 const Context = createContext<Context>(defaultValues);
@@ -164,6 +169,13 @@ const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
     const [data, setData] = useState<AvailabilityDto | null>(null);
     const [error, setError] = useState<any>();
     const mutate = useMutation<AvailabilityDto, CheckAvailabilityType>('/api/subscriptions/check-availability');
+    const refetch = async (payload: SubscriptionDto) => {
+      setIsLoading(true);
+      const { data: mutateData, error: mutateError } = await mutate('', payload);
+      setIsLoading(false);
+      if (mutateData) setData(mutateData);
+      setError(mutateError);
+    };
 
     useEffect(() => {
       (async () => {
@@ -174,7 +186,7 @@ const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
       })();
     }, []);
 
-    return { isLoading, data, error };
+    return { isLoading, data, error, refetch };
   };
 
   return (

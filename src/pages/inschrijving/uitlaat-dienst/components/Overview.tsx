@@ -1,159 +1,237 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { UseFormGetValues } from 'react-hook-form';
-import { IsKlantCollection } from 'src/common/domain/klant';
+import React, { useMemo, useState } from 'react';
 import Spinner from 'src/components/loaders/Spinner';
-import Table from 'src/components/Table/Table';
-import { useInschrijvingContext } from 'src/context/app/InschrijvingContext';
+import Table, { TableRow } from 'src/components/Table/Table';
 import { useUserContext } from 'src/context/app/UserContext';
-import { CheckAvailabilityType } from 'src/pages/api/subscriptions/schemas';
-import { FormType } from '../index.page';
-import { AvailabilityDto, SubscriptionDto } from 'src/common/api/dtos/Subscription';
+import { AvailabilityDto, SubscriptionDetailsDto, SubscriptionDto } from 'src/common/api/dtos/Subscription';
 import Select, { MultiValue } from 'react-select';
 import TimeFrameSelect from './timeFrameSelect';
-import { getDatesBetween, notEmpty } from 'src/shared/functions';
-import { unique } from 'src/common/api/shared/functions';
-
-type Props = {
-  getValues: UseFormGetValues<FormType>;
-};
+import { useSubscriptionContext } from 'src/context/app/SubscriptionContext';
+import { classNames, getDayNameFromDate, notEmpty } from 'src/shared/functions';
+import { Body } from 'src/components/Typography/Typography';
+import { Pagination } from 'src/common/api/shared/types';
+import { ImCross } from 'react-icons/im';
+import { SubmitButton } from 'src/components/buttons/Button';
+import FormRow from 'src/components/form/FormRow';
 
 export type MultiSelectValue = MultiValue<{ value: string; label: string }>;
 
-const Step3: React.FC<Props> = ({ getValues }) => {
-  const values = getValues();
-  const { honden } = useUserContext();
+type Props = { onSubmit: (values: SubscriptionDto | undefined) => Promise<void>; ['r-if']: boolean };
+
+const Step3: React.FC<Props> = ({ onSubmit, ['r-if']: rIf }) => {
+  const pageSize = 10;
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(1);
+  const { subscriptionCheck, checkAvailableSubscriptions, mapAvailabilityDtoToSubscriptionDto } =
+    useSubscriptionContext();
+  const { honden, klant } = useUserContext();
 
   const hondOptions = honden.map((hond) => ({
     label: hond.naam,
     value: hond.id,
   }));
 
-  const onDogChange = (value: any, args: any) => {
-    console.log({ value, args });
+  const onDogChange = async (value: MultiSelectValue, id: string) => {
+    if (!subscriptionCheck) return;
+    setIsLoading(true);
+    const itemMapper = (item: SubscriptionDetailsDto) => {
+      return item.id === id ? { ...item, hondIds: value.map((hond) => hond.value) } : item;
+    };
+    const payload: SubscriptionDto = mapAvailabilityDtoToSubscriptionDto(itemMapper);
+    await checkAvailableSubscriptions(payload);
+    setIsLoading(false);
   };
 
-  const handleTimeFrameSelect = (e: MultiSelectValue, idx: number) => {
-    console.log({ e, idx });
+  const onTimeFrameChange = async (value: MultiSelectValue, id: string) => {
+    if (!subscriptionCheck) return;
+    setIsLoading(true);
+    const itemMapper = (item: SubscriptionDetailsDto) => {
+      return item.id === id ? { ...item, timeSlots: value.map((timeSlot) => timeSlot.value) } : item;
+    };
+    const payload = mapAvailabilityDtoToSubscriptionDto(itemMapper);
+    await checkAvailableSubscriptions(payload);
+    setIsLoading(false);
   };
 
-  const createTableRowsFromData = (data: AvailabilityDto | null) => {
-    return (
-      data?.available?.items?.map((item, idx) => {
-        const priceExcl = data.priceExcl;
-        const date = new Date(item.date).toLocaleDateString('nl-BE', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-        });
-        const dogs = (
-          <Select
-            className="w-full table-select"
-            isMulti={true}
-            options={hondOptions}
-            onChange={(e) => onDogChange(e, idx)}
-            value={item.dogs.map((dog) => ({ value: dog._id.toString(), label: dog.naam }))}
-          />
-        );
-        const timeFrames = (
-          <TimeFrameSelect
-            isMulti={true}
-            value={item.timeSlots.map((timeSlot) => ({ label: timeSlot, value: timeSlot }))}
-            onChange={(e) => handleTimeFrameSelect(e, idx)}
-          />
-        );
-        const dogsAmount = item.dogs.length;
-        const timeSlotsAmount = item.timeSlots.length;
-        const unitPrice = timeSlotsAmount === 1 ? priceExcl : timeSlotsAmount === 2 ? 22.5 : 35;
-        const rowTotalExcl = (dogsAmount * unitPrice).toFixed(2);
-
-        return [date, dogs, timeFrames, unitPrice, dogsAmount, rowTotalExcl];
-      }) ?? []
-    );
+  const onRemoveItem = async (id: string) => {
+    setIsLoading(true);
+    const itemMapper = (item: SubscriptionDetailsDto) => {
+      return item.id !== id ? item : null;
+    };
+    const payload = mapAvailabilityDtoToSubscriptionDto(itemMapper);
+    await checkAvailableSubscriptions(payload);
+    setIsLoading(false);
   };
 
-  const { useCheckAvailabilityRecurringWalkingServiceSubscriptions } = useInschrijvingContext();
-  const { klant } = useUserContext();
-  const payload = transformValues(values, klant!);
-  const { data: result, isLoading, error } = useCheckAvailabilityRecurringWalkingServiceSubscriptions(payload);
-  const [data, setData] = useState<AvailabilityDto | null>(result);
-  const rows = useMemo(() => createTableRowsFromData(data), [data]);
-  const columns = ['datum', 'honden', 'momenten', 'eenheidsprijs', 'aantal', 'totaalExcl'];
-  const colWidths = ['15', '30', '25', '12.5', '7.5', '10'];
+  const getSelectedDogs = (item: SubscriptionDetailsDto) => {
+    return item.hondIds
+      ?.map((hondId) => {
+        const hond = honden.find((h) => h.id === hondId);
+        if (hond) return { label: hond.naam, value: hond.id };
+      })
+      .filter(notEmpty);
+  };
+
+  const createTableRowsFromData = (data: AvailabilityDto | null): [TableRow[], number, Pagination] => {
+    if (!data) return [[], 0, { first: 0, last: 0, page: 1, total: 0 }];
+    const rows = (data.available?.items.slice((page - 1) * pageSize, page * pageSize) ?? []).map((item) => {
+      const id = item.id;
+      const priceExcl = data.priceExcl;
+      const date = new Date(item.datum).toLocaleDateString('nl-BE', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+      const day = getDayNameFromDate(new Date(item.datum));
+      const dogs = (
+        <Select
+          className="w-full table-select"
+          isMulti={true}
+          options={hondOptions}
+          onChange={(e) => onDogChange(e, id)}
+          value={getSelectedDogs(item)}
+        />
+      );
+      const timeFrames = (
+        <TimeFrameSelect
+          isMulti={true}
+          value={item.timeSlots.map((timeSlot) => ({ label: timeSlot, value: timeSlot }))}
+          onChange={(e) => onTimeFrameChange(e, id)}
+        />
+      );
+      const dogsAmount = item.hondIds.length;
+      const timeSlotsAmount = item.timeSlots.length;
+      const unitPrice = timeSlotsAmount === 1 ? priceExcl : timeSlotsAmount === 2 ? 22.5 : 35;
+      const rowTotalExcl = (dogsAmount * unitPrice).toFixed(2);
+      const crossIcon = (
+        <ImCross style={{ color: 'red' }} className="cursor-pointer" onClick={() => onRemoveItem(id)} />
+      );
+
+      return {
+        rowId: id,
+        rowData: [`${day} ${date}`, dogs, timeFrames, `€ ${unitPrice}`, dogsAmount, `€ ${rowTotalExcl}`, crossIcon],
+      };
+    });
+
+    const totalItems = data.available?.items?.length ?? 0;
+
+    const pagination: Pagination = {
+      page: page,
+      first: (page - 1) * pageSize + 1,
+      last: Math.min(page * pageSize, totalItems),
+      total: totalItems,
+      next: page < Math.ceil(totalItems / pageSize) ? page + 1 : undefined,
+      prev: page > 1 ? page - 1 : undefined,
+    };
+
+    return [rows, totalItems, pagination];
+  };
+
+  const [rows, totalRows, pagination] = useMemo(
+    () => createTableRowsFromData(subscriptionCheck),
+    [subscriptionCheck, page]
+  );
+
+  const columns = ['datum', 'honden', 'momenten', 'prijs Excl', 'aantal', 'totaalExcl', ''];
+  const colWidths = ['15', '27.5', '25', '10.25', '7.5', '7.5', '5'];
+
   const total = useMemo(() => {
-    if (!result) return 0;
-    const priceExcl = result?.priceExcl;
-    const travelCost = result?.travelCost;
-    const rows = result?.available?.items?.map((item) => ({
-      dogAmount: item.dogs.length,
+    if (!subscriptionCheck) return 0;
+    const priceExcl = subscriptionCheck.priceExcl;
+    const travelCost = subscriptionCheck.travelCost;
+    const rows = subscriptionCheck.available?.items?.map((item) => ({
+      dogAmount: item.hondIds.length,
       periodAmount: item.timeSlots.length,
-      rowTotal: (item.timeSlots.length === 3 ? 35 : item.timeSlots.length === 2 ? 22.5 : 15) * item.dogs.length,
+      rowTotal: (item.timeSlots.length === 3 ? 35 : item.timeSlots.length === 2 ? 22.5 : 15) * item.hondIds.length,
     }));
     const totalTravelCost = rows?.reduce((acc, curr) => acc + curr.periodAmount * travelCost, 0) ?? 0;
     const totalCost = rows?.reduce((acc, curr) => acc + curr.rowTotal, 0) ?? 0;
     return (totalCost * 1.21 + totalTravelCost).toFixed(2);
-  }, [result]);
+  }, [subscriptionCheck]);
 
-  const onPageClick = async (page?: number) => {};
+  const onPageClick = async (page: number | undefined) => {
+    if (!page) return;
+    setPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
-  useEffect(() => {
-    if (result) setData(result);
-  }, [result]);
-
-  return (
+  return rIf ? (
     <>
-      {isLoading && (
+      <Spinner r-if={isLoading} label="Beschibaarheid controleren" />
+      {!isLoading && !subscriptionCheck && (
         <div>
-          <p>Beschikbaarheid controleren</p>
-          <Spinner />
+          <Body>Er is iets fout gegaan, keer terug naar de vorige stap</Body>
         </div>
       )}
-      {!isLoading && result && result.available && (
+      {!isLoading && subscriptionCheck && !subscriptionCheck.available && (
+        <div>
+          <Body>
+            Al uw geselecteerde momenten zijn reeds bezet, Keer terug naar de vorige stap om een andere selectie te
+            maken
+          </Body>
+        </div>
+      )}
+      {!isLoading && subscriptionCheck && subscriptionCheck.available && (
         <div className="w-full">
-          <Table rows={rows} columns={columns} colWidths={colWidths} onPaginationClick={onPageClick} />
-
-          <div>
-            <p>
-              Totaal: <span>{total}</span>
-            </p>
+          <div className="mb-4 px-10">
+            <Body className="text-left">
+              De selectie die u maakte omvat <strong>{totalRows}</strong> dagen. De verschillende dagen kunt u in
+              onderstaande tabel raadplegen. <br />
+              Indien u voor een specifieke dag een andere selectie wil hanteren, kunt u nog steeds uw gewenste hond(en)
+              en/of momenten aanpassen. <br />
+              Wenst u een specifieke dag te verwijderen, klikt u op de{' '}
+              <ImCross style={{ color: 'red' }} className="inline-block" />.
+            </Body>
+            <Body className="text-left">
+              Onder de tabel vindt u een overzicht van de <strong>totale kosten</strong>.
+            </Body>
           </div>
+          <Table
+            rows={rows}
+            columns={columns}
+            colWidths={colWidths}
+            onPaginationClick={onPageClick}
+            pagination={pagination}
+          />
+
+          <div className="flex flex-row-reverse my-20">
+            <ul>
+              <li className="flex justify-between">
+                <p>Totaal excl.</p>
+                <p className="pl-2">€ {subscriptionCheck.totalExcl.toFixed(2)}</p>
+              </li>
+              <li className="flex justify-between">
+                <p>BTW (21%)</p>
+                <p className="pl-2">€ {subscriptionCheck.btw.toFixed(2)}</p>
+              </li>
+              <li className="flex justify-between">
+                <p>Totaal incl.</p>
+                <p className="pl-2">€ {subscriptionCheck.totalIncl.toFixed(2)}</p>
+              </li>
+              <li className="flex justify-between">
+                <p>
+                  <span>Verplaatsingskost</span>{' '}
+                  <span>
+                    (€ {subscriptionCheck.travelCost} x {subscriptionCheck.travelTimes})
+                  </span>
+                </p>
+                <p className="pl-2">€ {(subscriptionCheck.travelCost * subscriptionCheck.travelTimes).toFixed(2)}</p>
+              </li>
+              <hr className="my-2" />
+              <li className="flex justify-between font-semibold">
+                <p>Te betalen:</p>
+                <p className="pl-2"> € {subscriptionCheck.toBePayed.toFixed(2)}</p>
+              </li>
+            </ul>
+          </div>
+          <FormRow className="flex flex-row-reverse">
+            <SubmitButton label="Naar betalen" onClick={() => onSubmit(subscriptionCheck?.available)} />
+          </FormRow>
         </div>
       )}
     </>
+  ) : (
+    <></>
   );
-};
-
-const transformValues = (values: FormType, klant: IsKlantCollection): SubscriptionDto => {
-  const period = values.period;
-  const datesInPeriod = getDatesBetween(new Date(period.from), new Date(period.to));
-  const selectedWeekdays = values.weekDays.map((weekday) => parseInt(weekday));
-  const selectedDates = datesInPeriod.filter((date) => selectedWeekdays.includes(date.getDay()));
-
-  const allSubscriptionItems = selectedDates
-    .map((date) => {
-      const weekday = date.getDay().toString();
-      const datum = date.toISOString().split('T')[0];
-      if (!weekday) return;
-      const hondIds = values.dogs
-        .filter((dogValues) => dogValues.weekday === weekday)
-        .reduce((acc, dogValues) => [...acc, ...dogValues.dogs.map((dogOption) => dogOption.value)], [] as string[]);
-      const timeSlots = values.moments
-        .filter((momentValues) => momentValues.weekday === weekday)
-        .reduce((acc, momentValues) => [...acc, ...momentValues.moments.map((moment) => moment.value)], [] as string[]);
-
-      return {
-        datum,
-        hondIds: unique(hondIds),
-        timeSlots,
-      };
-    })
-    .filter(notEmpty);
-
-  const result: SubscriptionDto = {
-    klantId: klant?._id.toString() ?? '',
-    serviceId: '64e508a34a1ed9fa7ad6fe09',
-    items: allSubscriptionItems,
-  };
-  return result;
 };
 
 export default Step3;

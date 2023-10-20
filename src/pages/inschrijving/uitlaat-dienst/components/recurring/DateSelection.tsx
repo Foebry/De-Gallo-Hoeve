@@ -1,19 +1,21 @@
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
 import DateRangeSelector, { SelectedRange } from 'src/components/form/inputs/date/DateRangeSelector';
+import { Body } from 'src/components/Typography/Typography';
 import { classNames, getCurrentTime, getDatesBetween, unique } from 'src/shared/functions';
-import { FormType, HandleSelectWeekDayArgs } from '../index.page';
+import { FormType, HandleSelectWeekDayArgs } from '../../index.page';
 
 type Props = {
   control: Control<FormType, any>;
   selectedPeriod: SelectedRange;
   handleSelectWeekdays: (...args: HandleSelectWeekDayArgs) => void;
+  onStepChange: () => void;
 };
 
 type RangeChangeArgs = [e: { from?: string; to?: string }, onChange: (...event: any[]) => void];
 
-const RecurringData: React.FC<Props> = ({ control, selectedPeriod, handleSelectWeekdays }) => {
+const DateSelection: React.FC<Props> = ({ control, selectedPeriod, handleSelectWeekdays }) => {
   const [selectedRange, setSelectedRange] = useState<SelectedRange>(selectedPeriod);
   const today = getCurrentTime().toISOString().split('T')[0];
   const rangeSelected = !!selectedRange;
@@ -41,9 +43,19 @@ const RecurringData: React.FC<Props> = ({ control, selectedPeriod, handleSelectW
     ];
     return weekdays.filter((day) => weekdaysInSelection.includes(parseInt(day.id)));
   };
+
+  useEffect(() => {}, []);
+
   return (
     <>
-      <div className="mt-20 mb-20 w-2/3 mx-auto">
+      <div className="w-2/3 mx-auto">
+        <div className="mb-16">
+          <Body>
+            Selecteer een gewenste periode, vervolgens selecteert u uw gewenst wekelijkse dagen. <br />U kan ons dan
+            iedere week, binnen de gewenst periode, verwachten op de aangeduide dagen.
+          </Body>
+        </div>
+
         <Controller
           control={control}
           name="period"
@@ -108,4 +120,4 @@ const RecurringData: React.FC<Props> = ({ control, selectedPeriod, handleSelectW
   );
 };
 
-export default RecurringData;
+export default DateSelection;

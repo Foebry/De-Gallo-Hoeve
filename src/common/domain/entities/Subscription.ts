@@ -14,6 +14,7 @@ export type SubscriptionDetails = {
   date: Date;
   dogs: HondCollection[];
   timeSlots: (string | TimeFrame)[];
+  id: ObjectId;
 };
 
 export default class Subscription extends Entitybase {

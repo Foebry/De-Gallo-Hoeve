@@ -76,6 +76,19 @@ export const getDatesBetween = (startDate: Date, endDate: Date) => {
   return dates;
 };
 
+export const getDayNameFromDate = (date: Date) => {
+  const weekdayMapper: Record<string, string> = {
+    '1': 'Maa',
+    '2': 'Di',
+    '3': 'Woe',
+    '4': 'Do',
+    '5': 'Vrij',
+    '6': 'Za',
+    '0': 'Zo',
+  };
+  return weekdayMapper[date.getDay()];
+};
+
 const helper: HelperInterface = {
   capitalize,
 };

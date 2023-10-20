@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Control, Controller, UseFormGetValues, UseFormSetValue } from 'react-hook-form';
+import { classNames } from 'src/shared/functions';
 import OptionCard from '../../components/OptionCard';
 import { FormType } from '../index.page';
 
@@ -7,9 +8,10 @@ type Props = {
   control: Control<FormType, any>;
   getValues: UseFormGetValues<FormType>;
   setValue: UseFormSetValue<FormType>;
+  ['r-if']: boolean;
 };
 
-const ChooseOption: React.FC<Props> = ({ control, getValues, setValue }) => {
+const ChooseOption: React.FC<Props> = ({ control, getValues, setValue, ['r-if']: rIf }) => {
   const recurring = getValues().recurring;
   const [selectedOption, setSelectedOption] = useState<number>(recurring === true ? 0 : recurring === false ? 1 : -1);
 
@@ -42,12 +44,12 @@ const ChooseOption: React.FC<Props> = ({ control, getValues, setValue }) => {
     },
   ];
 
-  return (
+  return rIf ? (
     <Controller
       control={control}
       name="recurring"
       render={() => (
-        <div className="flex flex-wrap justify-center gap-5">
+        <div className={`flex flex-wrap justify-center gap-5`}>
           {options.map((option, index) => (
             <OptionCard
               type={option.type}
@@ -62,6 +64,8 @@ const ChooseOption: React.FC<Props> = ({ control, getValues, setValue }) => {
         </div>
       )}
     />
+  ) : (
+    <></>
   );
 };
 

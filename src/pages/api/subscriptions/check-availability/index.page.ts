@@ -15,7 +15,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     return checkAvailability(req as Request, res);
   } catch (e: any) {
-    console.log(e);
     return res.status(e.code).send(e.response);
   }
 };

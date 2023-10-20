@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { getCurrentTime } from 'src/shared/functions';
-import {Document} from 'mongodb'
+import { Document } from 'mongodb';
 
 export interface ObjectLiteral extends Document {
   [k: string]: any;
@@ -11,7 +11,7 @@ export default class Entitybase implements ObjectLiteral {
   created_at: Date;
   updated_at: Date;
   deleted_at?: Date;
-  name = Entitybase.name;
+  // name = Entitybase.name;
 
   constructor() {
     this._id = new ObjectId();

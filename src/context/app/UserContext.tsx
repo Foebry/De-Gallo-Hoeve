@@ -59,7 +59,6 @@ const UserProvider: React.FC<{ children: any }> = ({ children }) => {
       const { data, error } = await getData<AuthenticationResponse>('/api/auth/me');
       if (data?.loggedIn) {
         setHonden(data.honden);
-        console.log({ data });
       } else router.push('/login');
     };
     initializeKlant();
