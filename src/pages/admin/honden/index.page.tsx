@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import React, { useMemo, useState } from 'react';
 import Dashboard from 'src/components/admin/dashboard';
-import Table from 'src/components/Table/Table';
+import Table, { TableRow } from 'src/components/Table/Table';
 import { NextRouter, useRouter } from 'next/router';
 import { useHondContext } from 'src/context/app/hondContext';
 import { HondDto } from 'src/common/api/types/hond';
 import Spinner from 'src/components/loaders/Spinner';
 import { PaginatedData } from 'src/common/api/shared/types';
+import { nanoid } from 'nanoid';
 
 const Index = () => {
   const headers = ['naam', 'ras', 'geslacht', 'klant', 'aangemaakt op', 'aangepast op', 'actions'];
@@ -15,7 +16,7 @@ const Index = () => {
   const { useGetPaginatedHonden } = useHondContext();
   const { data: paginatedHonden, isLoading } = useGetPaginatedHonden({ page: page.toString() });
 
-  const rows = useMemo(() => {
+  const rows: TableRow[] = useMemo(() => {
     return createTableFromData(paginatedHonden, router);
   }, [paginatedHonden, router]);
 
@@ -57,6 +58,6 @@ const createTableFromData = ({ data }: PaginatedData<HondDto>, router: NextRoute
     const created_at = klantHond.created_at;
     const updated_at = klantHond.updated_at;
 
-    return [naam, ras, geslacht, klant, created_at, updated_at, []];
+    return { rowId: nanoid(), rowData: [naam, ras, geslacht, klant, created_at, updated_at, []] };
   });
 };

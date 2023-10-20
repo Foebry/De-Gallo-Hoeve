@@ -10,7 +10,6 @@ type Props = {
   control: Control<FormType, any>;
   selectedPeriod: SelectedRange;
   handleSelectWeekdays: (...args: HandleSelectWeekDayArgs) => void;
-  onStepChange: () => void;
 };
 
 type RangeChangeArgs = [e: { from?: string; to?: string }, onChange: (...event: any[]) => void];

@@ -5,6 +5,7 @@ import Subscription from 'src/common/domain/entities/Subscription';
 import { getHondenByKlantId } from 'src/controllers/HondController';
 import { NotFoundError, NotFoundHttpErrorCodes } from 'src/shared/RequestError';
 import { getKlantById } from '../auth/me/repo';
+import { logError } from '../logError/repo';
 import { getServiceById } from '../services/repo';
 import { mapSubscriptionDetailDtoToSubscriptionDetail, mapSubscriptionToSubscriptionDto } from './mappers';
 import { saveSubcription } from './repo';
@@ -39,9 +40,9 @@ const handler = async (req: Request, res: NextApiResponse<Response>) => {
     const result = mapSubscriptionToSubscriptionDto(subscription);
 
     return res.status(201).send(result);
-  } catch (e: any) {
-    console.log(e);
-    return res.status(e.code).send(e.response);
+  } catch (err: any) {
+    logError('/subscriptions', req, err);
+    return res.status(err.code).send(err.response);
   }
 };
 
