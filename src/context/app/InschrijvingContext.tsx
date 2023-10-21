@@ -55,12 +55,6 @@ type Context = {
   };
   editInschrijving: (dto: InschrijvingDto) => ApiResponse<InschrijvingDto>;
   softDeleteInschrijving: (dto: InschrijvingDto) => ApiResponse<{}>;
-  useCheckAvailabilityRecurringWalkingServiceSubscriptions: (payload: SubscriptionDto) => {
-    data: AvailabilityDto | null;
-    isLoading: boolean;
-    refetch: (payload: SubscriptionDto) => Promise<void>;
-    error?: any;
-  };
 };
 
 const defaultValues: Context = {
@@ -77,11 +71,6 @@ const defaultValues: Context = {
   }),
   editInschrijving: async () => defaultApiResponse,
   softDeleteInschrijving: async () => defaultApiResponse,
-  useCheckAvailabilityRecurringWalkingServiceSubscriptions: () => ({
-    data: null,
-    isLoading: false,
-    refetch: async () => {},
-  }),
 };
 
 const Context = createContext<Context>(defaultValues);
@@ -164,31 +153,6 @@ const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
     return { data: data ?? EMPTY_INSCHRIJVING_DETAIL, isLoading };
   };
 
-  const useCheckAvailabilityRecurringWalkingServiceSubscriptions = (payload: SubscriptionDto) => {
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [data, setData] = useState<AvailabilityDto | null>(null);
-    const [error, setError] = useState<any>();
-    const mutate = useMutation<AvailabilityDto, CheckAvailabilityType>('/api/subscriptions/check-availability');
-    const refetch = async (payload: SubscriptionDto) => {
-      setIsLoading(true);
-      const { data: mutateData, error: mutateError } = await mutate('', payload);
-      setIsLoading(false);
-      if (mutateData) setData(mutateData);
-      setError(mutateError);
-    };
-
-    useEffect(() => {
-      (async () => {
-        const { data: mutationData, error: mutationError } = await mutate('', payload);
-        setIsLoading(false);
-        if (mutationData) setData(mutationData);
-        setError(mutationError);
-      })();
-    }, []);
-
-    return { isLoading, data, error, refetch };
-  };
-
   return (
     <Context.Provider
       value={{
@@ -199,7 +163,6 @@ const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
         useGetPaginatedInschrijvingen,
         useGetInschrijvingDetail,
         softDeleteInschrijving,
-        useCheckAvailabilityRecurringWalkingServiceSubscriptions,
       }}
     >
       {children}

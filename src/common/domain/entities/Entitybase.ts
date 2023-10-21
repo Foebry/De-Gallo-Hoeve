@@ -11,7 +11,6 @@ export default class Entitybase implements ObjectLiteral {
   created_at: Date;
   updated_at: Date;
   deleted_at?: Date;
-  // name = Entitybase.name;
 
   constructor() {
     this._id = new ObjectId();

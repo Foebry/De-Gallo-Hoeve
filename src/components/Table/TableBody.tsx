@@ -1,10 +1,6 @@
-import { nanoid } from 'nanoid';
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { TableRow as TableRowType } from './Table';
 import TableRow from './TableRow';
-
-// type TableData = string | ReactNode;
-// export type TableRow = { rowId: string; rowData: TableData[] };
 
 interface Props {
   rows: TableRowType[];

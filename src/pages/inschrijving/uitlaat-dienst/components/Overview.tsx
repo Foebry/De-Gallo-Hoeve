@@ -12,6 +12,7 @@ import { Pagination } from 'src/common/api/shared/types';
 import { ImCross } from 'react-icons/im';
 import { SubmitButton } from 'src/components/buttons/Button';
 import FormRow from 'src/components/form/FormRow';
+import TableSummary from './TableSummary';
 
 export type MultiSelectValue = MultiValue<{ value: string; label: string }>;
 
@@ -192,37 +193,8 @@ const Step3: React.FC<Props> = ({ onSubmit, ['r-if']: rIf }) => {
             onPaginationClick={onPageClick}
             pagination={pagination}
           />
+          <TableSummary subscriptionCheck={subscriptionCheck} className="flex flex-row-reverse my-20" />
 
-          <div className="flex flex-row-reverse my-20">
-            <ul>
-              <li className="flex justify-between">
-                <p>Totaal excl.</p>
-                <p className="pl-2">€ {subscriptionCheck.totalExcl.toFixed(2)}</p>
-              </li>
-              <li className="flex justify-between">
-                <p>BTW (21%)</p>
-                <p className="pl-2">€ {subscriptionCheck.btw.toFixed(2)}</p>
-              </li>
-              <li className="flex justify-between">
-                <p>Totaal incl.</p>
-                <p className="pl-2">€ {subscriptionCheck.totalIncl.toFixed(2)}</p>
-              </li>
-              <li className="flex justify-between">
-                <p>
-                  <span>Verplaatsingskost</span>{' '}
-                  <span>
-                    (€ {subscriptionCheck.travelCost} x {subscriptionCheck.travelTimes})
-                  </span>
-                </p>
-                <p className="pl-2">€ {(subscriptionCheck.travelCost * subscriptionCheck.travelTimes).toFixed(2)}</p>
-              </li>
-              <hr className="my-2" />
-              <li className="flex justify-between font-semibold">
-                <p>Te betalen:</p>
-                <p className="pl-2"> € {subscriptionCheck.toBePayed.toFixed(2)}</p>
-              </li>
-            </ul>
-          </div>
           <FormRow className="flex flex-row-reverse">
             <SubmitButton label="Naar betalen" onClick={() => onSubmit(subscriptionCheck?.available)} />
           </FormRow>

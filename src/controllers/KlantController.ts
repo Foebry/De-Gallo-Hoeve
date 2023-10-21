@@ -172,7 +172,7 @@ export type IsKlantController = {
     session: ClientSession
   ) => Promise<void>;
   update: (_id: ObjectId, data: IsKlantCollection) => Promise<IsKlantCollection>;
-  save: (klant: IsKlantCollection & Record<string, any>) => Promise<IsKlantCollection>;
+  save: (klant: IsKlantCollection) => Promise<IsKlantCollection>;
   saveMany: (klanten: IsKlantCollection[]) => Promise<IsKlantCollection[]>;
   getHondOwner: (hond: HondCollection) => Promise<IsKlantCollection | null>;
   getKlantByEmail: (email: string) => Promise<IsKlantCollection | null>;

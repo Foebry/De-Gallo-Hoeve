@@ -43,8 +43,6 @@ const DateSelection: React.FC<Props> = ({ control, selectedPeriod, handleSelectW
     return weekdays.filter((day) => weekdaysInSelection.includes(parseInt(day.id)));
   };
 
-  useEffect(() => {}, []);
-
   return (
     <>
       <div className="w-2/3 mx-auto">
