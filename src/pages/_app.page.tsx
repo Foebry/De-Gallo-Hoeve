@@ -10,6 +10,7 @@ import useMutation from 'src/hooks/useMutation';
 import { useRouter } from 'next/router';
 import AxiosProvider from 'src/context/AxiosContext';
 import AppProvider from 'src/context/app/AppContext';
+import logger from 'src/utils/logger';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const logError = useMutation<{}>('/api/logError');
@@ -22,9 +23,9 @@ function MyApp({ Component, pageProps }: AppProps) {
   const handleError = async (page: string, error: any, errorInfo: any) => {
     try {
       if (process.env.NODE_ENV === 'production') await logError('/', { page, error, errorInfo });
-      else console.log(error, errorInfo);
-    } catch (e: any) {
-      if (process.env.NODE_ENV !== 'production') console.log(e);
+      else logger.error({ error, errorInfo });
+    } catch (err: any) {
+      if (process.env.NODE_ENV !== 'production') logger.error({ error: err });
     }
   };
 

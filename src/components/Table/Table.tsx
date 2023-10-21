@@ -5,8 +5,8 @@ import TableBody from './TableBody';
 import TableHead from './TableHead';
 import TablePagination from './TablePagination';
 
-type TableData = string | ReactNode;
-export type TableRow = TableData[];
+export type TableData = string | ReactNode;
+export type TableRow = { rowId: string; rowData: TableData[] };
 
 interface Props {
   rows: TableRow[];

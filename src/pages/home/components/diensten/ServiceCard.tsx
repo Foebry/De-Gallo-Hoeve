@@ -4,19 +4,22 @@ import style from './ServiceCard.module.css';
 import { Body } from 'src/components/Typography/Typography';
 import { GiCheckMark } from 'react-icons/gi';
 import FormRow from 'src/components/form/FormRow';
-import Button from 'src/components/buttons/Button';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 type Props = {
   active?: boolean;
   title: string;
   imageSrc: string;
+  to: string;
 };
 
-const ServiceCard: React.FC<Props> = ({ active = false, title, imageSrc }) => {
+const ServiceCard: React.FC<Props> = ({ active = false, title, imageSrc, to }) => {
+  const router = useRouter();
   return (
     <div
       className="border cursor-pointer border-gray-100 rounded-lg pb-2 hover:shadow-xl max-w-md relative flex-shrink"
-      onClick={() => {}}
+      onClick={() => router.push(to)}
     >
       <div
         className={`${
@@ -35,16 +38,9 @@ const ServiceCard: React.FC<Props> = ({ active = false, title, imageSrc }) => {
           />
         </div>
         <div className="px-2 flex flex-col gap-2">
-          <Body>
-            Gaat u op vakantie voor enkele dagen of langer en heeft u geen oplossing voor
-            uw hond?
-          </Body>
-          <Body>
-            Heeft u het te druk met het werk en geen tijd om uw hond uit te laten?
-          </Body>
-          <Body>
-            Bent u slecht te been, of heeft u graag hulp bij het uitlaten van uw hond?
-          </Body>
+          <Body>Gaat u op vakantie voor enkele dagen of langer en heeft u geen oplossing voor uw hond?</Body>
+          <Body>Heeft u het te druk met het werk en geen tijd om uw hond uit te laten?</Body>
+          <Body>Bent u slecht te been, of heeft u graag hulp bij het uitlaten van uw hond?</Body>
           <Body>Dan staan wij iedere dag voor u klaar om u bij te staan.</Body>
         </div>
         <ul className="pl-5 md:pl-20 mt-10 mb-10">
@@ -62,11 +58,9 @@ const ServiceCard: React.FC<Props> = ({ active = false, title, imageSrc }) => {
           </li>
         </ul>
         <FormRow className="absolute w-full bottom-2">
-          <Button
-            className="mx-auto bg-grey-200 border-grey-200"
-            label="aanvragen"
-            disabled={true}
-          />
+          <div className="mx-auto bg-grey-200 border-grey capitalize border-solid rounded py-1 px-1.5 text-gray-100 bg-green-100 border-green-200">
+            <Link href={to}>aanvragen</Link>
+          </div>
         </FormRow>
       </div>
     </div>

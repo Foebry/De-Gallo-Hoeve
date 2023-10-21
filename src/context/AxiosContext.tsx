@@ -105,7 +105,6 @@ const AxiosProvider: React.FC<{ children: any }> = ({ children }) => {
         const canRetry = currentRetries.current < retries;
 
         if (apiResultInCache) {
-          console.log({ apiResultInCache });
           return setData(cachedResult);
         }
 

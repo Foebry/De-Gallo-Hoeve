@@ -80,7 +80,7 @@ const createTableFromData = (data: PaginatedData<RasDto> | undefined) => {
         </div>,
       ];
 
-      return [naam, soort, actions];
+      return { rowId: nanoid(), rowData: [naam, soort, actions] };
     }) ?? []
   );
 };

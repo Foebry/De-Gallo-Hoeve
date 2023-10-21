@@ -8,9 +8,7 @@ import { getCurrentTime } from 'src/shared/functions';
 import bcrypt from 'bcrypt';
 import { IsKlantCollection } from 'src/common/domain/klant';
 
-export const getAllKlanten = async (
-  includeDeleted: boolean = false
-): Promise<IsKlantCollection[]> => {
+export const getAllKlanten = async (includeDeleted: boolean = false): Promise<IsKlantCollection[]> => {
   const collection = await getKlantCollection();
   const filter = includeDeleted ? {} : { deleted_at: undefined };
   return collection.find(filter).toArray();
@@ -25,16 +23,12 @@ export const getKlantById = async (
   return collection.findOne(filter);
 };
 
-export const getKlantByEmail = async (
-  email: string
-): Promise<WithId<IsKlantCollection> | null> => {
+export const getKlantByEmail = async (email: string): Promise<WithId<IsKlantCollection> | null> => {
   const collection = await getKlantCollection();
   return collection.findOne({ email });
 };
 
-export const getHondOwner = async (
-  hond: HondCollection
-): Promise<IsKlantCollection | null> => {
+export const getHondOwner = async (hond: HondCollection): Promise<IsKlantCollection | null> => {
   const collection = await getKlantCollection();
   return collection.findOne({
     honden: { $elemMatch: { _id: hond._id } },
@@ -68,10 +62,7 @@ const save = async (klant: IsKlantCollection): Promise<IsKlantCollection> => {
   return klant;
 };
 
-export const update = async (
-  _id: ObjectId,
-  data: IsKlantCollection
-): Promise<IsKlantCollection> => {
+export const update = async (_id: ObjectId, data: IsKlantCollection): Promise<IsKlantCollection> => {
   const collection = await getKlantCollection();
   const updatedKlant = { ...data, updated_at: getCurrentTime() };
   const { modifiedCount } = await collection.updateOne({ _id }, { $set: updatedKlant });
@@ -107,23 +98,15 @@ export const hardDelete = async (klant: IsKlantCollection): Promise<void> => {
   const collection = await getKlantCollection();
 
   const inschrijvingen = await getAllInschrijvingen({ includeDeleted: true });
-  const klantInschrijvingen = inschrijvingen.filter(
-    (inschrijving) => inschrijving.klant.id === klant._id
-  );
+  const klantInschrijvingen = inschrijvingen.filter((inschrijving) => inschrijving.klant.id === klant._id);
 
-  await Promise.all(
-    klantInschrijvingen.map((inschrijving) =>
-      inschrijvingController.softDelete(inschrijving)
-    )
-  );
+  await Promise.all(klantInschrijvingen.map((inschrijving) => inschrijvingController.softDelete(inschrijving)));
 
   const { deletedCount } = await collection.deleteOne(klant);
   if (deletedCount !== 1) throw new InternalServerError();
 };
 
-export const setVerified = async (
-  klant: IsKlantCollection
-): Promise<IsKlantCollection> => {
+export const setVerified = async (klant: IsKlantCollection): Promise<IsKlantCollection> => {
   const collection = await getKlantCollection();
   const verified = true;
   const now = getCurrentTime();
@@ -180,11 +163,7 @@ const klantController: IsKlantController = {
 
 export type IsKlantController = {
   deleteAll: () => Promise<void>;
-  removeInschrijving: (
-    klant_id: ObjectId,
-    inschrijving_id: ObjectId,
-    session: ClientSession
-  ) => Promise<void>;
+  removeInschrijving: (klant_id: ObjectId, inschrijving_id: ObjectId, session: ClientSession) => Promise<void>;
   setVerified: (klant: IsKlantCollection) => Promise<IsKlantCollection>;
   hardDelete: (klant: IsKlantCollection) => Promise<void>;
   addKlantInschrijving: (
