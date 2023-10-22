@@ -124,6 +124,8 @@ module.exports = {
         s: '400px',
       },
       minHeight: {
+        '3xs': '100px',
+        '2xs': '200px',
         xs: '350px',
         s: '380px',
         '50vh': '50vh',

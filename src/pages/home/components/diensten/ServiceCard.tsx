@@ -5,14 +5,16 @@ import { Body } from 'src/components/Typography/Typography';
 import { GiCheckMark } from 'react-icons/gi';
 import Button from 'src/components/buttons/Button';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 type Props = {
   active?: boolean;
   title: string;
   imageSrc: string;
+  to: string;
 };
 
-const ServiceCard: React.FC<Props> = ({ active = false, title, imageSrc }) => {
+const ServiceCard: React.FC<Props> = ({ active = false, title, imageSrc, to }) => {
   return (
     <div className="border border-gray-100 rounded-lg pb-2 hover:shadow-xl max-w-md relative flex-shrink">
       <div

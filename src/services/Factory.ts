@@ -1,47 +1,24 @@
 import moment from 'moment';
 import { ObjectId } from 'mongodb';
-import ContentController, {
-  CONTENT,
-  IsContentController,
-} from '../controllers/ContentController';
+import ContentController, { CONTENT, IsContentController } from '../controllers/ContentController';
 import HondController, { HOND, IsHondController } from '../controllers/HondController';
-import InschrijvingController, {
-  INSCHRIJVING,
-  IsInschrijvingController,
-} from '../controllers/InschrijvingController';
-import KlantController, {
-  IsKlantController,
-  KLANT,
-} from '../controllers/KlantController';
+import InschrijvingController, { INSCHRIJVING, IsInschrijvingController } from '../controllers/InschrijvingController';
+import KlantController, { IsKlantController, KLANT } from '../controllers/KlantController';
 import RasController, { IsRasController, RAS } from '../controllers/rasController';
-import TrainingController, {
-  IsTrainingController,
-  TRAINING,
-} from '../controllers/TrainingController';
+import TrainingController, { IsTrainingController, TRAINING } from '../controllers/TrainingController';
 import { IsInschrijvingBodyInschrijving, IsNewKlantData } from '../types/requestTypes';
 import brcypt from 'bcrypt';
 import { capitalize, getCurrentTime, toLocalTime } from '../shared/functions';
 import { HondCollection, NewHond } from '../types/EntityTpes/HondTypes';
 import { CONFIRM, ConfirmCollection, NewConfirm } from '../types/EntityTpes/ConfirmTypes';
 import { InschrijvingCollection } from '../types/EntityTpes/InschrijvingTypes';
-import {
-  PriveTrainingCollection,
-  TrainingDaysCollection,
-  TrainingType,
-} from '../types/EntityTpes/TrainingType';
+import { PriveTrainingCollection, TrainingDaysCollection, TrainingType } from '../types/EntityTpes/TrainingType';
 import { NewRas, RasCollection } from '../types/EntityTpes/RasTypes';
 import { ERRORLOG } from '../types/EntityTpes/ErrorLogTypes';
-import TrainingDayController, {
-  IsTrainingDayController,
-  TRAININGDAY,
-} from 'src/controllers/TrainingDayController';
+import TrainingDayController, { IsTrainingDayController, TRAININGDAY } from 'src/controllers/TrainingDayController';
 import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
 import { createRandomConfirmCode } from 'src/pages/api/confirm/[code]/repo';
-import {
-  FeedbackConfiguration,
-  IsKlantCollection,
-  IsNewKlant,
-} from 'src/common/domain/klant';
+import { FeedbackConfiguration, IsKlantCollection, IsNewKlant } from 'src/common/domain/klant';
 import { FEEDBACK } from 'src/utils/db';
 
 export type CONFIRM = 'ConfirmController';
@@ -95,6 +72,7 @@ const createKlant = async (klant: IsNewKlant): Promise<IsKlantCollection> => ({
   reservaties: [],
   created_at: getCurrentTime(),
   updated_at: getCurrentTime(),
+  deleted_at: null,
   email: klant.email.toLowerCase(),
   password: await brcypt.hash(klant.password, 10),
   vnaam: capitalize(klant.vnaam),
@@ -107,6 +85,7 @@ const createKlant = async (klant: IsNewKlant): Promise<IsKlantCollection> => ({
   postcode: klant.postcode,
   honden: klant.honden.map((hond) => createHond(hond)),
   feedbackConfiguration: createDefaultFeedbackConfiguration(),
+  verified_at: null,
 });
 
 export const createDefaultFeedbackConfiguration = (): FeedbackConfiguration => {
@@ -123,9 +102,7 @@ const createRas = (ras: NewRas): RasCollection => ({
   soort: ras.soort,
 });
 
-export const createTrainingDay = (
-  trainingDayDto: TrainingDayDto
-): TrainingDaysCollection => ({
+export const createTrainingDay = (trainingDayDto: TrainingDayDto): TrainingDaysCollection => ({
   _id: new ObjectId(),
   created_at: getCurrentTime(),
   date: new Date(trainingDayDto.date),

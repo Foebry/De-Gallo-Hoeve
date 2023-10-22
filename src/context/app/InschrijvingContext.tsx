@@ -1,9 +1,11 @@
 import { NextRouter } from 'next/router';
-import { createContext, useContext, useMemo, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import { AvailabilityDto, SubscriptionDto } from 'src/common/api/dtos/Subscription';
 import { PaginatedData } from 'src/common/api/shared/types';
 import { InschrijvingDto } from 'src/common/api/types/inschrijving';
 import useMutation from 'src/hooks/useMutation';
+import { CheckAvailabilityType } from 'src/pages/api/subscriptions/schemas';
 import { ApiResponse, REQUEST_METHOD } from 'src/utils/axios';
 import { SWROptions, useAxiosContext } from '../AxiosContext';
 import { defaultApiResponse, emptyPaginatedResponse } from './AppContext';
@@ -76,8 +78,6 @@ const Context = createContext<Context>(defaultValues);
 const InschrijvingProvider: React.FC<{ children: any }> = ({ children }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
-  const [revalidateList, setRevalidateList] = useState<boolean>(false);
-  const [revalidateDetail, setRevalidateDetail] = useState<boolean>(false);
 
   const create = useMutation<InschrijvingDto>('api/inschrijvingen/');
   const edit = useMutation<InschrijvingDto>('/api/inschrijvingen/');

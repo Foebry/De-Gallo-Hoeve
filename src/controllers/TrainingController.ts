@@ -2,7 +2,7 @@ import moment from 'moment';
 import { ClientSession, ObjectId } from 'mongodb';
 import { InternalServerError, TransactionError } from '../shared/RequestError';
 import { InschrijvingCollection } from '../types/EntityTpes/InschrijvingTypes';
-import { IsKlantCollection } from '../types/EntityTpes/KlantTypes';
+import { IsKlantCollection } from 'src/common/domain/klant';
 import { GroepTrainingCollection, PriveTrainingCollection, TrainingType } from '../types/EntityTpes/TrainingType';
 import inschrijvingController, { getInschrijvingById } from './InschrijvingController';
 import { getInschrijvingCollection, getTrainingCollection } from 'src/utils/db';

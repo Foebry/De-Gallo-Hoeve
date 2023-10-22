@@ -41,10 +41,8 @@ export const createRandomKlant = (options?: RandomKlantOptions): IsKlantCollecti
     postcode: parseInt(faker.address.zipCode('####')),
     created_at: now,
     updated_at: now,
-    verified_at: options?.verified
-      ? faker.date.between(now, moment(now).add(10, 'days').toDate())
-      : undefined,
-    deleted_at: undefined,
+    verified_at: options?.verified ? faker.date.between(now, moment(now).add(10, 'days').toDate()) : null,
+    deleted_at: null,
     feedbackConfiguration: createDefaultFeedbackConfiguration(),
   };
 };

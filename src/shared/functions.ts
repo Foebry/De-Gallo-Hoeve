@@ -58,6 +58,37 @@ export const notEmpty = <T>(obj: T | null | undefined): obj is T => {
   return obj !== null && obj !== undefined;
 };
 
+export const classNames = (classes: Record<string, boolean>) => {
+  return Object.entries(classes)
+    .map(([className, check]) => (check ? className : undefined))
+    .filter(notEmpty)
+    .join(' ');
+};
+
+export const getDatesBetween = (startDate: Date, endDate: Date) => {
+  const dates: Date[] = [];
+  let currentDate = new Date(startDate);
+  while (currentDate <= endDate) {
+    const newDate = new Date(currentDate);
+    dates.push(newDate);
+    currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+  }
+  return dates;
+};
+
+export const getDayNameFromDate = (date: Date) => {
+  const weekdayMapper: Record<string, string> = {
+    '1': 'Maa',
+    '2': 'Di',
+    '3': 'Woe',
+    '4': 'Do',
+    '5': 'Vrij',
+    '6': 'Za',
+    '0': 'Zo',
+  };
+  return weekdayMapper[date.getDay()];
+};
+
 const helper: HelperInterface = {
   capitalize,
 };

@@ -24,10 +24,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 const register = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     await validateCsrfToken({ req, res });
-    await validate(
-      { req, res },
-      { schema: registerSchema, message: 'Registratie niet verwerkt' }
-    );
+    await validate({ req, res }, { schema: registerSchema, message: 'Registratie niet verwerkt' });
 
     const { csrf, ...klantData } = req.body as IsRegisterBody;
     const existingKlant = await getKlantByEmail(klantData.email);

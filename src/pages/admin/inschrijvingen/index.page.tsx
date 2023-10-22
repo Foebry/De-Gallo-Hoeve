@@ -70,6 +70,6 @@ const createTableFromData = ({ data }: PaginatedData<InschrijvingDto>, router: N
         <MdDelete />
       </div>,
     ];
-    return [datum, training, klant, hond, ingeschrevenOp, actions];
+    return { rowId: nanoid(), rowData: [datum, training, klant, hond, ingeschrevenOp, actions] };
   });
 };

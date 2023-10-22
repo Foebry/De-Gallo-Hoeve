@@ -1,5 +1,5 @@
 import { InschrijvingCollection } from '@/types/EntityTpes/InschrijvingTypes';
-import { IsKlantCollection } from '@/types/EntityTpes/KlantTypes';
+import { IsKlantCollection } from 'src/common/domain/klant';
 import { KlantDto } from 'src/common/api/types/klant';
 
 export const mapToKlantDto = (klant: IsKlantCollection) => ({

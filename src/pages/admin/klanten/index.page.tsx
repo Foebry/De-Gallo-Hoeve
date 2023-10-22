@@ -125,6 +125,6 @@ const createTableFromData = (data: PaginatedData<KlantDto>, router: NextRouter) 
         <MdDelete />
       </div>,
     ];
-    return [naam, klant.email, address, verified, registered, actions];
+    return { rowId: nanoid(), rowData: [naam, klant.email, address, verified, registered, actions] };
   });
 };

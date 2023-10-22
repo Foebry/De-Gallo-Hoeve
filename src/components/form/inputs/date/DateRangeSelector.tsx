@@ -16,6 +16,9 @@ type Props = {
   value: SelectedRange;
   retrieveStartDate?: (value: string) => void;
   disabled?: boolean;
+  disabledBeforeToday?: boolean;
+  disabledDays?: string[];
+  closeOnSelection?: boolean;
 };
 
 const DateRangeSelector: React.FC<Props> = ({
@@ -23,8 +26,11 @@ const DateRangeSelector: React.FC<Props> = ({
   value,
   retrieveStartDate,
   disabled = false,
+  disabledDays = [],
+  disabledBeforeToday = false,
+  closeOnSelection = false,
 }) => {
-  const { updateModal, openModal, isModalActive } = useContext(ModalContext);
+  const { updateModal, openModal, isModalActive, closeModal } = useContext(ModalContext);
 
   const openRangePickerModal = () => {
     if (disabled) return;
@@ -40,10 +46,19 @@ const DateRangeSelector: React.FC<Props> = ({
   const rangeSelector = useMemo(() => {
     return (
       <div className="min-w-s">
-        <RangePicker onChange={onChange} selectedDays={value} numberOfMonths={2} />
+        <RangePicker
+          onChange={(e) => {
+            onChange(e);
+            if (closeOnSelection && e.from && e.to) closeModal();
+          }}
+          selectedDays={value}
+          numberOfMonths={2}
+          disabledDays={disabledDays}
+          disabledBeforeToday={disabledBeforeToday}
+        />
       </div>
     );
-  }, [value, onChange]);
+  }, [value, onChange, disabledBeforeToday, disabledDays, closeOnSelection, closeModal]);
 
   return (
     <FormRow>
@@ -52,7 +67,7 @@ const DateRangeSelector: React.FC<Props> = ({
         name="periode"
         id="duration"
         onFocus={openRangePickerModal}
-        value={value?.from}
+        value={value?.from.split('-').reverse().join('-')}
         onChange={() => {}}
       />
       <FormInput
@@ -60,7 +75,7 @@ const DateRangeSelector: React.FC<Props> = ({
         name="periode"
         id="duration"
         onFocus={openRangePickerModal}
-        value={value?.to}
+        value={value?.to.split('-').reverse().join('-')}
         onChange={() => {}}
       />
     </FormRow>

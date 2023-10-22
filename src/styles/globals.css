@@ -131,3 +131,6 @@ header h1 {
   z-index: -5;
   pointer-events: none;
 }
+.dog-select > div:nth-of-type(2) > div > div {
+  z-index: 999999 !important;
+}

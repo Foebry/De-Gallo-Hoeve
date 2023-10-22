@@ -116,6 +116,7 @@ const Index: React.FC<Props> = ({}) => {
                 active={false}
                 title="Uitlaatdienst"
                 imageSrc="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1688751489/De-Gallo-Hoeve/content/pexels-blue-bird-7210754_rwez0z.jpg"
+                to="/inschrijving/uitlaat-dienst"
               />
             </div>
           </div>
