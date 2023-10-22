@@ -139,9 +139,6 @@ const Footer: React.FC<Props> = ({}) => {
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-center w-full h-16 border-2 z-20">
-        <Body className="text-center">&copy; Copyright 2023. All rights reserved.</Body>
-      </div>
     </footer>
   );
 };

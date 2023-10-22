@@ -1,4 +1,4 @@
-import React, { ReactNode, useContext } from 'react';
+import React, { HTMLAttributes, ReactNode, useContext } from 'react';
 import { useBannerContext } from 'src/context/BannerContext';
 import { ModalContext } from 'src/context/ModalContext';
 import { classNames } from 'src/shared/functions';
@@ -7,7 +7,7 @@ import Footer from '../Footer';
 import { Nav } from '../Nav';
 import Modal from 'src/components/Modal/Modal/BaseModal';
 
-interface Props {
+interface Props extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
 }
 

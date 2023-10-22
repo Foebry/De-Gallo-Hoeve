@@ -103,46 +103,6 @@ const Index: React.FC<Props> = ({}) => {
         <section className="bg-white pb-2 mx-auto md:px-5">
           <div className="px-5 mx-auto  max-w-7xl md:px-0">
             <Title2 className="text-green-200">Onze diensten</Title2>
-            <div className="text-center flex flex-col gap-3">
-              <Body>Onze diensten binnen de Gallo-hoeve zijn uitsluitend privé trainingen aan huis.</Body>
-              <Body>Waarom aan huis?</Body>
-              <Body>
-                Heb je zelf geen tijd om elke zondag ochtend naar de hondenschool te gaan? <br />
-                En heb je liever dat je het weekend thuis kunt spenderen en ook alles met je hond kunt leren?
-              </Body>
-              <Body>Reserveer hieronder dan een testsessie, de eerste consultatie is gratis.</Body>
-              <Body>Hierna kom ik tot bij u thuis en gaan wij samenzitten om alles rond uw hond te bespreken:</Body>
-              <ul className="mx-auto text-left pl-20 pt-2 pb-3 flex flex-col gap-1 md:w-4/5 md:pl-80">
-                <li className="flex gap-1 items-center">
-                  <GiCheckMark />
-                  Hoe oud is uw hond?
-                </li>
-                <li className="flex gap-1 items-center">
-                  <GiCheckMark />
-                  Welk ras is het en wat wil je leren?
-                </li>
-                <li className="flex gap-1 iems-center">
-                  <GiCheckMark />
-                  Wat zijn je einddoelen dat je wilt bereiken?
-                </li>
-                <li className="flex gap-1 items-center">
-                  <GiCheckMark />
-                  Is de hond bedoeld als huishond?
-                </li>
-                <li className="flex gap-1 items-center">
-                  <GiCheckMark />
-                  Of wil je gaag werken in de bewaking sector (afhankelijk van het ras), Politie, Defensie?
-                </li>
-                <li className="flex gap-1 items-center">
-                  <GiCheckMark />
-                  Wil je er graag hondensport mee doen?
-                </li>
-              </ul>
-              <span className="text-left md:pl-80">
-                <Body>Samen vinden wij een oplossing op al jou vragen.</Body>
-                <Body>Wist u trouwens dat wij onze honden niet trainen, maar onze honden ons trainen?</Body>
-              </span>
-            </div>
           </div>
           <div className="px-5 max-w-7xl pb-24 relative md:mx-auto md:px-0">
             <div className="flex gap-28 sm:gap-10 justify-center flex-wrap sm:flex-nowrap max-w-7xl md:mx-auto py-24">
