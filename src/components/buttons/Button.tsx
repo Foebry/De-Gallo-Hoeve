@@ -10,13 +10,7 @@ interface ButtonProps {
 
 type ButtonTypes = undefined | 'form';
 
-const Button: React.FC<ButtonProps> = ({
-  onClick,
-  label,
-  type,
-  className = '',
-  disabled = false,
-}) => {
+const Button: React.FC<ButtonProps> = ({ onClick, label, type, className = '', disabled = false }) => {
   return (
     <span
       className={`${type === 'form' ? 'absolute' : ''} ${className} ${

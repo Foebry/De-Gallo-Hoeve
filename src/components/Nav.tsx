@@ -23,7 +23,7 @@ export const Nav = () => {
   };
 
   return (
-    <div className="relative mb-30 w-full shadow h-16 z-20 md:mb-0 md:block">
+    <div className="relative w-full shadow h-16 z-20 md:mb-0 md:block">
       <div className="max-w-7xl flex justify-between items-center mx-auto px-5">
         <div className="flex gap-2 items-center cursor-pointer 3xs:gap-10" onClick={() => router.push(INDEX)}>
           <div className="w-16">
