@@ -1,5 +1,5 @@
 import { HondCollection, KlantHond } from '@/types/EntityTpes/HondTypes';
-import { IsKlantCollection } from '@/types/EntityTpes/KlantTypes';
+import { IsKlantCollection } from 'src/common/domain/klant';
 import { RasCollection } from '@/types/EntityTpes/RasTypes';
 import moment from 'moment';
 import { HondDto } from 'src/common/api/types/hond';

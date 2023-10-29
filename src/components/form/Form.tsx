@@ -1,7 +1,7 @@
 import React, { Dispatch, ReactNode, SetStateAction } from 'react';
 
 export interface FormProps {
-  onSubmit: (e: any) => void;
+  onSubmit?: (e: any) => void;
   action?: string;
   children: ReactNode;
   activeStep?: number;
@@ -11,7 +11,14 @@ export interface FormProps {
   steps?: string[];
 }
 
-const Form: React.FC<FormProps> = ({ onSubmit, action, children, className = '' }) => {
+const Form: React.FC<FormProps> = ({
+  onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+  },
+  action,
+  children,
+  className = '',
+}) => {
   return (
     <div className="mx-auto relative">
       <form className={`${className} mx-auto`} onSubmit={onSubmit}>

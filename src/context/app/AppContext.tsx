@@ -7,6 +7,7 @@ import HondProvider from './hondContext';
 import InschrijvingProvider from './InschrijvingContext';
 import KlantProvider from './klantContext';
 import { RasProvider } from './RasContext';
+import SubscriptionProvider from './SubscriptionContext';
 import TrainingProvider from './TrainingContext';
 import TrainingDayProvider from './TrainingDayContext';
 import UserProvider from './UserContext';
@@ -33,11 +34,13 @@ const AppProvider: React.FC<{ children: any }> = ({ children }) => {
               <HondProvider>
                 <TrainingDayProvider>
                   <InschrijvingProvider>
-                    <VacationProvider>
-                      <UserProvider>
-                        <AuthContext>{children}</AuthContext>
-                      </UserProvider>
-                    </VacationProvider>
+                    <SubscriptionProvider>
+                      <VacationProvider>
+                        <UserProvider>
+                          <AuthContext>{children}</AuthContext>
+                        </UserProvider>
+                      </VacationProvider>
+                    </SubscriptionProvider>
                   </InschrijvingProvider>
                 </TrainingDayProvider>
               </HondProvider>

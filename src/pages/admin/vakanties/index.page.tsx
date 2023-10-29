@@ -72,7 +72,7 @@ const Vakanties: React.FC<Props> = ({}) => {
           <MdDelete onClick={() => onDelete(row.id)} />
         </div>,
       ];
-      return [startDate, endDate, notificationStartDate, createdAt, editedAt, actions];
+      return { rowId: nanoid(), rowData: [startDate, endDate, notificationStartDate, createdAt, editedAt, actions] };
     });
   }, [vacationListData]);
 

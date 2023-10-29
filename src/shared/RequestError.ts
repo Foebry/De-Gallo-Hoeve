@@ -1,5 +1,10 @@
 import { FrontEndErrorCodes } from './functions';
 
+export enum NotFoundHttpErrorCodes {
+  CUSTOMER_NOT_FOUND = 'CustomerNotFound',
+  SERVICE_NOT_FOUND = 'ServiceNotFound',
+}
+
 export class HttpError extends Error {
   response: any;
   code: number;
@@ -45,6 +50,12 @@ export class InvalidCsrfError extends BadRequestError {
 export class InvalidConfirmCodeFormat extends BadRequestError {
   constructor() {
     super('InvalidConfirmCodeFormat', 'invalid confirm code');
+  }
+}
+
+export class NotFoundError extends HttpError {
+  constructor(message: string, errorCode: NotFoundHttpErrorCodes) {
+    super('NotFoundError', message, { errorCode }, 404);
   }
 }
 
@@ -153,8 +164,7 @@ export class InvalidPasswordError extends UnprocessablePayloadError {
 export class ReedsIngeschrevenError extends UnprocessablePayloadError {
   constructor(index: number) {
     super('ReedsIngeschrevenError', 'Inschrijving niet verwerkt', {
-      [`inschrijvingen[${index}][timeslot]`]:
-        'U bent reeds ingeschreven voor deze training',
+      [`inschrijvingen[${index}][timeslot]`]: 'U bent reeds ingeschreven voor deze training',
       message: 'Inschrijving niet verwerkt',
     });
   }
@@ -229,10 +239,7 @@ export class LinkAlreadyUsedError extends ConflictError {
 
 export class VacationOverLappingError extends ConflictError {
   constructor() {
-    super(
-      'VacationOverlappingError',
-      'Er bestaat reeds een vakantie-periode tussen deze start-en eind datum'
-    );
+    super('VacationOverlappingError', 'Er bestaat reeds een vakantie-periode tussen deze start-en eind datum');
   }
 }
 

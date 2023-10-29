@@ -1,11 +1,10 @@
-import { useRouter } from 'next/router';
 import React from 'react';
 import { INSCHRIJVING } from 'src/types/linkTypes';
 import Button from '../buttons/Button';
-import FormRow from '../form/FormRow';
 import { Body } from '../Typography/Typography';
 import { GiCheckMark } from 'react-icons/gi';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface TrainingProps {
   type: string;
@@ -14,43 +13,29 @@ interface TrainingProps {
   gratisVerplaatsingBinnen: number;
 }
 
-const TrainingCard: React.FC<TrainingProps> = ({
-  type,
-  price,
-  kmHeffing,
-  gratisVerplaatsingBinnen,
-}) => {
-  const router = useRouter();
+const TrainingCard: React.FC<TrainingProps> = ({ type, price, kmHeffing, gratisVerplaatsingBinnen }) => {
   return (
-    <div
-      className="border cursor-pointer border-gray-100 rounded-lg pb-2 hover:shadow-xl max-w-md flex-shrink"
-      onClick={() =>
-        router.push({ pathname: INSCHRIJVING, query: { type } }, INSCHRIJVING)
-      }
-    >
-      <div className="bg-green-200 text-center text-2xl py-8 text-gray-50 rounded-t-lg">
-        Priv&eacute; training
-      </div>
-      <div className="pb-2">
-        <div className="mb-5">
-          <Image
-            src="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656188984/De-Gallo-Hoeve/content/pexels-blue-bird-7210258_m74qdh.jpg"
-            width="448"
-            height="262"
-            alt="degallohoeve hondentrainer hond training basis-commandos basis commando's training privé"
-          />
+    <div className="border border-gray-100 rounded-lg pb-2 hover:shadow-xl max-w-md flex-shrink relative">
+      <div className="bg-green-200 text-center text-2xl py-8 text-gray-50 rounded-t-lg">Priv&eacute; training</div>
+      <div className="pb-2 mb-10">
+        <div className="mb-5 cursor-pointer">
+          <Link href={`/services/prive-training`}>
+            <Image
+              src="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1656188984/De-Gallo-Hoeve/content/pexels-blue-bird-7210258_m74qdh.jpg"
+              width="448"
+              height="262"
+              alt="degallohoeve hondentrainer hond training basis-commandos basis commando's training privé"
+            />
+          </Link>
         </div>
         <div className="px-2 flex flex-col gap-2">
           <Body>Heeft u een nieuwe pup en wil u ondersteuning bij de puppytraining?</Body>
           <Body>Wil u wat meer oefening op clicker training?</Body>
-          <Body>
-            Graag wat hulp bij de training voor basis commando&apos;s (zitten, liggen,
-            rechtstaan, ...)
-          </Body>
+          <Body>Graag wat hulp bij de training voor basis commando&apos;s (zitten, liggen, rechtstaan, ...)</Body>
           <Body>Wandelt uw hond niet correct aan de lijn?</Body>
           <Body>
-            Eerder op zoek naar gevorderde trainingen voor bewaking, politie of defensie?
-            (blaffen en stil zijn op commando, leren bijten en lossen, ...)
+            Eerder op zoek naar gevorderde trainingen voor bewaking, politie of defensie? (blaffen en stil zijn op
+            commando, leren bijten en lossen, ...)
           </Body>
           <Body>Vertoond uw hond gedragsproblemen, ook hiermee kunnen wij u helpen</Body>
           <Body>En nog zoveel meer ...</Body>
@@ -78,15 +63,16 @@ const TrainingCard: React.FC<TrainingProps> = ({
           </li>
         </ul>
       </div>
-      <FormRow className="mt-10">
+      <div className="w-full flex px-20 py-5 justify-center">
         <Button
-          className="mx-auto"
-          label="Aanvragen"
-          onClick={() =>
-            router.push({ pathname: INSCHRIJVING, query: { type } }, INSCHRIJVING)
-          }
+          className="bg-grey-200 border-grey-200 mx-auto"
+          label={<Link href={`${INSCHRIJVING}?type=${type}`}>Aanvragen</Link>}
         />
-      </FormRow>
+        <Button
+          className="bg-grey-200 border-grey-200 mx-auto"
+          label={<Link href="/services/prive-training">Meer info</Link>}
+        />
+      </div>
     </div>
   );
 };

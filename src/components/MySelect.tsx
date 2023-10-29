@@ -1,6 +1,6 @@
-import { ReactNode } from "react";
-import Select from "react-select";
-import { FormError } from "./Typography/Typography";
+import { ReactNode } from 'react';
+import Select from 'react-select';
+import { FormError } from './Typography/Typography';
 
 interface Props {
   options: any;
@@ -10,6 +10,7 @@ interface Props {
   value: any;
   label?: ReactNode | string;
   disabled?: boolean;
+  multi?: boolean;
 }
 
 export const MySelect: React.FC<Props> = ({
@@ -20,17 +21,17 @@ export const MySelect: React.FC<Props> = ({
   name,
   label,
   disabled = false,
+  multi = false,
 }) => {
   return (
     <div className="relative mb-12">
-      <span className="absolute -top-6 text-green-100 mr-5 capitalize w-full">
-        {label}
-      </span>
+      <span className="absolute -top-6 text-green-100 mr-5 capitalize w-full">{label}</span>
       <Select
         options={options}
         onChange={onChange}
-        value={value ?? { label: "Ras", value: undefined }}
+        value={value ?? { label: 'Ras', value: undefined }}
         isDisabled={disabled}
+        isMulti={multi}
       />
       <FormError>{errors[name]}</FormError>
     </div>

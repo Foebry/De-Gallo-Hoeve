@@ -8,6 +8,7 @@ import useMutation from 'src/hooks/useMutation';
 import logger from 'src/utils/logger';
 import Head from 'next/head';
 import { REQUEST_METHOD } from 'src/utils/axios';
+import { toast } from 'react-toastify';
 
 export const FallBack = () => {
   const router = useRouter();
@@ -46,9 +47,11 @@ const useGetErrorInfo = (router: NextRouter) => {
 
   const renewVerificationCode = async () => {
     try {
-      const { data, error } = await reset('/', {}, { method: REQUEST_METHOD.PUT });
-      if (data) router.push('/');
-      else if (error) router.push(`/error?${error.code}&code=${confirmCode}`);
+      const { data, error } = await reset(`/?code=${confirmCode}`, {}, { method: REQUEST_METHOD.PUT });
+      if (data) {
+        toast.success('We hebben u een nieuwe verificatie-email toegestuurd!');
+        router.push('/');
+      } else if (error) router.push(`/error?${error.code}&code=${confirmCode}`);
     } catch (e: any) {
       if (process.env.NODE_ENV === 'development') logger.error(e);
     }
@@ -71,7 +74,7 @@ const useGetErrorInfo = (router: NextRouter) => {
         </>
       );
       break;
-    case 'e7turmpp5tn':
+    case FrontEndErrorCodes.ExpiredConfirmCode:
       title = 'Deze verificatie-code is vervallen';
       link = (
         <>
