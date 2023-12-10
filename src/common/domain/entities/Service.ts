@@ -10,6 +10,7 @@ export default class Service extends Entitybase {
   freeTravelRadius!: number;
   travelRate!: number;
   subscriptions!: ObjectId[];
+  maxSubscriptionsPerTimeSlot!: number;
 
   static Create = (
     priceExcl: number,
@@ -18,7 +19,8 @@ export default class Service extends Entitybase {
     name: string,
     hasFreeTravel: boolean = false,
     freeTravelRadius: number = 0,
-    travelRate: number = 0
+    travelRate: number = 0,
+    maxSubscriptionsPerTimeSlot = 1
   ): Service => {
     const service = new Service();
     service.priceExcl = priceExcl;
@@ -29,6 +31,7 @@ export default class Service extends Entitybase {
     service.freeTravelRadius = freeTravelRadius;
     service.travelRate = travelRate;
     service.subscriptions = [];
+    service.maxSubscriptionsPerTimeSlot = maxSubscriptionsPerTimeSlot;
 
     return service;
   };

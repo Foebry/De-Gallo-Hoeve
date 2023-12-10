@@ -10,11 +10,12 @@ type Props = {
   control: Control<FormType, any>;
   selectedPeriod: SelectedRange;
   handleSelectWeekdays: (...args: HandleSelectWeekDayArgs) => void;
+  ['r-if']: boolean;
 };
 
 type RangeChangeArgs = [e: { from?: string; to?: string }, onChange: (...event: any[]) => void];
 
-const DateSelection: React.FC<Props> = ({ control, selectedPeriod, handleSelectWeekdays }) => {
+const DateSelection: React.FC<Props> = ({ control, selectedPeriod, handleSelectWeekdays, ['r-if']: rIf }) => {
   const [selectedRange, setSelectedRange] = useState<SelectedRange>(selectedPeriod);
   const today = getCurrentTime().toISOString().split('T')[0];
   const rangeSelected = !!selectedRange;
@@ -43,7 +44,9 @@ const DateSelection: React.FC<Props> = ({ control, selectedPeriod, handleSelectW
     return weekdays.filter((day) => weekdaysInSelection.includes(parseInt(day.id)));
   };
 
-  return (
+  return !rIf ? (
+    <></>
+  ) : (
     <>
       <div className="w-2/3 mx-auto">
         <div className="mb-16">

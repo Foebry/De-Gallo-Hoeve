@@ -10,8 +10,9 @@ import { getKlantById } from '../auth/me/repo';
 import { logError } from '../logError/repo';
 import { getServiceById } from '../services/repo';
 import { mapSubscriptionDetailDtoToSubscriptionDetail, mapSubscriptionToSubscriptionDto } from './mappers';
-import { saveSubcription } from './repo';
+import { handleSaveSubscription } from './repo';
 import { CreateSubscriptionSchema } from './schemas';
+import { sendSubscriptionEmails } from './service';
 
 export interface Request extends NextApiRequest {
   body: {
@@ -41,7 +42,8 @@ const handler = async (req: Request, res: NextApiResponse<Response>) => {
 
     const subscription = Subscription.Create(service, customer, subscriptionDetails);
 
-    await saveSubcription(subscription);
+    await handleSaveSubscription(subscription);
+    sendSubscriptionEmails(subscription);
 
     const result = mapSubscriptionToSubscriptionDto(subscription);
 

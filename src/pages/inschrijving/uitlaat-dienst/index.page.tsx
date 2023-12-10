@@ -21,6 +21,8 @@ import { useCreateSubscription } from 'src/common/api/inschrijving';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
+import DivElement from 'src/components/baseElements/divElement';
+import { useGetActiveEntriesForService, ActiveServiceEntry } from 'src/common/api/subscriptions';
 
 type DogsForDate = {
   date: string;
@@ -48,21 +50,16 @@ export type HandleSelectWeekDayArgs = [
   onChange: (...event: any[]) => void
 ];
 
+const steps = [
+  'Selecteer een optie',
+  'Selecteer datum(s) / Selecteer periode',
+  'Selecteer hond(en) & moment(en)',
+  'overzicht',
+];
+
 const Inschrijving = () => {
-  const steps = [
-    'Selecteer een optie',
-    'Selecteer datum(s) / Selecteer periode',
-    'Selecteer hond(en) & moment(en)',
-    'overzicht',
-  ];
   const router = useRouter();
-  const { klant } = useUserContext();
-  const formDefaultValues = useMemo(() => ({ dates: [], moments: [], dogs: [] }), []);
-  const [activeStep, setActiveStep] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { control, getValues, setValue } = useForm<FormType>({ defaultValues: formDefaultValues });
-  const [selectedWeekDays, setSelectedWeekDays] = useState<string[]>(getValues().weekDays);
-  const { checkAvailableSubscriptions, mapToSubscriptionDto } = useSubscriptionContext();
+  const { data: activeEntries } = useGetActiveEntriesForService('64e508a34a1ed9fa7ad6fe09');
   const {
     mutate: saveSubscriptionMutate,
     error: mutationError,
@@ -70,13 +67,38 @@ const Inschrijving = () => {
     data: mutationData,
   } = useCreateSubscription();
 
-  const handleDeleteWeekDay = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    const weekdayToDelete = event.currentTarget.parentElement?.dataset.id;
-    const { weekDays, dogs, moments } = getValues();
-    const newValue = weekDays.filter((day) => day !== weekdayToDelete);
-    const newDogsValue = dogs.filter((dogForDate) => dogForDate.weekday !== weekdayToDelete);
-    const newMomentsValue = moments.filter((momentForDate) => momentForDate.weekday !== weekdayToDelete);
-    setValue('weekDays', newValue);
+  const { klant } = useUserContext();
+  const { checkAvailableSubscriptions, mapToSubscriptionDto } = useSubscriptionContext();
+
+  const formDefaultValues = useMemo(() => ({ dates: [], moments: [], dogs: [] }), []);
+
+  const [disabledDays, setDisabledDays] = useState<string[]>([]);
+  const [partiallyDisabledDays, setPartiallyDisabledDays] = useState<ActiveServiceEntry[]>([]);
+  const [activeStep, setActiveStep] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { control, getValues, setValue } = useForm<FormType>({ defaultValues: formDefaultValues });
+  const [selectedWeekDays, setSelectedWeekDays] = useState<string[]>(getValues().weekDays);
+
+  useEffect(() => {
+    if (!activeEntries) return;
+    const fullyBookedEntries = activeEntries.filter(
+      (entry) => entry.timeSlots['ochtend'] >= 3 && entry.timeSlots['middag'] >= 3 && entry.timeSlots['avond'] >= 3
+    );
+    const partiallyBookedEntries = activeEntries.filter(
+      (entry) => entry.timeSlots['ochtend'] >= 3 || entry.timeSlots['middag'] >= 3 || entry.timeSlots['avond'] >= 3
+    );
+
+    setDisabledDays(fullyBookedEntries.map((entry) => entry.date.toString().split('T')[0]));
+    setPartiallyDisabledDays(partiallyBookedEntries.map((entry) => ({ ...entry, date: entry.date.split('T')[0] })));
+  }, [activeEntries]);
+
+  const handleDeleteItem = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const itemToDelete = event.currentTarget.parentElement?.dataset.id;
+    const { weekDays, dogs, moments, recurring, dates } = getValues();
+    const newValue = (recurring ? weekDays : dates).filter((item) => item !== itemToDelete);
+    const newDogsValue = dogs.filter((dogForDate) => dogForDate.weekday !== itemToDelete);
+    const newMomentsValue = moments.filter((momentForDate) => momentForDate.weekday !== itemToDelete);
+    setValue(recurring ? 'weekDays' : 'dates', newValue);
     setValue('dogs', newDogsValue);
     setValue('moments', newMomentsValue);
     setSelectedWeekDays(newValue);
@@ -131,13 +153,16 @@ const Inschrijving = () => {
       toast.success('Uw inschrijving is verwerkt!');
       router.push('/');
     }
-  }, [mutationData]);
+  }, [mutationData, router]);
 
   const handleStepChange = async (step: number) => {
     if (activeStep === 2) {
-      if (!klant) return;
-      setIsLoading(true);
+      if (!klant) {
+        console.log('niet meer ingelogd'); // we want to handle this correctly
+        return;
+      }
       const values = getValues();
+      setIsLoading(true);
       const payload = mapToSubscriptionDto(values, klant);
       await checkAvailableSubscriptions(payload);
       setIsLoading(false);
@@ -166,27 +191,27 @@ const Inschrijving = () => {
             <FormSteps steps={steps} activeStep={activeStep} setActiveStep={setActiveStep} errorSteps={[]} />
 
             {<Spinner r-if={isLoading || mutationLoading} />}
-            {!isLoading && !mutationLoading && (
-              <div className="py-20 text-center px-10 mx-auto">
-                <ChooseOption control={control} getValues={getValues} setValue={setValue} r-if={activeStep === 0} />
-                <SelectDates
-                  r-if={activeStep === 1}
-                  control={control}
-                  getValues={getValues}
-                  handleSelectWeekdays={handleSelectWeekdays}
-                />
-                <SelectDogsAndPeriods
-                  control={control}
-                  selectedWeekDays={selectedWeekDays}
-                  handleDeleteWeekDays={handleDeleteWeekDay}
-                  getValues={getValues}
-                  handleHondSelect={handleHondSelect}
-                  handleMomentSelect={handleMomentSelect}
-                  r-if={activeStep === 2}
-                />
-                <Overview onSubmit={onSubmit} r-if={activeStep === 3} />
-              </div>
-            )}
+            <DivElement r-if={!isLoading && !mutationLoading} className="py-20 text-center px-10 mx-auto">
+              <ChooseOption control={control} getValues={getValues} setValue={setValue} r-if={activeStep === 0} />
+              <SelectDates
+                r-if={activeStep === 1}
+                control={control}
+                getValues={getValues}
+                handleSelectWeekdays={handleSelectWeekdays}
+                disabledDays={disabledDays}
+              />
+              <SelectDogsAndPeriods
+                control={control}
+                selectedWeekDays={selectedWeekDays}
+                handleDeleteItem={handleDeleteItem}
+                getValues={getValues}
+                handleHondSelect={handleHondSelect}
+                handleMomentSelect={handleMomentSelect}
+                partiallyDisabledDays={partiallyDisabledDays}
+                r-if={activeStep === 2}
+              />
+              <Overview onSubmit={onSubmit} r-if={activeStep === 3} />
+            </DivElement>
           </Form>
         </div>
       </Skeleton>

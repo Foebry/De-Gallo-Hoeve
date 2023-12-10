@@ -13,6 +13,7 @@ import { ImCross } from 'react-icons/im';
 import { SubmitButton } from 'src/components/buttons/Button';
 import FormRow from 'src/components/form/FormRow';
 import TableSummary from './TableSummary';
+import DivElement from 'src/components/baseElements/divElement';
 
 export type MultiSelectValue = MultiValue<{ value: string; label: string }>;
 
@@ -155,51 +156,48 @@ const Step3: React.FC<Props> = ({ onSubmit, ['r-if']: rIf }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const errorState = !isLoading && !subscriptionCheck;
+  const noAvailableItems = !!(!isLoading && subscriptionCheck && !subscriptionCheck?.available);
+  const hasAvailableItems = !!(!isLoading && subscriptionCheck && subscriptionCheck?.available);
+
   return rIf ? (
     <>
       <Spinner r-if={isLoading} label="Beschibaarheid controleren" />
-      {!isLoading && !subscriptionCheck && (
-        <div>
-          <Body>Er is iets fout gegaan, keer terug naar de vorige stap</Body>
-        </div>
-      )}
-      {!isLoading && subscriptionCheck && !subscriptionCheck.available && (
-        <div>
-          <Body>
-            Al uw geselecteerde momenten zijn reeds bezet, Keer terug naar de vorige stap om een andere selectie te
-            maken
+      <DivElement r-if={errorState}>
+        <Body>Er is iets fout gegaan, keer terug naar de vorige stap.</Body>
+      </DivElement>
+      <DivElement r-if={noAvailableItems}>
+        <Body>
+          Al uw geselecteerde momenten zijn reeds bezet, Keer terug naar de vorige stap om een andere selectie te maken
+        </Body>
+      </DivElement>
+      <DivElement className="w-full" r-if={hasAvailableItems}>
+        <div className="mb-4 px-10">
+          <Body className="text-left">
+            De selectie die u maakte omvat <strong>{totalRows}</strong> dagen. De verschillende dagen kunt u in
+            onderstaande tabel raadplegen. <br />
+            Indien u voor een specifieke dag een andere selectie wil hanteren, kunt u nog steeds uw gewenste hond(en)
+            en/of momenten aanpassen. <br />
+            Wenst u een specifieke dag te verwijderen, klikt u op de{' '}
+            <ImCross style={{ color: 'red' }} className="inline-block" />.
+          </Body>
+          <Body className="text-left">
+            Onder de tabel vindt u een overzicht van de <strong>totale kosten</strong>.
           </Body>
         </div>
-      )}
-      {!isLoading && subscriptionCheck && subscriptionCheck.available && (
-        <div className="w-full">
-          <div className="mb-4 px-10">
-            <Body className="text-left">
-              De selectie die u maakte omvat <strong>{totalRows}</strong> dagen. De verschillende dagen kunt u in
-              onderstaande tabel raadplegen. <br />
-              Indien u voor een specifieke dag een andere selectie wil hanteren, kunt u nog steeds uw gewenste hond(en)
-              en/of momenten aanpassen. <br />
-              Wenst u een specifieke dag te verwijderen, klikt u op de{' '}
-              <ImCross style={{ color: 'red' }} className="inline-block" />.
-            </Body>
-            <Body className="text-left">
-              Onder de tabel vindt u een overzicht van de <strong>totale kosten</strong>.
-            </Body>
-          </div>
-          <Table
-            rows={rows}
-            columns={columns}
-            colWidths={colWidths}
-            onPaginationClick={onPageClick}
-            pagination={pagination}
-          />
-          <TableSummary subscriptionCheck={subscriptionCheck} className="flex flex-row-reverse my-20" />
+        <Table
+          rows={rows}
+          columns={columns}
+          colWidths={colWidths}
+          onPaginationClick={onPageClick}
+          pagination={pagination}
+        />
+        <TableSummary subscriptionCheck={subscriptionCheck!} className="flex flex-row-reverse my-20" />
 
-          <FormRow className="flex flex-row-reverse">
-            <SubmitButton label="Naar betalen" onClick={() => onSubmit(subscriptionCheck?.available)} />
-          </FormRow>
-        </div>
-      )}
+        <FormRow className="flex flex-row-reverse">
+          <SubmitButton label="Naar betalen" onClick={() => onSubmit(subscriptionCheck?.available)} />
+        </FormRow>
+      </DivElement>
     </>
   ) : (
     <></>

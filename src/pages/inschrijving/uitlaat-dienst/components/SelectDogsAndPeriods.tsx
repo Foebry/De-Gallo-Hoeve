@@ -8,14 +8,16 @@ import { useUserContext } from 'src/context/app/UserContext';
 import { optionInterface } from 'src/components/register/HondGegevens';
 import { Body } from 'src/components/Typography/Typography';
 import { classNames } from 'src/shared/functions';
+import { ActiveServiceEntry } from 'src/common/api/subscriptions';
 
 type Props = {
   control: Control<FormType, any>;
   selectedWeekDays: string[];
-  handleDeleteWeekDays: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  handleDeleteItem: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   getValues: UseFormGetValues<FormType>;
   handleHondSelect: (e: MultiValue<any>, weekday: string) => MultiValue<any>;
   handleMomentSelect: (e: MultiValue<any>, weekday: string) => MultiValue<any>;
+  partiallyDisabledDays: ActiveServiceEntry[];
   ['r-if']: boolean;
 };
 
@@ -23,9 +25,10 @@ const SelectDogsAndPeriods: React.FC<Props> = ({
   control,
   getValues,
   selectedWeekDays,
-  handleDeleteWeekDays,
+  handleDeleteItem,
   handleHondSelect,
   handleMomentSelect,
+  partiallyDisabledDays,
   ['r-if']: rIf,
 }) => {
   const { recurring, dates, period, weekDays } = getValues();
@@ -62,6 +65,25 @@ const SelectDogsAndPeriods: React.FC<Props> = ({
     label: hond.naam,
   }));
 
+  const sortAscending = (a: string, b: string) => {
+    if (recurring) return (a === '0' ? '7' : a) > (b === '0' ? '7' : b) ? 1 : -1;
+    return new Date(a).getTime() - new Date(b).getTime();
+  };
+
+  const data = recurring ? selectedWeekDays : dates;
+
+  const getOptionsForDate = (date: string) => {
+    const partiallyDisabledDates = partiallyDisabledDays.map((day) => day.date);
+
+    if (partiallyDisabledDates.includes(date)) {
+      const relevantDisabledDay = partiallyDisabledDays.find((day) => day.date === date);
+      if (!relevantDisabledDay) return [];
+      const relevantDisabledOptions = Object.keys(relevantDisabledDay.timeSlots).map((option) => option.toLowerCase());
+      return momentOptions.filter((option) => !relevantDisabledOptions.includes(option.value.toLowerCase()));
+    }
+    return momentOptions;
+  };
+
   return rIf ? (
     <>
       <div className="mb-16">
@@ -80,47 +102,45 @@ const SelectDogsAndPeriods: React.FC<Props> = ({
           we genoodzaakt hier 2x verplaatsingskosten aanrekenen.
         </Body>
       </div>
-      {recurringWeekdays &&
-        selectedWeekDays
-          .sort((a, b) => ((a === '0' ? '7' : a) > (b === '0' ? '7' : b) ? 1 : -1))
-          .map((weekday, index) => (
-            <InschrijvingCard
-              key={nanoid()}
-              weekday={weekdayMapper[weekday]}
-              data-id={weekday}
-              index={index}
-              onDelete={handleDeleteWeekDays}
-            >
-              <div className="flex flex-col gap-4">
-                <Controller
-                  name="dogs"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <Select
-                      options={hondOptions}
-                      placeholder={`Selecteer hond(en)...`}
-                      isMulti={true}
-                      value={value.filter((v) => v.weekday === weekday)[0]?.dogs ?? []}
-                      onChange={(e) => onChange(handleHondSelect(e, weekday))}
-                    />
-                  )}
+      {data.sort(sortAscending).map((weekday, index) => (
+        <InschrijvingCard
+          key={nanoid()}
+          weekday={recurring ? weekdayMapper[weekday] : undefined}
+          date={!recurring ? weekday : undefined}
+          data-id={weekday}
+          index={index}
+          onDelete={handleDeleteItem}
+        >
+          <div className="flex flex-col gap-4">
+            <Controller
+              name="dogs"
+              control={control}
+              render={({ field: { value, onChange } }) => (
+                <Select
+                  options={hondOptions}
+                  placeholder={`Selecteer hond(en)...`}
+                  isMulti={true}
+                  value={value.filter((v) => v.weekday === weekday)[0]?.dogs ?? []}
+                  onChange={(e) => onChange(handleHondSelect(e, weekday))}
                 />
-                <Controller
-                  name="moments"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <Select
-                      options={momentOptions}
-                      placeholder={`Selecteer moment(en...)`}
-                      isMulti={true}
-                      value={value.filter((v) => v.weekday === weekday)[0]?.moments ?? []}
-                      onChange={(e) => onChange(handleMomentSelect(e, weekday))}
-                    />
-                  )}
+              )}
+            />
+            <Controller
+              name="moments"
+              control={control}
+              render={({ field: { value, onChange } }) => (
+                <Select
+                  options={getOptionsForDate(weekday)}
+                  placeholder={`Selecteer moment(en...)`}
+                  isMulti={true}
+                  value={value.filter((v) => v.weekday === weekday)[0]?.moments ?? []}
+                  onChange={(e) => onChange(handleMomentSelect(e, weekday))}
                 />
-              </div>
-            </InschrijvingCard>
-          ))}
+              )}
+            />
+          </div>
+        </InschrijvingCard>
+      ))}
     </>
   ) : (
     <></>
