@@ -7,13 +7,14 @@ import { getKlantById } from '../../auth/me/repo';
 import { logError } from '../../logError/repo';
 import { getServiceById } from '../../services/repo';
 import { mapToAvailabilityDto } from '../mappers';
-import { getAvailableAndBlockedSubscriptions, getTravelCostForCustomer } from '../service';
+import { getAvailableAndBlockedSubscriptions, getBlockedSubscriptions } from '../repo';
+import { getTravelCostForCustomer } from '../service';
 
 export interface Request extends NextApiRequest {
   body: {
     serviceId: string;
     klantId: string;
-    items: SubscriptionDetailsDto[];
+    items?: SubscriptionDetailsDto[];
   };
 }
 
@@ -31,7 +32,10 @@ const handler = async (req: Request, res: NextApiResponse<Response>) => {
 
     const dogs = await getHondenByKlantId(customer._id);
 
-    const availableAndBlocked = await getAvailableAndBlockedSubscriptions(service, customer, dogs, items);
+    const availableAndBlocked = items
+      ? await getAvailableAndBlockedSubscriptions(service, customer, dogs, items)
+      : await getBlockedSubscriptions(service, customer, dogs);
+
     const travelCost = await getTravelCostForCustomer(customer);
     const result = mapToAvailabilityDto(availableAndBlocked, service, travelCost);
 

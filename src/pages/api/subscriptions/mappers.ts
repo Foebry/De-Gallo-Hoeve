@@ -13,6 +13,7 @@ export const mapToAvailabilityDto = (
   service: Service,
   travelCost: number
 ): AvailabilityResponse => {
+  console.log({ status: 'mapAvailabilityDto line 16' });
   const totalExcl = available?.items
     ? available.items.reduce((acc, curr) => {
         const rowPrice = curr.timeSlots.length === 1 ? service.priceExcl : curr.timeSlots.length === 2 ? 22.5 : 35;

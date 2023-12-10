@@ -7,6 +7,7 @@ import {
   ClientSession,
   MongoClientOptions,
   WithId,
+  ObjectId,
 } from 'mongodb';
 import { IsKlantCollection } from 'src/common/domain/klant';
 import { ConfirmCollection } from 'src/types/EntityTpes/ConfirmTypes';
@@ -137,3 +138,7 @@ export const getCollection = async <T extends ObjectLiteral>(name: string): Prom
   const client = await connectClient();
   return client.db(DATABASE).collection<T>(name);
 };
+
+export const match_excludeDeleted = <T>(matchOptions: Partial<Record<keyof T, any>>) => ({
+  $match: { ...matchOptions },
+});

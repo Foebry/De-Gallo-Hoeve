@@ -47,6 +47,10 @@ export const getTemplateId = (type: string): string => {
     ? 'd-ed7c6f5b2f164d4c99f5d5cd9de6a6c4'
     : type === TemplateIds.PRICE_ADJUSTMENT
     ? TemplateIds.PRICE_ADJUSTMENT
+    : type === TemplateIds.SUBSCRIPTION_CONFIRM
+    ? TemplateIds.SUBSCRIPTION_CONFIRM
+    : type === TemplateIds.SUBSCRIPTION_HEADSUP
+    ? TemplateIds.SUBSCRIPTION_HEADSUP
     : '';
 };
 
@@ -56,6 +60,8 @@ export enum TemplateIds {
   CONTACT = 'contact',
   CONTACT_CONFIRM = 'contact-confirm',
   PRICE_ADJUSTMENT = 'd-ad72c7abdb234cdeb5b69bd403cb3230',
+  SUBSCRIPTION_CONFIRM = '',
+  SUBSCRIPTION_HEADSUP = '',
 }
 
 const mailer: Mailer = {

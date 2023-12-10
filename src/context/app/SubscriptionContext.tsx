@@ -61,10 +61,14 @@ const SubscriptionProvider: React.FC<{ children: any }> = ({ children }) => {
 
   // helpers
   const mapToSubscriptionDto = (values: FormType, klant: IsKlantCollection): SubscriptionDto => {
-    const period = values.period;
-    const datesInPeriod = getDatesBetween(new Date(period.from), new Date(period.to));
-    const selectedWeekdays = values.weekDays.map((weekday) => parseInt(weekday));
-    const selectedDates = datesInPeriod.filter((date) => selectedWeekdays.includes(date.getDay()));
+    console.log({ values });
+    const datesInPeriod = values.period
+      ? getDatesBetween(new Date(values.period.from), new Date(values.period.to))
+      : [];
+    const selectedWeekdays = values.weekDays?.map((weekday) => parseInt(weekday)) ?? [];
+    const selectedDates = values.period
+      ? datesInPeriod.filter((date) => selectedWeekdays.includes(date.getDay()))
+      : values.dates.map((date) => new Date(date));
 
     const allSubscriptionItems = selectedDates
       .map((date) => {
@@ -73,10 +77,10 @@ const SubscriptionProvider: React.FC<{ children: any }> = ({ children }) => {
         const datum = date.toISOString().split('T')[0];
         if (!weekday) return;
         const hondIds = values.dogs
-          .filter((dogValues) => dogValues.weekday === weekday)
+          .filter((dogValues) => dogValues.weekday === weekday || dogValues.weekday === datum)
           .reduce((acc, dogValues) => [...acc, ...dogValues.dogs.map((dogOption) => dogOption.value)], [] as string[]);
         const timeSlots = values.moments
-          .filter((momentValues) => momentValues.weekday === weekday)
+          .filter((momentValues) => momentValues.weekday === weekday || momentValues.weekday === datum)
           .reduce(
             (acc, momentValues) => [...acc, ...momentValues.moments.map((moment) => moment.value)],
             [] as string[]
