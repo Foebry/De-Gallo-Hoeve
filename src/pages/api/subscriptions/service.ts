@@ -3,9 +3,8 @@ import Service from 'src/common/domain/entities/Service';
 import Subscription, { SubscriptionDetails } from 'src/common/domain/entities/Subscription';
 import { IsKlantCollection } from 'src/common/domain/klant';
 import mailer, { TemplateIds } from 'src/utils/Mailer';
+import { getServiceById } from '../services/repo';
 import { GroupedSubscription, itemDetail } from './repo';
-
-const MAX_SUBSCRIPTIONS_PER_TIMESLOT = 3;
 
 export type AvailableAndBlockedSubscriptions = Partial<{
   available: Subscription;
@@ -23,6 +22,7 @@ export const mapToAvailableAndBlocked = (
 
   subscriptionItems.forEach((subscriptionItem) => {
     const { available: availableItem, blocked: blockedItem } = checkAvailability(
+      service,
       customer._id,
       subscriptionItem,
       existingSubscriptions
@@ -48,6 +48,7 @@ export const mapToAvailableAndBlocked = (
 };
 
 const checkAvailability = (
+  service: Service,
   klantId: ObjectId,
   subscriptionItem: SubscriptionDetails,
   existingSubscriptions: GroupedSubscription[]
@@ -70,7 +71,7 @@ const checkAvailability = (
 
     // same timeSlot can be booked a maximum of 3 times;
     // timeSlots can not be booked twice by same user;
-    const timeSlotIsFull = timeslotRelevantSub && timeslotRelevantSub.length >= MAX_SUBSCRIPTIONS_PER_TIMESLOT;
+    const timeSlotIsFull = timeslotRelevantSub && timeslotRelevantSub.length >= service.maxSubscriptionsPerTimeSlot;
     const custmerAlreadyBookedTimeSlot =
       timeslotRelevantSub && timeslotRelevantSub.find((ts) => ts.klantId.toString() === klantId.toString());
 

@@ -61,7 +61,6 @@ const SubscriptionProvider: React.FC<{ children: any }> = ({ children }) => {
 
   // helpers
   const mapToSubscriptionDto = (values: FormType, klant: IsKlantCollection): SubscriptionDto => {
-    console.log({ values });
     const datesInPeriod = values.period
       ? getDatesBetween(new Date(values.period.from), new Date(values.period.to))
       : [];

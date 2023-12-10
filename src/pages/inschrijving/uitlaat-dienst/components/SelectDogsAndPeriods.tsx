@@ -73,12 +73,7 @@ const SelectDogsAndPeriods: React.FC<Props> = ({
   const data = recurring ? selectedWeekDays : dates;
 
   const getOptionsForDate = (date: string) => {
-    console.log({ date });
     const partiallyDisabledDates = partiallyDisabledDays.map((day) => day.date);
-    console.log({
-      partiallyDisabledDays,
-      partiallyDisabledDates: partiallyDisabledDates ?? 'no partiallyDisabledDates',
-    });
 
     if (partiallyDisabledDates.includes(date)) {
       const relevantDisabledDay = partiallyDisabledDays.find((day) => day.date === date);

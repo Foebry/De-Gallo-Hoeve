@@ -78,10 +78,8 @@ const Inschrijving = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { control, getValues, setValue } = useForm<FormType>({ defaultValues: formDefaultValues });
   const [selectedWeekDays, setSelectedWeekDays] = useState<string[]>(getValues().weekDays);
-  // const { checkAvailableSubscriptions, mapToSubscriptionDto } = useSubscriptionContext();
 
   useEffect(() => {
-    console.log(activeEntries);
     if (!activeEntries) return;
     const fullyBookedEntries = activeEntries.filter(
       (entry) => entry.timeSlots['ochtend'] >= 3 && entry.timeSlots['middag'] >= 3 && entry.timeSlots['avond'] >= 3
@@ -160,7 +158,7 @@ const Inschrijving = () => {
   const handleStepChange = async (step: number) => {
     if (activeStep === 2) {
       if (!klant) {
-        console.log('niet meer ingelogd');
+        console.log('niet meer ingelogd'); // we want to handle this correctly
         return;
       }
       const values = getValues();
