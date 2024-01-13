@@ -1,77 +1,72 @@
-import { KlantHond } from '@/types/EntityTpes/HondTypes';
-import { TrainingType } from '@/types/EntityTpes/TrainingType';
+import { LOGOUT } from '@/types/apiTypes';
+import { INDEX } from '@/types/linkTypes';
 import { useRouter } from 'next/router';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { AuthDto, AuthKlantDto } from 'src/common/api/dtos/AuthDto';
 import { HondDto } from 'src/common/api/types/hond';
 import { InschrijvingDto } from 'src/common/api/types/inschrijving';
-import { IsKlantCollection } from 'src/common/domain/klant';
 import getData from 'src/hooks/useApi';
-import { useKlantContext } from './klantContext';
-
-type Inschrijving = {
-  datum: Date;
-  training: TrainingType;
-};
+import useMutation from 'src/hooks/useMutation';
+import { REQUEST_METHOD } from 'src/utils/axios';
 
 type contextType = {
-  klant: IsKlantCollection | null;
-  isLoggedIn: boolean;
-  initializeKlant: (klant: IsKlantCollection) => void;
-  clearData: () => void;
-  honden: HondDto[];
+  klant: AuthKlantDto | null;
+  honden: Omit<HondDto, 'klant'>[];
+  inschrijvingen: Omit<InschrijvingDto, 'klant'>[];
+  logout: () => Promise<void>;
+  initializeKlant: (data: any) => Promise<void>;
 };
 
 const defaultValues: contextType = {
   klant: null,
-  isLoggedIn: false,
-  initializeKlant: () => {},
-  clearData: () => {},
   honden: [],
+  inschrijvingen: [],
+  logout: async () => {},
+  initializeKlant: async () => {},
 };
-
-type AuthenticationResponse = {
-  loggedIn: boolean;
-  honden: HondDto[];
-  inschrijvingen: InschrijvingDto[];
-  role: string;
-  name: string;
-};
-
 export const UserContext = createContext<contextType>(defaultValues);
 
 const UserProvider: React.FC<{ children: any }> = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [honden, setHonden] = useState<HondDto[]>([]);
-  const [inschrijvingen, setInschrijvingen] = useState<Inschrijving[]>();
-  const [klant, setKlant] = useState<IsKlantCollection | null>(null);
+  const [honden, setHonden] = useState<Omit<HondDto, 'klant'>[]>([]);
+  const [inschrijvingen, setInschrijvingen] = useState<Omit<InschrijvingDto, 'klant'>[]>([]);
+  const [klant, setKlant] = useState<AuthKlantDto | null>(null);
   const router = useRouter();
+  const logoutMutation = useMutation<{}>(LOGOUT);
 
-  const clearData = () => setKlant(null);
-
-  const initializeKlant = async (klant: IsKlantCollection) => {
-    setKlant(klant);
-    localStorage.setItem('klant', JSON.stringify({ ...klant, id: klant._id.toString() }));
-    setIsLoggedIn(true);
+  const logout = async () => {
+    await logoutMutation('/', {}, { method: REQUEST_METHOD.DELETE });
+    setKlant(null);
+    setInschrijvingen([]);
+    setHonden([]);
+    router.push(INDEX);
   };
 
+  const getMe = async () => {
+    const { data } = await getData<AuthDto>('/api/auth/me');
+    if (data) initializeKlant.current(data);
+  };
+  const initializeKlant = useRef(async (data: AuthDto) => {
+    if (!data || data?.loggedIn === false) setKlant(null);
+    else if (data && data.loggedIn) {
+      const { honden, inschrijvingen, ...klant } = data.klant;
+      setHonden(honden);
+      setInschrijvingen(inschrijvingen);
+      setKlant(klant);
+    }
+  });
+
   useEffect(() => {
-    const initializeKlant = async () => {
-      const { data, error } = await getData<AuthenticationResponse>('/api/auth/me');
-      if (data?.loggedIn) {
-        setHonden(data.honden);
-      } else router.push('/login');
-    };
-    initializeKlant();
+    getMe();
   }, []);
 
   return (
     <UserContext.Provider
       value={{
         klant,
-        isLoggedIn,
-        initializeKlant,
-        clearData,
         honden,
+        inschrijvingen,
+        logout,
+        initializeKlant: initializeKlant.current,
       }}
     >
       {children}
