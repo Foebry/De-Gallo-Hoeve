@@ -23,6 +23,9 @@ import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
 import DivElement from 'src/components/baseElements/divElement';
 import { useGetActiveEntriesForService, ActiveServiceEntry } from 'src/common/api/subscriptions';
+import { securepage } from 'src/services/Authenticator';
+import { GetServerSidePropsContext } from 'next';
+import { LOGIN } from '@/types/linkTypes';
 
 type DogsForDate = {
   date: string;
@@ -220,3 +223,9 @@ const Inschrijving = () => {
 };
 
 export default Inschrijving;
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  const klantId = await securepage(ctx);
+  if (!klantId) return { redirect: { permanent: false, destination: LOGIN } };
+  return { props: {} };
+};
