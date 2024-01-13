@@ -66,7 +66,7 @@ const authenticationHandler: AuthenticationHandlerInterface = {
 
   securepage: async ({ req, res }) => {
     const token = nookies.get({ req }).JWT;
-    if (token) return verifyToken(token);
+    if (token) return verifyToken(token)._id;
 
     validationHelper.redirect = INSCHRIJVING;
 

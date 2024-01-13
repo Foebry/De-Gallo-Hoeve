@@ -1,8 +1,7 @@
 import { nanoid } from 'nanoid';
 import { createContext, useContext, useState } from 'react';
+import { AuthKlantDto } from 'src/common/api/dtos/AuthDto';
 import { AvailabilityDto, SubscriptionDetailsDto, SubscriptionDto } from 'src/common/api/dtos/Subscription';
-import { SubscriptionDetails } from 'src/common/domain/entities/Subscription';
-import { IsKlantCollection } from 'src/common/domain/klant';
 import { SelectedRange } from 'src/components/form/inputs/date/DateRangeSelector';
 import useMutation from 'src/hooks/useMutation';
 import { getDatesBetween, notEmpty, unique } from 'src/shared/functions';
@@ -36,7 +35,7 @@ type ItemMapper = (
 type Context = {
   subscriptionCheck: AvailabilityDto | null;
   checkAvailableSubscriptions: (payload: SubscriptionDto) => Promise<AvailabilityDto | null>;
-  mapToSubscriptionDto: (values: FormType, klant: IsKlantCollection) => SubscriptionDto;
+  mapToSubscriptionDto: (values: FormType, klant: AuthKlantDto) => SubscriptionDto;
   mapAvailabilityDtoToSubscriptionDto: (itemMapper: ItemMapper) => SubscriptionDto;
 };
 
@@ -60,7 +59,7 @@ const SubscriptionProvider: React.FC<{ children: any }> = ({ children }) => {
   };
 
   // helpers
-  const mapToSubscriptionDto = (values: FormType, klant: IsKlantCollection): SubscriptionDto => {
+  const mapToSubscriptionDto = (values: FormType, klant: AuthKlantDto): SubscriptionDto => {
     const datesInPeriod = values.period
       ? getDatesBetween(new Date(values.period.from), new Date(values.period.to))
       : [];
@@ -95,7 +94,7 @@ const SubscriptionProvider: React.FC<{ children: any }> = ({ children }) => {
       .filter(notEmpty);
 
     const result: SubscriptionDto = {
-      klantId: klant?._id.toString() ?? '',
+      klantId: klant?.id ?? '',
       serviceId: '64e508a34a1ed9fa7ad6fe09',
       items: allSubscriptionItems,
     };

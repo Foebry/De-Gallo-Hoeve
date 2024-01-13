@@ -1,26 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ADMIN, INDEX, LOGIN, REGISTER } from '../types/linkTypes';
 import { Title3 } from './Typography/Typography';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import NavLink from './NavLink';
 import { Hamburger } from './Hamburger';
-import { LOGOUT } from '../types/apiTypes';
-import useMutation from '../hooks/useMutation';
-import { REQUEST_METHOD } from 'src/utils/axios';
-import { IsKlantCollection } from 'src/common/domain/klant';
+import { useUserContext } from 'src/context/app/UserContext';
 
 export const Nav = () => {
   const router = useRouter();
-  const { klant, clearData } = useGetActiveKlant();
-  const logout = useMutation<{}>(LOGOUT);
-
-  const onLogout = async () => {
-    await logout('/', {}, { method: REQUEST_METHOD.DELETE });
-    localStorage.clear();
-    clearData();
-    router.push(INDEX);
-  };
+  const { klant: activeUser, logout } = useUserContext();
 
   return (
     <div className="relative w-full shadow h-16 z-20 md:mb-0 md:block">
@@ -39,18 +28,18 @@ export const Nav = () => {
           </div>
         </div>
         {/* <NavLink href={CHANGELOG} label="nieuw" /> */}
-        {klant ? (
+        {activeUser ? (
           <div className="flex gap-10 items-center">
             <div className="hidden xs:block uppercase text-green-200 text-lg font-medium">
               <Title3>
-                <span className="capitalize">Hallo</span> {klant.vnaam}
+                <span className="capitalize">Hallo</span> {activeUser.vnaam}
               </Title3>
             </div>
-            <Hamburger roles={parseInt(klant.roles)}>
+            <Hamburger roles={parseInt(activeUser.roles)}>
               <span className="block xs:hidden capitalize border rounded py-1 px-1.5 text-gray-100 bg-green-100 cursor-pointer w-full hover:text-green-200 hover:bg-gray-100 text-md font-medium">
-                Hallo {klant.vnaam}
+                Hallo {activeUser.vnaam}
               </span>
-              {parseInt(klant.roles) > 0 && (
+              {parseInt(activeUser.roles) > 0 && (
                 <NavLink
                   href={ADMIN}
                   label="admin"
@@ -59,7 +48,7 @@ export const Nav = () => {
               )}
               <button
                 className="capitalize border rounded py-1 px-1.5 text-gray-100 bg-green-100 cursor-pointer w-full hover:text-green-200 hover:bg-gray-100 text-md font-medium"
-                onClick={onLogout}
+                onClick={logout}
               >
                 logout
               </button>
@@ -90,17 +79,4 @@ export const Nav = () => {
       </div>
     </div>
   );
-};
-
-const useGetActiveKlant = () => {
-  const [klant, setKlant] = useState<IsKlantCollection | null>();
-
-  const clearData = () => setKlant(null);
-
-  useEffect(() => {
-    const klant = localStorage.getItem('klant');
-    if (!klant) return;
-    setKlant(JSON.parse(klant));
-  }, []);
-  return { klant, clearData };
 };
