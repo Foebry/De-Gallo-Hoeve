@@ -5,11 +5,7 @@ import { ObjectId } from 'mongodb';
 import { INSCHRIJVING } from '../types/linkTypes';
 import validationHelper from './Validator';
 import base64 from 'base-64';
-import {
-  EmailNotVerifiedError,
-  NotLoggedInError,
-  UnauthorizedAccessError,
-} from '../shared/RequestError';
+import { EmailNotVerifiedError, NotLoggedInError, UnauthorizedAccessError } from '../shared/RequestError';
 import { IsKlantCollection } from '../types/EntityTpes/KlantTypes';
 import { HondCollection } from '../types/EntityTpes/HondTypes';
 
@@ -22,7 +18,6 @@ interface VerifiedToken {
 
 interface AuthenticationHandlerInterface {
   createJWT: (res: NextApiResponse, klantData: any) => void;
-  setClientCookie: (res: NextApiResponse, payload: any) => void;
   secureApi: (obj: { req: NextApiRequest; res: NextApiResponse }) => VerifiedToken;
   adminApi: (ob: { req: NextApiRequest; res: NextApiResponse }) => void;
   verifiedUserApi: (obj: { req: NextApiRequest; res: NextApiResponse }) => void;
@@ -49,27 +44,10 @@ const authenticationHandler: AuthenticationHandlerInterface = {
     });
   },
 
-  setClientCookie: (res, klantData) => {
-    const { vnaam: name, roles } = klantData;
-    const token = jwt.sign({ name, roles }, `${cookieSecret}`);
-    setCookie({ res }, 'Client', token, {
-      httpOnly: false,
-      maxAge: 3600,
-      secure: false,
-      sameSite: 'strict',
-      path: '/',
-    });
-  },
-
   secureApi: ({ req, res }) => {
-    const cookies = parseCookies({ req });
-    const token = cookies.JWT ?? req.headers.authorization?.split(' ')[1];
+    const token = getTokenFromRequest(req);
     if (!token) throw new NotLoggedInError();
-    const verifiedToken = jwt.verify(token, `${secret}`, {
-      algorithms: ['RS256', 'HS256'],
-    }) as jwt.JwtPayload;
-    if (!verifiedToken) throw new UnauthorizedAccessError();
-    return verifiedToken.payload;
+    return verifyToken(token);
   },
   verifiedUserApi: ({ req, res }) => {
     const verifiedToken = secureApi({ req, res });
@@ -78,8 +56,7 @@ const authenticationHandler: AuthenticationHandlerInterface = {
 
   adminApi: ({ req, res }) => {
     const payload = secureApi({ req, res });
-    if (payload.roles !== '1' && payload.roles !== '2')
-      throw new UnauthorizedAccessError();
+    if (payload.roles !== '1' && payload.roles !== '2') throw new UnauthorizedAccessError();
   },
 
   redirectToLogin: (ctx) => {
@@ -89,13 +66,8 @@ const authenticationHandler: AuthenticationHandlerInterface = {
 
   securepage: async ({ req, res }) => {
     const token = nookies.get({ req }).JWT;
-    if (token) {
-      const verifiedToken = jwt.verify(token, `${secret}`, {
-        algorithms: ['RS256', 'HS256'],
-      });
-      const { _id: klant_id } = JSON.parse(JSON.stringify(verifiedToken)).payload;
-      return new ObjectId(klant_id);
-    }
+    if (token) return verifyToken(token)._id;
+
     validationHelper.redirect = INSCHRIJVING;
 
     // throw new NotLoggedInError(res, null);
@@ -105,12 +77,8 @@ const authenticationHandler: AuthenticationHandlerInterface = {
   },
 
   hash: (value, secret) => {
-    const encValue = base64.encode(
-      typeof value === 'string' ? value : JSON.stringify(value)
-    );
-    const signature = jwt
-      .sign(typeof value === 'string' ? value : JSON.stringify(value), secret)
-      .split('.')[2];
+    const encValue = base64.encode(typeof value === 'string' ? value : JSON.stringify(value));
+    const signature = jwt.sign(typeof value === 'string' ? value : JSON.stringify(value), secret).split('.')[2];
     return `${encValue}$${signature}`;
   },
 
@@ -136,9 +104,21 @@ const authenticationHandler: AuthenticationHandlerInterface = {
   },
 };
 
+export const verifyToken = (token: string) => {
+  const verifiedToken = jwt.verify(token, `${secret}`, {
+    algorithms: ['RS256', 'HS256'],
+  }) as jwt.JwtPayload;
+  if (!verifiedToken) throw new UnauthorizedAccessError();
+  return verifiedToken.payload;
+};
+
+export const getTokenFromRequest = (req: NextApiRequest) => {
+  const cookies = parseCookies({ req });
+  return cookies.JWT ?? req.headers.authorization?.split(' ')[1];
+};
+
 export const {
   createJWT,
-  setClientCookie,
   secureApi,
   adminApi,
   verifiedUserApi,

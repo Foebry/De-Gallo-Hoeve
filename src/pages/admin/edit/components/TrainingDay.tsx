@@ -1,9 +1,9 @@
 import { TrainingDayDto } from '@/types/DtoTypes/TrainingDto';
-import React, { useContext } from 'react';
+import React from 'react';
 import { Body, Title3, Title4 } from 'src/components/Typography/Typography';
-import { TrainingDayContext } from 'src/context/TrainingDayContext';
 import { defaultTrainingTimeSlots } from 'src/mappers/trainingDays';
 import { TiDelete, TiRefresh } from 'react-icons/ti';
+import { useTrainingDayContext } from 'src/context/app/TrainingDayContext';
 
 type Props = {
   date: string;
@@ -76,7 +76,7 @@ const useGetReadableDate = (dateString: string): string =>
   dateString.split('T')[0].split('-').reverse().join('-');
 
 const useUpdateTrainingDay = ({ timeslots, date, _id }: TrainingDayDto) => {
-  const { updateTrainingDay } = useContext(TrainingDayContext);
+  const { updateTrainingDay } = useTrainingDayContext();
   const removeTimeSlot = (e: React.MouseEvent<HTMLSpanElement>) => {
     const timeslotToRemove = e.currentTarget.dataset.timeslot;
     const newTimeSlots = timeslots.filter((slot) => slot !== timeslotToRemove);

@@ -44,7 +44,7 @@ describe('/admin/klanten', () => {
         data: expect.arrayContaining(
           randomKlanten.slice(0, amount).map((klant) =>
             expect.objectContaining({
-              _id: klant._id.toString(),
+              id: klant._id.toString(),
               verified: klant.verified,
               email: klant.email,
               vnaam: klant.vnaam,
@@ -132,35 +132,34 @@ describe('/admin/klanten', () => {
       await getController(INSCHRIJVING).saveMany(specificInschrijvingen);
 
       const expectedResponse = expect.objectContaining({
-        _id: specificKlant._id.toString(),
+        id: specificKlant._id.toString(),
         email: specificKlant.email,
         vnaam: specificKlant.vnaam,
         lnaam: specificKlant.lnaam,
         gsm: specificKlant.gsm,
         straat: specificKlant.straat,
-        nr: specificKlant.nr,
+        nr: specificKlant.nr.toString(),
         gemeente: specificKlant.gemeente,
-        postcode: specificKlant.postcode,
-        roles: '0',
+        postcode: specificKlant.postcode.toString(),
+        honden: expect.arrayContaining(
+          specificKlant.honden.map((hond) =>
+            expect.objectContaining({
+              id: hond._id.toString(),
+              geslacht: hond.geslacht,
+              naam: hond.naam,
+              ras: hond.ras,
+            })
+          )
+        ),
         verified: specificKlant.verified,
         created_at: toReadableDate(specificKlant.created_at),
         inschrijvingen: expect.arrayContaining(
           specificInschrijvingen.map((inschrijving) =>
             expect.objectContaining({
-              _id: inschrijving._id.toString(),
+              id: inschrijving._id.toString(),
               datum: toReadableDate(inschrijving.datum),
               training: inschrijving.training,
               hond: inschrijving.hond.naam,
-            })
-          )
-        ),
-        honden: expect.arrayContaining(
-          specificKlant.honden.map((hond) =>
-            expect.objectContaining({
-              _id: hond._id.toString(),
-              geslacht: hond.geslacht,
-              naam: hond.naam,
-              ras: hond.ras,
             })
           )
         ),

@@ -7,11 +7,7 @@ import { createBearer } from 'src/services/Authenticator';
 import { getController } from 'src/services/Factory';
 import { getAge } from 'src/shared/functions';
 import { createRandomHond, createRandomHonden } from 'tests/fixtures/hond';
-import {
-  createRandomKlant,
-  createRandomKlanten,
-  RoleOptions,
-} from 'tests/fixtures/klant';
+import { createRandomKlant, createRandomKlanten, RoleOptions } from 'tests/fixtures/klant';
 import { createRandomRas } from 'tests/fixtures/ras';
 import { getRequest } from 'tests/helpers';
 
@@ -39,10 +35,7 @@ describe('/honden', () => {
       const bearerSuperAdmin = createBearer(superAdmin);
 
       const amount = faker.datatype.number();
-      const nextPage =
-        amount < allHonden.length
-          ? `/api/admin/honden?page=2&amount=${amount}`
-          : undefined;
+      const nextPage = amount < allHonden.length ? `/api/admin/honden?page=2&amount=${amount}` : undefined;
 
       const { body: adminBody } = await listRequest
         .get(`/api/admin/honden`)
@@ -55,25 +48,25 @@ describe('/honden', () => {
         expect.objectContaining({
           data: expect.arrayContaining(
             allHonden.slice(0, amount).map((hond) => {
-              const klant = [klant1, klant2, klant3].find((klant) =>
-                klant.honden.includes(hond)
-              );
+              const klant = [klant1, klant2, klant3].find((klant) => klant.honden.includes(hond));
               return expect.objectContaining({
-                _id: hond._id.toString(),
+                id: hond._id.toString(),
                 naam: hond.naam,
-                ras: hond.ras,
                 geslacht: hond.geslacht,
-                geboortedatum: hond.geboortedatum
-                  .toISOString()
-                  .replace('T', ' ')
-                  .split('.')[0],
                 created_at: hond.created_at.toISOString().replace('T', ' ').split('.')[0],
                 updated_at: hond.updated_at.toISOString().replace('T', ' ').split('.')[0],
-                leeftijd: getAge(hond.geboortedatum),
-                klant: {
-                  _id: klant?._id.toString(),
-                  naam: `${klant?.vnaam} ${klant?.lnaam}`,
+                ras: {
+                  id: '',
+                  naam: hond.ras,
                 },
+                klant: {
+                  id: klant?._id.toString(),
+                  vnaam: klant?.vnaam,
+                  lnaam: klant?.lnaam,
+                },
+                geboortedatum: hond.geboortedatum.toISOString().replace('T', ' ').split('.')[0],
+
+                leeftijd: getAge(hond.geboortedatum),
               });
             })
           ),
@@ -98,24 +91,23 @@ describe('/honden', () => {
         expect.objectContaining({
           data: expect.arrayContaining(
             allHonden.slice(0, amount).map((hond) => {
-              const klant = [klant1, klant2, klant3].find((klant) =>
-                klant.honden.includes(hond)
-              );
+              const klant = [klant1, klant2, klant3].find((klant) => klant.honden.includes(hond));
               return expect.objectContaining({
-                _id: hond._id.toString(),
+                id: hond._id.toString(),
                 naam: hond.naam,
-                ras: hond.ras,
+                ras: {
+                  id: '',
+                  naam: hond.ras,
+                },
                 geslacht: hond.geslacht,
-                geboortedatum: hond.geboortedatum
-                  .toISOString()
-                  .replace('T', ' ')
-                  .split('.')[0],
+                geboortedatum: hond.geboortedatum.toISOString().replace('T', ' ').split('.')[0],
                 created_at: hond.created_at.toISOString().replace('T', ' ').split('.')[0],
                 updated_at: hond.updated_at.toISOString().replace('T', ' ').split('.')[0],
                 leeftijd: getAge(hond.geboortedatum),
                 klant: {
-                  _id: klant?._id.toString(),
-                  naam: `${klant?.vnaam} ${klant?.lnaam}`,
+                  id: klant?._id.toString(),
+                  vnaam: klant?.vnaam,
+                  lnaam: klant?.lnaam,
                 },
               });
             })
@@ -162,16 +154,19 @@ describe('/honden', () => {
 
       expect(body).toEqual(
         expect.objectContaining({
-          _id: hond._id.toString(),
+          id: hond._id.toString(),
           naam: hond.naam,
-          geboortedatum: hond.geboortedatum.toISOString(),
           geslacht: hond.geslacht,
-          eigenaar: expect.objectContaining({
-            _id: klant._id.toString(),
-            fullName: `${klant.vnaam} ${klant.lnaam}`,
+          created_at: hond.created_at.toISOString(),
+          updated_at: hond.updated_at.toISOString(),
+          geboortedatum: hond.geboortedatum.toISOString(),
+          klant: expect.objectContaining({
+            id: klant._id.toString(),
+            vnaam: klant.vnaam,
+            lnaam: klant.lnaam,
           }),
           ras: expect.objectContaining({
-            _id: ras._id.toString(),
+            id: ras._id.toString(),
             naam: hond.ras,
           }),
         })
@@ -183,10 +178,7 @@ describe('/honden', () => {
       const hond = createRandomHond();
       const bearer = createBearer(klant);
 
-      await byIdRequest
-        .get(`/api/admin/honden/${hond._id.toString()}`)
-        .auth(bearer, { type: 'bearer' })
-        .expect(401);
+      await byIdRequest.get(`/api/admin/honden/${hond._id.toString()}`).auth(bearer, { type: 'bearer' }).expect(401);
     });
   });
 });

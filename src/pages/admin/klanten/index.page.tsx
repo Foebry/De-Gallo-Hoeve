@@ -1,22 +1,22 @@
 import Link from 'next/link';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Dashboard from 'src/components/admin/dashboard';
 import Table from 'src/components/Table/Table';
-import getData from 'src/hooks/useApi';
-import { ADMIN_KLANTEN_OVERVIEW } from 'src/types/apiTypes';
 import { GrView, GrEdit } from 'react-icons/gr';
 import { MdDelete } from 'react-icons/md';
-import { useRouter } from 'next/router';
+import { NextRouter, useRouter } from 'next/router';
 import FormRow from 'src/components/form/FormRow';
 import FormSearch from 'src/components/form/FormSearch';
 import { toast } from 'react-toastify';
-import { PaginationInterface } from 'src/components/Table/Table';
 import { nanoid } from 'nanoid';
-import { PaginatedKlant } from 'src/mappers/klanten';
 import Head from 'next/head';
-import Button from 'src/components/buttons/Button';
 import useMutation from 'src/hooks/useMutation';
-import useApi from 'src/hooks/useApi';
+import { REQUEST_METHOD } from 'src/utils/axios';
+import { useKlantContext } from 'src/context/app/klantContext';
+import { KlantDto } from 'src/common/api/types/klant';
+import Spinner from 'src/components/loaders/Spinner';
+import { toHumanReadableDate } from 'src/shared/functions';
+import { PaginatedData, Pagination } from 'src/common/api/shared/types';
 
 export type apiOptionsInterface = Partial<{
   page: number;
@@ -25,104 +25,37 @@ export type apiOptionsInterface = Partial<{
 
 export interface ApiResult<T> {
   data: T[];
-  pagination: PaginationInterface;
+  pagination: Pagination;
 }
 
 const Klanten = () => {
-  const headers: string[] = [
-    'naam',
-    'email',
-    'adres',
-    'verifieerd',
-    'geregistreerd',
-    'actions',
-  ];
-  const [options, setOptions] = useState<apiOptionsInterface>({});
-  const [apiData, setApiData] = useState<ApiResult<PaginatedKlant>>({
-    data: [],
-    pagination: { first: 0, last: 0, total: 0, currentPage: 0 },
-  });
+  const headers: string[] = ['naam', 'email', 'adres', 'verifieerd', 'geregistreerd', 'actions'];
   const router = useRouter();
-  const sendManualFeedbackMails = useMutation({}, () => {});
+  const { useGetPaginatedKlanten } = useKlantContext();
+  const [page, setPage] = useState<number>(1);
+  const [search, setSearch] = useState<string>();
 
-  const handleView = (_id: string) => {
-    router.push(`/admin/klanten/${_id}`);
-  };
+  const { data: paginatedKlanten, isLoading } = useGetPaginatedKlanten({ page, search });
 
-  useEffect(() => {
-    (async () => {
-      const { data } = await getData(ADMIN_KLANTEN_OVERVIEW, options);
-      setApiData(data);
-    })();
-  }, []);
+  const rows = useMemo(() => {
+    return createTableFromData(paginatedKlanten, router);
+  }, [paginatedKlanten, router]);
 
-  const klanten = useMemo(() => {
-    return apiData.data.map((klant: PaginatedKlant) => {
-      const naam = (
-        <Link href={`/admin/klanten/${klant._id}`}>
-          {[klant.vnaam, klant.lnaam].join(' ')}
-        </Link>
-      );
-      const verified = <Verified verified={klant.verified} />;
-      const registered = klant.created_at ?? 'onbekend';
-      const address = [
-        klant.straat,
-        `${klant.nr}${klant.bus ?? ''}`,
-        klant.gemeente,
-        klant.postcode,
-      ].join(' ');
-      const actions = [
-        <div
-          className="border rounded-l border-grey-200 border-solid p-1 cursor-pointer"
-          key={nanoid(10)}
-        >
-          <GrView onClick={() => handleView(klant._id.toString())} />
-        </div>,
-        <div
-          className="border border-grey-200 border-solid p-1 cursor-pointer"
-          key={nanoid(10)}
-        >
-          <GrEdit />
-        </div>,
-        <div
-          className="border rounded-r border-grey-200 border-solid p-1 cursor-pointer"
-          key={nanoid(10)}
-        >
-          <MdDelete />
-        </div>,
-      ];
-      return [naam, klant.email, address, verified, registered, actions];
-    });
-  }, [apiData]);
+  const sendManualFeedbackMails = useMutation<{}>('/api/cron/sendManualFeedbackMails');
 
   const onSearch = async (searchValue: string) => {
-    const { data, error } = await getData(`/api/admin/klanten?search=${searchValue}`);
-    if (!error && data) {
-      setApiData(data);
-    }
-    if (error) {
-      toast.warning('Zoek opdracht mislukt');
-    }
+    setPage(1);
+    setSearch(searchValue !== '' ? searchValue : undefined);
   };
 
-  const onPaginationClick = async (api?: string) => {
-    if (!api) return;
-    const { data, error } = await getData(api);
-    if (!error && data) {
-      setApiData(data);
-    }
-    if (error) {
-      toast.warning('Fout bij laden van klanten');
-    }
+  const onPaginationClick = async (page?: number) => {
+    if (!page) return;
+    setPage(page);
   };
 
   const onClickSendEmails = async () => {
     try {
-      const { data, error } = await sendManualFeedbackMails(
-        '/api/cron/sendManualFeedbackMails',
-        {},
-        { method: 'GET' }
-      );
+      const { data, error } = await sendManualFeedbackMails('', {}, { method: REQUEST_METHOD.GET });
       if (data) toast.success('emails verzonden');
       if (error) toast.error(error.message);
     } catch (err: any) {
@@ -144,13 +77,16 @@ const Klanten = () => {
             onClick={onClickSendEmails}
           /> */}
         </FormRow>
-        <Table
-          rows={klanten}
-          columns={headers}
-          colWidths={['15', '25', '22.5', '15', '12.5', '10']}
-          pagination={apiData.pagination}
-          onPaginationClick={onPaginationClick}
-        />
+        {isLoading && <Spinner />}
+        {!isLoading && (
+          <Table
+            rows={rows}
+            columns={headers}
+            colWidths={['15', '25', '22.5', '15', '12.5', '10']}
+            pagination={paginatedKlanten.pagination}
+            onPaginationClick={onPaginationClick}
+          />
+        )}
       </Dashboard>
     </>
   );
@@ -162,10 +98,33 @@ const Verified: React.FC<{ verified: boolean }> = ({ verified }) => {
   const bgColor = verified ? 'bg-green-500' : 'bg-red-200';
   const borderColor = verified ? 'border-green-500' : 'border-red-200';
   return (
-    <span
-      className={`capitalize text-gray-200 ${bgColor} border-1 ${borderColor} border-solid rounded-2xl px-3 py-1`}
-    >
+    <span className={`capitalize text-gray-200 ${bgColor} border-1 ${borderColor} border-solid rounded-2xl px-3 py-1`}>
       {verified ? 'verified' : 'not-verified'}
     </span>
   );
+};
+
+const createTableFromData = (data: PaginatedData<KlantDto>, router: NextRouter) => {
+  const handleView = (id: string) => {
+    router.push(`/admin/klanten/${id}`);
+  };
+
+  return data.data?.map((klant: KlantDto) => {
+    const naam = <Link href={`/admin/klanten/${klant.id}`}>{[klant.vnaam, klant.lnaam].join(' ')}</Link>;
+    const verified = <Verified verified={klant.verified} />;
+    const registered = toHumanReadableDate(new Date(klant.created_at)) ?? 'onbekend';
+    const address = [klant.straat, `${klant.nr}${klant.bus ?? ''}`, klant.gemeente, klant.postcode].join(' ');
+    const actions = [
+      <div className="border rounded-l border-grey-200 border-solid p-1 cursor-pointer" key={nanoid(10)}>
+        <GrView onClick={() => handleView(klant.id)} />
+      </div>,
+      <div className="border border-grey-200 border-solid p-1 cursor-pointer" key={nanoid(10)}>
+        <GrEdit />
+      </div>,
+      <div className="border rounded-r border-grey-200 border-solid p-1 cursor-pointer" key={nanoid(10)}>
+        <MdDelete />
+      </div>,
+    ];
+    return { rowId: nanoid(), rowData: [naam, klant.email, address, verified, registered, actions] };
+  });
 };

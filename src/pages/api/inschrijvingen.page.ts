@@ -14,11 +14,7 @@ import { getKlantById } from 'src/controllers/KlantController';
 import mailer from 'src/utils/Mailer';
 import { ObjectId } from 'mongodb';
 import { getKlantHond } from 'src/controllers/HondController';
-import {
-  getTrainingByName,
-  klantReedsIngeschreven,
-  trainingVolzet,
-} from 'src/controllers/TrainingController';
+import { getTrainingByName, klantReedsIngeschreven, trainingVolzet } from 'src/controllers/TrainingController';
 import Factory from 'src/services/Factory';
 import { IsInschrijvingBody } from 'src/types/requestTypes';
 import { save } from 'src/controllers/InschrijvingController';
@@ -78,8 +74,6 @@ const postInschrijving = async (req: PostInschrijvingRequest, res: NextApiRespon
     const klant = await getKlantById(new ObjectId(klant_id));
     if (!klant) throw new KlantNotFoundError();
 
-    const isFirstInschrijving = !klant.inschrijvingen.length;
-
     const selectedTraining = await getTrainingByName(training);
     if (!selectedTraining) throw new TrainingNotFoundError();
 
@@ -98,17 +92,10 @@ const postInschrijving = async (req: PostInschrijvingRequest, res: NextApiRespon
           const hond = await getKlantHond(klant._id, hondId);
           if (!hond) throw new HondNotFoundError();
 
-          const newInschrijving = Factory.createInschrijving(
-            inschrijving,
-            training,
-            klant,
-            hond
-          );
+          const newInschrijving = Factory.createInschrijving(inschrijving, training, klant, hond);
 
-          if (await klantReedsIngeschreven(klant, training, newInschrijving))
-            throw new ReedsIngeschrevenError(index);
-          if (await trainingVolzet(selectedTraining, newInschrijving.datum))
-            throw new TrainingVolzetError();
+          if (await klantReedsIngeschreven(klant, training, newInschrijving)) throw new ReedsIngeschrevenError(index);
+          if (await trainingVolzet(selectedTraining, newInschrijving.datum)) throw new TrainingVolzetError();
 
           await save(newInschrijving, session);
           ids.push(newInschrijving._id.toString());
@@ -118,7 +105,7 @@ const postInschrijving = async (req: PostInschrijvingRequest, res: NextApiRespon
       throw new TransactionError(e.name, e.code, e.response);
     }
 
-    const data = mapInschrijvingen(inschrijvingen, isFirstInschrijving, prijs);
+    const data = mapInschrijvingen(inschrijvingen, prijs);
     await mailer.sendMail('inschrijving', {
       naam,
       email: process.env.MAIL_TEST ?? email,

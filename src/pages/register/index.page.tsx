@@ -1,11 +1,10 @@
-import React, { Dispatch, useEffect, useState } from 'react';
+import React, { Dispatch, useState } from 'react';
 import Form from 'src/components/form/Form';
 import { useRouter } from 'next/router';
 import { INDEX, LOGIN } from 'src/types/linkTypes';
 import { useFieldArray, useForm } from 'react-hook-form';
 import PersoonlijkeGegevens from 'src/components/register/PersoonlijkeGegevens';
-import Step2, { optionInterface } from 'src/components/register/HondGegevens';
-import { OptionsOrGroups } from 'react-select';
+import Step2 from 'src/components/register/HondGegevens';
 import { REGISTERAPI } from 'src/types/apiTypes';
 import useMutation, { structureHondenPayload } from 'src/hooks/useMutation';
 import FormSteps from 'src/components/form/FormSteps';
@@ -14,9 +13,9 @@ import nookies from 'nookies';
 import { toast } from 'react-toastify';
 import Button, { SubmitButton } from 'src/components/buttons/Button';
 import { generateCsrf } from 'src/services/Validator';
-import { useAppContext } from 'src/context/appContext';
 import Skeleton from 'src/components/website/skeleton';
 import Head from 'next/head';
+import { useRasContext } from 'src/context/app/RasContext';
 import FormRow from 'src/components/form/FormRow';
 
 export interface RegisterHondErrorInterface {
@@ -47,10 +46,11 @@ interface RegisterProps {
 }
 
 const Register: React.FC<RegisterProps> = ({ csrf }) => {
-  const { retrieveRassen } = useAppContext();
+  const { useGetRasOptions } = useRasContext();
+  const { data: rasOptions, isLoading } = useGetRasOptions();
   const [formErrors, setFormErrors] = useState<RegisterErrorInterface>({});
   const router = useRouter();
-  const register = useMutation<Partial<RegisterErrorInterface>>();
+  const register = useMutation<Partial<RegisterErrorInterface>>(REGISTERAPI);
   const { control, handleSubmit, getValues } = useForm();
   const { fields, remove, append } = useFieldArray({
     control,
@@ -59,18 +59,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
   const [disabled, setDisabled] = useState<boolean>(false);
   const [activeStep, setActiveStep] = useState<number>(0);
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
-  const [rassen, setRassen] = useState<OptionsOrGroups<any, optionInterface>[]>([]);
-  const step1 = [
-    'vnaam',
-    'lnaam',
-    'email',
-    'straat',
-    'nr',
-    'bus',
-    'gemeente',
-    'postcode',
-    'telefoon',
-  ];
+  const step1 = ['vnaam', 'lnaam', 'email', 'straat', 'nr', 'bus', 'gemeente', 'postcode', 'telefoon'];
   const step2 = ['naam', 'ras_id', 'gelacht', 'chip_nr', 'geboortedatum', 'honden'];
 
   const setErrors = (step: number) => {
@@ -101,10 +90,8 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
         ...formErrors,
         password: 'Minstens 1 speciaal teken',
       });
-    else if (!password.match(/[0-9]+/))
-      setFormErrors({ ...formErrors, password: 'Minstens 1 cijfer' });
-    else if (password.length < 8)
-      setFormErrors({ ...formErrors, password: 'Minstens 8 characters' });
+    else if (!password.match(/[0-9]+/)) setFormErrors({ ...formErrors, password: 'Minstens 1 cijfer' });
+    else if (password.length < 8) setFormErrors({ ...formErrors, password: 'Minstens 8 characters' });
   };
 
   const onSubmit = async (values: any) => {
@@ -119,7 +106,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
 
     if (!disabled) {
       setDisabled(() => true);
-      const { data, error } = await register(REGISTERAPI, { ...payload, csrf });
+      const { data, error } = await register('/', { ...payload, csrf });
       if (data) {
         toast.success('Registratie succesvol!');
         router.push(LOGIN);
@@ -132,13 +119,6 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
       setDisabled(() => false);
     }
   };
-
-  useEffect(() => {
-    (async () => {
-      const data = await retrieveRassen!();
-      setRassen(data);
-    })();
-  }, []);
 
   return (
     <>
@@ -196,7 +176,7 @@ const Register: React.FC<RegisterProps> = ({ csrf }) => {
                     fields={fields}
                     append={append}
                     remove={remove}
-                    options={rassen}
+                    options={rasOptions ?? []}
                     errors={formErrors}
                     setErrors={setFormErrors}
                     values={getValues}
@@ -222,7 +202,5 @@ export default Register;
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const csrf = generateCsrf();
 
-  return nookies.get(ctx).JWT
-    ? { redirect: { permanent: false, destination: INDEX } }
-    : { props: { csrf } };
+  return nookies.get(ctx).JWT ? { redirect: { permanent: false, destination: INDEX } } : { props: { csrf } };
 };

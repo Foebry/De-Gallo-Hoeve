@@ -10,10 +10,7 @@ const setup = async () => {
   const args = argsv._.map((el) => {
     const [key, value] = el.toString().split('=');
     return { [key]: value };
-  }).reduce(
-    (acc: Record<string, string>, curr: Record<string, string>) => ({ ...acc, ...curr }),
-    {}
-  );
+  }).reduce((acc: Record<string, string>, curr: Record<string, string>) => ({ ...acc, ...curr }), {});
 
   if (!args['target-env']) {
     logger.warning(
@@ -23,16 +20,15 @@ const setup = async () => {
   }
   require('dotenv').config({ path: `.env.${args['target-env']}.local` });
   if (!process.env.NODE_ENV) {
-    logger.error(
-      `Environment variables not loaded correctly. Target-env: ${args['target-env']}`
-    );
+    logger.error(`Environment variables not loaded correctly. Target-env: ${args['target-env']}`);
 
     process.exit();
   }
-  job(args);
+  await job(args);
 
-  script(args);
+  await script(args);
 
+  process.exit();
   // closeClient();
 };
 

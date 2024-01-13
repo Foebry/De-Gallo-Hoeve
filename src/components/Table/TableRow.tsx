@@ -1,12 +1,12 @@
-import { nanoid } from "nanoid";
-import React from "react";
-import { TableRow } from "./Table";
-import TableCell from "./TableCell";
+import { nanoid } from 'nanoid';
+import React from 'react';
+import TableCell from './TableCell';
+import { TableData } from './Table';
 
-export type SpacingOption = "text-center" | "text-right" | "text-left";
+export type SpacingOption = 'text-center' | 'text-right' | 'text-left';
 
 interface Props {
-  cells: TableRow;
+  cells: TableData[];
   spacing?: SpacingOption;
   colWidths: string[];
 }
@@ -18,8 +18,8 @@ const TableRow: React.FC<Props> = ({ cells, colWidths }) => {
         <TableCell
           body={cell}
           key={nanoid(10)}
-          width={colWidths[index] + "%"}
-          spacing={index === cells.length - 1 ? "text-right" : "text-left"}
+          width={colWidths[index] + '%'}
+          spacing={index === cells.length - 1 ? 'text-right' : 'text-left'}
         />
       ))}
     </div>

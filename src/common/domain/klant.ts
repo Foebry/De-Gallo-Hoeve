@@ -27,9 +27,9 @@ export interface IsKlantCollection extends Omit<IsNewKlant, 'honden'> {
   reservaties: ObjectId[];
   feedbackConfiguration: FeedbackConfiguration;
   created_at: Date;
-  verified_at?: Date;
+  verified_at: Date | null;
   updated_at: Date;
-  deleted_at?: Date;
+  deleted_at: Date | null;
 }
 
 export interface IsUpdateKlantBody {
@@ -56,34 +56,17 @@ export const updateFeedbackConfigurationForKlant = (klant: IsKlantCollection): v
   const setting10 = feedbackConfiguration.find((setting) => setting.trainingCount === 10);
   const setting5 = feedbackConfiguration.find((setting) => setting.trainingCount === 5);
   const setting1 = feedbackConfiguration.find((setting) => setting.trainingCount === 1);
-  if (trainingCount >= 100)
-    feedbackConfiguration.every((setting) => (setting.triggered = true));
+  if (trainingCount >= 100) feedbackConfiguration.every((setting) => (setting.triggered = true));
   else if (trainingCount >= 50)
-    [setting50, setting20, setting10, setting5, setting1].forEach(
-      (setting) => (setting!.triggered = true)
-    );
+    [setting50, setting20, setting10, setting5, setting1].forEach((setting) => (setting!.triggered = true));
   else if (trainingCount >= 20)
-    [setting20, setting10, setting5, setting1].forEach(
-      (setting) => (setting!.triggered = true)
-    );
-  else if (trainingCount >= 10)
-    [setting10, setting5, setting1].forEach((setting) => (setting!.triggered = true));
-  else if (trainingCount >= 5)
-    [setting5, setting1].forEach((setting) => (setting!.triggered = true));
+    [setting20, setting10, setting5, setting1].forEach((setting) => (setting!.triggered = true));
+  else if (trainingCount >= 10) [setting10, setting5, setting1].forEach((setting) => (setting!.triggered = true));
+  else if (trainingCount >= 5) [setting5, setting1].forEach((setting) => (setting!.triggered = true));
   else setting1!.triggered = true;
 };
 
 export const getNextTresholdAmount = (klant: IsKlantCollection): number => {
   const amount = klant.inschrijvingen.length;
-  return amount >= 100
-    ? 100
-    : amount >= 50
-    ? 50
-    : amount >= 20
-    ? 20
-    : amount >= 10
-    ? 10
-    : amount >= 5
-    ? 5
-    : 1;
+  return amount >= 100 ? 100 : amount >= 50 ? 50 : amount >= 20 ? 20 : amount >= 10 ? 10 : amount >= 5 ? 5 : 1;
 };

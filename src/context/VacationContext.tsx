@@ -2,22 +2,32 @@ import { useRouter } from 'next/router';
 import { createContext, useContext, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { CreateVacationDto, VacationDto } from 'src/common/api/dtos/VacationDto';
+import { PaginatedData } from 'src/common/api/shared/types';
 import { SelectedRange } from 'src/components/form/inputs/date/DateRangeSelector';
 import getData from 'src/hooks/useApi';
 import useMutation from 'src/hooks/useMutation';
-import { PaginatedResponse } from 'src/shared/RequestHelper';
-import { string } from 'yup';
+import { REQUEST_METHOD } from 'src/utils/axios';
+import { emptyPaginatedResponse } from './app/AppContext';
+import { SWROptions, useAxiosContext } from './AxiosContext';
 import { useBannerContext } from './BannerContext';
+
+export type VacationQuery = Partial<{
+  page: string;
+  pageSize: string;
+}>;
 
 type VacationContext = {
   activateVacationNotification: (duration: SelectedRange) => void;
-  getActiveVacation: () => Promise<VacationDto>;
+  getActiveVacation: () => Promise<VacationDto | undefined>;
   updateVacation: (dto: VacationDto) => Promise<void>;
   saveVacation: (dto: CreateVacationDto) => Promise<void>;
   disableVacationNotification: () => void;
   deleteVacation: (id: string) => Promise<void>;
-  getVacationById: (id: string) => Promise<VacationDto>;
-  getVacationList: () => Promise<PaginatedResponse<VacationDto>>;
+  getVacationById: (id: string) => Promise<VacationDto | undefined>;
+  useGetVacationList: (
+    query: VacationQuery,
+    options?: SWROptions<PaginatedData<VacationDto>>
+  ) => { data: PaginatedData<VacationDto>; isLoading: boolean };
 };
 
 const VacationContextDefaultValues: VacationContext = {
@@ -40,77 +50,87 @@ const VacationContextDefaultValues: VacationContext = {
     duration: { from: '', to: '' },
     notificationStartDate: '',
   }),
-  getVacationList: async () => ({
-    pagination: { currentPage: 1, first: 1, last: 1, total: 1 },
-    data: [],
+  useGetVacationList: () => ({
+    data: emptyPaginatedResponse(),
+    isLoading: false,
   }),
 };
 
-export const VacationContext = createContext<VacationContext>(
-  VacationContextDefaultValues
-);
+export const VacationContext = createContext<VacationContext>(VacationContextDefaultValues);
 
 const VacationProvider: React.FC<{ children: any }> = ({ children }) => {
   const router = useRouter();
+  const swrKey = 'vacation';
+
   const { setBannerContent, activateBanner, disableBanner } = useBannerContext();
-  const mutate = useMutation();
+  const { useSWR } = useAxiosContext();
+  const { revalidate } = useSWR(swrKey);
+
+  const mutate = useMutation<VacationDto>('/api/admin/vacations');
 
   const getActiveVacation = async () => {
-    const { data, error } = await getData('/api/announcements');
-    if (error) return toast.error(error.message);
+    const { data, error } = await getData<VacationDto>('/api/announcements');
+    if (error) toast.error(error.message);
 
     return data;
   };
 
   const updateVacation = async (dto: VacationDto) => {
-    const { data, error } = await mutate(`/api/admin/vacations/${dto.id}`, dto, {
-      method: 'PUT',
+    const { data, error } = await mutate(`/${dto.id}`, dto, {
+      method: REQUEST_METHOD.PUT,
     });
 
     if (error) toast.error(error.message);
     if (data) {
       toast.success('Vakantie-periode aangepast');
+      revalidate();
       router.push('/admin/vakanties');
     }
   };
 
   const saveVacation = async (dto: CreateVacationDto) => {
-    const { data, error } = await mutate('/api/admin/vacations', dto);
+    const { data, error } = await mutate('/', dto);
     if (error) {
-      if (error.code === 403 && error.errorCode === 'NotLoggedInError')
-        router.push('/login');
+      if (error.code === 403 && error.errorCode === 'NotLoggedInError') router.push('/login');
       else toast.error(error.message);
     }
     if (data) {
       toast.success('Vakantie-periode aangemaakt');
       disableBanner();
+      revalidate();
       router.push('/admin/vakanties');
     }
   };
 
   const deleteVacation = async (id: string) => {
-    const { data, error } = await mutate(
-      `/api/admin/vacations/${id}`,
-      {},
-      { method: 'DELETE' }
-    );
-    if (data) toast.success('Vakantie-periode verwijderd');
-    else if (error) toast.error(error.message);
+    const { data, error } = await mutate(`/${id}`, {}, { method: REQUEST_METHOD.DELETE });
+    if (!error) {
+      // we should refactor the usMutatehook so that the mutate function returns a loading and isSuccess state
+      revalidate();
+      toast.success('Vakantie-periode verwijderd');
+    } else if (error) toast.error(error.message);
     return;
   };
 
   const getVacationById = async (id: string) => {
-    const { data, error } = await getData(`/api/admin/vacations/${id}`);
+    const { data, error } = await getData<VacationDto>(`/api/admin/vacations/${id}`);
     if (error) toast.error('Error bij ophalen vakantie data');
     if (data) return data;
   };
 
-  const getVacationList = async () => {
-    const { data, error } = await getData(`/api/admin/vacations`);
-    if (error) {
-      if (error.errorCode === 'NotLoggedInError') router.push('/login');
-      else toast.error(error.message);
-    } else if (data) return data;
+  const useGetVacationList = (query: VacationQuery, options?: SWROptions<PaginatedData<VacationDto>>) => {
+    const queryString = new URLSearchParams();
+    if (query.page) queryString.set('page', query.page.toString());
+    if (query.pageSize) queryString.set('pageSize', query.pageSize.toString());
+
+    const url = queryString ? `/api/admin/vacations?${queryString}` : 'api/admin/vacations';
+
+    const { data, isLoading } = useSWR<PaginatedData<VacationDto>>(swrKey, url, {
+      ...options,
+      errorMessage: 'Fout bij laden van vacanties',
+      fallbackData: emptyPaginatedResponse(),
+    });
+    return { data: data ?? emptyPaginatedResponse(), isLoading };
   };
 
   const getResumeDate = (dateString: string) => {
@@ -175,7 +195,7 @@ const VacationProvider: React.FC<{ children: any }> = ({ children }) => {
         disableVacationNotification,
         deleteVacation,
         getVacationById,
-        getVacationList,
+        useGetVacationList,
       }}
     >
       {children}

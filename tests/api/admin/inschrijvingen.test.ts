@@ -38,7 +38,9 @@ describe('/admin/inschrijvingen', () => {
         klant.honden = createRandomHonden(faker.datatype.number({ min: 1, max: 5 }));
       });
       const randomInschrijvingen = randomKlanten
-        .map((klant) => createRandomInschrijvingen(klant, faker.datatype.number(10)))
+        .map((klant) =>
+          createRandomInschrijvingen(klant, faker.datatype.number({ min: 0, max: 10 }))
+        )
         .reduce((curr, acc) => [...acc, ...curr], []);
       randomKlanten.forEach((klant) => {
         klant.inschrijvingen = randomInschrijvingen
@@ -64,16 +66,17 @@ describe('/admin/inschrijvingen', () => {
               (hond) => hond._id.toString() === inschrijving.hond.id.toString()
             );
             return expect.objectContaining({
-              _id: inschrijving._id.toString(),
-              created_at: toReadableDate(inschrijving.created_at),
+              id: inschrijving._id.toString(),
               datum: toReadableDate(inschrijving.datum),
               training: inschrijving.training,
+              created_at: toReadableDate(inschrijving.created_at),
               klant: expect.objectContaining({
-                _id: klant?._id.toString(),
-                naam: `${klant?.vnaam} ${klant?.lnaam}`,
+                id: klant?._id.toString(),
+                vnaam: klant?.vnaam,
+                lnaam: klant?.lnaam,
               }),
               hond: expect.objectContaining({
-                _id: hond?._id.toString(),
+                id: hond?._id.toString(),
                 naam: hond?.naam,
               }),
             });
@@ -162,17 +165,17 @@ describe('/admin/inschrijvingen', () => {
       ]);
 
       const expectedResponse = expect.objectContaining({
-        _id: specificInschrijving._id.toString(),
+        id: specificInschrijving._id.toString(),
         datum: toReadableDate(specificInschrijving.datum),
         training: specificInschrijving.training,
         created_at: toReadableDate(specificInschrijving.created_at),
         klant: expect.objectContaining({
-          _id: specificKlant._id.toString(),
+          id: specificKlant._id.toString(),
           vnaam: specificKlant.vnaam,
           lnaam: specificKlant.lnaam,
         }),
         hond: expect.objectContaining({
-          _id: specificHond._id.toString(),
+          id: specificHond._id.toString(),
           naam: specificHond.naam,
           ras: specificHond.ras,
         }),

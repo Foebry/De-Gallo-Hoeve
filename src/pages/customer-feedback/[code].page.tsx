@@ -6,10 +6,10 @@ import Form from 'src/components/form/Form';
 import FormRow from 'src/components/form/FormRow';
 import { FormTextBox } from 'src/components/form/FormTextBox';
 import EmptyNav from 'src/components/nav/EmptyNav';
-import { Body, Title2, Title3, Title4 } from 'src/components/Typography/Typography';
+import { Body, Title3 } from 'src/components/Typography/Typography';
 import Rating from './components/Rating';
 import { FeedbackBody as FormValues } from 'src/pages/api/feedback/schemas';
-import { FeedbackContext } from 'src/context/FeedbackContext';
+import { useFeedbackContext } from 'src/context/app/FeedbackContext';
 import Spinner from 'src/components/loaders/Spinner';
 import { GetServerSidePropsContext } from 'next';
 
@@ -23,7 +23,7 @@ const Feedback: React.FC<Props> = ({ userAgent }) => {
   );
   const router = useRouter();
   const uniqueCode = router.query.code as string;
-  const { sendFeedback, isLoading, errors } = useContext(FeedbackContext);
+  const { sendFeedback, isLoading, errors } = useFeedbackContext();
 
   const { control, handleSubmit } = useForm<FormValues>();
 

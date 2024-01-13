@@ -1,50 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { ADMIN, INDEX, LOGIN, REGISTER, CHANGELOG } from '../types/linkTypes';
+import React from 'react';
+import { ADMIN, INDEX, LOGIN, REGISTER } from '../types/linkTypes';
 import { Title3 } from './Typography/Typography';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import NavLink from './NavLink';
-import { parseCookies } from 'nookies';
-import jwt from 'jsonwebtoken';
 import { Hamburger } from './Hamburger';
-import { LOGOUT } from '../types/apiTypes';
-import useMutation from '../hooks/useMutation';
+import { useUserContext } from 'src/context/app/UserContext';
 
 export const Nav = () => {
   const router = useRouter();
-  const [userName, setUserName] = useState<string>();
-  const [roles, setRoles] = useState<number>();
-  const cookies = parseCookies();
-  const logout = useMutation();
-
-  const onLogout = async () => {
-    await logout(LOGOUT, {}, { method: 'DELETE' });
-    router.push(INDEX);
-  };
-
-  useEffect(() => {
-    const token = cookies.Client;
-    const secret = process.env.NEXT_PUBLIC_COOKIE_SECRET;
-    if (token) {
-      const verifiedToken = jwt.verify(token, `${secret}`, {
-        algorithms: ['RS256', 'HS256'],
-      });
-      const payload = JSON.parse(JSON.stringify(verifiedToken));
-      setUserName(payload.name);
-      setRoles(payload.roles);
-    } else {
-      setUserName(undefined);
-      setRoles(undefined);
-    }
-  }, [cookies]);
+  const { klant: activeUser, logout } = useUserContext();
 
   return (
-    <div className="relative mb-30 w-full shadow h-16 z-20 md:mb-0 md:block">
+    <div className="relative w-full shadow h-16 z-20 md:mb-0 md:block">
       <div className="max-w-7xl flex justify-between items-center mx-auto px-5">
-        <div
-          className="flex gap-2 items-center cursor-pointer 3xs:gap-10"
-          onClick={() => router.push(INDEX)}
-        >
+        <div className="flex gap-2 items-center cursor-pointer 3xs:gap-10" onClick={() => router.push(INDEX)}>
           <div className="w-16">
             <Image
               src="https://res.cloudinary.com/dv7gjzlsa/image/upload/v1659613403/De-Gallo-Hoeve/content/logo-r_vwnpdy.png"
@@ -58,18 +28,18 @@ export const Nav = () => {
           </div>
         </div>
         {/* <NavLink href={CHANGELOG} label="nieuw" /> */}
-        {userName ? (
+        {activeUser ? (
           <div className="flex gap-10 items-center">
             <div className="hidden xs:block uppercase text-green-200 text-lg font-medium">
               <Title3>
-                <span className="capitalize">Hallo</span> {userName}
+                <span className="capitalize">Hallo</span> {activeUser.vnaam}
               </Title3>
             </div>
-            <Hamburger roles={roles!}>
+            <Hamburger roles={parseInt(activeUser.roles)}>
               <span className="block xs:hidden capitalize border rounded py-1 px-1.5 text-gray-100 bg-green-100 cursor-pointer w-full hover:text-green-200 hover:bg-gray-100 text-md font-medium">
-                Hallo {userName}
+                Hallo {activeUser.vnaam}
               </span>
-              {roles && roles > 0 && (
+              {parseInt(activeUser.roles) > 0 && (
                 <NavLink
                   href={ADMIN}
                   label="admin"
@@ -78,7 +48,7 @@ export const Nav = () => {
               )}
               <button
                 className="capitalize border rounded py-1 px-1.5 text-gray-100 bg-green-100 cursor-pointer w-full hover:text-green-200 hover:bg-gray-100 text-md font-medium"
-                onClick={onLogout}
+                onClick={logout}
               >
                 logout
               </button>
@@ -91,7 +61,7 @@ export const Nav = () => {
               <NavLink href={REGISTER} label="registreer" />
             </nav>
             <div className="block md:hidden">
-              <Hamburger roles={roles!}>
+              <Hamburger roles={0}>
                 <NavLink
                   href={LOGIN}
                   label="login"

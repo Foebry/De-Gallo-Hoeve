@@ -42,7 +42,7 @@ describe('/admin/rassen', () => {
         data: expect.arrayContaining(
           rassen.slice(0, amount).map((ras) =>
             expect.objectContaining({
-              _id: ras._id.toString(),
+              id: ras._id.toString(),
               naam: ras.naam,
               soort: ras.soort,
             })

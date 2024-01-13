@@ -1,35 +1,36 @@
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, useEffect, useState } from 'react';
 import {
   Control,
   Controller,
   FieldValues,
   UseFieldArrayRemove,
   UseFormGetValues,
-} from "react-hook-form";
-import { OptionsOrGroups } from "react-select";
-import { RegisterErrorInterface } from "src/pages/register/index.page";
-import Button from "../buttons/Button";
-import FormInput from "../form/FormInput";
-import FormRow from "../form/FormRow";
-import { optionInterface } from "../register/HondGegevens";
-import { Body, Title3 } from "../Typography/Typography";
-import "react-datepicker/dist/react-datepicker.css";
-import { MyDatePicker } from "../MyDatePicker";
-import { MySelect } from "../MySelect";
+} from 'react-hook-form';
+import { OptionsOrGroups } from 'react-select';
+import { RegisterErrorInterface } from 'src/pages/register/index.page';
+import Button from '../buttons/Button';
+import FormInput from '../form/FormInput';
+import FormRow from '../form/FormRow';
+import { optionInterface } from '../register/HondGegevens';
+import { Body, Title3 } from '../Typography/Typography';
+import 'react-datepicker/dist/react-datepicker.css';
+import { MyDatePicker } from '../MyDatePicker';
+import { MySelect } from '../MySelect';
+import { Option } from 'src/utils/MongoDb';
 
 interface HondCardProps {
   control: Control<FieldValues, any>;
   index: number;
   errors: RegisterErrorInterface;
   setErrors: React.Dispatch<React.SetStateAction<RegisterErrorInterface>>;
-  rassen: OptionsOrGroups<any, optionInterface>[];
-  fields: Record<"id", string>[];
+  rassen: Option[];
+  fields: Record<'id', string>[];
   values: UseFormGetValues<FieldValues>;
   remove: UseFieldArrayRemove;
 }
 export const geslachten = [
-  { label: "Reu", value: true },
-  { label: "Teef", value: false },
+  { label: 'Reu', value: true },
+  { label: 'Teef', value: false },
 ];
 
 const HondCard: React.FC<HondCardProps> = ({
@@ -58,8 +59,7 @@ const HondCard: React.FC<HondCardProps> = ({
       errors[`honden[${index}].ras` as keyof typeof errors] !== undefined;
     const geboortedatum =
       Object.keys(errors).includes(`honden[${index}].geboortedatum`) &&
-      errors[`honden[${index}].geboortedatum` as keyof typeof errors] !==
-        undefined;
+      errors[`honden[${index}].geboortedatum` as keyof typeof errors] !== undefined;
     const geslacht =
       Object.keys(errors).includes(`honden[${index}].geslacht`) &&
       errors[`honden[${index}].geslacht` as keyof typeof errors] !== undefined;
@@ -71,7 +71,7 @@ const HondCard: React.FC<HondCardProps> = ({
       {open ? (
         <div
           className={`border-2 rounded px-2 ${
-            errorState && "border-red-800"
+            errorState && 'border-red-800'
           }  md:px-20 relative max-w-xl mx-auto`}
         >
           <div className="absolute right-1 top-2 z-10">
@@ -89,7 +89,7 @@ const HondCard: React.FC<HondCardProps> = ({
                     id={`honden.${index}.naam`}
                     value={value}
                     onChange={(e: FormEvent<HTMLInputElement>) => {
-                      handleChange("naam");
+                      handleChange('naam');
                       onChange(e);
                     }}
                     onBlur={onBlur}
@@ -108,12 +108,12 @@ const HondCard: React.FC<HondCardProps> = ({
                     <MySelect
                       options={geslachten}
                       onChange={(e: any) => {
-                        handleChange("geslacht");
+                        handleChange('geslacht');
                         onChange(e);
                       }}
                       value={
                         value ?? {
-                          label: "Geslacht",
+                          label: 'Geslacht',
                           value: undefined,
                         }
                       }
@@ -131,14 +131,12 @@ const HondCard: React.FC<HondCardProps> = ({
                     <MySelect
                       options={rassen}
                       onChange={(e: any) => {
-                        handleChange("ras");
+                        handleChange('ras');
                         onChange(e);
                       }}
                       errors={errors}
                       name={`honden[${index}].ras`}
-                      value={
-                        value ?? { label: "Selecteer ras", value: undefined }
-                      }
+                      value={value ?? { label: 'Selecteer ras', value: undefined }}
                     />
                   )}
                 />
@@ -152,7 +150,7 @@ const HondCard: React.FC<HondCardProps> = ({
                 render={({ field: { value, onChange } }) => (
                   <MyDatePicker
                     onChange={(e) => {
-                      handleChange("geboortedatum");
+                      handleChange('geboortedatum');
                       onChange(e);
                     }}
                     selected={value}
@@ -175,9 +173,9 @@ const HondCard: React.FC<HondCardProps> = ({
         >
           <div className="max-w-fit pl-5">
             <Title3>
-              {values().honden[index].naam > ""
+              {values().honden[index].naam > ''
                 ? values().honden[index].naam
-                : "Nieuwe hond"}
+                : 'Nieuwe hond'}
             </Title3>
           </div>
           <div className="absolute right-2 top-10 bottom-10">

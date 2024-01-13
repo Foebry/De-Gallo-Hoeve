@@ -1,7 +1,12 @@
 import { ObjectId } from 'mongodb';
 import { getCurrentTime } from 'src/shared/functions';
+import { Document } from 'mongodb';
 
-export default class Entitybase {
+export interface ObjectLiteral extends Document {
+  [k: string]: any;
+}
+
+export default class Entitybase implements ObjectLiteral {
   _id: ObjectId;
   created_at: Date;
   updated_at: Date;

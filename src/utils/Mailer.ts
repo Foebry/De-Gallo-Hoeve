@@ -25,6 +25,7 @@ const send = async (msg: any) => {
     });
 };
 
+// We should just set the templateIds in the enum. That is way cleaner and more readable.
 export const getTemplateId = (type: string): string => {
   return type === 'register'
     ? 'd-749bfb287b074dc68c8de14ac73ae240'
@@ -44,14 +45,23 @@ export const getTemplateId = (type: string): string => {
     ? 'd-b46dde21b5e14253b390b49b4ac6c33f'
     : type === TemplateIds.CONTACT_CONFIRM
     ? 'd-ed7c6f5b2f164d4c99f5d5cd9de6a6c4'
+    : type === TemplateIds.PRICE_ADJUSTMENT
+    ? TemplateIds.PRICE_ADJUSTMENT
+    : type === TemplateIds.SUBSCRIPTION_CONFIRM
+    ? TemplateIds.SUBSCRIPTION_CONFIRM
+    : type === TemplateIds.SUBSCRIPTION_HEADSUP
+    ? TemplateIds.SUBSCRIPTION_HEADSUP
     : '';
 };
 
-enum TemplateIds {
+export enum TemplateIds {
   RESET_CONFIRM = 'resetConfirm',
   CUSTOMER_FEEDBACK = 'customerFeedback',
   CONTACT = 'contact',
   CONTACT_CONFIRM = 'contact-confirm',
+  PRICE_ADJUSTMENT = 'd-ad72c7abdb234cdeb5b69bd403cb3230',
+  SUBSCRIPTION_CONFIRM = '',
+  SUBSCRIPTION_HEADSUP = '',
 }
 
 const mailer: Mailer = {
@@ -88,11 +98,7 @@ type ResetConfirmData = {
   domain?: string;
 };
 
-export const sendResetConfirmMail = async (
-  klant: IsKlantCollection,
-  code: string,
-  domain: string | undefined
-) => {
+export const sendResetConfirmMail = async (klant: IsKlantCollection, code: string, domain: string | undefined) => {
   const resetConfirmTemplateData: ResetConfirmData = {
     email: process.env.MAIL_TEST ?? klant.email,
     vnaam: klant.vnaam,
@@ -102,15 +108,9 @@ export const sendResetConfirmMail = async (
   await mailer.sendMail(TemplateIds.RESET_CONFIRM, resetConfirmTemplateData);
 };
 
-export const sendFeedBackMailsForKlanten = async (
-  klanten: IsKlantCollection[],
-  domain: string | undefined
-) => {
+export const sendFeedBackMailsForKlanten = async (klanten: IsKlantCollection[], domain: string | undefined) => {
   const mailsToSend = klanten.map((klant) => ({
-    email:
-      process.env.MAIL_TEST && process.env.NODE_ENV !== 'test'
-        ? process.env.MAIL_TEST
-        : klant.email,
+    email: process.env.MAIL_TEST && process.env.NODE_ENV !== 'test' ? process.env.MAIL_TEST : klant.email,
     vnaam: klant.vnaam,
     amount: getNextTresholdAmount(klant),
     domain: domain ?? 'https://degallohoeve.be',
@@ -119,11 +119,20 @@ export const sendFeedBackMailsForKlanten = async (
     }),
   }));
 
-  await Promise.all(
-    mailsToSend.map((templateData) =>
-      mailer.sendMail(TemplateIds.CUSTOMER_FEEDBACK, templateData)
-    )
-  );
+  await Promise.all(mailsToSend.map((templateData) => mailer.sendMail(TemplateIds.CUSTOMER_FEEDBACK, templateData)));
+};
+
+export const sendPriceAdjustmentEmailTo = async (klanten: IsKlantCollection[], extraData: any) => {
+  const templateData = klanten.map((klant) => ({
+    email: process.env.MAIL_TEST && process.env.NODE_ENV !== 'test' ? process.env.MAIL_TEST : klant.email,
+    ...extraData,
+  }));
+
+  return sendSameMailTo(templateData, TemplateIds.PRICE_ADJUSTMENT);
+};
+
+export const sendSameMailTo = async (emailsToSend: any[], templateId: TemplateIds) => {
+  await Promise.all(emailsToSend.map((templateData) => mailer.sendMail(templateId, templateData)));
 };
 
 export default mailer;
