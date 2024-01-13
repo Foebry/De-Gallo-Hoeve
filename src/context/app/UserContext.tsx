@@ -14,7 +14,7 @@ type contextType = {
   honden: Omit<HondDto, 'klant'>[];
   inschrijvingen: Omit<InschrijvingDto, 'klant'>[];
   logout: () => Promise<void>;
-  initializeKlant: (data: any) => Promise<void>;
+  initializeKlant: (data: AuthDto) => Promise<void>;
 };
 
 const defaultValues: contextType = {
